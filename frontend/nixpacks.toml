@@ -1,0 +1,13 @@
+[variables]
+# REACT_APP_API_URL is set via Railway service environment variables per environment.
+# Do NOT hardcode here — Railway env vars override this section.
+NODE_OPTIONS = "--max_old_space_size=4096"
+
+[phases.setup]
+nixPkgs = ["nodejs_20", "npm-9_x"]
+
+[phases.install]
+cmds = ["npm install --legacy-peer-deps --include=dev"]
+
+[phases.build]
+cmds = ["CI=false npm run build"]

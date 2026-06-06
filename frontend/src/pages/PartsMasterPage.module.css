@@ -1,0 +1,4 @@
+/* Hide file input visually but keep it accessible for screen readers */
+.hidden-file-input {
+  display: none;
+}

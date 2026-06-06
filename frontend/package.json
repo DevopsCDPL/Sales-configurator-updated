@@ -1,0 +1,67 @@
+{
+  "name": "forgedas-frontend",
+  "version": "1.0.2",
+  "private": true,
+  "dependencies": {
+    "@emotion/react": "^11.11.3",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.15.4",
+    "@mui/material": "^5.15.4",
+    "@mui/x-data-grid": "^6.19.0",
+    "@mui/x-date-pickers": "^6.19.0",
+    "@types/node": "^20.10.8",
+    "@types/react": "^18.2.47",
+    "@types/react-dom": "^18.2.18",
+    "ajv": "^8.18.0",
+    "axios": "^1.6.5",
+    "date-fns": "^2.30.0",
+    "dayjs": "^1.11.10",
+    "framer-motion": "^12.35.2",
+    "lucide-react": "^0.577.0",
+    "pdf-lib": "^1.17.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.49.3",
+    "react-router-dom": "^6.21.2",
+    "react-scripts": "5.0.1",
+    "recharts": "^3.7.0",
+    "serve": "^14.2.0",
+    "typescript": "^5.9.3",
+    "xlsx": "^0.18.5"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "serve": "serve -s build -l ${PORT:-3000}",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ],
+    "rules": {
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          "varsIgnorePattern": "^_",
+          "argsIgnorePattern": "^_"
+        }
+      ]
+    }
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {}
+}

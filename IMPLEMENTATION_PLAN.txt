@@ -1,0 +1,910 @@
+================================================================================
+     FORGED-IDAS — PHASED IMPLEMENTATION & DEPLOYMENT PLAN
+================================================================================
+Date        : April 18, 2026
+Purpose     : Step-by-step guide to implement all 17 identified gaps
+Methodology : Inspect current state → code change → deploy → manual test → next
+================================================================================
+
+HOW TO USE THIS PLAN
+--------------------
+  - We execute ONE phase at a time. I will make the code changes.
+  - At the end of each phase, you will receive MANUAL TEST INSTRUCTIONS.
+  - Tell me "done" or describe what you saw, then we move to the next phase.
+  - Each phase is self-contained and safe to deploy independently.
+  - All changes are backward-compatible — no data migrations in early phases.
+
+PHASES OVERVIEW
+---------------
+  Phase 1A  — Security: Remove /health admin operations              [URGENT]
+  Phase 1B  — Security: Add RiskScore to TENANT_MODELS              [URGENT]
+  Phase 1C  — Security: Fix route double-mount                       [URGENT]
+  Phase 1D  — Security: Lock down SETUP_ENABLED flag                 [URGENT]
+  Phase 1E  — Security: Add body size limits + CORS explicit config  [URGENT]
+  ─ DEPLOY & TEST Phase 1 ─
+  Phase 2A  — Rate Limiting: Global API rate limiter                 [HIGH]
+  Phase 2B  — Rate Limiting: Heavy endpoint limits                   [HIGH]
+  Phase 2C  — Response Compression                                   [HIGH]
+  ─ DEPLOY & TEST Phase 2 ─
+  Phase 3A  — PostgreSQL RLS: Verify/provision forged_app role       [CRITICAL]
+  Phase 3B  — PostgreSQL RLS: Create RLS policies migration          [CRITICAL]
+  ─ DEPLOY & TEST Phase 3 ─
+  Phase 4A  — Session Revocation: Wire Session table into auth       [CRITICAL]
+  Phase 4B  — Structured Logging: Replace console.* with pino       [HIGH]
+  ─ DEPLOY & TEST Phase 4 ─
+  Phase 5A  — Performance: DB connection pool increase               [MEDIUM]
+  Phase 5B  — Performance: DB indexes migration                      [MEDIUM]
+  ─ DEPLOY & TEST Phase 5 ─
+  Phase 6A  — Input Validation: UUID param validation all routes     [MEDIUM]
+  Phase 6B  — Input Validation: Body schema for core routes          [MEDIUM]
+  ─ DEPLOY & TEST Phase 6 ─
+  Phase 7A  — Password Policy: Minimum 12 chars + complexity         [MEDIUM]
+  Phase 7B  — 2FA Enforcement: Email OTP on login                    [CRITICAL]
+  ─ DEPLOY & TEST Phase 7 ─
+  Phase 8A  — JWT Refresh Token pattern                              [MEDIUM]
+  Phase 8B  — FileManagerFolder root path collision fix              [HIGH]
+  ─ DEPLOY & TEST Phase 8 ─
+
+
+================================================================================
+PHASE 1 — CRITICAL SECURITY FIXES (No Dependencies — Deploy Immediately)
+================================================================================
+
+These are 5 micro-changes that each independently make the system safer.
+None require DB changes. None affect any user-visible functionality.
+All 5 are bundled into one deployment.
+
+--------------------------------------------------------------------------------
+PHASE 1A — Remove dangerous /health endpoint admin operations
+--------------------------------------------------------------------------------
+
+CURRENT STATE INSPECTION:
+  File: backend/src/index.js
+  The /health endpoint currently supports:
+    ?admin=status  → exposes admin email + lock state (NO AUTH)
+    ?unlock=admin  → unlocks/resets admin password (secret = JWT_SECRET fallback)
+    ?reset=admin   → resets admin password to ADMIN_PASSWORD env var (NO AUTH guard shows plain text password in response)
+    ?r2clean=1     → deletes ALL R2 objects (secret = ADMIN_UNLOCK_SECRET)
+    ?r2test        → uploads test file to R2 (NO AUTH AT ALL)
+    ?r2sync=1      → syncs local files to R2
+
+  PROBLEM: ?reset=admin response includes the plain password in JSON.
+  PROBLEM: ?r2test requires NO authentication.
+  PROBLEM: All of these are on a public unauthenticated endpoint.
+
+WHAT WILL BE CHANGED:
+  - Strip ALL sensitive query param handlers (?admin, ?unlock, ?reset, ?r2clean, ?r2test, ?r2sync)
+  - /health will return ONLY: { status, db, r2, timestamp, version }
+  - The admin ops will be MOVED to POST /api/platform-admin/ops/* (already
+    authenticated by requirePlatformAdmin middleware)
+  - ADMIN_UNLOCK_SECRET must be set in env; fallback to JWT_SECRET is removed
+
+FILES MODIFIED:
+  - backend/src/index.js
+
+--------------------------------------------------------------------------------
+PHASE 1B — Add RiskScore to TENANT_MODELS
+--------------------------------------------------------------------------------
+
+CURRENT STATE INSPECTION:
+  File: backend/src/models/index.js, line 624-635
+  TENANT_MODELS array contains 50+ models.
+  RiskScore model is imported (line ~660) but NOT in the array.
+  Result: every RiskScore.findAll() has NO company_id filter.
+
+WHAT WILL BE CHANGED:
+  - Add RiskScore to the TENANT_MODELS array (1-line change)
+
+FILES MODIFIED:
+  - backend/src/models/index.js
+
+--------------------------------------------------------------------------------
+PHASE 1C — Remove root-level route double-mount
+--------------------------------------------------------------------------------
+
+CURRENT STATE INSPECTION:
+  File: backend/src/index.js, lines 380-385
+  Current code:
+    app.use('/api', routes);
+    app.use(routes);   // <-- double mount at root
+  This means /projects == /api/projects. Any middleware that filters only
+  /api/* paths can be bypassed by hitting the root path.
+
+WHAT WILL BE CHANGED:
+  - Remove: app.use(routes)
+  - Keep only: app.use('/api', routes)
+
+FILES MODIFIED:
+  - backend/src/index.js
+
+NOTE: Check your frontend. If any frontend API calls use paths WITHOUT the /api
+prefix (e.g. axios.get('/projects') instead of axios.get('/api/projects')),
+those will break. I'll scan the frontend before removing.
+
+--------------------------------------------------------------------------------
+PHASE 1D — Add SETUP_ENABLED guard to setup routes
+--------------------------------------------------------------------------------
+
+CURRENT STATE INSPECTION:
+  File: backend/src/routes/setupRoutes.js
+  Current guard: requires SETUP_SECRET header — blocks if not set.
+  PROBLEM: If SETUP_SECRET IS set, these routes are live permanently.
+  Routes create superuser accounts with NO company_id (tenant-unscoped).
+
+WHAT WILL BE CHANGED:
+  - Add a SETUP_ENABLED env var check at the top of the guard middleware.
+  - If SETUP_ENABLED !== 'true', all setup routes return 404 regardless of secret.
+  - This allows you to set SETUP_ENABLED=true temporarily, create/reset admin,
+    then set it back to false.
+
+FILES MODIFIED:
+  - backend/src/routes/setupRoutes.js
+
+ENV VAR CHANGE NEEDED:
+  In Railway production → set: SETUP_ENABLED=false
+  (Default behavior when not set = false = routes are off)
+
+--------------------------------------------------------------------------------
+PHASE 1E — Add body size limit + explicit CORS whitelist
+--------------------------------------------------------------------------------
+
+CURRENT STATE INSPECTION:
+  File: backend/src/index.js lines 60-63
+  Current: app.use(express.json()) — no limit set
+  Current: CORS auto-allows any *.up.railway.app if FRONTEND_URL not set
+
+WHAT WILL BE CHANGED:
+  - Add { limit: '2mb' } to express.json() and express.urlencoded()
+  - CORS: move the isRailwayFrontend auto-allow to only apply if
+    RAILWAY_STATIC_URL env var matches the frontend (not open wildcard)
+  - Log a startup WARNING if FRONTEND_URL is not set (so you don't forget)
+
+FILES MODIFIED:
+  - backend/src/index.js
+
+ENV VAR CHANGE NEEDED:
+  In Railway production → set FRONTEND_URL to your actual frontend URL
+  Example: FRONTEND_URL=https://forgedas-frontend.up.railway.app
+
+--------------------------------------------------------------------------------
+PHASE 1 — MANUAL TEST INSTRUCTIONS (After Deploy)
+--------------------------------------------------------------------------------
+
+>> TEST 1A: /health endpoint is clean
+  Open browser or Postman:
+  GET https://forged-idas-production.up.railway.app/health
+  EXPECTED: { status: "ok", db: "connected", r2: "configured", timestamp: "...", version: "..." }
+  MUST NOT see: admin, unlock, reset, r2clean, r2test, r2sync fields
+
+  GET https://forged-idas-production.up.railway.app/health?admin=status
+  EXPECTED: Same clean response, no admin object
+
+  GET https://forged-idas-production.up.railway.app/health?unlock=admin
+  EXPECTED: Same clean response, no unlock object
+
+>> TEST 1B: Admin ops work via platform-admin route
+  Log in as platform_admin in the app.
+  EXPECTED: Admin can still unlock/reset admin accounts (but now only via UI/platform-admin API)
+
+>> TEST 1C: Root-level bypass is blocked
+  In Postman (NO auth header):
+  GET https://forged-idas-production.up.railway.app/projects
+  EXPECTED: 401 Unauthorized (not a 200 with data)
+  GET https://forged-idas-production.up.railway.app/api/projects
+  EXPECTED: 401 Unauthorized
+
+>> TEST 1D: Setup routes are disabled
+  GET https://forged-idas-production.up.railway.app/api/setup/create-admin
+  EXPECTED: 404 Not Found (routes are off)
+  (If you need setup in future: set SETUP_ENABLED=true in Railway env, use it, set back to false)
+
+>> TEST 1E: Large payload is rejected
+  In Postman, POST /api/auth/login with a body of 3MB of JSON
+  EXPECTED: 413 Payload Too Large
+
+>> TEST 1 — CORE FUNCTIONALITY (most important):
+  Log in to the application normally.
+  Create a project, open it, navigate through all modules.
+  EXPECTED: Everything works as before — no 404s or broken flows.
+
+
+================================================================================
+PHASE 2 — RATE LIMITING & PERFORMANCE (After Phase 1 passes tests)
+================================================================================
+
+--------------------------------------------------------------------------------
+PHASE 2A + 2B — Global + Heavy Endpoint Rate Limiting
+--------------------------------------------------------------------------------
+
+CURRENT STATE INSPECTION:
+  File: backend/src/routes/authRoutes.js line 11
+  Only the auth route group has rate limiting (20 req/15min).
+  No other route file has any rate limiting.
+
+WHAT WILL BE CHANGED:
+  1. Add a global limiter in backend/src/index.js applied to all /api routes:
+     200 requests / 1 minute per IP (generous for normal use)
+  2. Add a "heavy" limiter on PDF/export endpoints:
+     10 requests / 1 minute per IP
+  3. Trust Railway's proxy (app.set('trust proxy', 1)) so IP is extracted
+     correctly from X-Forwarded-For header instead of the Railway proxy IP
+
+FILES MODIFIED:
+  - backend/src/index.js
+
+--------------------------------------------------------------------------------
+PHASE 2C — HTTP Response Compression
+--------------------------------------------------------------------------------
+
+CURRENT STATE INSPECTION:
+  File: backend/package.json — 'compression' package NOT in dependencies
+  All JSON responses are sent uncompressed.
+
+WHAT WILL BE CHANGED:
+  - Install: npm install compression
+  - Add app.use(require('compression')()) before all routes
+  - This is a 2-line change after install
+
+FILES MODIFIED:
+  - backend/src/index.js
+  - backend/package.json (via npm install)
+
+--------------------------------------------------------------------------------
+PHASE 2 — MANUAL TEST INSTRUCTIONS
+--------------------------------------------------------------------------------
+
+>> TEST 2A: Rate limiting works
+  In Postman, send 25 rapid POST /api/auth/login requests.
+  EXPECTED: First 20 succeed (even with wrong password → 401)
+  After 20: receive 429 Too Many Requests
+
+>> TEST 2B: Global limit is generous (normal use not blocked)
+  Use the app normally for 5 minutes — create projects, navigate, etc.
+  EXPECTED: No 429 errors during normal usage
+
+>> TEST 2C: Compression is active
+  In Postman, set header: Accept-Encoding: gzip
+  GET /api/projects (or any list endpoint)
+  EXPECTED: Response header Content-Encoding: gzip
+  Response body size should be ~70% smaller than without compression
+
+>> TEST 2 — CORE FUNCTIONALITY:
+  Log in, navigate full app, generate a PDF.
+  EXPECTED: All works normally.
+
+
+================================================================================
+PHASE 3 — POSTGRESQL RLS VERIFICATION & PROVISIONING
+================================================================================
+
+THIS PHASE REQUIRES MANUAL DATABASE ACCESS FIRST.
+
+Before writing any code, you need to check if the forged_app role already
+exists in your Railway PostgreSQL database.
+
+--------------------------------------------------------------------------------
+PHASE 3A — Manual Check: Does forged_app role exist?
+--------------------------------------------------------------------------------
+
+>> MANUAL ACTION REQUIRED:
+  Go to Railway → your PostgreSQL service → "Connect" tab → get connection string
+  Open a psql shell or use Railway's built-in query tool.
+
+  Run this query:
+    SELECT rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb,
+           rolcanlogin, rolbypassrls
+    FROM pg_roles
+    WHERE rolname = 'forged_app';
+
+  CASE A — Query returns 1 row:
+    The role exists. Tell me what the "rolbypassrls" column says.
+    Expected: rolbypassrls = false (good — this means RLS is enforced)
+    Bad: rolbypassrls = true (means the role can bypass RLS — needs fixing)
+
+  CASE B — Query returns 0 rows:
+    The role does NOT exist. The RLS layer is completely inactive in production.
+    Tell me "forged_app role does not exist" and I will create the migration.
+
+  Also check if any RLS policies exist:
+    SELECT tablename, policyname, permissive, roles, qual
+    FROM pg_policies
+    WHERE schemaname = 'public'
+    LIMIT 20;
+
+  Tell me the results of both queries.
+
+--------------------------------------------------------------------------------
+PHASE 3B — Create RLS Migration (Based on Phase 3A Results)
+--------------------------------------------------------------------------------
+
+WHAT WILL BE CHANGED (depends on Phase 3A findings):
+
+  If role does NOT exist:
+    Create migration: backend/migrations/YYYYMMDD-create-rls-role-and-policies.js
+    Contents:
+      - CREATE ROLE forged_app NOLOGIN NOBYPASSRLS
+      - GRANT CONNECT, USAGE, SELECT/INSERT/UPDATE/DELETE to forged_app
+      - ALTER DEFAULT PRIVILEGES for future tables
+      - ENABLE ROW LEVEL SECURITY on all 50+ tenant tables
+      - CREATE POLICY tenant_isolation on each table:
+        USING (company_id::text = current_setting('app.company_id', true)
+               OR current_setting('app.company_id', true) = '')
+
+  If role EXISTS but no policies:
+    Create migration with only the ENABLE RLS + CREATE POLICY steps.
+
+  The policy allows platform_admin (app.company_id = '') to see all rows,
+  and restricts all others to their company's rows only.
+
+FILES MODIFIED:
+  - New migration file
+
+NOTE: This migration is safe to run on existing data — it adds policies but
+does not alter or delete any existing rows.
+
+--------------------------------------------------------------------------------
+PHASE 3 — MANUAL TEST INSTRUCTIONS
+--------------------------------------------------------------------------------
+
+>> TEST 3A: RLS role is active in app
+  GET https://forged-idas-production.up.railway.app/api/health/db-role
+  (platform_admin endpoint that reports isRlsActive() value)
+  EXPECTED: { rlsActive: true, role: "forged_app" }
+
+>> TEST 3B: Tenant isolation is working at DB level
+  Log in as Company A admin. Navigate to Projects. Note project count.
+  Log in as Company B admin. Navigate to Projects.
+  EXPECTED: Company B cannot see Company A's projects.
+  (This should already work — this test verifies the new DB layer)
+
+>> TEST 3C: Platform admin can still see everything
+  Log in as platform_admin.
+  Navigate to company management.
+  EXPECTED: Can see all companies and their data.
+
+>> TEST 3 — CORE FUNCTIONALITY:
+  Full workflow test: login → project → estimate → generate PDF → download.
+  EXPECTED: All works normally.
+
+
+================================================================================
+PHASE 4 — SESSION REVOCATION + STRUCTURED LOGGING
+================================================================================
+
+--------------------------------------------------------------------------------
+PHASE 4A — Wire Session table into authenticate() middleware
+--------------------------------------------------------------------------------
+
+CURRENT STATE INSPECTION:
+  File: backend/src/middleware/auth.js
+  Current authenticate() flow:
+    1. Extract token from Authorization header
+    2. jwt.verify(token, JWT_SECRET)  ← validates signature + expiry
+    3. User.findByPk(decoded.userId)  ← checks user still exists + is_active
+    4. next()
+  The Session table exists (model, associations) but is NEVER queried here.
+  A token from a logged-out user is still accepted for up to 7 days.
+
+  File: backend/src/models/Session.js — I need to check its fields.
+
+WHAT WILL BE CHANGED:
+  - In authenticate(), after jwt.verify, compute a SHA-256 hash of the token.
+  - Query Session.findOne({ where: { token_hash: hash, is_active: true } })
+  - If no valid session found → 401 "Session expired or revoked"
+  - If found → update session.last_used_at = now() (lightweight ping)
+
+  This means: when you log out, the session is revoked and future requests
+  with the old token are rejected immediately.
+
+  PERFORMANCE NOTE: This adds 1 DB query per request. We offset this with
+  a simple in-process LRU cache (Map with TTL) keyed by token hash.
+  Cache hit: no DB query. Cache TTL: 60 seconds.
+  On logout/revocation, the session service clears the cache entry.
+
+FILES MODIFIED:
+  - backend/src/middleware/auth.js
+  - backend/src/services/authService.js (store token_hash on login)
+
+IMPORTANT: Check if authService.createSession() already saves token_hash.
+I will inspect this before writing code.
+
+--------------------------------------------------------------------------------
+PHASE 4B — Structured Logging with pino
+--------------------------------------------------------------------------------
+
+CURRENT STATE INSPECTION:
+  File: backend/package.json — 'pino' and 'pino-http' NOT in dependencies.
+  All files use console.log / console.error / console.warn.
+  No request correlation IDs. No JSON log format. No log levels.
+
+STRATEGY: We will NOT replace every console.log in one pass (too risky).
+Instead:
+  1. Install pino + pino-http
+  2. Create backend/src/utils/logger.js — centralized logger instance
+  3. Add pino-http middleware to index.js for automatic request/response logging
+  4. Replace console.* in the 5 most critical files:
+     - backend/src/index.js
+     - backend/src/middleware/auth.js
+     - backend/src/middleware/tenantScope.js
+     - backend/src/services/authService.js
+     - backend/src/models/index.js (RLS hooks)
+  Remaining files: converted progressively in later maintenance PRs.
+
+FILES MODIFIED:
+  - backend/package.json (via npm install)
+  - backend/src/utils/logger.js (NEW FILE)
+  - backend/src/index.js
+  - backend/src/middleware/auth.js
+  - backend/src/middleware/tenantScope.js
+  - backend/src/services/authService.js
+  - backend/src/models/index.js
+
+--------------------------------------------------------------------------------
+PHASE 4 — MANUAL TEST INSTRUCTIONS
+--------------------------------------------------------------------------------
+
+>> TEST 4A: Session revocation works
+  Step 1: Log in to the app. Note you are authenticated.
+  Step 2: In another tab, still logged in — works fine.
+  Step 3: Log OUT in one tab.
+  Step 4: Go back to the other tab and try to navigate (e.g. click Projects).
+  EXPECTED: You get redirected to login page (401 response from API)
+  Previously: The other tab would have continued working for 7 days.
+
+>> TEST 4B: Structured logs appear in Railway
+  After deploy, go to Railway → Backend service → Logs tab.
+  EXPECTED: Logs are in JSON format:
+  {"level":30,"time":1234567890,"req_id":"uuid","method":"GET","url":"/api/projects","status":200,"duration":45}
+  No longer plain text console.log lines.
+
+>> TEST 4 — CORE FUNCTIONALITY:
+  Login, use app normally, log out, log back in.
+  EXPECTED: Works normally. The only difference is logout is now instantaneous
+  (old token dies immediately instead of after 7 days).
+
+
+================================================================================
+PHASE 5 — DATABASE PERFORMANCE
+================================================================================
+
+--------------------------------------------------------------------------------
+PHASE 5A — Increase DB Connection Pool Size
+--------------------------------------------------------------------------------
+
+CURRENT STATE INSPECTION:
+  File: backend/src/models/index.js lines 60-62
+  URL mode: pool: { max: 10, min: 2 }
+  Host mode: pool: { max: 5, min: 0 }
+  For multi-tenant SaaS with 50+ models and concurrent users, max:10 is low.
+
+WHAT WILL BE CHANGED:
+  - URL mode: max: 20, min: 3
+  - Host mode: max: 10, min: 1
+  - Add acquire: 60000 (60s timeout before "connection unavailable" error)
+
+NOTE: Check your Railway PostgreSQL plan's connection limit before increasing.
+Railway Hobby plan: 25 connections max. Set max to 20 (leaves 5 for migrations/admin).
+Railway Pro plan: 100+ connections. Can set max to 50.
+
+>> MANUAL CHECK REQUIRED:
+  In Railway → PostgreSQL → Metrics tab, check current connection usage.
+  Also check your PostgreSQL plan limit.
+  Tell me the plan and current peak connection count.
+
+FILES MODIFIED:
+  - backend/src/models/index.js
+
+--------------------------------------------------------------------------------
+PHASE 5B — Add Composite DB Indexes
+--------------------------------------------------------------------------------
+
+CURRENT STATE INSPECTION:
+  Need to check which indexes already exist before creating duplicates.
+
+>> MANUAL CHECK REQUIRED:
+  Run in Railway PostgreSQL query tool:
+    SELECT
+      t.relname AS table_name,
+      i.relname AS index_name,
+      array_agg(a.attname ORDER BY ix.indseqno) AS columns
+    FROM pg_class t
+    JOIN pg_index ix ON t.oid = ix.indrelid
+    JOIN pg_class i ON i.oid = ix.indexrelid
+    JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = ANY(ix.indkey)
+    JOIN unnest(ix.indkey) WITH ORDINALITY AS ix(attnum, indseqno)
+      ON a.attnum = ix.attnum
+    WHERE t.relkind = 'r'
+      AND t.relnamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'public')
+    GROUP BY t.relname, i.relname
+    ORDER BY t.relname, i.relname;
+
+  This lists all existing indexes. Share the output and I will create a
+  migration that only adds the MISSING composite indexes (no duplicates).
+
+WHAT WILL BE ADDED (new composite indexes for tenant query performance):
+  CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_projects_company_deleted
+    ON projects (company_id, deleted_at, created_at DESC);
+
+  CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_documents_company_project
+    ON documents (company_id, project_id, created_at DESC);
+
+  CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_estimates_company_project
+    ON estimates (company_id, project_id, status);
+
+  CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_work_orders_company_status
+    ON work_orders (company_id, status, created_at DESC);
+
+  CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_invoices_company_status
+    ON invoices (company_id, status, created_at DESC);
+
+  CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_audit_logs_company_time
+    ON audit_logs (company_id, created_at DESC);
+
+  CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_activity_company_time
+    ON activity_timelines (company_id, created_at DESC);
+
+  NOTE: CONCURRENTLY means indexes are built without locking the table —
+  safe to run on live production database.
+
+--------------------------------------------------------------------------------
+PHASE 5 — MANUAL TEST INSTRUCTIONS
+--------------------------------------------------------------------------------
+
+>> TEST 5A: Connection pool increase
+  Go to Railway → PostgreSQL → Metrics.
+  Use the app normally for 5 minutes (open multiple tabs, list pages).
+  EXPECTED: Active connections increase from baseline but stay well under limit.
+
+>> TEST 5B: Query performance improved
+  Open the Projects list page. Note page load time (browser DevTools → Network).
+  Open Analytics page. Note load time.
+  EXPECTED: Pages load noticeably faster (especially list pages with many rows).
+  (Improvement may not be dramatic unless you have 1000+ records per company)
+
+>> TEST 5 — CORE FUNCTIONALITY:
+  Full app navigation test.
+  EXPECTED: All works, page loads are same or faster.
+
+
+================================================================================
+PHASE 6 — INPUT VALIDATION
+================================================================================
+
+--------------------------------------------------------------------------------
+PHASE 6A + 6B — UUID Param Validation + Core Route Body Validation
+--------------------------------------------------------------------------------
+
+CURRENT STATE INSPECTION:
+  File: backend/src/routes/authRoutes.js
+  Only auth routes have express-validator validation.
+  All 44 other route files accept unvalidated :id params and request bodies.
+
+STRATEGY: We take a tiered approach to avoid touching 44 files at once.
+
+  TIER 1 (Phase 6A) — UUID middleware for ALL routes (safest, 1 change):
+    Create a global middleware that validates any :id, :projectId, :companyId
+    etc. param that looks like it should be a UUID.
+    Register this on the /api router, not individual routes.
+    Invalid UUIDs return 400 before reaching any controller.
+
+  TIER 2 (Phase 6B) — Body validation on highest-risk routes:
+    POST /api/auth/register  — add company_id requirement  
+    POST /api/projects       — validate required fields
+    POST /api/estimates      — validate line items array
+    POST /api/invoices       — validate required numeric fields
+    POST /api/users          — validate role enum
+
+FILES MODIFIED:
+  - backend/src/middleware/validateUuid.js (NEW)
+  - backend/src/routes/index.js or backend/src/index.js
+  - backend/src/routes/authRoutes.js
+  - backend/src/routes/projectRoutes.js
+  - backend/src/routes/estimateRoutes.js
+
+--------------------------------------------------------------------------------
+PHASE 6 — MANUAL TEST INSTRUCTIONS
+--------------------------------------------------------------------------------
+
+>> TEST 6A: Invalid UUID returns 400, not 500
+  In Postman:
+  GET /api/projects/not-a-uuid  (with valid auth token)
+  EXPECTED: 400 Bad Request { "message": "Invalid ID format" }
+  Previously: Would return 500 Internal Server Error from database
+
+  GET /api/projects/00000000-0000-0000-0000-000000000000  (valid UUID format)
+  EXPECTED: 404 Not Found (valid format, just doesn't exist)
+
+>> TEST 6B: Invalid body rejected
+  POST /api/projects with empty body {}
+  EXPECTED: 422 Unprocessable Entity with field errors
+
+>> TEST 6 — CORE FUNCTIONALITY:
+  Create a project, create an estimate, add items, save.
+  EXPECTED: Works normally (valid data passes validation).
+
+
+================================================================================
+PHASE 7 — PASSWORD POLICY + 2FA ENFORCEMENT
+================================================================================
+
+--------------------------------------------------------------------------------
+PHASE 7A — Password Policy: 12+ Characters + Complexity
+--------------------------------------------------------------------------------
+
+CURRENT STATE INSPECTION:
+  File: backend/src/routes/authRoutes.js line 24
+  body('password').isLength({ min: 6 })
+  That is the only password requirement — 6 chars minimum, no complexity.
+  ADMIN_PASSWORD defaults to "admin1234" in authService.js.
+
+WHAT WILL BE CHANGED:
+  - min 12 characters
+  - must contain at least 1 uppercase letter
+  - must contain at least 1 lowercase letter
+  - must contain at least 1 digit
+  - must contain at least 1 special character
+  - Custom error message explaining all requirements
+
+  This applies to: register, change-password routes.
+  Does NOT retroactively invalidate existing passwords (only on change).
+
+  ADMIN_PASSWORD: Add a startup warning if it is <= 8 chars.
+
+FILES MODIFIED:
+  - backend/src/routes/authRoutes.js
+  - backend/src/services/authService.js (startup warning)
+
+>> IMPORTANT NOTE TO YOU:
+  Before deploying Phase 7A, make sure your admin account uses a password
+  that meets the new policy (12+ chars, mixed case, digit, special char).
+  You will need to change it before the new policy applies to change-password.
+  The existing hash is NOT affected — only future password changes/registrations
+  will enforce the new policy.
+
+--------------------------------------------------------------------------------
+PHASE 7B — 2FA Enforcement: Email OTP on Login
+--------------------------------------------------------------------------------
+
+CURRENT STATE INSPECTION:
+  File: backend/src/services/authService.js — login() function
+  Current: email → password verify → lockout check → issue JWT (no 2FA check)
+  File: backend/src/models/OtpToken.js — model exists
+  File: backend/src/services/authService.js — OTP-related functions exist?
+  File: backend/package.json — nodemailer is already a dependency
+
+  Need to check: does a sendOtp / verifyOtp function exist in authService?
+  Need to check: does OtpToken have token, user_id, expires_at fields?
+
+WHAT WILL BE CHANGED:
+  In authService.login():
+    If user.two_factor_enabled === true:
+      1. Generate 6-digit OTP
+      2. Store in OtpToken table with 10-minute expiry
+      3. Send via email (nodemailer — already configured)
+      4. Return { requires_2fa: true, email: user.email, temp_user_id: <obscured> }
+         (NO JWT issued yet)
+
+  New endpoint: POST /api/auth/verify-2fa
+    Body: { temp_token, otp_code }
+    Validates: OTP matches + not expired + not already used
+    Issues: full JWT on success
+    Marks: OtpToken as used (is_used = true)
+
+  Frontend changes (MINIMAL):
+    Login page: if response.requires_2fa, show OTP input box
+    Submit OTP → call /verify-2fa → store JWT as normal
+
+FILES MODIFIED:
+  - backend/src/services/authService.js
+  - backend/src/routes/authRoutes.js
+  - backend/src/controllers/authController.js
+  - frontend/src/pages/ (Login page — add OTP step)
+  - frontend/src/services/authService.ts
+
+NOTE: 2FA is only triggered for users who have two_factor_enabled = true.
+Users without 2FA enabled continue to log in exactly as today.
+There is NO disruption to users who haven't enabled 2FA.
+
+--------------------------------------------------------------------------------
+PHASE 7 — MANUAL TEST INSTRUCTIONS
+--------------------------------------------------------------------------------
+
+>> TEST 7A: Password policy enforced on registration
+  Try to register a new user with password "short1"
+  EXPECTED: 422 error "Password must be at least 12 characters..."
+  Try with "ValidPass123!"
+  EXPECTED: Registration succeeds
+
+>> TEST 7B: 2FA login flow (enable 2FA on a test user first)
+  Step 1: Log in as an admin. Go to user settings for a test user.
+          Enable 2FA for that test user.
+  Step 2: Log out. Try to log in as that test user.
+  EXPECTED: After correct password, see OTP input screen (not logged in yet).
+  Step 3: Check test user's email for OTP code. Enter it.
+  EXPECTED: Login succeeds and you are redirected to dashboard.
+  Step 4: Try an incorrect OTP.
+  EXPECTED: "Invalid or expired code" error.
+  Step 5: Wait 11 minutes, try the original OTP code again.
+  EXPECTED: "Code has expired" error.
+
+>> TEST 7B-2: Users without 2FA are unaffected
+  Log in as any user who has two_factor_enabled = false.
+  EXPECTED: Normal login, no OTP screen, works as before.
+
+>> TEST 7 — CORE FUNCTIONALITY:
+  Full login/logout cycle with and without 2FA.
+  EXPECTED: Both paths work. Non-2FA users see no change.
+
+
+================================================================================
+PHASE 8 — JWT REFRESH TOKENS + FILE MANAGER FIX
+================================================================================
+
+--------------------------------------------------------------------------------
+PHASE 8A — JWT Refresh Token Pattern
+--------------------------------------------------------------------------------
+
+CURRENT STATE INSPECTION:
+  File: backend/src/services/authService.js
+  JWT_EXPIRES_IN defaults to '7d'. No refresh token mechanism.
+  The Session model has: token_hash, user_id, company_id, expires_at, is_active.
+  Already being used (after Phase 4A — Session table wired in).
+
+WHAT WILL BE CHANGED:
+  1. Reduce access token lifetime: JWT_EXPIRES_IN = '1h' (1 hour, was 7 days)
+  2. On login: also issue a refresh token (UUID stored in Session table, 30-day expiry)
+     Send refresh token in HTTP-only, SameSite=Strict, Secure cookie
+     (not in JSON body — cookies are not accessible to JavaScript)
+  3. New endpoint: POST /api/auth/refresh
+     Reads refresh token from cookie
+     Validates against Session table
+     Issues new access JWT (1 hour)
+     Returns { token } in response body (frontend stores in memory/localStorage)
+  4. Frontend: set up axios interceptor to call /refresh when 401 is received,
+     then retry original request with new token
+
+  MIGRATION PATH: Existing logged-in users will be logged out when you deploy
+  (their 7-day tokens expire if you rotate JWT_SECRET, OR they just work for
+  remaining time). To avoid disruption:
+    - DO NOT change JWT_SECRET when deploying Phase 8A.
+    - Existing tokens stay valid for remainder of their 7-day window.
+    - New logins issue 1-hour tokens + refresh cookie.
+    - After 7 days, all old tokens are naturally expired.
+
+FILES MODIFIED:
+  - backend/src/services/authService.js
+  - backend/src/routes/authRoutes.js
+  - backend/src/controllers/authController.js
+  - backend/src/index.js (add cookie-parser middleware)
+  - frontend/src/services/authService.ts
+  - frontend/src/utils/api.ts or axios config (add interceptor)
+
+ENV VAR CHANGE:
+  JWT_EXPIRES_IN=1h  (update in Railway)
+
+--------------------------------------------------------------------------------
+PHASE 8B — FileManagerFolder Root Path Collision Fix
+--------------------------------------------------------------------------------
+
+CURRENT STATE INSPECTION:
+  File: backend/src/controllers/fileManagerController.js
+  File: backend/src/services/fileManagerService.js
+  Root folders created with company_id: null
+  findOrCreate uses path string only — no company_id in lookup
+
+  Need to check: how many companies currently use the file manager?
+  If companies already have data, this change must be backward-compatible.
+
+WHAT WILL BE CHANGED:
+  Option (safe for existing data):
+  - Keep root folders with company_id: null as global anchors (don't change existing rows)
+  - Fix the findOrCreate lookup: add company_id to WHERE clause for non-root folders
+  - Fix project sub-folder path: prefix with company_id hash to ensure uniqueness
+    /Project Documents/<company_id_prefix>_<ProjectName>_<Number>
+  - This prevents future collisions without breaking existing data
+
+  NOTE: If two companies already have projects with the same name, their folders
+  may already be cross-linked. I will add a detection query first.
+
+>> MANUAL CHECK BEFORE CODING:
+  Run in Railway DB:
+    SELECT path, company_id, COUNT(*) as cnt
+    FROM file_manager_folders
+    WHERE parent_id IS NOT NULL
+    GROUP BY path, company_id
+    HAVING COUNT(*) > 1;
+
+  If this returns rows: there are duplicate paths. Tell me and I will handle cleanup.
+  If empty: no collisions yet. We just need to fix the future prevention.
+
+FILES MODIFIED:
+  - backend/src/controllers/fileManagerController.js
+  - backend/src/services/fileManagerService.js
+
+--------------------------------------------------------------------------------
+PHASE 8 — MANUAL TEST INSTRUCTIONS
+--------------------------------------------------------------------------------
+
+>> TEST 8A: Refresh token flow
+  Step 1: Log in to the app.
+  Step 2: Wait 61 minutes (or temporarily set JWT_EXPIRES_IN=1m for testing).
+  Step 3: Try to navigate (Projects page).
+  EXPECTED: App silently refreshes token and continues working (no login page).
+
+  Alternatively (easier test):
+  Step 1: Log in. Open DevTools → Application → Cookies.
+  EXPECTED: See a refresh_token cookie (httpOnly, Secure, SameSite=Strict).
+
+  Step 2: Open DevTools → Application → LocalStorage.
+  EXPECTED: JWT token present but with 1-hour expiry (check jwt.io to decode).
+
+>> TEST 8B: File manager no path collision
+  Step 1: Log in as Company A. Create a project named "Test Project 001".
+  Step 2: Log in as Company B. Create a project also named "Test Project 001".
+  Step 3: As Company B, go to File Manager.
+  EXPECTED: Only see Company B's project folder, not Company A's.
+  Previously: Both companies would share the same folder row.
+
+>> TEST 8 — CORE FUNCTIONALITY:
+  Full file manager test: upload file, create folder, download.
+  EXPECTED: Works normally.
+
+
+================================================================================
+QUICK REFERENCE: WHICH PHASE TO START WITH
+================================================================================
+
+  TODAY (start right now):
+    Phase 1A — Remove /health admin exposure    → I will code it now
+    Phase 1B — RiskScore in TENANT_MODELS       → I will code it now
+    Phase 1C — Remove root route double-mount   → after frontend scan
+    Phase 1D — SETUP_ENABLED guard              → I will code it now
+    Phase 1E — Body size + CORS explicit        → I will code it now
+    → DEPLOY Phase 1 to Railway → run manual tests → report back
+
+  AFTER PHASE 1 TESTS PASS:
+    Phase 2A/B/C — Rate limiting + compression  → I will code it
+
+  REQUIRES YOUR MANUAL DB QUERY FIRST:
+    Phase 3A — Check if forged_app role exists  → you query DB, report back
+    Phase 5A — Check Railway DB connection limit → you check Railway plan
+    Phase 5B — Check existing indexes           → you run query, report back
+    Phase 8B — Check file manager collision     → you run query, report back
+
+  REQUIRES FRONTEND CHANGES (planned carefully):
+    Phase 7B — 2FA OTP enforcement
+    Phase 8A — JWT refresh token + frontend interceptor
+
+
+================================================================================
+ENV VARIABLES TO SET IN RAILWAY (All Phases)
+================================================================================
+
+  Set these in Railway → Backend Service → Variables:
+
+  NOW (Phase 1):
+    SETUP_ENABLED=false
+    FRONTEND_URL=https://<your-actual-frontend-url>.up.railway.app
+    ADMIN_UNLOCK_SECRET=<generate a 32-char random string — NOT JWT_SECRET>
+
+  Phase 7 (when ready):
+    (no new env vars for 7A)
+
+  Phase 8 (when ready):
+    JWT_EXPIRES_IN=1h
+
+  Generate ADMIN_UNLOCK_SECRET with:
+    node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+
+
+================================================================================
+READY TO START?
+================================================================================
+
+  Just say "start Phase 1" and I will:
+  1. Scan the frontend to confirm no root-path API calls (for Phase 1C safety)
+  2. Inspect each file I'm about to change
+  3. Make all 5 Phase 1 changes
+  4. Tell you exactly what to deploy and what to test
+
+================================================================================

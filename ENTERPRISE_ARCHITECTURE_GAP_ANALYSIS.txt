@@ -1,0 +1,1155 @@
+================================================================================
+       FORGED-IDAS — ENTERPRISE ARCHITECTURE & SECURITY GAP ANALYSIS
+================================================================================
+Date        : April 18, 2026
+Branch      : dev  (repo: Cholan-Dynamics-Private-Limited/forged-idas)
+Analyst     : GitHub Copilot — Automated Architecture Review
+Scope       : Full-stack (Node.js backend + PostgreSQL + Cloudflare R2 + React frontend)
+================================================================================
+
+
+TABLE OF CONTENTS
+-----------------
+  1.  Executive Summary
+  2.  System Architecture Overview
+  3.  Multi-Tenant Isolation Assessment
+  4.  Security Gap Analysis — CRITICAL  (4 gaps)
+  5.  Security Gap Analysis — HIGH      (7 gaps)
+  6.  Architecture Gap Analysis — MEDIUM (6 gaps)
+  7.  Performance & Scalability Assessment
+  8.  Database Integrity Assessment
+  9.  Frontend Security Assessment
+  10. What is Already Working Well
+  11. Priority Action Plan (3 Phases)
+  12. Appendix — File Reference Map
+
+
+================================================================================
+SECTION 1 — EXECUTIVE SUMMARY
+================================================================================
+
+Overall Readiness Level: NOT YET ENTERPRISE-GRADE  (strong foundation, 17 gaps remain)
+
+The system has a well-designed multi-tenant architecture. The core concept is
+correct: shared software/schema/infrastructure, with row-level company_id
+isolation enforced at four independent layers. Feature deployments apply to all
+tenants simultaneously. Data access is scoped per company at every layer.
+
+However, 17 gaps remain before the system meets enterprise-grade standards:
+
+  - 4 CRITICAL security issues that require immediate action
+  - 7 HIGH issues affecting security posture and data correctness
+  - 6 MEDIUM issues affecting operational reliability and maintainability
+
+The single most dangerous issue is that Layer 4 of the tenant defense stack
+(PostgreSQL Row-Level Security) may be silently inactive in production, because
+the forged_app database role is referenced in code but never provisioned by
+any migration.
+
+The second most dangerous issue is that 2FA exists as a UI toggle but is never
+enforced during login, providing a false sense of security to admins who believe
+they have 2FA enabled.
+
+
+================================================================================
+SECTION 2 — SYSTEM ARCHITECTURE OVERVIEW
+================================================================================
+
+BACKEND
+-------
+  Runtime        : Node.js (Express 4.x)
+  Language       : JavaScript (CommonJS)
+  ORM            : Sequelize 6.x  (50+ models)
+  Database       : PostgreSQL (hosted on Railway)
+  File Storage   : Cloudflare R2 (S3-compatible) with local disk fallback
+  PDF Generation : PDFKit (server-side, synchronous in request thread)
+  Auth           : JWT Bearer tokens (jsonwebtoken 9.x, bcryptjs for passwords)
+  Deployment     : Railway (production: https://forged-idas-production.up.railway.app)
+
+FRONTEND
+--------
+  Framework      : React 18 + TypeScript
+  UI Library     : Material UI 5.x
+  State          : React Context API (AuthContext, CompanyLogoContext, etc.)
+  Auth storage   : localStorage (token + user), sessionStorage (impersonation)
+  HTTP client    : axios
+  Deployment     : Railway
+
+INFRASTRUCTURE
+--------------
+  Backend DB pool      : max:10 connections (URL mode) / max:5 (host mode)
+  JWT token lifetime   : 7 days (JWT_EXPIRES_IN env var, default "7d")
+  R2 presigned URL TTL : 60 seconds
+  Rate limiting        : 20 req / 15 min — auth routes ONLY
+
+MULTI-TENANT MODEL
+------------------
+  Architecture type    : Shared database, shared schema
+  Isolation mechanism  : company_id column on every tenant table
+  Tenant scoping stack : 4 layers (see Section 3)
+
+
+================================================================================
+SECTION 3 — MULTI-TENANT ISOLATION ASSESSMENT
+================================================================================
+
+The system implements a 4-layer defense-in-depth isolation model:
+
+  Layer 1 — JWT Token
+  -------------------
+  The JWT payload carries company_id and role. Every request that passes
+  authenticate() middleware has req.user.company_id available.
+  STATUS: WORKING CORRECTLY
+
+  Layer 2 — tenantScope Middleware
+  ---------------------------------
+  Sets req.tenantScope = { where: { company_id } } and req.activeCompanyId.
+  Applied via router.use(tenantScope) in all 44 route files.
+  Also writes company_id into AsyncLocalStorage (tenantContext) so it is
+  available throughout the entire async call chain without prop drilling.
+  platform_admin can set x-active-company-id header (UUID-validated) to
+  impersonate a company for support operations.
+  STATUS: WORKING CORRECTLY — all 44 route files verified
+
+  Layer 3 — Sequelize beforeFind / beforeCreate Hooks
+  ----------------------------------------------------
+  Automatically appends WHERE company_id = <active> to every Model.findAll(),
+  Model.findOne(), Model.create() across all models listed in TENANT_MODELS.
+  Also enforces on bulk creates. Has a strict allowlist (_SKIP_TENANT_SCOPE_
+  ALLOWLIST) with call-stack validation for the one service (settingsService)
+  that manages its own explicit scoping.
+  STATUS: WORKING CORRECTLY — but RiskScore model is missing (see Gap #2)
+
+  Layer 4 — PostgreSQL Row-Level Security (RLS)
+  ---------------------------------------------
+  Sets ROLE forged_app (NOBYPASSRLS) on every DB connection after startup.
+  Sets app.company_id session variable via set_config().
+  Intended to be the last line of defense — even raw SQL queries would be
+  blocked by RLS policies if they attempt cross-tenant access.
+  STATUS: POTENTIALLY INACTIVE IN PRODUCTION (see Critical Gap #1)
+
+ISOLATION VERDICT BY DATA TYPE
+-------------------------------
+
+  Data Type                    Isolated?   Notes
+  ---------------------------  ----------  ------------------------------------------
+  Projects / Clients / Vendors   YES       3-layer enforcement confirmed
+  Estimates / Work Orders        YES       3-layer enforcement confirmed
+  Documents (via /uploads)       YES       JWT + Document table lookup (fail-closed)
+  R2 files (via /file-manager)   YES       verifyR2KeyOwnership() checks company prefix
+  Document numbering (WO/INV)    YES       Scoped to document_numbering:{companyId}
+  Company settings / logo        YES       settingsService uses (key, company_id) pair
+  Risk scores                    NO        RiskScore not in TENANT_MODELS — Gap #2
+  FileManager root folders       PARTIAL   Shared global roots, path collision possible
+  PostgreSQL RLS (hard DB guard) UNKNOWN   forged_app role may not exist — Gap #1
+  Session revocation             PARTIAL   Session table exists but not checked in auth
+
+
+================================================================================
+SECTION 4 — SECURITY GAP ANALYSIS: CRITICAL
+================================================================================
+
+--------------------------------------------------------------------------------
+GAP-001 | PostgreSQL forged_app Role May Not Exist
+SEVERITY: CRITICAL
+File: backend/src/models/index.js  (activateRls function, afterConnect hook)
+--------------------------------------------------------------------------------
+
+DESCRIPTION:
+  The code calls SET ROLE forged_app on every new database connection after
+  startup to enforce RLS as a NOBYPASSRLS role. It also calls SET LOCAL
+  app.company_id = '<value>' to provide the row-level security filter value.
+
+  However, NO migration in the /migrations directory creates the forged_app
+  role. No migration creates RLS POLICY statements (USING clauses) on any
+  table either.
+
+  The afterConnect hook is wrapped in a try/catch. If SET ROLE forged_app
+  fails (because the role doesn't exist), the error is silently swallowed,
+  _rlsRoleActive is set to true anyway (it's set before the try block based
+  on an earlier flag), and every subsequent query runs as a superuser with
+  BYPASSRLS — bypassing ALL RLS policies entirely.
+
+  This means Layer 4 of the 4-layer defense stack may be completely inactive
+  in production right now.
+
+IMPACT:
+  - If an ORM hook bug or a raw SQL query bypasses Layers 1-3, there is no
+    database-level safety net to prevent cross-tenant data access.
+  - Any scripts, migrations, or background jobs that run raw SQL queries
+    are not protected at all.
+
+REQUIRED FIXES:
+  1. Create a migration that provisions the role and all RLS policies:
+
+     DO $$ BEGIN
+       IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'forged_app') THEN
+         CREATE ROLE forged_app NOLOGIN NOBYPASSRLS;
+         GRANT CONNECT ON DATABASE your_db TO forged_app;
+         GRANT USAGE ON SCHEMA public TO forged_app;
+         GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public
+           TO forged_app;
+         ALTER DEFAULT PRIVILEGES IN SCHEMA public
+           GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO forged_app;
+       END IF;
+     END $$;
+
+  2. Add RLS policies on every tenant table, for example:
+     ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
+     CREATE POLICY tenant_isolation ON projects
+       USING (company_id::text = current_setting('app.company_id', true));
+
+  3. Verify that activateRls() detects role creation failure and throws
+     instead of silently continuing.
+
+  4. Add a startup smoke test: after activateRls(), run:
+     SELECT current_role; — must return 'forged_app'
+     SELECT current_setting('app.company_id'); — must return empty string
+
+
+--------------------------------------------------------------------------------
+GAP-002 | RiskScore Model Not in TENANT_MODELS Auto-Scope List
+SEVERITY: CRITICAL
+File: backend/src/models/index.js  (TENANT_MODELS array)
+File: backend/src/models/RiskScore.js
+File: backend/src/services/riskService.js
+--------------------------------------------------------------------------------
+
+DESCRIPTION:
+  The RiskScore model has a company_id column (allowNull: true) and is a
+  polymorphic model (entity_type + entity_id with no FK constraint). It is
+  NOT included in the TENANT_MODELS array in models/index.js.
+
+  Because the beforeFind hook only fires for models in TENANT_MODELS, every
+  RiskScore query is executed WITHOUT a company_id filter unless the calling
+  code adds one explicitly. Inspection of riskService.js shows that several
+  query paths do not add explicit company_id filtering.
+
+  Result: Company A can see risk scores belonging to Company B's users,
+  projects, and vendors.
+
+IMPACT:
+  - Cross-tenant leakage of risk assessments and security risk data.
+  - Risk dashboard shows incorrect/combined data for multi-tenant installs.
+
+REQUIRED FIX:
+  Add RiskScore to the TENANT_MODELS array in backend/src/models/index.js.
+  This is a one-line change. Then audit riskService.js to verify all queries
+  include req.tenantScope in their where clauses.
+
+
+--------------------------------------------------------------------------------
+GAP-003 | JWT Revocation Not Enforced — Session Table Not Checked on Each Request
+SEVERITY: CRITICAL
+File: backend/src/middleware/auth.js  (authenticate function)
+File: backend/src/models/Session.js
+--------------------------------------------------------------------------------
+
+DESCRIPTION:
+  The authenticate() middleware:
+    1. Extracts Bearer token from Authorization header
+    2. Verifies JWT signature and expiry via jwt.verify()
+    3. Fetches user from DB by decoded user_id
+    4. Attaches user to req.user
+
+  Step 4 confirms the user still exists. But the Session table (which stores
+  active sessions with is_active, revoked_at columns) is NEVER consulted.
+
+  The system has sessionService.revokeSession() and the Session model — but
+  these are not wired into the auth check. So:
+    - If a user logs out, their old token still works until it expires (7 days).
+    - If an admin deactivates a user (is_active=false on User), the user's
+      existing JWT still works — the code DOES check user.is_active but only
+      after fetching from DB (so this part works).
+    - If a user's device is reported stolen, there is no way to invalidate
+      their token before the 7-day expiry.
+    - If JWT_SECRET is rotated for security reasons, all users are forcibly
+      logged out simultaneously with no graceful migration path.
+
+IMPACT:
+  - Stolen tokens remain valid for up to 7 days.
+  - Deactivated users can continue using the system until token expiry.
+  - No "logout all devices" capability.
+
+REQUIRED FIX:
+  In authenticate() middleware, after jwt.verify(), check the Session table:
+
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+    const session = await Session.findOne({
+      where: { token_hash: tokenHash, is_active: true, revoked_at: null }
+    });
+    if (!session) return res.status(401).json({ message: 'Session expired' });
+
+  To avoid adding a DB query to every single request, cache session validity
+  in Redis (TTL matching the remaining JWT lifetime). Without Redis, even a
+  simple in-process LRU cache (lru-cache package) on the token hash would
+  reduce DB hits by ~95% for typical user session patterns.
+
+
+--------------------------------------------------------------------------------
+GAP-004 | 2FA Flag Is a UI Toggle Only — No Enforcement During Login
+SEVERITY: CRITICAL
+File: backend/src/services/authService.js  (login function)
+File: backend/src/services/userService.js  (toggle2FA function)
+File: backend/src/models/User.js
+--------------------------------------------------------------------------------
+
+DESCRIPTION:
+  The User model has a two_factor_enabled boolean field. The toggle2FA service
+  method sets it to true/false and logs an audit event. The riskService.js even
+  uses the absence of 2FA as a risk factor signal.
+
+  But the login() function in authService.js NEVER checks two_factor_enabled.
+  It performs: email lookup → password verify → lockout check → issue JWT.
+  There is no TOTP challenge, no OTP email, no step-up authentication of any
+  kind. Setting two_factor_enabled = true changes nothing about the login flow.
+
+  Admins who believe they have 2FA protection are actually unprotected.
+
+IMPACT:
+  - 2FA security guarantee is completely illusory.
+  - Admin accounts with two_factor_enabled=true are as vulnerable as any other.
+  - Regulatory/compliance claims about MFA are not supportable.
+
+REQUIRED FIX:
+  Implement a real two-step login:
+
+  Step 1 — POST /auth/login:
+    - If 2FA is disabled: issue JWT as today (no change)
+    - If 2FA is enabled: return { requires_2fa: true, temp_token: <short-lived JWT>}
+      where temp_token has a 5-minute TTL and scope claim "2fa_pending"
+
+  Step 2 — POST /auth/verify-2fa:
+    - Accepts { temp_token, otp_code }
+    - Validates temp_token (must have scope = "2fa_pending")
+    - Validates OTP via TOTP (use otplib or speakeasy package) or via email
+      (use the existing OtpToken model and nodemailer which is already in deps)
+    - On success: issues full-scope JWT
+
+  The OtpToken model already exists. The nodemailer package is already
+  a dependency. Email OTP is the faster implementation path.
+
+
+================================================================================
+SECTION 5 — SECURITY GAP ANALYSIS: HIGH
+================================================================================
+
+--------------------------------------------------------------------------------
+GAP-005 | Rate Limiting Only on Auth Routes — All Other Endpoints Unprotected
+SEVERITY: HIGH
+File: backend/src/routes/authRoutes.js  (authLimiter — 20 req/15min)
+--------------------------------------------------------------------------------
+
+DESCRIPTION:
+  express-rate-limit is configured with 20 requests / 15 minutes per IP, but
+  it is applied only to the auth route group. Every other API endpoint has no
+  rate limiting at all.
+
+  High-cost endpoints that can be abused:
+    POST /api/documents/generate/*     — PDFKit runs synchronously, spikes CPU
+    POST /api/ai-assistant/message     — calls external AI API, costs $ per call
+    GET  /api/analytics                — expensive multi-table aggregation queries
+    GET  /api/estimates/:id/pdf        — large PDF generation
+    POST /api/estimates                — creates multiple related records
+    GET  /api/reports/*                — full table scans with joins
+
+IMPACT:
+  - A single attacker can DoS the server by hammering PDF generation.
+  - AI assistant endpoint can incur unbounded external API costs.
+  - No protection against scraping, enumeration, or data exfiltration via
+    automated pagination attacks.
+
+REQUIRED FIX:
+  Add a global limiter at the app level:
+
+    const globalLimiter = rateLimit({ windowMs: 60*1000, max: 200 });
+    app.use('/api', globalLimiter);
+
+  Add tighter per-route limits on expensive endpoints:
+
+    const heavyLimiter = rateLimit({ windowMs: 60*1000, max: 10 });
+    router.post('/generate', heavyLimiter, documentController.generate);
+
+
+--------------------------------------------------------------------------------
+GAP-006 | /health Endpoint Exposes Sensitive Data and Admin Operations
+SEVERITY: HIGH
+File: backend/src/index.js  (GET /health handler)
+--------------------------------------------------------------------------------
+
+DESCRIPTION:
+  The public /health endpoint (no authentication required) supports several
+  dangerous query parameters:
+
+  ?admin=status
+    Returns the admin account email (from ADMIN_EMAIL env var), account lock
+    state, failed_login_attempts counter, and locked_until timestamp.
+    No authentication required.
+
+  ?unlock=admin
+    Resets the admin account password and unlocks it. Protected only by
+    x-unlock-secret header which defaults to ADMIN_UNLOCK_SECRET or falls
+    back to JWT_SECRET if ADMIN_UNLOCK_SECRET is not set.
+    The JWT_SECRET must never be used as an admin password — it signs all
+    user tokens and has very different security properties.
+
+  ?r2clean=1
+    Deletes ALL objects from the R2 bucket. Protected by ADMIN_UNLOCK_SECRET
+    header only. If this secret is compromised, all uploaded documents,
+    generated PDFs, and company files are permanently deleted.
+
+  ?r2test
+    Uploads a test file to R2 with no authentication.
+    (Lower risk but information leak about R2 configuration.)
+
+  Additionally, the standard /health response always includes:
+    - R2 configured status
+    - Backend version string
+    - startup error messages (which may reveal internal paths/module names)
+
+IMPACT:
+  - Admin account status is openly visible to anyone on the internet.
+  - If JWT_SECRET or ADMIN_UNLOCK_SECRET is leaked, full admin reset is a
+    single curl command away.
+  - R2 bucket can be wiped completely without any audit trail.
+
+REQUIRED FIX:
+  1. Remove all query parameter logic from /health.
+  2. /health should return only: { status, db, timestamp }
+  3. Move admin unlock to: POST /api/platform-admin/ops/unlock-admin
+     protected by requirePlatformAdmin middleware.
+  4. Move R2 operations to: POST /api/platform-admin/ops/r2-clean
+     protected by requirePlatformAdmin middleware.
+  5. Ensure ADMIN_UNLOCK_SECRET is always set as a separate env var and
+     never falls back to JWT_SECRET.
+
+
+--------------------------------------------------------------------------------
+GAP-007 | FileManagerFolder Root Nodes Are Global (company_id: null) — Path Collisions
+SEVERITY: HIGH
+File: backend/src/controllers/fileManagerController.js  (ensureRootFolders)
+File: backend/src/services/fileManagerService.js  (createProjectFolders)
+--------------------------------------------------------------------------------
+
+DESCRIPTION:
+  Root folders are created with company_id: null:
+    /Project Documents
+    /Procurement Documents
+    /Part Master
+    /Inventory
+
+  These 4 rows are shared global anchor nodes for all tenants. When
+  createProjectFolders() creates sub-folders, it uses findOrCreate with the
+  path string as the unique key — with no company_id in the WHERE clause
+  for the root lookup.
+
+  Path strings are constructed as: /<RootFolder>/<ProjectName>_<Number>
+
+  If Company A has a project named "Alpha 001" and Company B also has a
+  project named "Alpha 001", they will produce the same path string. The
+  findOrCreate on the sub-folder will find Company A's folder record and
+  assign Company B's project sub-tree to Company A's folder as parent.
+
+  This breaks the folder tree for both companies.
+
+IMPACT:
+  - Project folder trees can cross-contaminate between tenants with same-name
+    projects.
+  - File manager shows incorrect parent hierarchy.
+  - File deletions could affect wrong tenant's folder records.
+
+REQUIRED FIX:
+  Option A (recommended): Make each company's root folders company-scoped.
+    Change createProjectFolders() to create root folders per company:
+    company_id: companyId instead of null.
+    Change ensureRootFolders() lookup to include company_id in WHERE clause.
+
+  Option B: Prefix all paths with company UUID:
+    Path format: /<company_uuid>/Project Documents/<ProjectName>_<Number>
+    This guarantees global uniqueness regardless of project names.
+
+
+--------------------------------------------------------------------------------
+GAP-008 | No HTTP Response Compression
+SEVERITY: HIGH
+File: backend/src/index.js  (missing compression middleware)
+File: backend/package.json  (compression package not in dependencies)
+--------------------------------------------------------------------------------
+
+DESCRIPTION:
+  All API responses are sent uncompressed over the network. The backend has
+  no compression middleware configured. The compression npm package is not
+  listed in package.json dependencies.
+
+  Typical API payload sizes in this system:
+    Project list with estimates    : 50–150 KB uncompressed
+    Analytics response             : 80–200 KB uncompressed
+    Estimate with all line items   : 30–100 KB uncompressed
+    Work order list                : 40–120 KB uncompressed
+
+  gzip/brotli compression reduces JSON payloads by approximately 70–80%.
+  A 150 KB response becomes ~30 KB. For users on mobile networks or slow
+  connections, this directly impacts perceived application performance.
+
+IMPACT:
+  - 3–5x larger data transfers than necessary.
+  - Slower page loads especially for list views and dashboards.
+  - Higher Railway egress bandwidth costs.
+
+REQUIRED FIX:
+  npm install compression
+  In index.js, add before all other middleware:
+    const compression = require('compression');
+    app.use(compression());
+
+
+--------------------------------------------------------------------------------
+GAP-009 | CORS Accepts All *.up.railway.app Origins
+SEVERITY: HIGH
+File: backend/src/index.js  (CORS configuration)
+--------------------------------------------------------------------------------
+
+DESCRIPTION:
+  The CORS configuration auto-whitelists any subdomain matching the pattern
+  *.up.railway.app when RAILWAY_ENVIRONMENT_NAME is set and FRONTEND_URL
+  is not explicitly configured. Railway is a shared hosting platform where
+  anyone can deploy a service and get a *.up.railway.app subdomain.
+
+  A malicious actor could:
+    1. Deploy a phishing/XSS payload to any Railway service
+    2. Get a *.up.railway.app subdomain
+    3. Trick an authenticated user into visiting that URL
+    4. The browser will allow cross-origin requests to the backend because
+       the Origin header matches the wildcard pattern
+
+IMPACT:
+  - Any Railway customer can make authenticated cross-origin requests to
+    the backend if they can trick a logged-in user into visiting their page.
+  - Session tokens in localStorage are accessible to scripts on the page,
+    making this a token theft vector.
+
+REQUIRED FIX:
+  1. Always set FRONTEND_URL explicitly in Railway environment variables.
+  2. Remove the automatic wildcard allowance.
+  3. The CORS origin validation should be an exact match against a whitelist:
+     const ALLOWED_ORIGINS = (process.env.FRONTEND_URL || '').split(',')
+       .map(o => o.trim()).filter(Boolean);
+     origin: (origin, cb) => {
+       if (!origin || ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
+       cb(new Error('Not allowed by CORS'));
+     }
+
+
+--------------------------------------------------------------------------------
+GAP-010 | No Structured Logging or Observability
+SEVERITY: HIGH
+File: backend/src/index.js  (and throughout all service/controller files)
+--------------------------------------------------------------------------------
+
+DESCRIPTION:
+  The entire backend uses console.log / console.error / console.warn for all
+  logging. There is no:
+    - Structured JSON logging (pino, winston)
+    - Log levels (DEBUG / INFO / WARN / ERROR / FATAL)
+    - Request correlation IDs (x-request-id propagation)
+    - HTTP request/response logging (method, path, status, duration)
+    - Log aggregation integration (Datadog, Papertrail, CloudWatch, Seq)
+    - Separate audit log stream vs application log stream
+
+  In a multi-tenant SaaS with 50+ models and complex async flows, unstructured
+  interleaved console output makes security incident investigation nearly
+  impossible. If Company A reports that Company B saw their data, the logs
+  cannot be correlated to trace the exact request path.
+
+IMPACT:
+  - Security incidents cannot be investigated effectively.
+  - Performance bottlenecks cannot be identified from logs.
+  - No alerting possible (no structured data to filter on).
+  - Compliance requirements (SOC2, ISO 27001) require audit-quality logging.
+
+REQUIRED FIX:
+  npm install pino pino-http
+  Replace console.* calls with a pino logger instance.
+  Add pino-http as express middleware for automatic request logging:
+    app.use(require('pino-http')({ logger })());
+  Log format: JSON with fields: level, time, req_id, company_id, user_id,
+    method, path, status, duration_ms, message.
+  Generate a unique req_id (UUID) for every request and propagate it via
+  AsyncLocalStorage alongside the existing tenantContext.
+
+
+--------------------------------------------------------------------------------
+GAP-011 | Input Validation Missing on Most API Routes
+SEVERITY: HIGH
+File: backend/src/routes/authRoutes.js  (only place validation is applied)
+--------------------------------------------------------------------------------
+
+DESCRIPTION:
+  express-validator and the validate() middleware are used only in authRoutes.js
+  (login, register, change-password). The remaining 44 route files and their
+  controllers accept arbitrary request bodies with no schema validation.
+
+  Examples of unvalidated inputs reaching the database:
+    - Negative or zero quantities on estimate line items
+    - Strings over 10,000 characters in description fields
+    - Invalid UUIDs passed as :id path parameters (SQL injection via Sequelize
+      is prevented by parameterized queries, but malformed UUIDs cause noisy
+      500 errors instead of clean 400 responses)
+    - Boolean fields accepting string "truee" or 0 or null interchangeably
+    - Date fields accepting non-date strings
+
+IMPACT:
+  - Data integrity degradation over time (garbage in, garbage out).
+  - 500 errors from constraint violations expose internal error messages.
+  - Harder to maintain consistent business rules.
+
+REQUIRED FIX:
+  At minimum, add UUID validation for all :id route parameters:
+    const { param } = require('express-validator');
+    router.get('/:id', param('id').isUUID(), validate, controller.getById);
+
+  For full validation, add Zod or Joi schemas for all POST/PUT request bodies.
+  The existing validate() middleware in backend/src/middleware/validate.js
+  is already set up for express-validator — just add schemas to more routes.
+
+
+--------------------------------------------------------------------------------
+GAP-011B | /setup Routes Must Be Disabled in Production
+SEVERITY: HIGH
+File: backend/src/routes/setupRoutes.js
+--------------------------------------------------------------------------------
+
+DESCRIPTION:
+  The setup routes provide emergency admin creation and password reset:
+    GET  /setup/create-admin   — creates a new main_admin account
+    POST /setup/reset-password — resets any user's password by email
+
+  These routes are protected only by a SETUP_SECRET header value. The routes
+  use raw SQL (bypasses all ORM hooks and tenant scoping) and create accounts
+  with no company_id (tenant-unscoped). There is no mechanism to automatically
+  disable these routes after initial provisioning.
+
+  If SETUP_SECRET is weak, guessable, or inadvertently logged/exposed, these
+  routes allow full account takeover without any authentication.
+
+IMPACT:
+  - A leaked SETUP_SECRET allows creation of a superuser account.
+  - Created accounts have no company_id — they operate outside all tenant
+    scoping rules.
+
+REQUIRED FIX:
+  1. Add SETUP_ENABLED env var (defaults to false):
+     if (process.env.SETUP_ENABLED !== 'true') {
+       return res.status(404).json({ message: 'Not found' });
+     }
+  2. Ensure SETUP_SECRET is a cryptographically random 32+ char string.
+  3. Rotate SETUP_SECRET after every use.
+  4. Require SETUP_SECRET to be set (throw on startup if empty string).
+
+
+================================================================================
+SECTION 6 — ARCHITECTURE GAP ANALYSIS: MEDIUM
+================================================================================
+
+--------------------------------------------------------------------------------
+GAP-012 | JWT Lifetime Is 7 Days With No Refresh Token
+SEVERITY: MEDIUM
+File: backend/src/services/authService.js  (generateToken function)
+--------------------------------------------------------------------------------
+
+DESCRIPTION:
+  Access tokens default to 7d lifetime (JWT_EXPIRES_IN env var). There is
+  no refresh token mechanism. Once issued, a JWT is valid for 7 days regardless
+  of user activity. Combined with no session revocation check (Gap #003), this
+  creates a large window for token misuse.
+
+  Rotating JWT_SECRET to respond to a security incident immediately invalidates
+  ALL active sessions for ALL users simultaneously — there is no graceful
+  migration path.
+
+REQUIRED FIX:
+  Reduce access token to 15 minutes (or maximum 1 hour).
+  Issue a refresh token (UUID stored in the Session table) as an httpOnly,
+  SameSite=Strict cookie.
+  Implement POST /auth/refresh — validates refresh token from cookie, issues
+  new access JWT. This also naturally integrates session revocation (Gap #003).
+
+
+--------------------------------------------------------------------------------
+GAP-013 | Password Policy Is Too Weak
+SEVERITY: MEDIUM
+File: backend/src/routes/authRoutes.js  (body('password').isLength({ min: 6 }))
+File: backend/src/services/authService.js  (ADMIN_PASSWORD default)
+--------------------------------------------------------------------------------
+
+DESCRIPTION:
+  The only password requirement is a minimum of 6 characters. No complexity
+  rules (uppercase, lowercase, digit, special character). The ADMIN_PASSWORD
+  environment variable defaults to "admin1234" and is used for auto-healing
+  the admin account after lockout.
+
+REQUIRED FIX:
+  Enforce: min 12 characters, at least one uppercase, one lowercase, one digit,
+  one special character.
+  Remove the "admin1234" default — require ADMIN_PASSWORD to be explicitly set.
+  Set force_password_reset: true on any auto-created/auto-reset admin account.
+
+
+--------------------------------------------------------------------------------
+GAP-014 | No Background Job Infrastructure
+SEVERITY: MEDIUM
+--------------------------------------------------------------------------------
+
+DESCRIPTION:
+  Heavy operations run synchronously in the request thread:
+    - PDF generation (PDFKit) — blocks the event loop for 100–500ms per PDF
+    - Excel report generation — blocks for similar durations
+    - Bulk email sending via nodemailer — synchronous in request
+    - Analytics aggregation queries — long-running DB queries
+
+  The tenantContext module has runWithTenantContext() and runAsPlatformAdmin()
+  helpers explicitly designed for background job use — but no background job
+  framework exists to use them. The system has no queue, no worker, no cron.
+
+IMPACT:
+  - Under load, one tenant's PDF generation blocks all other tenants' requests.
+  - No retry mechanism if PDF/email fails midway.
+  - No way to show progress for long-running operations.
+
+REQUIRED FIX:
+  Add BullMQ (Redis-backed queue) for:
+    - PDF generation jobs (respond immediately with job_id, poll for result)
+    - Bulk email dispatch
+    - Report generation
+  Use runWithTenantContext(companyId, fn) pattern that is already defined.
+
+
+--------------------------------------------------------------------------------
+GAP-015 | No API Versioning
+SEVERITY: MEDIUM
+File: backend/src/index.js  (app.use('/api', routes))
+--------------------------------------------------------------------------------
+
+DESCRIPTION:
+  All routes are mounted at /api/ with no version prefix (/api/v1/). Breaking
+  API changes affect all tenants simultaneously with no transition period.
+
+  Additionally, routes are DOUBLE-MOUNTED at both /api/ and / (root):
+    app.use('/api', routes);
+    app.use(routes);         // Also mounted at root level
+  This creates ambiguity — is /projects the same as /api/projects? Both work.
+  The root-level mount can be used to bypass API-level middleware that is only
+  applied to the /api prefix.
+
+REQUIRED FIX:
+  1. Remove the root-level mount: app.use(routes) — keep only app.use('/api', routes).
+  2. Add version prefix: app.use('/api/v1', routes).
+     Maintain a compatibility shim /api → /api/v1 during migration.
+
+
+--------------------------------------------------------------------------------
+GAP-016 | express.json() Has No Body Size Limit
+SEVERITY: MEDIUM
+File: backend/src/index.js
+--------------------------------------------------------------------------------
+
+DESCRIPTION:
+  app.use(express.json()) and app.use(express.urlencoded({ extended: true }))
+  are called without a limit option. Express default is 100KB but this is not
+  explicitly enforced. Several endpoints accept JSONB payloads with embedded
+  base64 content (logo uploads, document metadata, AI assistant messages)
+  that can legitimately exceed 100KB, potentially masking whether limits are
+  actually enforced.
+
+  Without explicit limits, a malicious actor can send large payloads to
+  exhaust Node.js heap memory.
+
+REQUIRED FIX:
+  app.use(express.json({ limit: '1mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+  For the logo upload endpoint specifically, enforce a separate stricter limit.
+
+
+--------------------------------------------------------------------------------
+GAP-017 | Company Logo Stored as Base64 in Database
+SEVERITY: MEDIUM
+File: backend/src/services/settingsService.js  (logo_binary key)
+File: backend/src/routes/platformAdminRoutes.js  (logo upload to local disk)
+--------------------------------------------------------------------------------
+
+DESCRIPTION:
+  Company logos are stored as base64-encoded binary in the Settings table
+  under the key "logo_binary" scoped to each company_id. A typical company
+  logo PNG is 20–100 KB, which as base64 becomes 27–133 KB stored as a
+  PostgreSQL TEXT column. With 100 companies, this is 2.7–13 MB of binary
+  data in the Settings table.
+
+  Platform admin logos are stored to LOCAL DISK at uploads/logos/ (not R2)
+  with Date.now() + random in the filename. These files are served from
+  /uploads/logos/ which bypasses all tenant auth checks.
+
+IMPACT:
+  - Bloated Settings table rows slow down all settings queries.
+  - Logo binary in DB is inefficient — DB is not a file store.
+  - Platform admin logos are public (no auth check) and stored outside R2.
+
+REQUIRED FIX:
+  Store all logos in R2 under a dedicated key path:
+    logos/<company_id>/logo.<ext>
+  Return the presigned URL (or a stable proxy URL via /api/settings/logo).
+  Delete the base64 approach.
+  For platform admin logos: upload to R2 instead of local disk.
+
+
+================================================================================
+SECTION 7 — PERFORMANCE & SCALABILITY ASSESSMENT
+================================================================================
+
+DATABASE CONNECTION POOL
+  Current: max:10 (URL mode) / max:5 (host mode)
+  Problem: With 50+ models, complex joins, and multi-tenant load, 10 connections
+           shared across all tenants means one tenant's slow queries starve others.
+  Target:  max:25–50 for production; consider PgBouncer for connection pooling
+           in front of PostgreSQL on Railway.
+
+CACHING
+  Current: In-process Map in r2StorageService (_nameCache, 60-second TTL).
+           Lost on restart, not shared across multiple backend instances.
+  Problem: Every request for company settings, folder trees, user permissions
+           hits PostgreSQL. With 50+ tenants, this becomes a hot path.
+  Target:  Redis (ioredis) with:
+             - Company settings cache: TTL 5 minutes
+             - User session validity cache: TTL = remaining JWT lifetime
+             - Folder tree cache: TTL 2 minutes, invalidate on folder create/rename
+             - R2 name resolution cache: TTL 10 minutes
+
+SYNCHRONOUS PDF GENERATION
+  Current: PDFKit runs synchronously in the Express request thread.
+  Problem: A 50-page estimate PDF can take 300–800ms, blocking the event loop.
+           Under concurrent multi-tenant load, all requests queue behind PDFs.
+  Target:  Async queue (BullMQ). Request returns { job_id }, client polls
+           GET /jobs/:id/status until complete.
+
+DATABASE INDEXES — CRITICAL FOR MULTI-TENANT PERFORMANCE
+  Every tenant query includes WHERE company_id = ? as the first filter.
+  Without composite indexes, PostgreSQL does a full table scan filtered by
+  company_id, then further filters by other conditions.
+
+  Required composite indexes (verify these exist):
+    CREATE INDEX ON projects (company_id, deleted_at, created_at DESC);
+    CREATE INDEX ON documents (company_id, project_id, created_at DESC);
+    CREATE INDEX ON estimates (company_id, project_id, status);
+    CREATE INDEX ON work_orders (company_id, status, created_at DESC);
+    CREATE INDEX ON invoices (company_id, status, created_at DESC);
+    CREATE INDEX ON audit_logs (company_id, created_at DESC);
+    CREATE INDEX ON activity_timelines (company_id, created_at DESC);
+    CREATE INDEX ON vendor_rfqs (company_id, status);
+
+  Run EXPLAIN ANALYZE on the most common query patterns to verify index usage.
+
+HORIZONTAL SCALING
+  The backend is stateless (no in-memory session state beyond the process-
+  level name cache). It CAN be scaled horizontally on Railway with multiple
+  replicas — but only after adding Redis (the in-process cache would split
+  across instances causing inconsistency).
+
+
+================================================================================
+SECTION 8 — DATABASE INTEGRITY ASSESSMENT
+================================================================================
+
+MISSING TRANSACTIONS
+  Only 11 sequelize.transaction() calls exist across the entire codebase
+  (mostly in procurementService.js). The following critical multi-step
+  operations are NOT atomic:
+
+    projectService.createProject()
+      Creates: Project + Estimate + FileManagerFolder + Document records
+      Risk: If Document creation fails, orphaned Project + Estimate exist.
+
+    workOrderService.createWorkOrder()
+      Creates: WorkOrder + Document + activity log
+      Risk: WorkOrder created without associated document.
+
+    invoiceController.create()
+      Creates: Invoice header + multiple InvoiceLineItem records
+      Risk: Invoice exists with partial line items.
+
+    userService.createUser()
+      Creates: User + sends invite email + creates audit log
+      Risk: User created but no audit log (silent).
+
+  Fix: Wrap all multi-model write operations in sequelize.transaction().
+
+POLYMORPHIC MODELS WITHOUT FK CONSTRAINTS
+  RiskScore, ActivityTimeline, AuditLog, Conversation all use:
+    entity_type VARCHAR (e.g. 'project', 'user', 'vendor')
+    entity_id   UUID
+  Without FK constraints, entity_id can reference deleted or non-existent
+  records indefinitely. Soft deletes (deleted_at) are used throughout but
+  not all polymorphic lookups handle deleted parent records.
+
+CONVERSATION / MESSAGE TENANT ISOLATION
+  The Conversation model has company_id. But ConversationParticipant and
+  Message models do NOT have company_id. They rely entirely on the parent
+  conversation_id to inherit tenant scope. If a conversation_id is known
+  or guessable, Messages can be queried without company_id filtering.
+  This should be audited and company_id added to Message and
+  ConversationParticipant models.
+
+SOFT DELETE CONSISTENCY
+  deleted_at (soft delete) is used inconsistently. Some models have it
+  (Project, Document, User), others do not. The Sequelize hooks add
+  company_id filters but do NOT automatically exclude soft-deleted records
+  unless paranoid: true is set on the model. Verify all tenant models that
+  have deleted_at also have paranoid: true in the model definition.
+
+
+================================================================================
+SECTION 9 — FRONTEND SECURITY ASSESSMENT
+================================================================================
+
+TOKEN STORAGE
+  JWT tokens are stored in localStorage. This is a known XSS risk —
+  any JavaScript that runs on the page (including via XSS or a compromised
+  npm package) can read localStorage. The industry recommendation for sensitive
+  tokens is httpOnly cookies (not accessible to JavaScript).
+  
+  Given the application is a business management tool (not a public consumer
+  app), localStorage is an acceptable pragmatic choice IF:
+    - A strict Content-Security-Policy header is set (via helmet)
+    - All npm dependencies are regularly audited (npm audit)
+    - XSS vectors in React are not introduced (use dangerouslySetInnerHTML
+      sparingly and never with unescaped user content)
+
+IMPERSONATION TOKEN HANDLING
+  The platform admin impersonation flow passes tokens via:
+    localStorage.setItem('forge_impersonate_token', token)
+  Then the new tab reads it and moves it to sessionStorage. The localStorage
+  key is cleared after transfer. This is acceptable but the window between
+  setItem and removeItem is a brief race where another tab's JavaScript
+  (if XSS were present) could read the token.
+
+ACTIVE COMPANY CONTEXT
+  Platform admin's active company is stored in localStorage under
+  'active-company-context'. The shouldApplyActiveCompany() function
+  correctly skips the header injection for /platform-admin and /auth/
+  routes. The backend validates the x-active-company-id header as a valid
+  UUID before trusting it.
+
+DEPENDENCY AUDIT
+  The frontend has framer-motion ^12.35.2, lucide-react ^0.577.0, and
+  recharts ^3.7.0 as dependencies. These are not security-critical but
+  should be audited periodically.
+  Run: npm audit in frontend/ directory.
+
+CSP (CONTENT SECURITY POLICY)
+  helmet() on the backend sets default security headers for API responses.
+  For the React SPA served by serve (or Railway static hosting), a
+  Content-Security-Policy meta tag or response header should be configured
+  in the build. This is not currently done.
+  Recommend: Add a netlify.toml / Railway headers config with:
+    Content-Security-Policy: default-src 'self'; img-src 'self' data: blob:;
+      connect-src 'self' <backend-url> <r2-url>;
+
+
+================================================================================
+SECTION 10 — WHAT IS ALREADY WORKING WELL
+================================================================================
+
+The following aspects of the system are correctly implemented and represent
+a strong foundation:
+
+  AUTHENTICATION
+  [OK] bcryptjs for password hashing (industry standard, correct salt rounds)
+  [OK] Failed login attempt counting with configurable lockout duration
+  [OK] Soft-delete check prevents deleted users from logging in
+  [OK] force_password_reset field exists and is checked during login
+
+  MULTI-TENANT ISOLATION
+  [OK] All 44 route files have authenticate + tenantScope middleware applied
+  [OK] 4-layer defense: JWT -> tenantScope -> Sequelize hooks -> RLS (design)
+  [OK] AsyncLocalStorage for clean tenant context propagation in async chains
+  [OK] _SKIP_TENANT_SCOPE_ALLOWLIST with call-stack validation (prevents misuse)
+  [OK] x-active-company-id header is validated as UUID before backend uses it
+  [OK] R2 file keys organized as: {CompanyName_Code}/{ProjectName_Number}/...
+  [OK] verifyR2KeyOwnership() checks company prefix on all R2 file operations
+  [OK] /uploads handler is fail-closed (unknown files denied, not allowed)
+  [OK] Document table lookup for /uploads enforces company_id match
+
+  DOCUMENT MANAGEMENT
+  [OK] Document numbering (INV, WO, QTN, etc.) properly scoped per company
+       Uses Settings key: document_numbering:{companyId}
+  [OK] In-memory promise-chain lock per {docType}:{companyId} for serialization
+
+  SETTINGS
+  [OK] Company settings use explicit (key, company_id) composite key
+  [OK] settingsService is on the _skipTenantScope allowlist and handles its
+       own scoping correctly
+
+  SECURITY HEADERS
+  [OK] helmet() middleware sets: X-Frame-Options, X-Content-Type-Options,
+       X-XSS-Protection, Referrer-Policy, HSTS, etc.
+
+  AUDIT LOGGING
+  [OK] AuditLog model used throughout for security-relevant events
+  [OK] LoginHistory model records login times and IPs
+
+  FILE SECURITY
+  [OK] Path traversal check on /uploads endpoint (req.path.includes('..'))
+  [OK] Presigned URLs (60s TTL) — files never proxied through Node.js server
+  [OK] multer file upload handling (multipart/form-data)
+
+
+================================================================================
+SECTION 11 — PRIORITY ACTION PLAN
+================================================================================
+
+PHASE 1 — CRITICAL (Do Immediately — Before Next Production Deployment)
+------------------------------------------------------------------------
+
+  P1-1  Verify and provision forged_app PostgreSQL role + RLS policies
+        Files: new migration file
+        Effort: 4 hours
+        Risk if skipped: Layer 4 (database-level) isolation is inactive
+
+  P1-2  Add RiskScore to TENANT_MODELS
+        Files: backend/src/models/index.js  (1-line change)
+        Effort: 30 minutes
+        Risk if skipped: Cross-tenant risk score data leakage
+
+  P1-3  Wire Session table into authenticate() middleware
+        Files: backend/src/middleware/auth.js
+        Effort: 2 hours
+        Risk if skipped: Revoked/stolen tokens valid for 7 days
+
+  P1-4  Remove all admin operations from /health endpoint
+        Files: backend/src/index.js
+        Effort: 2 hours
+        Risk if skipped: Admin password reset exposed to internet
+
+  P1-5  Remove root-level route double-mount
+        Files: backend/src/index.js  (remove: app.use(routes))
+        Effort: 15 minutes
+        Risk if skipped: Middleware bypass possible via root path
+
+PHASE 2 — HIGH (Complete Within Current Sprint)
+-----------------------------------------------
+
+  P2-1  Add global rate limiter on all /api routes
+        Files: backend/src/index.js, backend/src/routes/*.js
+        Effort: 2 hours
+
+  P2-2  Add HTTP compression middleware
+        Files: backend/src/index.js, backend/package.json
+        Effort: 30 minutes
+
+  P2-3  Fix CORS to use explicit FRONTEND_URL whitelist only
+        Files: backend/src/index.js
+        Effort: 1 hour
+
+  P2-4  Fix FileManagerFolder root path collision
+        Files: backend/src/controllers/fileManagerController.js,
+               backend/src/services/fileManagerService.js
+        Effort: 3 hours
+
+  P2-5  Wrap project/workorder/invoice creation in transactions
+        Files: backend/src/services/projectService.js,
+               backend/src/services/workOrderService.js,
+               backend/src/controllers/invoiceController.js
+        Effort: 4 hours
+
+  P2-6  Add express.json({ limit: '1mb' }) body size cap
+        Files: backend/src/index.js
+        Effort: 15 minutes
+
+  P2-7  Disable /setup routes via SETUP_ENABLED=false env var
+        Files: backend/src/routes/setupRoutes.js
+        Effort: 1 hour
+
+  P2-8  Add UUID validation to all :id route parameters
+        Files: all 44 route files (batch update)
+        Effort: 4 hours
+
+PHASE 3 — MEDIUM (Next Sprint)
+-------------------------------
+
+  P3-1  Implement real TOTP/email OTP 2FA enforcement during login
+        Files: backend/src/services/authService.js,
+               backend/src/routes/authRoutes.js,
+               frontend/src/pages/Login.tsx (or equivalent)
+        Effort: 8 hours
+
+  P3-2  Replace console.* with pino structured logging
+        Files: All backend service and controller files
+        Effort: 6 hours
+
+  P3-3  Add Redis caching (company settings, sessions, folder trees)
+        Files: backend/package.json (add ioredis),
+               backend/src/services/settingsService.js,
+               backend/src/middleware/auth.js
+        Effort: 8 hours
+
+  P3-4  JWT refresh token pattern (reduce access token TTL to 15 min)
+        Files: backend/src/services/authService.js,
+               backend/src/routes/authRoutes.js,
+               frontend/src/services/authService.ts
+        Effort: 8 hours
+
+  P3-5  Upgrade password policy to 12+ chars with complexity
+        Files: backend/src/routes/authRoutes.js,
+               backend/src/services/authService.js (ADMIN_PASSWORD default)
+        Effort: 2 hours
+
+  P3-6  Move logo storage from DB base64 to R2
+        Files: backend/src/services/settingsService.js,
+               backend/src/routes/platformAdminRoutes.js
+        Effort: 4 hours
+
+  P3-7  Add BullMQ queue for async PDF/report generation
+        Files: backend/src/services/pdfService.js (new queue worker),
+               backend/src/controllers/documentController.js
+        Effort: 12 hours
+
+  P3-8  Verify all composite DB indexes exist on tenant tables
+        Files: new migration with CREATE INDEX statements
+        Effort: 4 hours
+
+  P3-9  Add company_id to Message and ConversationParticipant models
+        Files: migration + model update
+        Effort: 3 hours
+
+
+================================================================================
+SECTION 12 — APPENDIX: FILE REFERENCE MAP
+================================================================================
+
+File                                           | Gaps Referenced
+-----------------------------------------------|---------------------------
+backend/src/index.js                           | 005, 006, 008, 009, 015, 016
+backend/src/middleware/auth.js                 | 003
+backend/src/middleware/tenantScope.js          | (working correctly)
+backend/src/middleware/tenantContext.js        | (working correctly)
+backend/src/models/index.js                   | 001, 002
+backend/src/models/RiskScore.js               | 002
+backend/src/models/User.js                    | 004, 013
+backend/src/services/authService.js           | 003, 004, 012, 013
+backend/src/services/userService.js           | 004
+backend/src/services/settingsService.js       | 017
+backend/src/services/fileManagerService.js    | 007
+backend/src/services/r2StorageService.js      | (minor: process-level cache)
+backend/src/services/documentNumberingService | (working correctly)
+backend/src/controllers/fileManagerController | 007
+backend/src/routes/authRoutes.js              | 005, 013
+backend/src/routes/setupRoutes.js             | 011B
+backend/src/routes/platformAdminRoutes.js     | 017
+frontend/src/contexts/AuthContext.tsx         | (impersonation flow noted)
+frontend/src/utils/activeCompany.ts           | (working correctly)
+
+================================================================================
+END OF REPORT
+================================================================================
+Total Gaps Found  : 17  (4 Critical, 7 High, 6 Medium)
+Report Generated  : April 18, 2026
+System Version    : 2026-04-17-v16
+================================================================================

@@ -1,0 +1,69 @@
+server:
+  port: ${PORT:5000}
+
+# jdbc:postgresql://localhost:5432/forgedas_dev
+# root
+spring:
+  datasource:
+    # url: jdbc:postgresql://localhost:5432/forgedas_dev
+    # username: postgres
+    # password: root
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+        jdbc:
+          time_zone: UTC
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+logging:
+  level:
+    org.hibernate.SQL: WARN
+
+
+CLOUDFLARE_ACCOUNT_ID: 26321438a92570a9cf316897e91f08cb
+R2_ACCESS_KEY_ID: a4acab01246cfabf0b4e9e3725e4a0cb
+R2_SECRET_ACCESS_KEY: da5e955ed7923e74ebee086517a5a7e16ff44c857e0b587aec4aee2757f9d2f4
+R2_BUCKET_NAME: forge-files
+
+ADMIN_PASSWORD: Admin@123
+ADMIN_UNLOCK_SECRET: 4lhhg35340y4me45ooepgp9job1nb0nd
+SETUP_ENABLED: "false"
+SETUP_SECRET: m320od7dxov8jlzdoik7latvcvymufuz
+FRONTEND_URL: "https://forgehalima.com,https://www.forgehalima.com"
+CORS_ORIGIN: "https://forgehalima.com,https://www.forgehalima.com"
+MAX_FILE_SIZE: "10485760"
+SMTP_PASS: xqsxrcrsc7nk5otpdk4u3uwk74e6hzub
+
+app:
+  security:
+    jwt-secret: ${JWT_SECRET:forgedidas-dev-jwt-secret-2026-xyz}
+    access-token-expiry: ${JWT_EXPIRES_IN:7d}
+    jwt-refresh-secret: ${JWT_REFRESH_SECRET:${JWT_SECRET:forgedidas-dev-jwt-secret-2026-xyz}}
+    refresh-token-expiry: ${REFRESH_TOKEN_EXPIRY:30d}
+  market:
+    provider: ${MARKETDATA_PROVIDER:comexlive}
+    comex-url: ${COMEXLIVE_COPPER_URL:https://comexlive.org/copper/}
+    timeout-seconds: ${COMEXLIVE_HTTP_TIMEOUT:20}
+    cache-ttl-seconds: ${MARKETDATA_CACHE_TTL:600}
+  drawing:
+    solidworks-api-url: ${SOLIDWORKS_API_URL:http://localhost:5100}
+    timeout-seconds: ${SOLIDWORKS_HTTP_TIMEOUT:30}
+  storage:
+    local-root: ${FORGE_STORAGE_ROOT:java-backend/generated}
+  pdf-service:
+    url: ${PDF_SERVICE_URL:http://localhost:3100}
+    secret: ${PDF_SERVICE_SECRET:change-me-in-production}

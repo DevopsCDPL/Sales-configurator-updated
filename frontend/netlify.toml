@@ -1,0 +1,13 @@
+[build]
+  base    = "frontend"
+  command = "npm run build"
+  publish = "build"
+
+[build.environment]
+  NODE_VERSION = "20"
+  REACT_APP_API_URL = "https://g-t-production.up.railway.app/api"
+
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200

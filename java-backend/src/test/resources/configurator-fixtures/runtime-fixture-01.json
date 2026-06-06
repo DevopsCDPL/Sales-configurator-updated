@@ -1,0 +1,141 @@
+{
+  "configuration": {
+    "id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+    "code": "CFG-FIXTURE-01",
+    "name": "Fixture Configuration",
+    "project_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"
+  },
+  "configData": {
+    "stepLines": {
+      "enclosure": [
+        {
+          "componentId": "11111111-1111-1111-1111-111111111111",
+          "partNumber": "CB-400A",
+          "name": "Breaker 400A",
+          "unitPrice": 250.5,
+          "quantity": 2,
+          "meta": {
+            "source": "fixture"
+          }
+        }
+      ],
+      "controls": [
+        {
+          "componentId": "22222222-2222-2222-2222-222222222222",
+          "partNumber": "CTRL-RELAY",
+          "name": "Control Relay",
+          "unitPrice": 40,
+          "quantity": 3,
+          "meta": {
+            "source": "fixture"
+          }
+        }
+      ]
+    },
+    "plus_comp": {
+      "bom_rows": [
+        {
+          "part_number": "MANUAL-KIT",
+          "name": "Manual Kit",
+          "description": "Manual adder line",
+          "category": "ADDER",
+          "quantity": 1,
+          "unit": "ea",
+          "unit_cost": 15.75,
+          "unit_material_cost": 10.5,
+          "unit_labor_cost": 5.25,
+          "lbr_asm": 0.1,
+          "section_number": 2,
+          "meta": {
+            "type": "manual"
+          }
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "id": "11111111-1111-1111-1111-111111111111",
+      "part_number": "CB-400A",
+      "name": "Breaker 400A",
+      "description": "Main incomer breaker",
+      "category": "CIRCUIT BREAKER",
+      "component_type": "breaker",
+      "unit": "ea",
+      "price": "250.50",
+      "material_cost": "200.25",
+      "mat_cost": "200.25",
+      "labor_cost": "50.25",
+      "lbr_cu": "0.25",
+      "lbr_asm": "0.75",
+      "lbr_cnt": "0.10",
+      "lbr_qc": "0.05",
+      "lbr_tst": "0.03",
+      "lbr_eng": "0.02",
+      "lbr_cad": "0.01",
+      "copper_weight_per_unit": "1.50"
+    },
+    {
+      "id": "22222222-2222-2222-2222-222222222222",
+      "part_number": "CTRL-RELAY",
+      "name": "Control Relay",
+      "description": "Panel relay",
+      "category": "CONTROLS",
+      "component_type": "relay",
+      "unit": "ea",
+      "price": "40.00",
+      "material_cost": "32.00",
+      "mat_cost": "32.00",
+      "labor_cost": "8.00",
+      "lbr_cu": "0.00",
+      "lbr_asm": "0.20",
+      "lbr_cnt": "0.10",
+      "lbr_qc": "0.04",
+      "lbr_tst": "0.03",
+      "lbr_eng": "0.01",
+      "lbr_cad": "0.01",
+      "copper_weight_per_unit": "0.20"
+    }
+  ],
+  "lookup": {
+    "LBR_CU_rate": 85,
+    "LBR_ASM_rate": 75,
+    "LBR_CNT_rate": 95,
+    "LBR_QC_rate": 80,
+    "LBR_TST_rate": 90,
+    "LBR_ENG_rate": 130,
+    "LBR_CAD_rate": 110,
+    "OVERHEAD_PCT": 0.1,
+    "COPPER_RATE_PER_LB": 4.5
+  },
+  "pricing": {
+    "strategy": "DESIRED GM%",
+    "desired_gm_pct": 0.3,
+    "desired_price": null,
+    "roundup_factor": -1
+  },
+  "schedule": {
+    "order_date": "2025-01-06T00:00:00Z",
+    "long_lead_sub_weeks": 1,
+    "long_lead_approve_weeks": 2,
+    "eng_sub_weeks": 1,
+    "sub_approve_weeks": 1,
+    "lead_time_weeks": 2,
+    "mfg_time_weeks": 1
+  },
+  "holidays": [
+    "2025-01-13"
+  ],
+  "lineAdders": [
+    {
+      "section_id": "0",
+      "desc": "Logistics",
+      "value": 25
+    },
+    {
+      "section_id": "2",
+      "desc": "Special Testing",
+      "value": 10
+    }
+  ]
+}

@@ -1,0 +1,457 @@
+
+
+===== PAGE 1 =====
+My Accoun t
+Settings
+Da tabase
+Oper a tions
+Dashboar d
+P r ojects
+P r ocur emen t
+In v en t ory
+Business Anala tics
+File Manag er
+My Accoun t
+Settings
+Da tabase
+Oper a tions
+Dashboar d
+P r ojects
+P r ocur emen t
+In v en t ory
+Business Anala tics
+File Manag er
+I n s t r u c i t o n s :
+1 . D u p l i c a t e  t h e  e n t i r e  f o r g e  a p p l i c a t i o n ,  u n d e r s t a n d  h o w  i t  w o r k s  ( D h i n a k a r a n  w i l l  h e l p  y o u
+u n d e r s t a n d  i t ) .
+2 . I n s e r t  t h e  c o n f i g u r a t i o n  m o d u l e  t o  t h e  e s t i m a t i o n  m o d u l e  ( r e f e r  s c r e e n s h o t s  a s  f o l l o w s ) .
+3 . C h a n g e  t h e  e n t i r e  f o r g e  a p p l i c a t i o n  t h e m e  a s  l i k e  t h e  s a l e s  C o n f i g u r a t i o n  t h e m e  ( d a r k  a n d
+l i g h t n i n g  b l u e  t h e m e ) . ,  e x a c t l y  s a m e .
+4 . M a k e  r e s t  o f  t h e  c h a n g e s  a s  g i v e n  i n  t h e  f o l l o w i n g  s c r e e n s h o t s .
+
+===== PAGE 2 =====
+My Accoun t
+Settings
+Da tabase
+Oper a tions
+Dashboar d
+P r ojects
+P r ocur emen t
+In v en t ory
+Business Anala tics
+File Manag er
+Sa v e
+Ne xt
+Back
+My Accoun t
+Settings
+Da tabase
+Oper a tions
+Dashboar d
+P r ojects
+P r ocur emen t
+In v en t ory
+Business Anala tics
+File Manag er
+M o d i f y  t h e  p r o j e c t  f l o w  t h i s  w a y :
+“ P r o j e c t  I n f o  →  C o n f i g u r a t i o n  →  D r a w i n g  G e n e r a t i o n  →  Q u o t a t i o n  →  P O  f r o m  C l i e n t  →  W o r k  O r d e r  →
+P r o d u c t i o n  T r a v e l l e r  →  Q u a l i t y  →  L o g i s t i c s  →  I n v o i c e  →  D o c u m e n t a t i o n  →  A n a l y t i c s ”
+T h e  o n l y  c h a n g e  i n  t h i s  f l o w  i s :  r e n a m e  t h e  “ e s t i m a t i o n ”  t o  “ c o n f i g u r a t i o n ” ,  y o u  n e e d  t o  b r i n g  t h e  e n t i r e
+S a l e s  C o n f i g u r a t o r  →  D a s h b o a r d  h e r e  t o  t h e  “ c o n f i g u r a t i o n ”  m e n u
+O n c e  t h e  p r o j e c t  i s  c r e a t e d  t h e  t o p  p r o g r e s s  b a r  s h o u l d  a p p e a r  w i t h   n e x t ,  p r e v i o u s  a n d  s a v e  b u t t o n .
+I n  D r a w i n g  g e n e r a t i o n  p a r t / t a b  w e  a r e  a c t u a l l y  g e n e r a t i n g  t h e  s o l i d w r o k s  f r a w i n g  w i t h  o u r  U I
+T h i s  i s  t h e  n e w  p r o j e c t  w o r k f l o w  o f  t h e  c o n f i g u r a t o r ,  i t  s h o u l d  w o r k  s a m e  a s  t h e  f o r g e  a p p l i c a t i o n . ,  
+t h e  u s e r  s h o u l d  b e  a b l e  t o  c r e a t e  a  n e w  p r o j e c t  a n d  i n s t e a d  o f  t h e  e s t i m a t i o n  ,  t h e  u s e r  s h o u l d  b e  a b l e
+t o  c r e a t e  t h e  c o n f i g u r a t i o n  l i k e  w e  d o  n o r m a l l y .
+
+===== PAGE 3 =====
+My Accoun t
+Settings
+Da tabase
+Oper a tions
+Dashboar d
+P r ojects
+P r ocur emen t
+In v en t ory
+Business Anala tics
+File Manag er
+P r o gr ess :        5 %
+Sa v e
+Ne xt
+Back
+B r i n g  t h e  l o a d  c o n f i g u r a t i o n  h e r e ,  i t  s h o u l d  w o r k  s a m e  a s  i n  t h e  o l d  c o n f i g u r a t o r . ,  t h e  u s e r  s h o u l d
+e i t h e r  c r e a t e  t h e   n e w  c o n f i g u r a t i o n  b y  c l i c k i n g  o n  c r e a t e  n e w  c o n f i g u r a t i o n  o r  l o a d  c o n f i g u r a t i o n  t o
+g e t  t h e  p r e v i o u s l y  s a v e d  c o n f i g u r a t i o n .
+R e n a m e  t h e  S t a r t  n e w  e s t i m a t i o n  t o  S t a r t  n e w  c o n f i g u r a t i o n . ,  r e p l a c e  a l l  e s t i m a t i o n   t o  C o n f i g u r a t i o n
+
+===== PAGE 4 =====
+My Accoun t
+Settings
+Da tabase
+Oper a tions
+Dashboar d
+P r ojects
+P r ocur emen t
+In v en t ory
+Business Anala tics
+File Manag er
+P r o gr ess :        5 %
+Sa v e
+Ne xt
+Back
+ B r i n g  t h e  e x a c t  s a m e  c o n f i g u r a t i o n  s t e p s  h e r e  t o  t h e  c o n f i g u r a t i o n  w i n d o w / t a b :
+“ S y s t e m  D e s i g n  →  E n c l o s u r e  →  B u s s i n g  →  G l a s t i c →  C a m  l o c k  &  P a n e l  →  S P D  &  A T S  →  C o n t r o l s  →
+C T / V T / C P T →  C o n d u i t  &  F i t t i n g s  →  W i r e  &  C a b l e  →  S t a n d a r d  B O M  →  L a b o u r  →  +  C o m p  →  S L D  →  P r e v i e w  →
+Q u o t a t i o n ”
+I n  t h i s  f l o w  “ +  C o m p  →  S L D  →  Q u o t a t i o n ”  a r e  n e w . ,  t a b s  b u t  n o t  c o m p l e t e l y  n e w ,  p r e v i o u s l y  i t  w a s  i n s i d e
+t h e  q u o t a t i o n  n o w  w e  a r e  b r i n g i n g  i t  t o  t h e  p r o j e c t  f l o w  i t s e l d
+T h e  o n l y  c h a n g e  i n  t h i s  f l o w  i s :  r e n a m e  t h e  “ e s t i m a t i o n ”  t o  “ c o n f i g u r a t i o n ” ,  y o u  n e e d  t o  b r i n g  t h e  e n t i r e
+S a l e s  C o n f i g u r a t o r  →  D a s h b o a r d  h e r e  t o  t h e  “ c o n f i g u r a t i o n ”  m e n u
+O n c e  t h e  p r o j e c t  i s  c r e a t e d  t h e  t o p  p r o g r e s s  b a r  s h o u l d  a p p e a r  w i t h   n e x t ,  p r e v i o u s  a n d  s a v e  b u t t o n .
+
+===== PAGE 5 =====
+My Accoun t
+Settings
+Da tabase
+Oper a tions
+Dashboar d
+P r ojects
+P r ocur emen t
+In v en t ory
+Business Anala tics
+File Manag er
+P r o gr ess :        5 %
+Sa v e
+Ne xt
+Back
+T h i s  i s  t h e  “ +  C o m p ”
+p a g e  i n s i d e  t h e
+p r o j e c t  f l o w
+
+===== PAGE 6 =====
+My Accoun t
+Settings
+Da tabase
+Oper a tions
+Dashboar d
+P r ojects
+P r ocur emen t
+In v en t ory
+Business Anala tics
+File Manag er
+P r o gr ess :        5 %
+Sa v e
+Ne xt
+Back
+T h i s  i s  t h e  “ S L D ”
+p a g e  i n s i d e  t h e
+p r o j e c t  f l o w
+
+===== PAGE 7 =====
+My Accoun t
+Settings
+Da tabase
+Oper a tions
+Dashboar d
+P r ojects
+P r ocur emen t
+In v en t ory
+Business Anala tics
+File Manag er
+P r o gr ess :        5 %
+Sa v e
+Ne xt
+Back
+T h i s  i s  t h e  “ P r e v i e w ”
+p a g e  i n s i d e  t h e
+p r o j e c t  f l o w
+
+===== PAGE 8 =====
+My Accoun t
+Settings
+Da tabase
+Oper a tions
+Dashboar d
+P r ojects
+P r ocur emen t
+In v en t ory
+Business Anala tics
+File Manag er
+P r o gr ess :        5 %
+Sa v e
+Ne xt
+Back
+D o w n l o a d  Q u o t a t i o n
+T h i s  i s  t h e
+“ Q u o t a t i o n ”  p a g e
+i n s i d e  t h e  p r o j e c t
+f l o w .
+H e r e   w e  a r e
+g e n e r a t i n g  t h e
+q u o t a t i o n  p d f .
+
+===== PAGE 9 =====
+My Accoun t
+Settings
+Da tabase
+Oper a tions
+Dashboar d
+P r ojects
+P r ocur emen t
+In v en t ory
+Business Anala tics
+File Manag er
+Sa v e
+Ne xt
+Back
+P r o gr ess :        5 %
+My Accoun t
+Settings
+Da tabase
+Oper a tions
+Dashboar d
+P r ojects
+P r ocur emen t
+In v en t ory
+Business Anala tics
+File Manag er
+Sa v e
+Ne xt
+Back
+P r o gr ess :        5 %
+D o w n l o a d  Q u o t a t i o n
+O n c e   t h e  q u o t a i t o n  i s  g e n e r a t e d  t h e  p r o j e c t  f l o w  g o e s  t o  t h e  P o  f r o m  c l i e n t .  f r o m  t h i s  t h e  U I  w o r k s  e x a c t l y  l i k e
+f o r g e ,  u n l e s s  s p e c i f i e d .
+T h i s  p a r t . ,  t h e  U I  w o r k s  e x a c t l y  l i k e  f o r g e ,  u n l e s s  s p e c i f i e d .
+
+===== PAGE 10 =====
+My Accoun t
+Settings
+Da tabase
+Oper a tions
+Dashboar d
+P r ojects
+P r ocur emen t
+In v en t ory
+Business Anala tics
+File Manag er
+Sa v e
+Ne xt
+Back
+P r o gr ess :        5 %
+
+
+===== PAGE 11 =====
+My Accoun t
+Settings
+Da tabase
+Sa v e
+My Accoun t
+Settings
+Da tabase
+Sa v e
+Oper a tions
+Dashboar d
+P r ojects
+P r ocur emen t
+In v en t ory
+Business Anala tics
+File Manag er
+Oper a tions
+Dashboar d
+P r ojects
+P r ocur emen t
+In v en t ory
+Business Anala tics
+File Manag er
+
+===== PAGE 12 =====
+My Accoun t
+Settings
+Da tabase
+Sa v e
+My Accoun t
+Settings
+Da tabase
+Sa v e
+Oper a tions
+Dashboar d
+P r ojects
+P r ocur emen t
+In v en t ory
+Business Anala tics
+File Manag er
+Oper a tions
+Dashboar d
+P r ojects
+P r ocur emen t
+In v en t ory
+Business Anala tics
+File Manag er
+My Account
+Def ault settings    |     T & C / Not es     |     Security & Notifica tion
+B r i n g  t h e  s e t t i n g s  t a b s  a s  s h o w n  i n  t h e  i m a g e
+T h i s  p a r t . ,  t h e  U I  w o r k s  e x a c t l y  l i k e  f o r g e ,  u n l e s s  s p e c i f i e d .  w e  a r e
+j u s t  c h a n g i n g  t h e  l o c a t i o n  o f  t h e  b u t t o n s
+
+===== PAGE 13 =====
+My Accoun t
+Settings
+Da tabase
+Sa v e
+My Accoun t
+Settings
+Da tabase
+Sa v e
+Oper a tions
+Dashboar d
+P r ojects
+P r ocur emen t
+In v en t ory
+Business Anala tics
+File Manag er
+Def ault settings    |     T & C / Not es     |     Security & Notifica tion
+Oper a tions
+Dashboar d
+P r ojects
+P r ocur emen t
+In v en t ory
+Business Anala tics
+File Manag er
+Def ault settings    |     T & C / Not es     |     Security & Notifica tion
+T h i s  p a r t . ,  t h e  U I  w o r k s  e x a c t l y  l i k e  f o r g e ,  u n l e s s  s p e c i f i e d .  w e  a r e
+j u s t  c h a n g i n g  t h e  l o c a t i o n  o f  t h e  b u t t o n s
+
+===== PAGE 14 =====
+My Accoun t
+Settings
+Da tabase
+Sa v e
+My Accoun t
+Settings
+Da tabase
+Sa v e
+Oper a tions
+Dashboar d
+P r ojects
+P r ocur emen t
+In v en t ory
+Business Anala tics
+File Manag er
+   Come x Copper |    Componen ts     |     Ra w Ma t erial    |    Sa v ed Con figur a tion   |    V endor Da ta    |    Clien t Da ta
+Oper a tions
+Dashboar d
+P r ojects
+P r ocur emen t
+In v en t ory
+Business Anala tics
+File Manag er
+   Come x Copper |    Componen ts     |     Ra w Ma t erial    |    Sa v ed Con figur a tion   |    V endor Da ta    |    Clien t Da ta
+T h i s  p a r t . ,  t h e  U I  w o r k s  e x a c t l y  l i k e  o l d  s a l e s  c o n f i g u r a t o r ,  u n l e s s
+s p e c i f i e d .  w e  a r e  j u s t  c h a n g i n g  t h e  l o c a t i o n  o f  t h e  b u t t o n s
+T h i s  p a r t . ,  t h e  U I  w o r k s  e x a c t l y  l i k e  o l d  s a l e s  c o n f i g u r a t o r ,  u n l e s s
+s p e c i f i e d .  w e  a r e  j u s t  c h a n g i n g  t h e  l o c a t i o n  o f  t h e  b u t t o n s
+
+===== PAGE 15 =====
+My Accoun t
+Settings
+Da tabase
+Sa v e
+My Accoun t
+Settings
+Da tabase
+Sa v e
+Oper a tions
+Dashboar d
+P r ojects
+P r ocur emen t
+In v en t ory
+Business Anala tics
+File Manag er
+   Come x Copper |    Componen ts     |     Ra w Ma t erial    |    Sa v ed Con figur a tion   |    V endor Da ta    |    Clien t Da ta
+Oper a tions
+Dashboar d
+P r ojects
+P r ocur emen t
+In v en t ory
+Business Anala tics
+File Manag er
+   Come x Copper |    Componen ts     |     Ra w Ma t erial    |    Sa v ed Con figur a tion   |    V endor Da ta    |    Clien t Da ta
+T h i s  p a r t . ,  t h e  U I  w o r k s  e x a c t l y  l i k e  o l d  s a l e s  c o n f i g u r a t o r ,  u n l e s s
+s p e c i f i e d .  w e  a r e  j u s t  c h a n g i n g  t h e  l o c a t i o n  o f  t h e  b u t t o n s
+
+===== PAGE 16 =====
+My Accoun t
+Settings
+Da tabase
+Sa v e
+Oper a tions
+Dashboar d
+P r ojects
+P r ocur emen t
+In v en t ory
+Business Anala tics
+File Manag er
+   Come x Copper |    Componen ts     |     Ra w Ma t erial    |    Sa v ed Con figur a tion   |    V endor Da ta    |    Clien t Da ta
+T h i s  p a r t . ,  t h e  U I  w o r k s  e x a c t l y  l i k e  o l d  s a l e s  c o n f i g u r a t o r ,  u n l e s s
+s p e c i f i e d .  w e  a r e  j u s t  c h a n g i n g  t h e  l o c a t i o n  o f  t h e  b u t t o n s
+
+===== PAGE 17 =====
+My Accoun t
+Settings
+Da tabase
+Sa v e
+My Accoun t
+Settings
+Da tabase
+Sa v e
+Oper a tions
+Dashboar d
+P r ojects
+P r ocur emen t
+In v en t ory
+Business Anala tics
+File Manag er
+   Come x Copper |    Componen ts     |     Ra w Ma t erial    |    Sa v ed Con figur a tion   |    V endor Da ta    |    Clien t Da ta
+Oper a tions
+Dashboar d
+P r ojects
+P r ocur emen t
+In v en t ory
+Business Anala tics
+File Manag er
+   Come x Copper |    Componen ts     |     Ra w Ma t erial    |    Sa v ed Con figur a tion   |    V endor Da ta    |    Clien t Da ta
+T h i s  p a r t . ,  t h e  U I  w o r k s  e x a c t l y  l i k e  F o r g e ,  u n l e s s  s p e c i f i e d .  w e  a r e
+j u s t  c h a n g i n g  t h e  l o c a t i o n  o f  t h e  b u t t o n s
+T h i s  p a r t . ,  t h e  U I  w o r k s  e x a c t l y  l i k e  F o r g e ,  u n l e s s  s p e c i f i e d .  w e  a r e
+j u s t  c h a n g i n g  t h e  l o c a t i o n  o f  t h e  b u t t o n s
+
+===== PAGE 18 =====
+My Accoun t
+Settings
+Da tabase
+Sa v e
+My Accoun t
+Settings
+Da tabase
+Sa v e
+Oper a tions
+Dashboar d
+P r ojects
+P r ocur emen t
+In v en t ory
+Business Anala tics
+File Manag er
+   Come x Copper |    Componen ts     |     Ra w Ma t erial    |    Sa v ed Con figur a tion   |    V endor Da ta    |    Clien t Da ta
+Oper a tions
+Dashboar d
+P r ojects
+P r ocur emen t
+In v en t ory
+Business Anala tics
+File Manag er
+   Come x Copper |    Componen ts     |     Ra w Ma t erial    |    Sa v ed Con figur a tion   |    V endor Da ta    |    Clien t Da ta
+T h i s  p a r t . ,  t h e  U I  w o r k s  e x a c t l y  l i k e  F o r g e ,  u n l e s s  s p e c i f i e d .  w e  a r e
+j u s t  c h a n g i n g  t h e  l o c a t i o n  o f  t h e  b u t t o n s
+T h i s  p a r t . ,  t h e  U I  w o r k s  e x a c t l y  l i k e  F o r g e ,  u n l e s s  s p e c i f i e d .  w e  a r e
+j u s t  c h a n g i n g  t h e  l o c a t i o n  o f  t h e  b u t t o n s

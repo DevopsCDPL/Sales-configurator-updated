@@ -1,0 +1,65 @@
+[
+  {
+    "name": "quotation-health",
+    "method": "GET",
+    "path": "/api/quotation/health",
+    "auth": "none",
+    "expectedStatus": 200,
+    "expectedBody": {
+      "success": true,
+      "data": {
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "name": "auth-me-unauthorized",
+    "method": "GET",
+    "path": "/api/auth/me",
+    "auth": "none",
+    "expectedStatus": 401,
+    "expectedBody": {
+      "success": false,
+      "message": "Authentication required. Please provide a valid token."
+    }
+  },
+  {
+    "name": "configurator-preview-missing-configuration-id",
+    "method": "POST",
+    "path": "/api/configurator/preview",
+    "auth": "user",
+    "body": {},
+    "expectedStatus": 422,
+    "expectedBody": {
+      "success": false,
+      "message": "configuration_id is required"
+    }
+  },
+  {
+    "name": "configurator-invalid-uuid-returns-envelope",
+    "method": "GET",
+    "path": "/api/configurator/quotations/not-a-uuid",
+    "auth": "user",
+    "expectedStatus": 400,
+    "expectedBody": {
+      "success": false,
+      "message": "Invalid value for id"
+    }
+  },
+  {
+    "name": "auth-contact-admin",
+    "method": "POST",
+    "path": "/api/auth/contact-admin",
+    "auth": "none",
+    "body": {
+      "email": "user@forge.test"
+    },
+    "expectedStatus": 200,
+    "expectedBody": {
+      "success": true,
+      "data": {
+        "contactEmail": "admin@forge.test"
+      }
+    }
+  }
+]

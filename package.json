@@ -1,0 +1,21 @@
+{
+  "name": "forged-backend",
+  "version": "1.0.0",
+  "main": "backend/src/index.js",
+  "scripts": {
+    "start": "cd backend && node src/index.js",
+    "install:backend": "cd backend && npm install",
+    "reset-admin": "node backend/scripts/resetAdminPassword.js",
+    "db:migrate:configurator": "cd backend && npx sequelize-cli db:migrate --migrations-path src/migrations-configurator"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "date-fns": "^2.30.0",
+    "pg": "^8.18.0",
+    "sequelize": "^6.37.7",
+    "sequelize-cli": "^6.6.5"
+  },
+  "devDependencies": {
+    "@types/date-fns": "^2.5.3"
+  }
+}

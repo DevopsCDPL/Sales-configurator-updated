@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- ⚠️  eslint-disable-next-line -->
+    <meta name="theme-color" content="#1F7A63" />
+    <meta name="description" content="Switchgear Configurator - Industrial Project Management System" />
+    <script>
+      // Flash-prevention: apply saved theme before first paint
+      (function(){
+        var saved = localStorage.getItem('app-theme') || 'light';
+        document.documentElement.setAttribute('data-theme', saved);
+        if (saved === 'dark') {
+          document.documentElement.style.backgroundColor = '#0a0f1a';
+          document.documentElement.style.colorScheme = 'dark';
+        }
+      })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <title>Switchgear Configurator</title>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root">
+      <!-- Fallback loading indicator — replaced by React once JS bundle loads -->
+      <div id="initial-loader" style="display:flex;align-items:center;justify-content:center;height:100vh;background:#F9FAFB;">
+        <div style="text-align:center;">
+          <img src="%PUBLIC_URL%/cholan-dynamics-full.png" alt="Loading" style="max-width:220px;margin-bottom:24px;" />
+          <div style="color:#1F7A63;font-family:Inter,sans-serif;">Loading...</div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
