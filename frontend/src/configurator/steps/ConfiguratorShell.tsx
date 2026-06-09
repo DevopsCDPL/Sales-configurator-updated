@@ -143,7 +143,7 @@ const InnerShell: React.FC<Props> = ({ configuration, onPersist, onBack, onNext,
                         : isPhantom
                         ? alpha(accent, 0.05)
                         : 'transparent',
-                      color: active ? '#06151c' : 'rgba(217,228,251,0.78)',
+                      color: active ? '#ffffff' : 'rgba(217,228,251,0.78)',
                       borderRadius: '8px',
                       '&:hover': { bgcolor: active ? accent : 'rgba(255,255,255,0.04)' },
                     }}

@@ -6,11 +6,11 @@ import type { PaletteMode } from '@mui/material';
 // Mirrors index.css custom properties. Neon cyan brand accent.
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Brand Colors — Neon Cyan
-const PRIMARY      = '#00c8ff';
-const PRIMARY_LT   = '#33d4ff';
-const PRIMARY_DK   = '#0099cc';
-const PRIMARY_DKR  = '#006699';
+// Brand Colors — Professional Blue
+const PRIMARY      = '#1976D2';
+const PRIMARY_LT   = '#42A5F5';
+const PRIMARY_DK   = '#1565C0';
+const PRIMARY_DKR  = '#0D47A1';
 
 // Dark FLAT palette — pure black canvas, neutral surfaces, no blue tint
 const c = {
@@ -34,9 +34,9 @@ const GRAD_PRIMARY       = PRIMARY;
 const GRAD_PRIMARY_HOVER = PRIMARY_LT;
 const SURFACE_GRADIENT   = c.bgSurface;
 
-// Ring shadow for focus states — cyan glow at ~50% of original
-const RING_PRIMARY        = `0 0 0 3px rgba(0, 200, 255, 0.10)`;
-const RING_PRIMARY_STRONG = `0 0 0 4px rgba(0, 200, 255, 0.12)`;
+// Ring shadow for focus states — blue glow
+const RING_PRIMARY        = `0 0 0 3px rgba(25, 118, 210, 0.15)`;
+const RING_PRIMARY_STRONG = `0 0 0 4px rgba(25, 118, 210, 0.18)`;
 
 export const createAppTheme = (_mode?: PaletteMode) => {
   // Multi-layer dark shadows
@@ -127,11 +127,11 @@ export const createAppTheme = (_mode?: PaletteMode) => {
           },
           containedPrimary: {
             backgroundColor: PRIMARY,
-            color: '#06151c',
+            color: '#ffffff',
             boxShadow: `0 0 0 1px ${alpha(PRIMARY, 0.15)} inset, 0 1px 2px rgba(0,0,0,0.40)`,
             '&:hover': {
               backgroundColor: PRIMARY_LT,
-              boxShadow: `0 0 0 1px ${alpha(PRIMARY, 0.20)} inset, 0 2px 4px rgba(0,0,0,0.50), 0 0 12px ${alpha(PRIMARY, 0.10)}`,
+              boxShadow: `0 0 0 1px ${alpha(PRIMARY, 0.20)} inset, 0 2px 4px rgba(0,0,0,0.50)`,
             },
             '&:active': {
               boxShadow: `0 0 0 1px ${alpha(PRIMARY, 0.12)} inset, 0 1px 2px rgba(0,0,0,0.40)`,
@@ -318,7 +318,7 @@ export const createAppTheme = (_mode?: PaletteMode) => {
             border: `1px solid ${c.border}`,
             '&.MuiChip-colorPrimary': {
               backgroundColor: PRIMARY,
-              color: '#06151c',
+              color: '#ffffff',
               border: 'none',
               boxShadow: 'none',
             },
@@ -497,9 +497,9 @@ export const createAppTheme = (_mode?: PaletteMode) => {
         styleOverrides: {
           primary: {
             backgroundColor: PRIMARY,
-            color: '#06151c',
+            color: '#ffffff',
             boxShadow: `0 0 0 1px ${alpha(PRIMARY, 0.15)} inset, ${SHADOW_LG}`,
-            '&:hover': { backgroundColor: PRIMARY_LT, transform: 'translateY(-2px)', boxShadow: `0 0 0 1px ${alpha(PRIMARY, 0.20)} inset, ${SHADOW_XL}, 0 0 16px ${alpha(PRIMARY, 0.12)}` },
+            '&:hover': { backgroundColor: PRIMARY_LT, transform: 'translateY(-2px)', boxShadow: `0 0 0 1px ${alpha(PRIMARY, 0.20)} inset, ${SHADOW_XL}` },
           },
         },
       },
@@ -525,7 +525,7 @@ export const createAppTheme = (_mode?: PaletteMode) => {
             padding: 7,
             '&.Mui-checked': {
               transform: 'translateX(20px)',
-              color: '#06151c',
+              color: '#ffffff',
               '& + .MuiSwitch-track': { backgroundColor: PRIMARY, opacity: 1, border: 'none' },
             },
           },

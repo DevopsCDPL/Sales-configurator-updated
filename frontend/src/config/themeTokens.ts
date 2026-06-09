@@ -22,18 +22,18 @@
 import { createTheme, alpha } from '@mui/material/styles';
 import type { PaletteMode, Theme } from '@mui/material';
 
-/* ─── Brand palette: Lightning Blue ──────────────────────────────────── */
+/* ─── Brand palette: Professional Blue (Material Design) ─────────────── */
 export const LIGHTNING_BLUE = {
-  50:  '#eef5ff',
-  100: '#d9e8ff',
-  200: '#b6d2ff',
-  300: '#84b1ff',
-  400: '#4f87ff',
-  500: '#2563ff',   // primary
-  600: '#1948e6',
-  700: '#1238b8',
-  800: '#10318f',
-  900: '#0a2068',
+  50:  '#E3F2FD',
+  100: '#BBDEFB',
+  200: '#90CAF9',
+  300: '#64B5F6',
+  400: '#42A5F5',
+  500: '#1976D2',   // primary
+  600: '#1565C0',
+  700: '#0D47A1',
+  800: '#0A3880',
+  900: '#082560',
 } as const;
 
 /* ─── Light/Dark surface tokens ──────────────────────────────────────── */

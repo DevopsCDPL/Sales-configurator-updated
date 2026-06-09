@@ -85,9 +85,9 @@ const AVATAR_MALE = '/avatars/male.png';
 const AVATAR_FEMALE = '/avatars/female.png';
 
 // â”€â”€â”€ Brand Tokens (constant across modes) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-const PRIMARY    = '#00c8ff';
-const PRIMARY_DK = '#0099cc';
-const PRIMARY_LT = '#33d4ff';
+const PRIMARY    = '#1976D2';
+const PRIMARY_DK = '#1565C0';
+const PRIMARY_LT = '#42A5F5';
 
 // â”€â”€â”€ Constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const SIDEBAR_EXPANDED = 260;
@@ -497,7 +497,7 @@ const Layout: React.FC = () => {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               flexShrink: 0,
             }}>
-              <Typography sx={{ fontSize: 13, fontWeight: 800, color: '#06151c', letterSpacing: '-0.02em' }}>SC</Typography>
+              <Typography sx={{ fontSize: 13, fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em' }}>SC</Typography>
             </Box>
             {!c && (
               <Box sx={{ minWidth: 0 }}>
@@ -964,7 +964,7 @@ const Layout: React.FC = () => {
                   placeholder="Enter new name"
                   style={{ flex: 1, padding: '6px 10px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: '0.85rem', outline: 'none' }}
                 />
-                <Button size="small" variant="contained" onClick={handleUpdateName} sx={{ minWidth: 0, px: 1.5, bgcolor: PRIMARY, '&:hover': { bgcolor: PRIMARY_DK }, textTransform: 'none', fontSize: '0.78rem', borderRadius: 2 }}>Save</Button>
+                <Button size="small" variant="contained" onClick={handleUpdateName} sx={{ minWidth: 0, px: 1.5, bgcolor: PRIMARY, color: '#fff', '&:hover': { bgcolor: PRIMARY_DK }, textTransform: 'none', fontSize: '0.78rem', borderRadius: 2 }}>Save</Button>
               </Box>
             )}
             <MenuItem onClick={() => { handleProfileClose(); navigate('/settings'); }} sx={{ py: 1.2, px: 2.5, mx: 1, mt: 0.5, borderRadius: '8px', '&:hover': { bgcolor: 'var(--bg-sidebar-active)' } }}>

@@ -5,9 +5,9 @@ server:
 # root
 spring:
   datasource:
-    # url: jdbc:postgresql://localhost:5432/forgedas_dev
-    # username: postgres
-    # password: root
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/forgedas_dev}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
