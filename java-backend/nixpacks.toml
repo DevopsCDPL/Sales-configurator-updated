@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["jdk21", "maven"]
+nixPkgs = ["jdk25", "maven"]
 
 [phases.build]
 cmds = ["mvn clean package -DskipTests"]
