@@ -637,18 +637,7 @@ const Layout: React.FC = () => {
             </>
           )}
 
-          {/* SYSTEM */}
-          {(canSeeSidebarItem(user?.role, '/users', userIsCoAdmin) || showEnterprise) && (
-            <>
-              {renderSectionLabel('System', c)}
-              <List disablePadding>
-                {canSeeSidebarItem(user?.role, '/users', userIsCoAdmin) && renderNavItem(<GroupIcon />, 'Users', '/users', c)}
-                {showEnterpriseItem('/custom-roles') && renderNavItem(<AdminPanelIcon />, 'Roles', '/custom-roles', c)}
-                {showEnterpriseItem('/approvals') && renderNavItem(<ApprovalIcon />, 'Approvals', '/approvals', c)}
-                {showEnterpriseItem('/sessions') && renderNavItem(<DevicesIcon />, 'Sessions', '/sessions', c)}
-              </List>
-            </>
-          )}
+          {/* System section moved into Settings tabs (Users / Roles / Approvals / Sessions) */}
         </Box>
 
         {/* Bottom */}

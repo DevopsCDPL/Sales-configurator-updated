@@ -14,6 +14,10 @@ import {
   Badge as BadgeIcon,
   Tag as TagIcon,
   ContentCopy as CopyIcon,
+  Group as GroupIcon,
+  AdminPanelSettings as AdminPanelIcon,
+  Approval as ApprovalIcon,
+  Devices as DevicesIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import { useCompanyLogo } from '../contexts/CompanyLogoContext';
@@ -22,6 +26,11 @@ import api from '../services/api';
 // Lazy load DocumentNumberingPanel - only loads when System tab is opened
 const DocumentNumberingPanel = lazy(() => import('../components/DocumentNumberingPanel'));
 const DefaultTextConfigPanel = lazy(() => import('../components/DefaultTextConfigPanel'));
+// Lazy load the panels relocated from the sidebar System section
+const UsersPanel = lazy(() => import('./UsersPage'));
+const CustomRolesPanel = lazy(() => import('../components/CustomRoleBuilder'));
+const ApprovalsPanel = lazy(() => import('../components/ApprovalWorkflowUI'));
+const SessionsPanel = lazy(() => import('../components/SessionMonitoring'));
 
 /* ═══════════════════════════════════════════════════════════════
    Design helpers
@@ -160,7 +169,7 @@ const SettingsPage: React.FC = () => {
   // Full access: platform_admin, main_admin, or co-admin (Owner/Co-Owner)
   const hasFullAccess = isPlatformAdmin || isMainAdmin || isCoAdmin;
 
-  type Section = 'profile' | 'system' | 'security' | 'defaultTexts';
+  type Section = 'profile' | 'system' | 'security' | 'defaultTexts' | 'users' | 'roles' | 'approvals' | 'sessions';
   const [activeSection, setActiveSection] = useState<Section>('profile');
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -204,6 +213,10 @@ const SettingsPage: React.FC = () => {
     { key: 'system', label: 'System', icon: <SystemIcon />, adminOnly: true },
     { key: 'defaultTexts', label: 'Default Text Configuration', icon: <TagIcon />, adminOnly: true },
     { key: 'security', label: 'Security', icon: <LockIcon /> },
+    { key: 'users', label: 'Users', icon: <GroupIcon />, adminOnly: true },
+    { key: 'roles', label: 'Roles', icon: <AdminPanelIcon />, adminOnly: true },
+    { key: 'approvals', label: 'Approvals', icon: <ApprovalIcon />, adminOnly: true },
+    { key: 'sessions', label: 'Sessions', icon: <DevicesIcon />, adminOnly: true },
   ];
   const visibleNav = navItems.filter(n => !n.adminOnly || hasFullAccess);
 
@@ -503,20 +516,30 @@ const SettingsPage: React.FC = () => {
      RENDER
      ═══════════════════════════════════════════════════════════════ */
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', bgcolor: 'var(--bg-canvas, #05080d)', minHeight: '100vh' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', bgcolor: 'transparent' }}>
       {/* ─── Sticky Header + Tabs ──────────────────────────── */}
-      <Box sx={{ position: 'sticky', top: 0, zIndex: 10, bgcolor: 'var(--bg-surface, #0b1018)', pt: 1, pb: 0, borderBottom: '1px solid', borderColor: 'rgba(0,200,255,0.1)' }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
-          <Typography sx={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--text-primary, #f8fbff)' }}>Settings</Typography>
+      <Box sx={{
+        position: 'sticky', top: 0, zIndex: 10,
+        bgcolor: 'var(--bg-canvas, #000)',
+        mx: '-12px', px: '12px', pt: 1.25, pb: 0,
+        borderBottom: '1px solid', borderColor: 'var(--border, #1E2235)',
+      }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: 40, mb: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+            <Box sx={{ width: 30, height: 30, borderRadius: '8px', bgcolor: 'rgba(0,200,255,0.12)', border: `1px solid ${PRIMARY}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <SystemIcon sx={{ fontSize: 16, color: PRIMARY }} />
+            </Box>
+            <Typography sx={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-primary, #f8fbff)', letterSpacing: '-0.01em', lineHeight: 1 }}>Settings</Typography>
+          </Box>
           {activeSection === 'profile' && (
-            <Button variant="contained" startIcon={<SaveIcon sx={{ fontSize: 15 }} />} onClick={handleSaveAll} sx={{ ...saveBtnSx, minWidth: 120, whiteSpace: 'nowrap' }}>Save</Button>
+            <Button variant="contained" startIcon={<SaveIcon sx={{ fontSize: 15 }} />} onClick={handleSaveAll} sx={{ ...saveBtnSx, minWidth: 120, whiteSpace: 'nowrap', height: 34 }}>Save</Button>
           )}
           {activeSection === 'system' && hasFullAccess && (
-            <Button variant="contained" startIcon={<SaveIcon sx={{ fontSize: 15 }} />} onClick={handleSaveSystem} sx={{ ...saveBtnSx, minWidth: 120, whiteSpace: 'nowrap' }}>Save System Settings</Button>
+            <Button variant="contained" startIcon={<SaveIcon sx={{ fontSize: 15 }} />} onClick={handleSaveSystem} sx={{ ...saveBtnSx, minWidth: 120, whiteSpace: 'nowrap', height: 34 }}>Save System Settings</Button>
           )}
         </Box>
         {/* Horizontal Tab Navigation */}
-        <Box sx={{ display: 'flex', gap: 0.5, px: 0.5 }}>
+        <Box sx={{ display: 'flex', gap: 0.5, overflowX: 'auto', '&::-webkit-scrollbar': { height: 4 }, '&::-webkit-scrollbar-thumb': { bgcolor: 'var(--border, #1E2235)', borderRadius: 2 } }}>
           {visibleNav.map((n) => {
             const active = activeSection === n.key;
             return (
@@ -887,6 +910,42 @@ const SettingsPage: React.FC = () => {
               <Box className="animate-fadeIn">
                 <Suspense fallback={<CircularProgress />}>
                   <DefaultTextConfigPanel />
+                </Suspense>
+              </Box>
+            )}
+
+            {/* ══════════════ USERS ════════════════════════════ */}
+            {activeSection === 'users' && hasFullAccess && (
+              <Box className="animate-fadeIn">
+                <Suspense fallback={<Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}><CircularProgress /></Box>}>
+                  <UsersPanel />
+                </Suspense>
+              </Box>
+            )}
+
+            {/* ══════════════ ROLES ════════════════════════════ */}
+            {activeSection === 'roles' && hasFullAccess && (
+              <Box className="animate-fadeIn">
+                <Suspense fallback={<Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}><CircularProgress /></Box>}>
+                  <CustomRolesPanel />
+                </Suspense>
+              </Box>
+            )}
+
+            {/* ══════════════ APPROVALS ════════════════════════ */}
+            {activeSection === 'approvals' && hasFullAccess && (
+              <Box className="animate-fadeIn">
+                <Suspense fallback={<Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}><CircularProgress /></Box>}>
+                  <ApprovalsPanel />
+                </Suspense>
+              </Box>
+            )}
+
+            {/* ══════════════ SESSIONS ═════════════════════════ */}
+            {activeSection === 'sessions' && hasFullAccess && (
+              <Box className="animate-fadeIn">
+                <Suspense fallback={<Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}><CircularProgress /></Box>}>
+                  <SessionsPanel />
                 </Suspense>
               </Box>
             )}
