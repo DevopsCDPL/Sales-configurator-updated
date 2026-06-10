@@ -10,74 +10,75 @@
   --transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ═══ Design Tokens — DARK FLAT (Configurator parity) ═══════════════════
-   Canvas is pure black; surfaces are very-dark neutrals with NO blue tint.
-   Borders are white-translucent (configurator pattern). Blue accent is
-   reserved for active state, with all halos / glows reduced to ~50%. */
+/* ═══ Design Tokens — Premium Industrial SaaS Dark ════════════════════
+   Canvas is a deep neutral (#0D0D14, not pure black). Surfaces are slightly
+   lifted dark slate (#13131E) with crisp solid hairline borders (#1E2235).
+   Text uses cool slate scale (#E2E8F0 / #64748B / #3D4663). Blue is the
+   only brand accent — no gold, no yellow, no cyan. */
 :root {
-  /* Backgrounds — pure black canvas, neutral dark surfaces */
-  --bg-canvas:          #000000;
-  --bg-surface:         #0a0d12;
-  --bg-surface-2:       #0e1218;
-  --bg-surface-3:       #131822;
-  --bg-sidebar:         #050709;
-  --bg-sidebar-active:  rgba(255, 255, 255, 0.04);
-  --bg-input:           rgba(255, 255, 255, 0.015);
+  /* Backgrounds — deep neutral canvas, lifted slate surfaces */
+  --bg-canvas:          #0D0D14;
+  --bg-surface:         #13131E;
+  --bg-surface-2:       #181826;
+  --bg-surface-3:       #1E2235;
+  --bg-sidebar:         #0D0D14;
+  --bg-sidebar-active:  #1E2235;
+  --bg-input:           #0D0D14;
 
   /* Flat surface — no gradient (kept as a CSS var so legacy refs resolve) */
-  --surface-gradient:   #0a0d12;
-  --surface-gradient-2: #0a0d12;
+  --surface-gradient:   #13131E;
+  --surface-gradient-2: #13131E;
 
-  /* Borders — white-translucent hairlines (mirrors configurator) */
-  --border:             rgba(255, 255, 255, 0.06);
-  --border-subtle:      rgba(255, 255, 255, 0.04);
-  --border-hairline:    rgba(255, 255, 255, 0.02);
-  --border-strong:      rgba(255, 255, 255, 0.10);
+  /* Borders — solid 1px slate hairlines */
+  --border:             #1E2235;
+  --border-subtle:      #181826;
+  --border-hairline:    #15151F;
+  --border-strong:      #2A2F44;
 
-  /* Text */
-  --text-primary:       #f0f6ff;
-  --text-secondary:     #d9e4fb;
-  --text-muted:         #9ab0d0;
-  --text-disabled:      #4d5c78;
-  --text-sidebar:       #d9e4fb;
-  --text-sidebar-active:#1976D2;
+  /* Text — cool slate ramp */
+  --text-primary:       #E2E8F0;
+  --text-secondary:     #CBD5E1;
+  --text-muted:         #64748B;
+  --text-disabled:      #3D4663;
+  --text-sidebar:       #64748B;
+  --text-sidebar-active:#E2E8F0;
 
-  /* Accent: Green */
-  --accent-green:       #4ade80;
-  --accent-green-bg:    rgba(22, 163, 74, 0.12);
-  /* Accent: Blue */
-  --accent-blue:        #60a5fa;
-  --accent-blue-bg:     rgba(59, 130, 246, 0.12);
-  /* Accent: Amber */
-  --accent-amber:       #fbbf24;
-  --accent-amber-bg:    rgba(245, 158, 11, 0.12);
-  /* Accent: Red */
-  --accent-red:         #f87171;
-  --accent-red-bg:      rgba(239, 68, 68, 0.12);
-  /* Accent: Cyan */
-  --accent-cyan:        #00c8ff;
-  --accent-cyan-bg:     rgba(0, 200, 255, 0.10);
-  /* Accent: Purple */
-  --accent-purple:      #c084fc;
-  --accent-purple-bg:   rgba(168, 85, 247, 0.12);
+  /* Accent: Green (semantic only — success states) */
+  --accent-green:       #22C55E;
+  --accent-green-bg:    rgba(34, 197, 94, 0.10);
+  /* Accent: Blue — single brand accent */
+  --accent-blue:        #1976D2;
+  --accent-blue-bg:     rgba(25, 118, 210, 0.10);
+  /* Accent: Amber — REMOVED, mapped to blue per design spec */
+  --accent-amber:       #1976D2;
+  --accent-amber-bg:    rgba(25, 118, 210, 0.10);
+  /* Accent: Red (semantic only — error/danger states) */
+  --accent-red:         #EF4444;
+  --accent-red-bg:      rgba(239, 68, 68, 0.10);
+  /* Accent: Cyan — REMOVED, mapped to blue per design spec */
+  --accent-cyan:        #1976D2;
+  --accent-cyan-bg:     rgba(25, 118, 210, 0.10);
+  /* Accent: Purple (kept for analytics charts only) */
+  --accent-purple:      #8B5CF6;
+  --accent-purple-bg:   rgba(139, 92, 246, 0.10);
 
-  /* Brand — Professional Blue (active-state only) */
+  /* Brand — Professional Blue */
   --primary:            #1976D2;
-  --primary-light:      #42A5F5;
+  --primary-light:      #2563EB;
   --primary-dark:       #1565C0;
   --primary-darker:     #0D47A1;
-  --primary-bg:         rgba(25, 118, 210, 0.05);
-  --primary-bg-strong:  rgba(25, 118, 210, 0.10);
+  --primary-bg:         rgba(25, 118, 210, 0.08);
+  --primary-bg-strong:  rgba(25, 118, 210, 0.15);
 
   /* Brand colors — flat solids only (no gradients in this theme) */
   --primary-gradient:       #1976D2;
   --primary-gradient-hover: #42A5F5;
 
-  /* Semantic */
-  --success:            #4ade80;
-  --warning:            #fbbf24;
-  --error:              #f87171;
-  --info:               #60a5fa;
+  /* Semantic — minimal palette, blue-forward */
+  --success:            #22C55E;
+  --warning:            #1976D2;
+  --error:              #EF4444;
+  --info:               #1976D2;
 
   /* Shadows — neutral dark only (no cyan glow on default surfaces) */
   --shadow-xs:   0 1px 2px rgba(0, 0, 0, 0.40);
@@ -93,13 +94,13 @@
   --shadow-focus-ring:        0 0 0 3px rgba(25, 118, 210, 0.15);
   --shadow-focus-ring-strong: 0 0 0 4px rgba(25, 118, 210, 0.18);
 
-  /* Radii */
-  --radius-xs:          6px;
-  --radius-sm:          8px;
-  --radius:             12px;
-  --radius-lg:          16px;
-  --radius-xl:          20px;
-  --radius-2xl:         24px;
+  /* Radii — premium SaaS scale */
+  --radius-xs:          4px;
+  --radius-sm:          6px;
+  --radius:             8px;
+  --radius-lg:          12px;
+  --radius-xl:          16px;
+  --radius-2xl:         20px;
   --radius-pill:        9999px;
 
   /* Misc */
@@ -155,8 +156,8 @@ body, .navbar, .sidebar, .card, .panel, .modal,
 
 /* ═══ Selection ════════════════════════════════════════════════════════════ */
 ::selection {
-  background: rgba(25, 118, 210, 0.25);
-  color: #f0f6ff;
+  background: rgba(25, 118, 210, 0.30);
+  color: #E2E8F0;
 }
 
 /* ═══ Scrollbar — neutral white-translucent ════════════════════════════ */
@@ -267,18 +268,18 @@ body, .navbar, .sidebar, .card, .panel, .modal,
 
 /* Glass morphism — neutral dark */
 .glass {
-  background: rgba(10, 13, 18, 0.72);
+  background: rgba(19, 19, 30, 0.78);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   backdrop-filter: saturate(180%) blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid #1E2235;
 }
 
 /* Sticky frosted top bar variant (opt-in) */
 .frosted-bar {
-  background: rgba(5, 7, 9, 0.80);
+  background: rgba(13, 13, 20, 0.82);
   -webkit-backdrop-filter: saturate(180%) blur(16px);
   backdrop-filter: saturate(180%) blur(16px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid #1E2235;
 }
 
 /* Solid accent text utility (kept for back-compat — no gradient) */
@@ -355,12 +356,12 @@ body, .navbar, .sidebar, .card, .panel, .modal,
 }
 
 /* ═══ Status Badges ════════════════════════════════════════════════════════ */
-.status-draft           { background-color: rgba(255,255,255,0.04); color: var(--text-secondary); }
+.status-draft           { background-color: var(--border-subtle); color: var(--text-secondary); }
 .status-estimated       { background-color: var(--accent-blue-bg); color: var(--accent-blue); }
 .status-quoted          { background-color: var(--accent-purple-bg); color: var(--accent-purple); }
 .status-order_confirmed { background-color: var(--accent-green-bg); color: var(--accent-green); }
-.status-in_production   { background-color: var(--accent-amber-bg); color: var(--accent-amber); }
-.status-inspected       { background-color: var(--accent-cyan-bg); color: var(--accent-cyan); }
+.status-in_production   { background-color: var(--primary-bg); color: var(--primary); }
+.status-inspected       { background-color: var(--accent-blue-bg); color: var(--accent-blue); }
 .status-shipped         { background-color: var(--accent-green-bg); color: var(--accent-green); }
 
 /* Dark mode special effects removed — light mode only */

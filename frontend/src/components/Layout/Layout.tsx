@@ -84,16 +84,16 @@ import { clearActiveCompanyContext, getActiveCompanyContext, listenToActiveCompa
 const AVATAR_MALE = '/avatars/male.png';
 const AVATAR_FEMALE = '/avatars/female.png';
 
-// â”€â”€â”€ Brand Tokens (constant across modes) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Brand Tokens (constant across modes) ────────────────────────────────
 const PRIMARY    = '#1976D2';
 const PRIMARY_DK = '#1565C0';
-const PRIMARY_LT = '#42A5F5';
+const PRIMARY_LT = '#2563EB';
 
-// â”€â”€â”€ Constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-const SIDEBAR_EXPANDED = 260;
-const SIDEBAR_COLLAPSED = 72;
-const HEADER_HEIGHT = 64;
-const TRANSITION = '280ms cubic-bezier(0.4, 0, 0.2, 1)';
+// ─── Constants ───────────────────────────────────────────────────────────
+const SIDEBAR_EXPANDED = 220;
+const SIDEBAR_COLLAPSED = 64;
+const HEADER_HEIGHT = 60;
+const TRANSITION = '240ms cubic-bezier(0.4, 0, 0.2, 1)';
 
 // Welcome messages that rotate
 const WELCOME_MESSAGES = [
@@ -307,58 +307,55 @@ const Layout: React.FC = () => {
     return `${days}d ago`;
   };
 
-  // â”€â”€â”€ Sidebar Nav Item â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─── Sidebar Nav Item ──────────────────────────────────────────────────────
   const renderNavItem = (icon: React.ReactNode, label: string, path: string, isCollapsedView: boolean) => {
     const active = isActive(path);
     const button = (
       <ListItemButton
         onClick={() => handleNav(path)}
         sx={{
-          minHeight: 40,
-          borderRadius: '10px',
-          mx: isCollapsedView ? 0.75 : 0,
-          px: isCollapsedView ? 0 : 1.5,
-          py: 0.6,
+          minHeight: 36,
+          borderRadius: 0,
+          mx: 0,
+          px: isCollapsedView ? 0 : '20px',
+          py: '8px',
           justifyContent: isCollapsedView ? 'center' : 'flex-start',
-          transition: 'all 0.22s cubic-bezier(0.4, 0, 0.2, 1)',
+          transition: 'background 0.18s ease, color 0.18s ease',
           position: 'relative',
+          borderLeft: '3px solid transparent',
           ...(active
             ? {
-                bgcolor: alpha(PRIMARY, 0.07),
-                color: PRIMARY,
-                borderLeft: isCollapsedView ? 'none' : `3px solid ${PRIMARY}`,
+                bgcolor: '#1E2235',
+                color: '#E2E8F0',
+                borderLeft: isCollapsedView ? '3px solid transparent' : `3px solid ${PRIMARY}`,
                 '&::before': isCollapsedView ? {
                   content: '""',
                   position: 'absolute',
-                  left: '50%',
-                  top: 0,
-                  width: '60%',
-                  height: 3,
-                  transform: 'translateX(-50%)',
-                  borderRadius: 4,
+                  left: 0,
+                  top: '50%',
+                  width: 3,
+                  height: '60%',
+                  transform: 'translateY(-50%)',
                   backgroundColor: PRIMARY,
                 } : undefined,
-                '&:hover': { bgcolor: alpha(PRIMARY, 0.11) },
+                '&:hover': { bgcolor: '#1E2235' },
               }
             : {
-                color: 'var(--text-secondary)',
-                opacity: 0.82,
+                color: '#64748B',
                 '&:hover': {
-                  bgcolor: 'var(--bg-sidebar-active)',
-                  color: 'var(--text-primary)',
-                  opacity: 1,
-                  transform: isCollapsedView ? 'none' : 'translateX(3px)',
+                  bgcolor: 'rgba(30, 34, 53, 0.4)',
+                  color: '#CBD5E1',
                 },
               }),
         }}
       >
         <ListItemIcon
           sx={{
-            minWidth: isCollapsedView ? 0 : 34,
+            minWidth: isCollapsedView ? 0 : 28,
             justifyContent: 'center',
-            color: active ? PRIMARY : 'var(--text-muted)',
+            color: active ? '#E2E8F0' : '#64748B',
             transition: 'color 0.18s ease',
-            '& .MuiSvgIcon-root': { fontSize: 19 },
+            '& .MuiSvgIcon-root': { fontSize: 16 },
           }}
         >
           {icon}
@@ -367,13 +364,12 @@ const Layout: React.FC = () => {
           <ListItemText
             primary={label}
             primaryTypographyProps={{
-              fontSize: '0.82rem',
-              fontWeight: active ? 650 : 450,
-              color: active ? PRIMARY : 'var(--text-primary)',
+              fontSize: '13px',
+              fontWeight: active ? 600 : 500,
+              color: active ? '#E2E8F0' : '#64748B',
               whiteSpace: 'nowrap',
-              letterSpacing: '-0.01em',
+              letterSpacing: '-0.005em',
             }}
-            sx={{ '& .MuiListItemText-primary': { opacity: active ? 1 : 0.88 } }}
           />
         )}
 
@@ -381,20 +377,19 @@ const Layout: React.FC = () => {
     );
 
     return (
-      <ListItem disablePadding sx={{ mb: 0.3 }} key={path}>
+      <ListItem disablePadding sx={{ mb: 0 }} key={path}>
         {isCollapsedView ? <Tooltip title={label} placement="right" arrow>{button}</Tooltip> : button}
       </ListItem>
     );
   };
 
   const renderSectionLabel = (label: string, isCollapsedView: boolean) => {
-    if (isCollapsedView) return <Divider sx={{ my: 2.5, mx: 1.5, borderColor: 'var(--border)' }} />;
+    if (isCollapsedView) return <Divider sx={{ my: 2, mx: 1.5, borderColor: '#1E2235' }} />;
     return (
-      <Box sx={{ px: 1.5, pt: 3, pb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-        <Typography sx={{ fontSize: '0.6rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.12em', whiteSpace: 'nowrap' }}>
+      <Box sx={{ px: '20px', pt: '16px', pb: '6px' }}>
+        <Typography sx={{ fontSize: '10px', fontWeight: 600, color: '#3D4663', textTransform: 'uppercase', letterSpacing: '1px', whiteSpace: 'nowrap' }}>
           {label}
         </Typography>
-        <Box sx={{ flex: 1, height: '1px', bgcolor: 'var(--border-subtle)' }} />
       </Box>
     );
   };
@@ -487,24 +482,24 @@ const Layout: React.FC = () => {
     const c = !isMobile && collapsed;
 
     return (
-      <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', bgcolor: 'var(--bg-sidebar)', borderRight: '1px solid var(--border)' }}>
+      <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', bgcolor: '#0D0D14', borderRight: '1px solid #1E2235' }}>
         {/* Logo & Toggle */}
-        <Box sx={{ p: c ? 1.5 : 2, display: 'flex', alignItems: 'center', justifyContent: c ? 'center' : 'space-between', minHeight: HEADER_HEIGHT }}>
+        <Box sx={{ px: c ? 1.5 : '20px', py: '20px', display: 'flex', alignItems: 'center', justifyContent: c ? 'center' : 'space-between', minHeight: HEADER_HEIGHT, borderBottom: '1px solid #1E2235' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, overflow: 'hidden', cursor: 'pointer', transition: 'opacity 0.2s ease', '&:hover': { opacity: 0.8 } }} onClick={() => handleNav('/')}>
             <Box sx={{
-              width: 36, height: 36, borderRadius: '8px',
+              width: 32, height: 32, borderRadius: '6px',
               backgroundColor: PRIMARY,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               flexShrink: 0,
             }}>
-              <Typography sx={{ fontSize: 13, fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em' }}>SC</Typography>
+              <Typography sx={{ fontSize: 12, fontWeight: 700, color: '#ffffff', letterSpacing: '-0.02em' }}>SC</Typography>
             </Box>
             {!c && (
               <Box sx={{ minWidth: 0 }}>
-                <Typography sx={{ fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif', fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.85rem', letterSpacing: '-0.02em', lineHeight: 1.3, mb: 0.4 }}>
+                <Typography sx={{ fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif', fontWeight: 600, color: '#E2E8F0', fontSize: '0.8125rem', letterSpacing: '-0.015em', lineHeight: 1.25 }}>
                   Switchgear<br />Configurator
                 </Typography>
-                <Typography sx={{ fontSize: '0.58rem', color: 'var(--text-muted)', letterSpacing: '0.08em', whiteSpace: 'nowrap', textTransform: 'uppercase', fontWeight: 600 }}>
+                <Typography sx={{ fontSize: '0.55rem', color: '#3D4663', letterSpacing: '0.1em', whiteSpace: 'nowrap', textTransform: 'uppercase', fontWeight: 600, mt: 0.3 }}>
                   Industrial Systems
                 </Typography>
               </Box>
@@ -512,17 +507,15 @@ const Layout: React.FC = () => {
           </Box>
           {!isMobile && !c && (
             <Tooltip title="Collapse sidebar" placement="right">
-              <IconButton onClick={toggleCollapse} size="small" sx={{ color: 'var(--text-muted)', transition: 'all 0.2s ease', '&:hover': { bgcolor: 'var(--bg-sidebar-active)', color: PRIMARY } }}>
+              <IconButton onClick={toggleCollapse} size="small" sx={{ color: '#64748B', transition: 'all 0.2s ease', '&:hover': { bgcolor: 'rgba(30,34,53,0.4)', color: '#E2E8F0' } }}>
                 <ChevronLeftIcon fontSize="small" />
               </IconButton>
             </Tooltip>
           )}
         </Box>
 
-        <Divider sx={{ mx: c ? 1 : 2, borderColor: 'var(--border-subtle)' }} />
-
         {/* Navigation */}
-        <Box sx={{ flex: 1, overflow: 'auto', py: 1, px: c ? 0.5 : 1.25 }}>
+        <Box sx={{ flex: 1, overflow: 'auto', py: 0.5, px: 0 }}>
           {/* OPERATIONS */}
           {renderSectionLabel('Operations', c)}
           <List disablePadding>

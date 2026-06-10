@@ -55,20 +55,20 @@ export const LIGHT_TOKENS = {
 } as const;
 
 export const DARK_TOKENS = {
-  bgCanvas:     '#000000',
-  bgSurface:    '#0a0d12',
-  bgSurface2:   '#0e1218',
-  bgSurface3:   '#131822',
-  bgInput:      'rgba(255, 255, 255, 0.015)',
-  border:       'rgba(255, 255, 255, 0.06)',
-  borderSubtle: 'rgba(255, 255, 255, 0.04)',
-  borderStrong: 'rgba(255, 255, 255, 0.10)',
-  textPrimary:  '#f0f6ff',
-  textSecondary:'#d9e4fb',
-  textMuted:    '#9ab0d0',
-  textDisabled: '#4d5c78',
-  sidebar:      '#050709',
-  sidebarActive:'rgba(255, 255, 255, 0.04)',
+  bgCanvas:     '#0D0D14',
+  bgSurface:    '#13131E',
+  bgSurface2:   '#181826',
+  bgSurface3:   '#1E2235',
+  bgInput:      '#0D0D14',
+  border:       '#1E2235',
+  borderSubtle: '#181826',
+  borderStrong: '#2A2F44',
+  textPrimary:  '#E2E8F0',
+  textSecondary:'#CBD5E1',
+  textMuted:    '#64748B',
+  textDisabled: '#3D4663',
+  sidebar:      '#0D0D14',
+  sidebarActive:'#1E2235',
 } as const;
 
 export type ThemeTokens = {

@@ -18,14 +18,12 @@
 import React, { useMemo, useState } from 'react';
 import {
   Box,
-  Chip,
   Stack,
   ThemeProvider,
-  alpha,
   useTheme,
 } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { extendMuiTheme, LIGHTNING_BLUE } from '../../config/themeTokens';
+import { extendMuiTheme } from '../../config/themeTokens';
 import type { Configuration } from '../../services/configuratorService';
 import type { ConfiguratorStepKey } from '../../services/configuratorService';
 import { ConfiguratorProvider } from '../state/ConfiguratorProvider';
@@ -93,61 +91,61 @@ const InnerShell: React.FC<Props> = ({ configuration, onPersist, onBack, onNext,
 
   return (
     <ConfiguratorProvider configuration={configuration} onPersist={onPersist}>
-      {/* Pure-black canvas with subtle border — no decorative shadows or
-          gradients. The inner step (e.g. SystemDesignStep) owns its own
-          card styling so this wrapper stays transparent. */}
+      {/* Deep neutral canvas with hairline border — no decorative shadows. */}
       <Box
         sx={{
           bgcolor: 'transparent',
-          border: '1px solid rgba(255,255,255,0.06)',
-          borderRadius: '10px',
+          border: '1px solid #1E2235',
+          borderRadius: '8px',
           overflow: 'hidden',
         }}
       >
         <Box sx={{ p: 0 }}>
-          {/* Chip strip only renders when NOT in controlled mode (parent renders it) */}
+          {/* Linear underline tab strip — no pills, no border-radius on tabs */}
           {!isControlled && (
             <Stack
               direction="row"
-              spacing={0.75}
               sx={{
-                flexWrap: 'wrap',
-                gap: 0.75,
-                px: 2,
-                py: 1.25,
-                borderBottom: '1px solid rgba(255,255,255,0.05)',
+                flexWrap: 'nowrap',
+                overflowX: 'auto',
+                bgcolor: '#13131E',
+                borderBottom: '1px solid #1E2235',
+                px: '24px',
               }}
             >
               {orderedSubsteps.map((key) => {
-                const isPhantom = key === '__preview';
                 const active = key === activeSubstep;
-                const accent = LIGHTNING_BLUE[500];
+                const isPhantom = key === '__preview';
                 return (
-                  <Chip
+                  <Box
                     key={key}
-                    size="small"
-                    icon={
-                      key === '__preview' ? (
-                        <VisibilityIcon sx={{ fontSize: 14 }} />
-                      ) : undefined
-                    }
-                    label={SUBSTEP_LABELS[key]}
+                    role="tab"
+                    aria-selected={active}
                     onClick={() => setActiveSubstep(key)}
                     sx={{
                       cursor: 'pointer',
-                      fontWeight: active ? 700 : 500,
-                      fontSize: '0.74rem',
-                      border: `1px solid ${active ? accent : 'rgba(255,255,255,0.07)'}`,
-                      bgcolor: active
-                        ? accent
-                        : isPhantom
-                        ? alpha(accent, 0.05)
-                        : 'transparent',
-                      color: active ? '#ffffff' : 'rgba(217,228,251,0.78)',
-                      borderRadius: '8px',
-                      '&:hover': { bgcolor: active ? accent : 'rgba(255,255,255,0.04)' },
+                      padding: '10px 16px',
+                      fontSize: '13px',
+                      fontWeight: 500,
+                      letterSpacing: '-0.005em',
+                      color: active ? '#E2E8F0' : '#64748B',
+                      borderBottom: active ? '2px solid #1976D2' : '2px solid transparent',
+                      marginBottom: '-1px',
+                      backgroundColor: 'transparent',
+                      whiteSpace: 'nowrap',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 0.5,
+                      transition: 'color 0.15s ease, background 0.15s ease, border-color 0.15s ease',
+                      '&:hover': {
+                        color: active ? '#E2E8F0' : '#CBD5E1',
+                        backgroundColor: active ? 'transparent' : 'rgba(30,34,53,0.6)',
+                      },
                     }}
-                  />
+                  >
+                    {isPhantom && <VisibilityIcon sx={{ fontSize: 14 }} />}
+                    {SUBSTEP_LABELS[key]}
+                  </Box>
                 );
               })}
             </Stack>
