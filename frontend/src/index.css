@@ -17,13 +17,13 @@
    only brand accent — no gold, no yellow, no cyan. */
 :root {
   /* Backgrounds — deep neutral canvas, lifted slate surfaces */
-  --bg-canvas:          #0D0D14;
+  --bg-canvas:          #000000;
   --bg-surface:         #13131E;
   --bg-surface-2:       #181826;
   --bg-surface-3:       #1E2235;
-  --bg-sidebar:         #0D0D14;
+  --bg-sidebar:         #000000;
   --bg-sidebar-active:  #1E2235;
-  --bg-input:           #0D0D14;
+  --bg-input:           #000000;
 
   /* Flat surface — no gradient (kept as a CSS var so legacy refs resolve) */
   --surface-gradient:   #13131E;

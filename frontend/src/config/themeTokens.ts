@@ -55,11 +55,11 @@ export const LIGHT_TOKENS = {
 } as const;
 
 export const DARK_TOKENS = {
-  bgCanvas:     '#0D0D14',
+  bgCanvas:     '#000000',
   bgSurface:    '#13131E',
   bgSurface2:   '#181826',
   bgSurface3:   '#1E2235',
-  bgInput:      '#0D0D14',
+  bgInput:      '#000000',
   border:       '#1E2235',
   borderSubtle: '#181826',
   borderStrong: '#2A2F44',
@@ -67,7 +67,7 @@ export const DARK_TOKENS = {
   textSecondary:'#CBD5E1',
   textMuted:    '#64748B',
   textDisabled: '#3D4663',
-  sidebar:      '#0D0D14',
+  sidebar:      '#000000',
   sidebarActive:'#1E2235',
 } as const;
 

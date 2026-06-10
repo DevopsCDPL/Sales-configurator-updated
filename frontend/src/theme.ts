@@ -14,11 +14,11 @@ const PRIMARY_DKR  = '#0D47A1';
 
 // Dark palette — premium industrial SaaS (deep neutral canvas, lifted slate surfaces)
 const c = {
-  bgCanvas:      '#0D0D14',
+  bgCanvas:      '#000000',
   bgSurface:     '#13131E',
   bgSurface2:    '#181826',
   bgSurface3:    '#1E2235',
-  bgInput:       '#0D0D14',
+  bgInput:       '#000000',
   border:        '#1E2235',
   borderSubtle:  '#181826',
   borderHairline:'#15151F',
@@ -511,7 +511,7 @@ export const createAppTheme = (_mode?: PaletteMode) => {
         },
       },
 
-      MuiDrawer: { styleOverrides: { paper: { border: 'none', backgroundColor: '#0D0D14', backgroundImage: 'none' } } },
+      MuiDrawer: { styleOverrides: { paper: { border: 'none', backgroundColor: '#000000', backgroundImage: 'none' } } },
       MuiSkeleton: {
         styleOverrides: {
           root: {
@@ -660,7 +660,7 @@ export const createAppTheme = (_mode?: PaletteMode) => {
         defaultProps: { elevation: 0 },
         styleOverrides: {
           root: {
-            backgroundColor: alpha('#0D0D14', 0.92),
+            backgroundColor: alpha('#000000', 0.92),
             backgroundImage: 'none',
             color: c.textPrimary,
             backdropFilter: 'saturate(180%) blur(16px)',

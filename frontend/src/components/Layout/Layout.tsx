@@ -481,7 +481,7 @@ const Layout: React.FC = () => {
     const c = !isMobile && collapsed;
 
     return (
-      <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', bgcolor: '#0D0D14', borderRight: '1px solid #1E2235' }}>
+      <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', bgcolor: '#000000', borderRight: '1px solid #1E2235' }}>
         {/* Logo & Toggle */}
         <Box sx={{ px: c ? 1.5 : '20px', py: '20px', display: 'flex', alignItems: 'center', justifyContent: c ? 'center' : 'space-between', minHeight: HEADER_HEIGHT, borderBottom: '1px solid #1E2235' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, overflow: 'hidden', cursor: 'pointer', transition: 'opacity 0.2s ease', '&:hover': { opacity: 0.8 } }} onClick={() => handleNav('/')}>
