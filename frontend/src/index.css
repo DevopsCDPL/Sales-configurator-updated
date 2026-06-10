@@ -62,17 +62,17 @@
   --accent-purple:      #8B5CF6;
   --accent-purple-bg:   rgba(139, 92, 246, 0.10);
 
-  /* Brand — Professional Blue */
-  --primary:            #1976D2;
-  --primary-light:      #2563EB;
-  --primary-dark:       #1565C0;
-  --primary-darker:     #0D47A1;
-  --primary-bg:         rgba(25, 118, 210, 0.08);
-  --primary-bg-strong:  rgba(25, 118, 210, 0.15);
+  /* Brand — Premium Cyan-Blue (action buttons & accents) */
+  --primary:            #33d6ff;
+  --primary-light:      #5ce0ff;
+  --primary-dark:       #00bce0;
+  --primary-darker:     #0099b8;
+  --primary-bg:         rgba(51, 214, 255, 0.10);
+  --primary-bg-strong:  rgba(51, 214, 255, 0.18);
 
   /* Brand colors — flat solids only (no gradients in this theme) */
-  --primary-gradient:       #1976D2;
-  --primary-gradient-hover: #42A5F5;
+  --primary-gradient:       #33d6ff;
+  --primary-gradient-hover: #5ce0ff;
 
   /* Semantic — minimal palette, blue-forward */
   --success:            #22C55E;

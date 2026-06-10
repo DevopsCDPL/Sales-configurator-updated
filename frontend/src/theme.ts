@@ -7,10 +7,10 @@ import type { PaletteMode } from '@mui/material';
 // ═══════════════════════════════════════════════════════════════════════════
 
 // Brand Colors — Professional Blue
-const PRIMARY      = '#1976D2';
-const PRIMARY_LT   = '#2563EB';   // active/selected accent
-const PRIMARY_DK   = '#1565C0';
-const PRIMARY_DKR  = '#0D47A1';
+const PRIMARY      = '#33d6ff';
+const PRIMARY_LT   = '#5ce0ff';   // active/selected accent
+const PRIMARY_DK   = '#00bce0';
+const PRIMARY_DKR  = '#0099b8';
 
 // Dark palette — premium industrial SaaS (deep neutral canvas, lifted slate surfaces)
 const c = {
@@ -127,14 +127,15 @@ export const createAppTheme = (_mode?: PaletteMode) => {
           },
           containedPrimary: {
             backgroundColor: PRIMARY,
-            color: '#ffffff',
-            boxShadow: `0 0 0 1px ${alpha(PRIMARY, 0.15)} inset, 0 1px 2px rgba(0,0,0,0.40)`,
+            color: '#000000',
+            boxShadow: `0 0 0 1px ${alpha(PRIMARY, 0.20)} inset, 0 1px 2px rgba(0,0,0,0.40)`,
             '&:hover': {
               backgroundColor: PRIMARY_LT,
-              boxShadow: `0 0 0 1px ${alpha(PRIMARY, 0.20)} inset, 0 2px 4px rgba(0,0,0,0.50)`,
+              color: '#000000',
+              boxShadow: `0 0 0 1px ${alpha(PRIMARY, 0.28)} inset, 0 2px 4px rgba(0,0,0,0.50)`,
             },
             '&:active': {
-              boxShadow: `0 0 0 1px ${alpha(PRIMARY, 0.12)} inset, 0 1px 2px rgba(0,0,0,0.40)`,
+              boxShadow: `0 0 0 1px ${alpha(PRIMARY, 0.15)} inset, 0 1px 2px rgba(0,0,0,0.40)`,
             },
           },
           containedSecondary: {

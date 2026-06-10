@@ -30,7 +30,7 @@ import {
 import { useNotification } from '../contexts/NotificationContext';
 
 const PAGE_SIZE = 25;
-const PRIMARY = '#1F7A63';
+const PRIMARY = '#33d6ff';
 
 const ComponentsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -120,7 +120,7 @@ const ComponentsPage: React.FC = () => {
             startIcon={<AddIcon />}
             onClick={() => navigate('/components/new')}
             variant="contained"
-            sx={{ bgcolor: PRIMARY, '&:hover': { bgcolor: '#176650' } }}
+            sx={{ bgcolor: PRIMARY, '&:hover': { bgcolor: '#5ce0ff' } }}
           >
             Add Component
           </Button>

@@ -28,7 +28,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(isToday);
 dayjs.extend(relativeTime);
 
-const PRIMARY = '#1F7A63';
+const PRIMARY = '#33d6ff';
 
 interface FolderNode {
   id: string;
@@ -1307,7 +1307,7 @@ const FileManagerPage: React.FC = () => {
             }}
             sx={{
               bgcolor: PRIMARY, textTransform: 'none', fontWeight: 600, borderRadius: 2,
-              '&:hover': { bgcolor: '#166354' },
+              '&:hover': { bgcolor: '#5ce0ff' },
             }}
           >
             Upload

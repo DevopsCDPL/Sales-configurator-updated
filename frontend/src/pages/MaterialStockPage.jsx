@@ -49,7 +49,7 @@ import { rawMaterialService } from '../services/rawMaterialService';
 
 dayjs.extend(relativeTime);
 
-const PRIMARY = '#1F7A63';
+const PRIMARY = '#33d6ff';
 
 /* ─── empty row template ─── */
 const emptyRow = () => ({

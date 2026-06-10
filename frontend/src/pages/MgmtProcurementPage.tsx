@@ -34,9 +34,9 @@ import api from '../services/api';
 
 /* ── Theme tokens (matched to Operations Dashboard) ────────────────────── */
 const T = {
-  primary:   '#1F7A63',
-  primaryLt: '#2A9D7E',
-  primaryBg: '#E8F7F2',
+  primary:   '#33d6ff',
+  primaryLt: '#5ce0ff',
+  primaryBg: 'rgba(51, 214, 255, 0.10)',
   dark:      '#1F2937',
   textSec:   '#6B7280',
   textMuted: '#9CA3AF',
