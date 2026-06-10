@@ -339,7 +339,7 @@ const ProjectDetailPage: React.FC = () => {
       {/* â•â•â• STICKY HEADER â•â•â• */}
       <Box data-project-sticky-header="true" ref={headerRef} sx={{
         position: 'sticky', top: 0, zIndex: 100,
-        bgcolor: P.white,
+        bgcolor: P.bg,
         borderBottom: `1px solid ${P.border}`,
         boxShadow: scrolled ? '0 2px 8px rgba(0,0,0,0.08)' : '0 1px 4px rgba(0,0,0,0.04)',
         transition: 'box-shadow 0.2s ease',
