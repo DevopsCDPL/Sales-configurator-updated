@@ -16,11 +16,11 @@ import {
 
 /* â”€â”€â”€ Design Tokens â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 export const UI = {
-  /* Colors â€” Neon Cyan / Dark Industrial */
-  primary:        '#00c8ff',
-  primaryLight:   '#33d4ff',
-  primaryDark:    '#0099cc',
-  primaryBg:      'rgba(0, 200, 255, 0.08)',
+  /* Colors — Unified Cyan / Dark Industrial */
+  primary:        '#33d6ff',
+  primaryLight:   '#5ce0ff',
+  primaryDark:    '#00bce0',
+  primaryBg:      'rgba(51, 214, 255, 0.10)',
 
   textPrimary:    'var(--text-primary)',
   textSecondary:  'var(--text-secondary)',
@@ -316,12 +316,11 @@ interface TabContainerProps {
   children: React.ReactNode;
   maxWidth?: number;
 }
-export const TabContainer: React.FC<TabContainerProps> = ({ children, maxWidth = 1440 }) => (
+export const TabContainer: React.FC<TabContainerProps> = ({ children, maxWidth }) => (
   <Box sx={{
-    maxWidth,
-    mx: 'auto',
-    px: { xs: 1.5, sm: 2.5, md: 3 },
-    py: 3,
+    ...(maxWidth ? { maxWidth, mx: 'auto' } : { width: '100%' }),
+    px: 0,
+    py: 0,
     display: 'flex',
     flexDirection: 'column',
     gap: 2.5,        // consistent 20px gap between sections

@@ -515,8 +515,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, onUpdate, onPr
           mt: 2,
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           px: { xs: 2, sm: 3 }, py: 1.25,
-          backgroundColor: 'rgba(255,255,255,0.95)',
-          backdropFilter: 'blur(12px)',
+          backgroundColor: UI.bgCard,
           borderTop: `1px solid ${UI.border}`,
           borderRadius: UI.radiusSm,
           boxShadow: UI.shadow,
@@ -585,9 +584,9 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, onUpdate, onPr
               onClick={handleSave}
               disabled={saving}
               sx={{
-                height: 36, borderRadius: UI.radiusXs, px: 2.5, fontSize: 13, fontWeight: 600,
-                backgroundColor: UI.primary, boxShadow: 'none', textTransform: 'none',
-                '&:hover': { backgroundColor: UI.primaryLight, boxShadow: '0 2px 8px rgba(0, 200, 255,0.25)' },
+                height: 36, borderRadius: UI.radiusXs, px: 2.5, fontSize: 13, fontWeight: 700,
+                backgroundColor: UI.primary, color: '#000', boxShadow: 'none', textTransform: 'none',
+                '&:hover': { backgroundColor: UI.primaryLight, color: '#000', boxShadow: '0 2px 8px rgba(51, 214, 255, 0.30)' },
               }}
             >
               {saving ? 'Saving...' : 'Save'}
@@ -602,11 +601,11 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, onUpdate, onPr
             sx={{
               height: 36, borderRadius: UI.radiusXs, fontSize: 13, fontWeight: 700, px: 2.5,
               textTransform: 'none',
-              backgroundColor: isFormValid ? UI.primary : '#E2E8F0',
-              color: isFormValid ? '#fff' : UI.textLight,
-              boxShadow: isFormValid ? '0 2px 8px rgba(0, 200, 255,0.25)' : 'none',
+              backgroundColor: isFormValid ? UI.primary : 'rgba(51, 214, 255, 0.20)',
+              color: isFormValid ? '#000' : 'rgba(255,255,255,0.55)',
+              boxShadow: isFormValid ? '0 2px 8px rgba(51, 214, 255, 0.30)' : 'none',
               '&:hover': isFormValid
-                ? { backgroundColor: UI.primaryLight, boxShadow: '0 4px 12px rgba(0, 200, 255,0.3)' }
+                ? { backgroundColor: UI.primaryLight, color: '#000', boxShadow: '0 4px 12px rgba(51, 214, 255, 0.40)' }
                 : {},
             }}
           >
