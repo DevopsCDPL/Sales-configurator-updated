@@ -326,7 +326,7 @@ const Layout: React.FC = () => {
           ...(active
             ? {
                 bgcolor: '#1E2235',
-                color: '#E2E8F0',
+                color: '#FFFFFF',
                 '&::before': isCollapsedView ? {
                   content: '""',
                   position: 'absolute',
@@ -340,10 +340,10 @@ const Layout: React.FC = () => {
                 '&:hover': { bgcolor: '#1E2235' },
               }
             : {
-                color: '#64748B',
+                color: '#FFFFFF',
                 '&:hover': {
                   bgcolor: 'rgba(30, 34, 53, 0.4)',
-                  color: '#CBD5E1',
+                  color: '#FFFFFF',
                 },
               }),
         }}
@@ -352,7 +352,7 @@ const Layout: React.FC = () => {
           sx={{
             minWidth: isCollapsedView ? 0 : 28,
             justifyContent: 'center',
-            color: active ? '#E2E8F0' : '#64748B',
+            color: active ? '#FFFFFF' : '#FFFFFF',
             transition: 'color 0.18s ease',
             '& .MuiSvgIcon-root': { fontSize: 16 },
           }}
@@ -365,7 +365,7 @@ const Layout: React.FC = () => {
             primaryTypographyProps={{
               fontSize: '13px',
               fontWeight: active ? 600 : 500,
-              color: active ? '#E2E8F0' : '#64748B',
+              color: active ? '#FFFFFF' : '#FFFFFF',
               whiteSpace: 'nowrap',
               letterSpacing: '-0.005em',
             }}
@@ -386,7 +386,7 @@ const Layout: React.FC = () => {
     if (isCollapsedView) return <Divider sx={{ my: 2, mx: 1.5, borderColor: '#1E2235' }} />;
     return (
       <Box sx={{ px: '20px', pt: '16px', pb: '6px' }}>
-        <Typography sx={{ fontSize: '10px', fontWeight: 600, color: '#3D4663', textTransform: 'uppercase', letterSpacing: '1px', whiteSpace: 'nowrap' }}>
+        <Typography sx={{ fontSize: '10px', fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '1px', whiteSpace: 'nowrap' }}>
           {label}
         </Typography>
       </Box>
