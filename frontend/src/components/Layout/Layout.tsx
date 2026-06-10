@@ -600,32 +600,15 @@ const Layout: React.FC = () => {
                         letterSpacing: '-0.01em',
                       }}
                     />
-                    <Chip
-                      label="New"
-                      size="small"
-                      sx={{
-                        height: 18,
-                        fontSize: '0.6rem',
-                        fontWeight: 700,
-                        bgcolor: PRIMARY,
-                        color: '#06151c',
-                        '& .MuiChip-label': { px: 0.8 },
-                      }}
-                    />
                   </ListItemButton>
                 )}
               </ListItem>
             )}
             {canSeeSidebarItem(user?.role, '/material-stock', userIsCoAdmin) && renderNavItem(<InventoryIcon />, 'Inventory', '/material-stock', c)}
-          </List>
-
-          {/* FILE MANAGER */}
-          {renderSectionLabel('File Manager', c)}
-          <List disablePadding>
             {renderNavItem(<FolderIcon />, 'File Manager', '/file-manager', c)}
-            {renderNavItem(<ForumIcon />, 'Messages', '/messages', c)}
           </List>
 
+          {/* Messages moved to top-right header icon */}
           {/* Business Analytics moved to top-right header icon (Analytics hub) */}
 
           {/* System section moved into Settings tabs (Users / Roles / Approvals / Sessions) */}
