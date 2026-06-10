@@ -1268,15 +1268,15 @@ const FileManagerPage: React.FC = () => {
   const currentModule = ROOT_TABS[activeTab]?.module;
 
   return (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', bgcolor: '#f8fafb' }}>
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', bgcolor: 'var(--bg-canvas)' }}>
       {/* Header */}
       <Box sx={{
         px: 3, pt: 3, pb: 1.5,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        bgcolor: 'var(--bg-surface)', borderBottom: '1px solid', borderColor: 'divider',
+        bgcolor: 'transparent', borderBottom: '1px solid', borderColor: 'var(--border)',
       }}>
         <Box>
-          <Typography variant="h5" sx={{ fontWeight: 700, letterSpacing: '-0.02em', color: '#1a1a2e' }}>
+          <Typography variant="h5" sx={{ fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
             File Manager
           </Typography>
           <Typography sx={{ color: 'text.secondary', fontSize: '0.85rem', mt: 0.3 }}>
@@ -1333,7 +1333,7 @@ const FileManagerPage: React.FC = () => {
       </Box>
 
       {/* Tabs */}
-      <Box sx={{ px: 3, bgcolor: 'var(--bg-surface)' }}>
+      <Box sx={{ px: 3, bgcolor: 'transparent' }}>
         <Tabs
           value={activeTab}
           onChange={(_, v) => { setActiveTab(v); setSearch(''); }}
