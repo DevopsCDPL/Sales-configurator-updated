@@ -597,41 +597,41 @@ const FileManagerPage: React.FC = () => {
           <Typography sx={{ fontWeight: 700, fontSize: '0.9rem', color: PRIMARY, mb: 1, px: 1 }}>
             {title} ({filtered.length})
           </Typography>
-          <TableContainer sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
-            <Table size="small" sx={{ '& .MuiTableCell-root': { py: 0.7, px: 1.2, borderBottom: '1px solid #f0f0f0' } }}>
+          <TableContainer sx={{ border: '1px solid', borderColor: 'var(--border)', borderRadius: 2, bgcolor: '#2A2A38' }}>
+            <Table size="small" sx={{ '& .MuiTableCell-root': { py: 0.7, px: 1.2, borderBottom: '1px solid var(--border)', color: 'var(--text-primary)' } }}>
               <TableHead>
-                <TableRow sx={{ bgcolor: alpha(PRIMARY, 0.06) }}>
-                  <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem', color: '#6b7280', textTransform: 'uppercase', width: 50 }}>S.No</TableCell>
-                  <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem', color: '#6b7280', textTransform: 'uppercase' }}>File Name</TableCell>
-                  <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem', color: '#6b7280', textTransform: 'uppercase', width: 120 }}>Type</TableCell>
-                  <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem', color: '#6b7280', textTransform: 'uppercase', width: 120 }}>Date</TableCell>
-                  <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem', color: '#6b7280', textTransform: 'uppercase', width: 90 }}>Size</TableCell>
-                  <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem', color: '#6b7280', textTransform: 'uppercase', width: 130, textAlign: 'center' }}>Actions</TableCell>
+                <TableRow sx={{ bgcolor: '#33334A' }}>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase', width: 50 }}>S.No</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>File Name</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase', width: 120 }}>Type</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase', width: 120 }}>Date</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase', width: 90 }}>Size</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase', width: 130, textAlign: 'center' }}>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {filtered.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} align="center" sx={{ py: 3, color: 'text.secondary', fontSize: '0.82rem' }}>
+                    <TableCell colSpan={6} align="center" sx={{ py: 3, color: 'var(--text-muted)', fontSize: '0.82rem' }}>
                       No {title.toLowerCase()} yet
                     </TableCell>
                   </TableRow>
                 ) : filtered.map((doc, idx) => (
-                  <TableRow key={doc.id} hover>
-                    <TableCell sx={{ fontSize: '0.78rem', color: '#6b7280' }}>{idx + 1}</TableCell>
+                  <TableRow key={doc.id} hover sx={{ '&:hover': { bgcolor: 'rgba(255,255,255,0.04)' } }}>
+                    <TableCell sx={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>{idx + 1}</TableCell>
                     <TableCell>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <FileIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
-                        <Typography sx={{ fontSize: '0.8rem', fontWeight: 500 }}>{doc.file_name}</Typography>
+                        <FileIcon sx={{ fontSize: 18, color: 'var(--text-secondary)' }} />
+                        <Typography sx={{ fontSize: '0.8rem', fontWeight: 500, color: 'var(--text-primary)' }}>{doc.file_name}</Typography>
                       </Box>
                     </TableCell>
-                    <TableCell sx={{ fontSize: '0.78rem', color: '#6b7280', textTransform: 'capitalize' }}>
+                    <TableCell sx={{ fontSize: '0.78rem', color: 'var(--text-secondary)', textTransform: 'capitalize' }}>
                       {(doc.document_type || '').replace(/_/g, ' ')}
                     </TableCell>
-                    <TableCell sx={{ fontSize: '0.78rem' }}>
+                    <TableCell sx={{ fontSize: '0.78rem', color: 'var(--text-primary)' }}>
                       {doc.created_at ? dayjs(doc.created_at).format('DD MMM YYYY') : '—'}
                     </TableCell>
-                    <TableCell sx={{ fontSize: '0.78rem' }}>{formatBytes(doc.size)}</TableCell>
+                    <TableCell sx={{ fontSize: '0.78rem', color: 'var(--text-primary)' }}>{formatBytes(doc.size)}</TableCell>
                     <TableCell>
                       <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
                         <Tooltip title="View">
@@ -765,52 +765,52 @@ const FileManagerPage: React.FC = () => {
               <Typography sx={{ fontWeight: 700, fontSize: '0.95rem', color: PRIMARY, mb: 1 }}>
                 {selectedProjectSection}
               </Typography>
-              <TableContainer sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
-                <Table size="small" sx={{ tableLayout: 'fixed', '& .MuiTableCell-root': { py: 0.75, px: 1.2, borderBottom: '1px solid #f0f0f0' } }}>
+              <TableContainer sx={{ border: '1px solid', borderColor: 'var(--border)', borderRadius: 2, bgcolor: '#2A2A38' }}>
+                <Table size="small" sx={{ tableLayout: 'fixed', '& .MuiTableCell-root': { py: 0.75, px: 1.2, borderBottom: '1px solid var(--border)', color: 'var(--text-primary)' } }}>
                   <TableHead>
-                  <TableRow sx={{ bgcolor: alpha(PRIMARY, 0.06) }}>
-                    <TableCell sx={{ fontWeight: 700, fontSize: '0.72rem', width: 55 }}>S.No</TableCell>
-                    <TableCell sx={{ fontWeight: 700, fontSize: '0.72rem' }}>Description</TableCell>
-                    <TableCell sx={{ fontWeight: 700, fontSize: '0.72rem', width: 90 }}>Version</TableCell>
-                    <TableCell sx={{ fontWeight: 700, fontSize: '0.72rem', width: 110 }}>Status</TableCell>
-                    <TableCell sx={{ fontWeight: 700, fontSize: '0.72rem', width: 105 }}>Type</TableCell>
-                    <TableCell sx={{ fontWeight: 700, fontSize: '0.72rem', width: 115 }}>Date</TableCell>
-                    <TableCell sx={{ fontWeight: 700, fontSize: '0.72rem', width: 90 }}>Size</TableCell>
-                    <TableCell sx={{ fontWeight: 700, fontSize: '0.72rem', width: 125, textAlign: 'center' }}>Action</TableCell>
+                  <TableRow sx={{ bgcolor: '#33334A' }}>
+                    <TableCell sx={{ fontWeight: 700, fontSize: '0.72rem', color: 'var(--text-secondary)', width: 55 }}>S.No</TableCell>
+                    <TableCell sx={{ fontWeight: 700, fontSize: '0.72rem', color: 'var(--text-secondary)' }}>Description</TableCell>
+                    <TableCell sx={{ fontWeight: 700, fontSize: '0.72rem', color: 'var(--text-secondary)', width: 90 }}>Version</TableCell>
+                    <TableCell sx={{ fontWeight: 700, fontSize: '0.72rem', color: 'var(--text-secondary)', width: 110 }}>Status</TableCell>
+                    <TableCell sx={{ fontWeight: 700, fontSize: '0.72rem', color: 'var(--text-secondary)', width: 105 }}>Type</TableCell>
+                    <TableCell sx={{ fontWeight: 700, fontSize: '0.72rem', color: 'var(--text-secondary)', width: 115 }}>Date</TableCell>
+                    <TableCell sx={{ fontWeight: 700, fontSize: '0.72rem', color: 'var(--text-secondary)', width: 90 }}>Size</TableCell>
+                    <TableCell sx={{ fontWeight: 700, fontSize: '0.72rem', color: 'var(--text-secondary)', width: 125, textAlign: 'center' }}>Action</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {filteredDocs.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} align="center" sx={{ py: 4, color: 'text.secondary', fontSize: '0.82rem' }}>
+                      <TableCell colSpan={8} align="center" sx={{ py: 4, color: 'var(--text-muted)', fontSize: '0.82rem' }}>
                         No documents in {selectedProjectSection}
                       </TableCell>
                     </TableRow>
                   ) : filteredDocs.map((doc, idx) => (
-                    <TableRow key={doc.id} hover>
-                      <TableCell sx={{ fontSize: '0.78rem', color: '#6b7280' }}>{idx + 1}</TableCell>
+                    <TableRow key={doc.id} hover sx={{ '&:hover': { bgcolor: 'rgba(255,255,255,0.04)' } }}>
+                      <TableCell sx={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>{idx + 1}</TableCell>
                       <TableCell>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
-                          <FileIcon sx={{ fontSize: 18, color: 'text.secondary', flexShrink: 0 }} />
+                          <FileIcon sx={{ fontSize: 18, color: 'var(--text-secondary)', flexShrink: 0 }} />
                           <Box sx={{ minWidth: 0 }}>
-                            <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                               {doc.description || doc.file_name}
                             </Typography>
-                            <Typography sx={{ fontSize: '0.7rem', color: 'text.secondary', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            <Typography sx={{ fontSize: '0.7rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                               {doc.file_name}
                             </Typography>
                           </Box>
                         </Box>
                       </TableCell>
-                      <TableCell sx={{ fontSize: '0.78rem', fontWeight: 700 }}>V{doc.version || 1}</TableCell>
+                      <TableCell sx={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-primary)' }}>V{doc.version || 1}</TableCell>
                       <TableCell>{statusChip(doc.status || 'draft')}</TableCell>
-                      <TableCell sx={{ fontSize: '0.78rem', textTransform: 'capitalize' }}>
+                      <TableCell sx={{ fontSize: '0.78rem', color: 'var(--text-primary)', textTransform: 'capitalize' }}>
                         {(doc.file_type || 'uploaded').replace(/_/g, ' ')}
                       </TableCell>
-                      <TableCell sx={{ fontSize: '0.78rem' }}>
+                      <TableCell sx={{ fontSize: '0.78rem', color: 'var(--text-primary)' }}>
                         {doc.created_at ? dayjs(doc.created_at).format('DD MMM YYYY') : '-'}
                       </TableCell>
-                      <TableCell sx={{ fontSize: '0.78rem' }}>{formatBytes(doc.size)}</TableCell>
+                      <TableCell sx={{ fontSize: '0.78rem', color: 'var(--text-primary)' }}>{formatBytes(doc.size)}</TableCell>
                       <TableCell>
                         <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
                           <Tooltip title="View">
@@ -855,13 +855,13 @@ const FileManagerPage: React.FC = () => {
         </Box>
 
         {filteredProjects.length > 0 ? (
-          <TableContainer sx={{ mx: 2, mb: 2, border: '1px solid', borderColor: 'divider', borderRadius: 2, width: 'auto' }}>
-            <Table size="small" sx={{ '& .MuiTableCell-root': { py: 0.7, px: 1.2, borderBottom: '1px solid #f0f0f0' } }}>
+          <TableContainer sx={{ mx: 2, mb: 2, border: '1px solid', borderColor: 'var(--border)', borderRadius: 2, bgcolor: '#2A2A38', width: 'auto' }}>
+            <Table size="small" sx={{ '& .MuiTableCell-root': { py: 0.7, px: 1.2, borderBottom: '1px solid var(--border)', color: 'var(--text-primary)' } }}>
               <TableHead>
-                <TableRow sx={{ bgcolor: '#f8f9fa' }}>
-                  <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem', color: '#6b7280', textTransform: 'uppercase', width: 50 }}>S.No</TableCell>
-                  <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem', color: '#6b7280', textTransform: 'uppercase' }}>Project</TableCell>
-                  <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem', color: '#6b7280', textTransform: 'uppercase', width: 90, textAlign: 'center' }}>Actions</TableCell>
+                <TableRow sx={{ bgcolor: '#33334A' }}>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase', width: 50 }}>S.No</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Project</TableCell>
+                  <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase', width: 90, textAlign: 'center' }}>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -870,15 +870,15 @@ const FileManagerPage: React.FC = () => {
                     key={proj.prefix}
                     hover
                     onClick={() => loadProjectFiles(proj)}
-                    sx={{ cursor: 'pointer', '&:hover': { bgcolor: alpha(PRIMARY, 0.06) } }}
+                    sx={{ cursor: 'pointer', '&:hover': { bgcolor: 'rgba(255,255,255,0.04)' } }}
                   >
                     <TableCell>
-                      <Typography sx={{ fontSize: '0.78rem', color: '#6b7280', fontWeight: 500 }}>{idx + 1}</Typography>
+                      <Typography sx={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 500 }}>{idx + 1}</Typography>
                     </TableCell>
                     <TableCell>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <FolderOpenIcon sx={{ color: '#f0a500', fontSize: 20, flexShrink: 0 }} />
-                        <Typography sx={{ fontWeight: 600, fontSize: '0.82rem', color: '#1a1a2e' }}>
+                        <Typography sx={{ fontWeight: 600, fontSize: '0.82rem', color: 'var(--text-primary)' }}>
                           {proj.name}
                         </Typography>
                       </Box>
