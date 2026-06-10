@@ -322,12 +322,11 @@ const Layout: React.FC = () => {
           justifyContent: isCollapsedView ? 'center' : 'flex-start',
           transition: 'background 0.18s ease, color 0.18s ease',
           position: 'relative',
-          borderLeft: '3px solid transparent',
+          borderLeft: active && !isCollapsedView ? `3px solid ${PRIMARY}` : '3px solid transparent',
           ...(active
             ? {
                 bgcolor: '#1E2235',
                 color: '#E2E8F0',
-                borderLeft: isCollapsedView ? '3px solid transparent' : `3px solid ${PRIMARY}`,
                 '&::before': isCollapsedView ? {
                   content: '""',
                   position: 'absolute',
