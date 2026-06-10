@@ -55,6 +55,10 @@ import {
   Engineering as EngineeringIcon,
   AddCircleOutline as PlusCircleIcon,
   Description as DescriptionIcon,
+  ArrowBack as ArrowBackIcon,
+  ArrowForward as ArrowForwardIcon,
+  Save as SaveIcon,
+  CloudDone as CloudDoneIcon,
 } from '@mui/icons-material';
 import { useNotification } from '../../contexts/NotificationContext';
 import { configuratorService } from '../../services/configuratorService';
@@ -65,6 +69,7 @@ import type {
 import { ProjectFlowFooter } from './ProjectFlowFooter';
 import type { Project } from '../../types';
 import ConfiguratorShell, { SUBSTEP_LABELS, STANDARD_KEYS } from '../../configurator/steps/ConfiguratorShell';
+import type { ConfiguratorShellState } from '../../configurator/steps/ConfiguratorShell';
 import type { ConfiguratorSubstepKey } from '../../configurator/steps/StepRouter';
 
 const PRIMARY = '#00c8ff';
@@ -106,6 +111,7 @@ const ConfigurationTab: React.FC<ConfigurationTabProps> = ({ project, onUpdate, 
   const [activeSubstep, setActiveSubstep] = useState<ConfiguratorSubstepKey>('system_design');
   const [configMenuAnchor, setConfigMenuAnchor] = useState<null | HTMLElement>(null);
   const [stickyTop, setStickyTop] = useState(88);
+  const [shellState, setShellState] = useState<ConfiguratorShellState | null>(null);
 
   const orderedSubsteps: ConfiguratorSubstepKey[] = [...STANDARD_KEYS, '__preview'];
 
@@ -287,20 +293,25 @@ const ConfigurationTab: React.FC<ConfigurationTabProps> = ({ project, onUpdate, 
             gap: 1,
           }}
         >
-          {/* LEFT — project identifier */}
+          {/* LEFT — back arrow + project identifier */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1, minWidth: 0 }}>
-            {/* <Box
-              sx={{
-                px: 1, py: 0.25, borderRadius: '6px',
-                bgcolor: 'rgba(0,200,255,0.08)',
-                border: '1px solid rgba(0,200,255,0.18)',
-                flexShrink: 0,
-              }}
-            >
-              <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: '#00c8ff', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
-                {project.project_number || project.id?.slice(0, 8) || 'PRJ'}
-              </Typography>
-            </Box> */}
+            {onBack && (
+              <Tooltip title="Back">
+                <IconButton
+                  size="small"
+                  onClick={onBack}
+                  sx={{
+                    color: 'var(--text-secondary, #d9e4fb)',
+                    bgcolor: 'rgba(255,255,255,0.04)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    borderRadius: '8px',
+                    '&:hover': { bgcolor: 'rgba(0,200,255,0.10)', color: PRIMARY, borderColor: 'rgba(0,200,255,0.35)' },
+                  }}
+                >
+                  <ArrowBackIcon sx={{ fontSize: 16 }} />
+                </IconButton>
+              </Tooltip>
+            )}
             <Typography sx={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-secondary, #d9e4fb)', whiteSpace: 'nowrap' }}>
               Configuration
             </Typography>
@@ -439,6 +450,72 @@ const ConfigurationTab: React.FC<ConfigurationTabProps> = ({ project, onUpdate, 
             >
               New
             </Button>
+
+            {/* ── Project-flow actions (single Save + Continue) ── */}
+            {activeConfig && shellState && (
+              <>
+                <Box sx={{ width: '1px', height: 20, bgcolor: 'rgba(255,255,255,0.10)', mx: 0.5 }} />
+                <Tooltip title={shellState.saving ? 'Saving…' : shellState.dirty ? 'Save draft' : 'All changes saved'}>
+                  <span>
+                    <Button
+                      size="small"
+                      onClick={shellState.flush}
+                      disabled={shellState.saving || !shellState.dirty}
+                      startIcon={
+                        shellState.saving ? (
+                          <CircularProgress size={12} sx={{ color: PRIMARY }} />
+                        ) : shellState.dirty ? (
+                          <SaveIcon sx={{ fontSize: 14 }} />
+                        ) : (
+                          <CloudDoneIcon sx={{ fontSize: 14 }} />
+                        )
+                      }
+                      sx={{
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        fontSize: '0.75rem',
+                        px: 1.25,
+                        py: 0.45,
+                        minWidth: 0,
+                        borderRadius: '8px',
+                        color: shellState.dirty ? PRIMARY : 'rgba(217,228,251,0.55)',
+                        border: `1px solid ${shellState.dirty ? 'rgba(0,200,255,0.35)' : 'rgba(255,255,255,0.08)'}`,
+                        bgcolor: shellState.dirty ? 'rgba(0,200,255,0.08)' : 'rgba(255,255,255,0.02)',
+                        '&:hover': { bgcolor: 'rgba(0,200,255,0.13)', borderColor: 'rgba(0,200,255,0.50)' },
+                        '&.Mui-disabled': { color: 'rgba(217,228,251,0.45)' },
+                      }}
+                    >
+                      {shellState.saving ? 'Saving' : shellState.dirty ? 'Save' : 'Saved'}
+                    </Button>
+                  </span>
+                </Tooltip>
+              </>
+            )}
+
+            {onNext && (
+              <Button
+                size="small"
+                onClick={onNext}
+                endIcon={<ArrowForwardIcon sx={{ fontSize: 14 }} />}
+                disabled={!activeConfig}
+                sx={{
+                  bgcolor: PRIMARY,
+                  color: '#06151c',
+                  textTransform: 'none',
+                  borderRadius: '8px',
+                  fontWeight: 700,
+                  fontSize: '0.75rem',
+                  px: 1.5,
+                  py: 0.45,
+                  minWidth: 0,
+                  boxShadow: 'none',
+                  '&:hover': { bgcolor: PRIMARY_LT },
+                  '&.Mui-disabled': { bgcolor: 'rgba(255,255,255,0.06)', color: 'rgba(217,228,251,0.45)' },
+                }}
+              >
+                Continue
+              </Button>
+            )}
           </Stack>
         </Box>
 
@@ -514,6 +591,7 @@ const ConfigurationTab: React.FC<ConfigurationTabProps> = ({ project, onUpdate, 
             }}
             onBack={onBack}
             onNext={onNext}
+            onShellStateChange={setShellState}
           />
         ) : (
           <Card
@@ -571,14 +649,6 @@ const ConfigurationTab: React.FC<ConfigurationTabProps> = ({ project, onUpdate, 
               >
                 {creating ? 'Creating…' : 'New Configuration'}
               </Button>
-
-              <ProjectFlowFooter
-                onBack={onBack}
-                onNext={onNext}
-                hideSave
-                nextDisabled={!activeConfig}
-                nextLabel="Continue"
-              />
             </CardContent>
           </Card>
         )}

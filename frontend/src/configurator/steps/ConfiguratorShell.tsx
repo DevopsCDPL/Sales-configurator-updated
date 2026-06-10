@@ -15,7 +15,7 @@
  * variables, which is the desired Phase 4 behaviour (global flip is a
  * later phase).
  */
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Box,
   Stack,
@@ -28,7 +28,12 @@ import type { Configuration } from '../../services/configuratorService';
 import type { ConfiguratorStepKey } from '../../services/configuratorService';
 import { ConfiguratorProvider } from '../state/ConfiguratorProvider';
 import StepRouter, { type ConfiguratorSubstepKey } from './StepRouter';
-import { ProjectFlowFooter } from '../../components/ProjectTabs/ProjectFlowFooter';
+
+export interface ConfiguratorShellState {
+  saving: boolean;
+  dirty: boolean;
+  flush: () => void;
+}
 
 export const STANDARD_KEYS: ConfiguratorStepKey[] = [
   'system_design',
@@ -73,12 +78,14 @@ export interface ConfiguratorShellProps {
   /** Controlled substep — if provided the parent owns the selection state */
   activeSubstep?: ConfiguratorSubstepKey;
   onSubstepChange?: (key: ConfiguratorSubstepKey) => void;
+  /** Pushes saving/dirty/flush up so the parent can host the action bar. */
+  onShellStateChange?: (s: ConfiguratorShellState) => void;
 }
 
 /** @internal */
 type Props = ConfiguratorShellProps;
 
-const InnerShell: React.FC<Props> = ({ configuration, onPersist, onBack, onNext, activeSubstep: controlledSubstep, onSubstepChange }) => {
+const InnerShell: React.FC<Props> = ({ configuration, onPersist, onShellStateChange, activeSubstep: controlledSubstep, onSubstepChange }) => {
   const [internalSubstep, setInternalSubstep] = useState<ConfiguratorSubstepKey>('system_design');
   const isControlled = controlledSubstep !== undefined && onSubstepChange !== undefined;
   const activeSubstep = isControlled ? controlledSubstep : internalSubstep;
@@ -156,7 +163,7 @@ const InnerShell: React.FC<Props> = ({ configuration, onPersist, onBack, onNext,
             <StepRouter stepKey={activeSubstep} />
           </Box>
 
-          <FooterWithFlush onBack={onBack} onNext={onNext} />
+          {onShellStateChange && <ShellStateBridge onChange={onShellStateChange} />}
         </Box>
       </Box>
     </ConfiguratorProvider>
@@ -164,24 +171,16 @@ const InnerShell: React.FC<Props> = ({ configuration, onPersist, onBack, onNext,
 };
 
 /**
- * Footer is a separate child so it can consume the configurator context
- * (saving, flush) — it must be inside <ConfiguratorProvider>.
+ * Bridges configurator context (saving / dirty / flush) up to the parent so
+ * the unified header action bar can render Save / Continue.
  */
-const FooterWithFlush: React.FC<{ onBack?: () => void; onNext?: () => void }> = ({ onBack, onNext }) => {
-  // Lazy import to avoid circular when Provider re-renders.
+const ShellStateBridge: React.FC<{ onChange: (s: ConfiguratorShellState) => void }> = ({ onChange }) => {
   const { useConfigurator } = require('../state/ConfiguratorProvider') as typeof import('../state/ConfiguratorProvider');
   const { saving, dirty, flush } = useConfigurator();
-  return (
-    <ProjectFlowFooter
-      onBack={onBack}
-      onNext={onNext}
-      onSave={flush}
-      saving={saving}
-      saveLabel={dirty ? 'Save Draft' : 'Saved'}
-      hint={dirty ? 'Unsaved changes — autosaves shortly.' : undefined}
-      nextLabel="Continue"
-    />
-  );
+  useEffect(() => {
+    onChange({ saving, dirty, flush });
+  }, [saving, dirty, flush, onChange]);
+  return null;
 };
 
 const ConfiguratorShell: React.FC<ConfiguratorShellProps> = (props) => {
