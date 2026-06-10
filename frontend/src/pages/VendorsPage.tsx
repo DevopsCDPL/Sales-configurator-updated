@@ -610,8 +610,8 @@ const VendorsPage: React.FC = () => {
           <ToggleButtonGroup size="small" value={viewMode} exclusive onChange={(_,v) => v && setViewMode(v)}
             sx={{ '& .MuiToggleButton-root':{ border:'1px solid var(--border)', borderRadius:'var(--radius-sm) !important', width:38, height:38, p:0,
               transition:'all 0.15s',
-              '&.Mui-selected':{ bgcolor:'var(--primary)', color:'#fff', borderColor:'var(--primary)',
-                '&:hover':{ bgcolor:'var(--primary-light)' } },
+              '&.Mui-selected':{ bgcolor:'var(--primary)', color:'#000', borderColor:'var(--primary)',
+                '&:hover':{ bgcolor:'var(--primary-light)', color:'#000' } },
               '&:not(.Mui-selected):hover':{ bgcolor:'var(--accent)' },
               '&:not(:first-of-type)':{ ml:'6px' } } }}>
             <ToggleButton value="grid"><GridViewIcon sx={{ fontSize:17 }} /></ToggleButton>
@@ -628,7 +628,7 @@ const VendorsPage: React.FC = () => {
             onClick={() => setVerifiedOnly(!verifiedOnly)}
             sx={{
               borderRadius:'var(--radius-sm)', fontWeight:600, fontSize:'0.72rem', height:32,
-              ...(verifiedOnly ? { bgcolor:'var(--primary)', color:'#fff', '& .MuiChip-icon':{ color:'#fff' } }
+              ...(verifiedOnly ? { bgcolor:'var(--primary)', color:'#000', '& .MuiChip-icon':{ color:'#000' } }
                                : { borderColor:'var(--border)', color:'var(--muted)' }),
             }} />
         </Box>

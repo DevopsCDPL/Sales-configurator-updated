@@ -654,7 +654,7 @@ const LogisticsTab: React.FC<LogisticsTabProps> = ({ project, onUpdate, onBack, 
                   size="small"
                   onClick={e => { e.stopPropagation(); toggleExpand(pl.id); }}
                   sx={isOpen
-                    ? { bgcolor: T.primary, color: '#fff', borderRadius: '8px', width: 30, height: 30, '&:hover': { bgcolor: T.primary } }
+                    ? { bgcolor: T.primary, color: '#000', borderRadius: '8px', width: 30, height: 30, '&:hover': { bgcolor: T.primary, color: '#000' } }
                     : { border: `1px solid #CBD5E1`, color: T.textSec, borderRadius: '8px', width: 30, height: 30, '&:hover': { borderColor: 'var(--text-muted)', bgcolor: 'var(--bg-surface-2)' } }
                   }
                 >

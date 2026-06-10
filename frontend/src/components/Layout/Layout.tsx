@@ -85,9 +85,9 @@ const AVATAR_MALE = '/avatars/male.png';
 const AVATAR_FEMALE = '/avatars/female.png';
 
 // ─── Brand Tokens (constant across modes) ────────────────────────────────
-const PRIMARY    = '#1976D2';
-const PRIMARY_DK = '#1565C0';
-const PRIMARY_LT = '#2563EB';
+const PRIMARY    = '#33d6ff';
+const PRIMARY_DK = '#00bce0';
+const PRIMARY_LT = '#5ce0ff';
 
 // ─── Constants ───────────────────────────────────────────────────────────
 const SIDEBAR_EXPANDED = 220;
@@ -415,11 +415,11 @@ const Layout: React.FC = () => {
                 minHeight: 44, borderRadius: '8px', mx: 0.75, justifyContent: 'center',
                 transition: 'all 0.15s ease',
                 ...(isAcPath
-                  ? { bgcolor: PRIMARY, color: '#fff', '&:hover': { bgcolor: PRIMARY_DK } }
+                  ? { bgcolor: PRIMARY, color: '#000', '&:hover': { bgcolor: PRIMARY_DK, color: '#000' } }
                   : { '&:hover': { bgcolor: 'var(--bg-sidebar-active)' } }),
               }}
             >
-              <ListItemIcon sx={{ minWidth: 0, justifyContent: 'center', color: isAcPath ? '#fff' : 'var(--text-muted)', '& .MuiSvgIcon-root': { fontSize: 20 } }}>
+              <ListItemIcon sx={{ minWidth: 0, justifyContent: 'center', color: isAcPath ? '#000' : 'var(--text-muted)', '& .MuiSvgIcon-root': { fontSize: 20 } }}>
                 <ShieldIcon />
               </ListItemIcon>
             </ListItemButton>
@@ -956,7 +956,7 @@ const Layout: React.FC = () => {
                   placeholder="Enter new name"
                   style={{ flex: 1, padding: '6px 10px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: '0.85rem', outline: 'none' }}
                 />
-                <Button size="small" variant="contained" onClick={handleUpdateName} sx={{ minWidth: 0, px: 1.5, bgcolor: PRIMARY, color: '#fff', '&:hover': { bgcolor: PRIMARY_DK }, textTransform: 'none', fontSize: '0.78rem', borderRadius: 2 }}>Save</Button>
+                <Button size="small" variant="contained" onClick={handleUpdateName} sx={{ minWidth: 0, px: 1.5, bgcolor: PRIMARY, color: '#000', '&:hover': { bgcolor: PRIMARY_DK, color: '#000' }, textTransform: 'none', fontSize: '0.78rem', borderRadius: 2 }}>Save</Button>
               </Box>
             )}
             <MenuItem onClick={() => { handleProfileClose(); navigate('/settings'); }} sx={{ py: 1.2, px: 2.5, mx: 1, mt: 0.5, borderRadius: '8px', '&:hover': { bgcolor: 'var(--bg-sidebar-active)' } }}>

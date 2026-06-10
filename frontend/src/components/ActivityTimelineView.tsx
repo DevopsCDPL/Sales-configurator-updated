@@ -577,8 +577,8 @@ const ActivityTimelineView: React.FC = () => {
               variant="contained" size="small"
               sx={{
                 textTransform: 'none', borderRadius: '10px', fontWeight: 600, fontSize: 13,
-                bgcolor: PRIMARY, color: '#fff', boxShadow: `0 2px 8px ${alpha(PRIMARY, .25)}`,
-                '&:hover': { bgcolor: alpha(PRIMARY, .9) },
+                bgcolor: PRIMARY, color: '#000', boxShadow: `0 2px 8px ${alpha(PRIMARY, .25)}`,
+                '&:hover': { bgcolor: alpha(PRIMARY, .9), color: '#000' },
               }}>
               Add Event
             </Button>
@@ -594,7 +594,7 @@ const ActivityTimelineView: React.FC = () => {
               textTransform: 'none', borderRadius: '10px', fontWeight: 600, fontSize: 13,
               ...(viewMode === 'calendar'
                 ? { borderColor: '#e5e7eb', color: '#6B7280' }
-                : { bgcolor: PRIMARY, color: '#fff', boxShadow: `0 2px 8px ${alpha(PRIMARY, .25)}`, '&:hover': { bgcolor: alpha(PRIMARY, .9) } }),
+                : { bgcolor: PRIMARY, color: '#000', boxShadow: `0 2px 8px ${alpha(PRIMARY, .25)}`, '&:hover': { bgcolor: alpha(PRIMARY, .9), color: '#000' } }),
             }}>
             {viewMode === 'calendar' ? 'Timeline' : 'Calendar'}
           </Button>

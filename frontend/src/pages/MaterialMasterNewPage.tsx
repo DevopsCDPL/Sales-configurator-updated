@@ -611,7 +611,7 @@ const MaterialMasterNewPage: React.FC = () => {
               <ToggleButtonGroup size="small" value={viewMode} exclusive onChange={(_, v) => v && setViewMode(v)}
                 sx={{ '& .MuiToggleButton-root':{ border:'1px solid var(--border)', borderRadius:'var(--radius-sm) !important', width:38, height:38, p:0,
                   transition:'all 0.15s',
-                  '&.Mui-selected':{ bgcolor:'var(--primary)', color:'#fff', borderColor:'var(--primary)',
+                  '&.Mui-selected':{ bgcolor:'var(--primary)', color:'#000', borderColor:'var(--primary)',
                     '&:hover':{ bgcolor:'var(--primary-light)' } },
                   '&:not(.Mui-selected):hover':{ bgcolor:'var(--accent)' },
                   '&:not(:first-of-type)':{ ml:'6px' } } }}>

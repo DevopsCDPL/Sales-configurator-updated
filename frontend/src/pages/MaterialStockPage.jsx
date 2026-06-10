@@ -771,9 +771,9 @@ const MaterialStockPage = () => {
                 ...(statusFilter === tab
                   ? {
                       bgcolor: PRIMARY,
-                      color: '#fff',
+                      color: '#000',
                       boxShadow: `0 2px 6px ${alpha(PRIMARY, 0.3)}`,
-                      '&:hover': { bgcolor: alpha(PRIMARY, 0.9) },
+                      '&:hover': { bgcolor: alpha(PRIMARY, 0.9), color: '#000' },
                     }
                   : {
                       color: 'var(--muted)',

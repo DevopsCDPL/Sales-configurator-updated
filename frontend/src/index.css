@@ -36,10 +36,10 @@
   --border-strong:      #2A2F44;
 
   /* Text — cool slate ramp */
-  --text-primary:       #E2E8F0;
-  --text-secondary:     #CBD5E1;
-  --text-muted:         #64748B;
-  --text-disabled:      #3D4663;
+  --text-primary:       #F1F5F9;
+  --text-secondary:     #E2E8F0;
+  --text-muted:         #94A3B8;
+  --text-disabled:      #475569;
   --text-sidebar:       #64748B;
   --text-sidebar-active:#E2E8F0;
 

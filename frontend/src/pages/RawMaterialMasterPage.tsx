@@ -769,7 +769,7 @@ const RawMaterialMasterPage: React.FC = () => {
                 onChange={(_, val) => { if (val) { setUnitSystem(val); setFDims({}); } }}
                 sx={{ '& .MuiToggleButton-root': { fontSize: '0.65rem', fontWeight: 700, px: 1.5, py: 0.3,
                   textTransform: 'none', borderColor: 'var(--border)', borderRadius: 'var(--radius-sm) !important',
-                  '&.Mui-selected': { bgcolor: 'var(--primary)', color: '#fff', borderColor: 'var(--primary)', '&:hover': { bgcolor: 'var(--primary-light)' } },
+                  '&.Mui-selected': { bgcolor: 'var(--primary)', color: '#000', borderColor: 'var(--primary)', '&:hover': { bgcolor: 'var(--primary-light)', color: '#000' } },
                   '&:not(.Mui-selected)': { color: 'var(--muted)', '&:hover': { bgcolor: 'var(--accent)' } },
                   '&:not(:first-of-type)': { ml: '4px' } } }}>
                 <ToggleButton value="imperial">Imperial (in/ft)</ToggleButton>

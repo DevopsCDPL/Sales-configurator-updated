@@ -649,10 +649,10 @@ const QuotationTab: React.FC<QuotationTabProps> = ({ project, onUpdate, onBack, 
             sx={{
               borderRadius: '10px', height: 42, px: 3,
               textTransform: 'none', fontWeight: 600, fontSize: '0.82rem',
-              color: 'white', background: T.primary,
+              color: '#000', background: T.primary,
               boxShadow: T.shadow,
-              '&:hover': { background: '#116b33', boxShadow: T.shadowMd },
-              '&.Mui-disabled': { color: 'white', background: T.primary, opacity: 0.5 },
+              '&:hover': { background: '#116b33', color: '#000', boxShadow: T.shadowMd },
+              '&.Mui-disabled': { color: '#000', background: T.primary, opacity: 0.5 },
               transition: 'all .2s',
             }}
           >

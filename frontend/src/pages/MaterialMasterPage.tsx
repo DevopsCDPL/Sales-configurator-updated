@@ -520,7 +520,7 @@ const MaterialMasterPage: React.FC = () => {
               size="small"
               sx={{
                 fontWeight: 700, fontSize: '0.72rem', borderRadius: '7px',
-                bgcolor: T.primary, color: '#fff', height: 24,
+                bgcolor: T.primary, color: '#000', height: 24,
               }}
             />
             <Button size="small" onClick={handleBulkActivate} sx={{

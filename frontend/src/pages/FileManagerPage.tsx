@@ -955,7 +955,7 @@ const FileManagerPage: React.FC = () => {
                 textTransform: 'none', fontWeight: 600, fontSize: '0.82rem', borderRadius: '10px',
                 px: 2, py: 0.8, minWidth: 'auto',
                 ...(procSubTab === i
-                  ? { bgcolor: PRIMARY, color: '#fff', boxShadow: `0 2px 6px ${alpha(PRIMARY, 0.3)}`, '&:hover': { bgcolor: alpha(PRIMARY, 0.9) } }
+                  ? { bgcolor: PRIMARY, color: '#000', boxShadow: `0 2px 6px ${alpha(PRIMARY, 0.3)}`, '&:hover': { bgcolor: alpha(PRIMARY, 0.9), color: '#000' } }
                   : { color: 'text.secondary', '&:hover': { bgcolor: alpha(PRIMARY, 0.08), color: 'text.primary' } }),
               }}
             >

@@ -1093,7 +1093,7 @@ const ProjectsPage: React.FC = () => {
           <Button variant="contained" onClick={handleCopyProject} disabled={copyLoading}
             startIcon={<CopyIcon sx={{ fontSize: 16 }} />}
             sx={{ textTransform: 'none', fontSize: 13, fontWeight: 600, borderRadius: '10px', px: 2, boxShadow: 'none',
-              bgcolor: UI.primary, '&:hover': { bgcolor: '#0099cc' }, color: '#fff' }}>
+              bgcolor: UI.primary, '&:hover': { bgcolor: '#0099cc', color: '#000' }, color: '#000' }}>
             {copyLoading ? 'Copying...' : 'Confirm Copy'}
           </Button>
         </DialogActions>

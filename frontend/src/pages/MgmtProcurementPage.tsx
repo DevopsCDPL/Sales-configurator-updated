@@ -37,9 +37,9 @@ const T = {
   primary:   '#33d6ff',
   primaryLt: '#5ce0ff',
   primaryBg: 'rgba(51, 214, 255, 0.10)',
-  dark:      '#1F2937',
-  textSec:   '#6B7280',
-  textMuted: '#9CA3AF',
+  dark:      '#F1F5F9',
+  textSec:   '#CBD5E1',
+  textMuted: '#94A3B8',
   border:    '#E5E7EB',
   borderLight: '#F3F4F6',
   bg:        '#F9FAFB',
@@ -147,7 +147,7 @@ const FilterBar = ({ search, onSearch, statusFilter, onStatusFilter, statusCount
               fontWeight: isActive ? 700 : 500, fontSize: 11, borderRadius: '999px',
               height: 26, px: '6px',
               bgcolor: isActive ? c : 'transparent',
-              color: isActive ? '#FFFFFF' : T.textSec,
+              color: isActive ? '#000000' : T.textSec,
               border: isActive ? `1.5px solid ${c}` : `1.5px solid ${T.border}`,
               cursor: 'pointer',
               boxShadow: isActive ? `0 2px 8px ${alpha(c, 0.25)}` : 'none',
@@ -278,7 +278,7 @@ const PaginationBar = ({ page, totalPages, totalItems, pageSize, onPageChange, o
                   alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
                   fontSize: 12, fontWeight: page === pageNum ? 700 : 500,
                   bgcolor: page === pageNum ? T.primary : 'transparent',
-                  color: page === pageNum ? T.white : T.textSec,
+                  color: page === pageNum ? '#000000' : T.textSec,
                   '&:hover': page === pageNum ? {} : { bgcolor: T.primaryBg },
                 }}
               >
@@ -310,7 +310,7 @@ const PaginationBar = ({ page, totalPages, totalItems, pageSize, onPageChange, o
             const n = parseInt(customVal, 10);
             if (n > 0 && n <= 500) { onPageSizeChange!(n); setCustomOpen(false); setCustomVal(''); }
           }} disabled={!customVal || parseInt(customVal, 10) <= 0 || parseInt(customVal, 10) > 500}
-            sx={{ bgcolor: T.primary, fontSize: 12, textTransform: 'none', borderRadius: '8px', '&:hover': { bgcolor: alpha(T.primary, 0.9) } }}>
+            sx={{ bgcolor: T.primary, color: '#000000', fontSize: 12, textTransform: 'none', borderRadius: '8px', '&:hover': { bgcolor: alpha(T.primary, 0.9), color: '#000000' } }}>
             Apply
           </Button>
         </DialogActions>
@@ -384,8 +384,8 @@ const MgmtProcurementPage = () => {
               textTransform: 'none', fontWeight: 600, fontSize: '0.82rem', borderRadius: '10px',
               px: 2, py: 0.8, minWidth: 'auto',
               ...(tab === i
-                ? { bgcolor: T.primary, color: '#fff', boxShadow: `0 2px 6px ${alpha(T.primary, 0.3)}`, '&:hover': { bgcolor: alpha(T.primary, 0.9) } }
-                : { color: T.textMuted, '&:hover': { bgcolor: alpha(T.primary, 0.08), color: T.dark } }),
+                ? { bgcolor: T.primary, color: '#000000', boxShadow: `0 2px 6px ${alpha(T.primary, 0.3)}`, '&:hover': { bgcolor: alpha(T.primary, 0.9), color: '#000000' } }
+                : { color: T.textSec, '&:hover': { bgcolor: alpha(T.primary, 0.08), color: T.dark } }),
             }}
           >
             {t.label}
@@ -959,7 +959,7 @@ const RFQSection = ({ showToast, onStats, onCreatePO }: { showToast: (m: string,
             </Button>
           )}
           <Button variant="contained" startIcon={<AddIcon />} onClick={() => { resetForm(); setOpen(true); }}
-            sx={{ bgcolor: T.primary, textTransform: 'none', fontWeight: 600, fontSize: 13, borderRadius: '10px', px: 2.5, boxShadow: `0 2px 8px ${alpha(T.primary, 0.25)}`, '&:hover': { bgcolor: alpha(T.primary, 0.9) } }}>
+            sx={{ bgcolor: T.primary, color: '#000000', textTransform: 'none', fontWeight: 600, fontSize: 13, borderRadius: '10px', px: 2.5, boxShadow: `0 2px 8px ${alpha(T.primary, 0.25)}`, '&:hover': { bgcolor: alpha(T.primary, 0.9), color: '#000000' } }}>
             Create New RFQ
           </Button>
         </Box>
@@ -1404,7 +1404,7 @@ const RFQSection = ({ showToast, onStats, onCreatePO }: { showToast: (m: string,
           <Button variant="contained" onClick={handleEditSave}
             disabled={saving || !editItemsValid || !editForm.vendor_id}
             startIcon={saving ? <CircularProgress size={16} color="inherit" /> : undefined}
-            sx={{ bgcolor: T.primary, textTransform: 'none', fontWeight: 600, fontSize: 13, borderRadius: '10px', px: 3, boxShadow: `0 2px 8px ${alpha(T.primary, 0.25)}`, '&:hover': { bgcolor: alpha(T.primary, 0.9) } }}>
+            sx={{ bgcolor: T.primary, color: '#000000', textTransform: 'none', fontWeight: 600, fontSize: 13, borderRadius: '10px', px: 3, boxShadow: `0 2px 8px ${alpha(T.primary, 0.25)}`, '&:hover': { bgcolor: alpha(T.primary, 0.9), color: '#000000' } }}>
             {saving ? 'Updating...' : 'Update RFQ'}
           </Button>
           {editStatus === 'Sent' && (
@@ -1530,7 +1530,7 @@ const RFQSection = ({ showToast, onStats, onCreatePO }: { showToast: (m: string,
           <Button onClick={() => { setOpen(false); setCreateError(null); }} disabled={saving} sx={{ textTransform: 'none', fontSize: 13, borderRadius: '8px' }}>Cancel</Button>
           <Button variant="contained" onClick={handleCreate} disabled={saving || !itemsValid || form.vendor_ids.length === 0}
             startIcon={saving ? <CircularProgress size={16} color="inherit" /> : undefined}
-            sx={{ bgcolor: T.primary, textTransform: 'none', fontWeight: 600, fontSize: 13, borderRadius: '10px', px: 3, boxShadow: `0 2px 8px ${alpha(T.primary, 0.25)}`, '&:hover': { bgcolor: alpha(T.primary, 0.9) } }}>
+            sx={{ bgcolor: T.primary, color: '#000000', textTransform: 'none', fontWeight: 600, fontSize: 13, borderRadius: '10px', px: 3, boxShadow: `0 2px 8px ${alpha(T.primary, 0.25)}`, '&:hover': { bgcolor: alpha(T.primary, 0.9), color: '#000000' } }}>
             {saving ? 'Saving...' : 'Save as Draft'}
           </Button>
         </DialogActions>
@@ -2024,7 +2024,7 @@ const POSection = ({ showToast, onStats, initialRfqId, onClearInitialRfqId }: { 
             onStatusFilter={setStatusFilter} statusCounts={statusCounts} />
         </Box>
         <Button variant="contained" startIcon={<AddIcon />} onClick={() => { setForm(emptyForm()); setSelectedRFQ(null); setOpen(true); }}
-          sx={{ bgcolor: T.primary, textTransform: 'none', fontWeight: 600, fontSize: 13, borderRadius: '10px', px: 2.5, boxShadow: `0 2px 8px ${alpha(T.primary, 0.25)}`, '&:hover': { bgcolor: alpha(T.primary, 0.9) } }}>
+          sx={{ bgcolor: T.primary, color: '#000000', textTransform: 'none', fontWeight: 600, fontSize: 13, borderRadius: '10px', px: 2.5, boxShadow: `0 2px 8px ${alpha(T.primary, 0.25)}`, '&:hover': { bgcolor: alpha(T.primary, 0.9), color: '#000000' } }}>
           Create New PO
         </Button>
       </Box>
@@ -2280,7 +2280,7 @@ const POSection = ({ showToast, onStats, initialRfqId, onClearInitialRfqId }: { 
           <Button onClick={() => setOpen(false)} disabled={saving} sx={{ textTransform: 'none', fontSize: 13, borderRadius: '8px' }}>Cancel</Button>
           <Button variant="contained" onClick={handleCreate} disabled={saving || !form.rfq_id}
             startIcon={saving ? <CircularProgress size={16} color="inherit" /> : undefined}
-            sx={{ bgcolor: T.primary, textTransform: 'none', fontWeight: 600, fontSize: 13, borderRadius: '10px', px: 3, boxShadow: `0 2px 8px ${alpha(T.primary, 0.25)}`, '&:hover': { bgcolor: alpha(T.primary, 0.9) }, '&.Mui-disabled': { bgcolor: alpha(T.primary, 0.4), color: '#fff' } }}>
+            sx={{ bgcolor: T.primary, color: '#000000', textTransform: 'none', fontWeight: 600, fontSize: 13, borderRadius: '10px', px: 3, boxShadow: `0 2px 8px ${alpha(T.primary, 0.25)}`, '&:hover': { bgcolor: alpha(T.primary, 0.9), color: '#000000' }, '&.Mui-disabled': { bgcolor: alpha(T.primary, 0.4), color: '#000000' } }}>
             {saving ? 'Saving...' : 'Save as Draft'}
           </Button>
         </DialogActions>
@@ -2403,7 +2403,7 @@ const POSection = ({ showToast, onStats, initialRfqId, onClearInitialRfqId }: { 
         <DialogActions sx={{ borderTop: `1px solid ${T.border}`, px: 3, py: 1.5 }}>
           <Button onClick={() => setEditPoOpen(false)} sx={{ textTransform: 'none', fontSize: 13, borderRadius: '8px' }}>Cancel</Button>
           <Button variant="contained" onClick={handleSaveEditPO}
-            sx={{ bgcolor: T.primary, textTransform: 'none', fontWeight: 600, fontSize: 13, borderRadius: '10px', px: 3, boxShadow: `0 2px 8px ${alpha(T.primary, 0.25)}`, '&:hover': { bgcolor: alpha(T.primary, 0.9) } }}>
+            sx={{ bgcolor: T.primary, color: '#000000', textTransform: 'none', fontWeight: 600, fontSize: 13, borderRadius: '10px', px: 3, boxShadow: `0 2px 8px ${alpha(T.primary, 0.25)}`, '&:hover': { bgcolor: alpha(T.primary, 0.9), color: '#000000' } }}>
             Save Changes
           </Button>
         </DialogActions>

@@ -610,7 +610,7 @@ const DocumentsTab: React.FC<DocumentsTabProps> = ({ project, onUpdate: _onUpdat
             </Typography>
           </Box>
           <Stack direction="row" alignItems="center" spacing={1}>
-            <Chip label={`${allDocs.length} Files`} size="small" sx={{ fontWeight: 700, bgcolor: UI.primary, color: '#fff', fontSize: 12 }} />
+            <Chip label={`${allDocs.length} Files`} size="small" sx={{ fontWeight: 700, bgcolor: UI.primary, color: '#000', fontSize: 12 }} />
             <IconButton
               size="small"
               onClick={(e) => { e.stopPropagation(); handleDownloadAll(); }}
@@ -627,7 +627,7 @@ const DocumentsTab: React.FC<DocumentsTabProps> = ({ project, onUpdate: _onUpdat
               size="small"
               onClick={(e) => { e.stopPropagation(); setIsMainPanelOpen(!isMainPanelOpen); }}
               sx={isMainPanelOpen
-                ? { bgcolor: UI.primary, color: '#fff', borderRadius: '8px', width: 30, height: 30, flexShrink: 0, '&:hover': { bgcolor: UI.primary } }
+                ? { bgcolor: UI.primary, color: '#000', borderRadius: '8px', width: 30, height: 30, flexShrink: 0, '&:hover': { bgcolor: UI.primary, color: '#000' } }
                 : { border: `1px solid ${UI.border}`, color: UI.textSecondary, borderRadius: '8px', width: 30, height: 30, flexShrink: 0, '&:hover': { borderColor: UI.textMuted, bgcolor: 'var(--bg-surface-2)' } }
               }
             >

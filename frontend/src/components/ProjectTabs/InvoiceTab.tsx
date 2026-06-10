@@ -746,7 +746,7 @@ const InvoiceTab: React.FC<InvoiceTabProps> = ({ project, onUpdate, onBack, onNe
                     size="small"
                     onClick={() => setIsMainPanelOpen(!isMainPanelOpen)}
                     sx={isMainPanelOpen
-                      ? { bgcolor: T.primary, color: '#fff', borderRadius: '8px', width: 30, height: 30, flexShrink: 0, '&:hover': { bgcolor: T.primary } }
+                      ? { bgcolor: T.primary, color: '#000', borderRadius: '8px', width: 30, height: 30, flexShrink: 0, '&:hover': { bgcolor: T.primary, color: '#000' } }
                       : { border: `1px solid ${T.border}`, color: T.textSec, borderRadius: '8px', width: 30, height: 30, flexShrink: 0, '&:hover': { borderColor: T.textMuted, bgcolor: 'var(--bg-surface-2)' } }
                     }
                   >
