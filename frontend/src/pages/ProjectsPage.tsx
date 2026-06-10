@@ -581,12 +581,12 @@ const ProjectsPage: React.FC = () => {
 
         {/* Expanded Project Table (full width) */}
         <Grid item xs={12} md={12}>
-          <Card sx={{ border: `1px solid #2962FF`, borderRadius: '16px',
+          <Card sx={{ border: `1px solid #1E2235`, borderRadius: '16px',
             boxShadow: '0 1px 2px rgba(0,0,0,0.12), 0 4px 12px -2px rgba(0,0,0,0.20)', overflow: 'hidden',
-            background: '#2962FF',
+            background: '#1A1A26',
             position: 'relative',
             transition: 'box-shadow 0.22s ease, border-color 0.22s ease',
-            '&:hover': { boxShadow: '0 1px 2px rgba(0,0,0,0.15), 0 10px 24px -6px rgba(41,98,255,0.30), 0 20px 48px -12px rgba(41,98,255,0.20)', borderColor: '#1E5BFF' },
+            '&:hover': { boxShadow: '0 1px 2px rgba(0,0,0,0.15), 0 10px 24px -6px rgba(0,200,255,0.10), 0 20px 48px -12px rgba(0,200,255,0.06)', borderColor: 'var(--border-strong)' },
           }}>
             {/* Bottom accent line */}
             <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '3px', bgcolor: COLOR.PRIMARY, borderRadius: '0 0 14px 14px', zIndex: 1 }} />
