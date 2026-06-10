@@ -282,7 +282,7 @@ export default function IntakeStep(props: IntakeStepProps) {
 
       {/* Proposal diff preview — nothing applies silently (Phase C §4.3) */}
       <Dialog open={!!proposal} onClose={() => setProposal(null)} fullWidth maxWidth="md"
-        slotProps={{ paper: { sx: { bgcolor: C.surface, border: `1px solid ${C.border}`, backgroundImage: 'none' } } }}>
+        PaperProps={{ sx: { bgcolor: C.surface, border: `1px solid ${C.border}`, backgroundImage: 'none' } }}>
         <DialogTitle sx={{ color: C.text, fontSize: 15 }}>
           Proposed Line-up — review before applying
         </DialogTitle>

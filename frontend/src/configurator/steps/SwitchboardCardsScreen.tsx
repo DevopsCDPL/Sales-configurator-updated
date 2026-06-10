@@ -175,7 +175,7 @@ export default function SwitchboardCardsScreen(props: SwitchboardCardsScreenProp
       {/* card menu */}
       <Menu
         anchorEl={menuAnchor?.el} open={!!menuAnchor} onClose={() => setMenuAnchor(null)}
-        slotProps={{ paper: { sx: { bgcolor: C.surface, border: `1px solid ${C.border}`, color: C.text, minWidth: 160 } } }}
+        PaperProps={{ sx: { bgcolor: C.surface, border: `1px solid ${C.border}`, color: C.text, minWidth: 160 } }}
       >
         <MenuItem onClick={() => { props.onOpen(menuAnchor!.id); setMenuAnchor(null); }} sx={{ fontSize: 13 }}>Open</MenuItem>
         <MenuItem
@@ -202,7 +202,7 @@ export default function SwitchboardCardsScreen(props: SwitchboardCardsScreenProp
       {/* add menu: New | Load */}
       <Menu
         anchorEl={addAnchor} open={!!addAnchor} onClose={() => setAddAnchor(null)}
-        slotProps={{ paper: { sx: { bgcolor: C.surface, border: `1px solid ${C.border}`, color: C.text, minWidth: 220 } } }}
+        PaperProps={{ sx: { bgcolor: C.surface, border: `1px solid ${C.border}`, color: C.text, minWidth: 220 } }}
       >
         <MenuItem onClick={() => { setNewOpen(true); setAddAnchor(null); }} sx={{ fontSize: 13 }}>
           <Box>
@@ -219,7 +219,7 @@ export default function SwitchboardCardsScreen(props: SwitchboardCardsScreenProp
       </Menu>
 
       {/* new dialog */}
-      <Dialog open={newOpen} onClose={() => setNewOpen(false)} slotProps={{ paper: { sx: dialogSx } }}>
+      <Dialog open={newOpen} onClose={() => setNewOpen(false)} PaperProps={{ sx: dialogSx }}>
         <DialogTitle sx={{ color: C.text, fontSize: 15 }}>New Configuration</DialogTitle>
         <DialogContent>
           <TextField
@@ -240,7 +240,7 @@ export default function SwitchboardCardsScreen(props: SwitchboardCardsScreenProp
       </Dialog>
 
       {/* load dialog */}
-      <Dialog open={loadOpen} onClose={() => setLoadOpen(false)} fullWidth maxWidth="xs" slotProps={{ paper: { sx: dialogSx } }}>
+      <Dialog open={loadOpen} onClose={() => setLoadOpen(false)} fullWidth maxWidth="xs" PaperProps={{ sx: dialogSx }}>
         <DialogTitle sx={{ color: C.text, fontSize: 15 }}>Load Configuration</DialogTitle>
         <DialogContent>
           <Typography sx={{ color: C.sub, fontSize: 12, mb: 1 }}>
@@ -272,7 +272,7 @@ export default function SwitchboardCardsScreen(props: SwitchboardCardsScreenProp
       </Dialog>
 
       {/* rename dialog */}
-      <Dialog open={!!renameId} onClose={() => setRenameId(null)} slotProps={{ paper: { sx: dialogSx } }}>
+      <Dialog open={!!renameId} onClose={() => setRenameId(null)} PaperProps={{ sx: dialogSx }}>
         <DialogTitle sx={{ color: C.text, fontSize: 15 }}>Rename Switchgear</DialogTitle>
         <DialogContent>
           <TextField autoFocus fullWidth size="small" value={nameDraft} onChange={(e) => setNameDraft(e.target.value)} sx={fieldSx} />
