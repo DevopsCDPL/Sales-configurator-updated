@@ -59,6 +59,7 @@ import {
   Inventory as InventoryIcon,
   BarChart as BarChartIcon,
   SmartToyOutlined as SmartToyIcon,
+  Storage as StorageIcon,
   CalendarMonth as CalendarIcon,
   DeleteOutline as RecycleBinIcon,
   Build as BuildIcon,
@@ -618,20 +619,6 @@ const Layout: React.FC = () => {
             {canSeeSidebarItem(user?.role, '/material-stock', userIsCoAdmin) && renderNavItem(<InventoryIcon />, 'Inventory', '/material-stock', c)}
           </List>
 
-          {/* MASTER DATA */}
-          {(canSeeSidebarItem(user?.role, '/parts-master', userIsCoAdmin) || canSeeSidebarItem(user?.role, '/clients', userIsCoAdmin)) && (
-            <>
-              {renderSectionLabel('Database', c)}
-              <List disablePadding>
-                {canSeeSidebarItem(user?.role, '/vendors', userIsCoAdmin) && renderNavItem(<ShippingIcon />, 'Vendors Database', '/vendors', c)}
-                {canSeeSidebarItem(user?.role, '/clients', userIsCoAdmin) && renderNavItem(<PeopleIcon />, 'Clients Database', '/clients', c)}
-                {canSeeSidebarItem(user?.role, '/material-stock', userIsCoAdmin) && renderNavItem(<ScienceIcon />, 'Raw Material Master', '/raw-materials', c)}
-                {canSeeSidebarItem(user?.role, '/parts-master', userIsCoAdmin) && renderNavItem(<BuildIcon />, 'Parts Master', '/parts-master', c)}
-                {canSeeSidebarItem(user?.role, '/components', userIsCoAdmin) && renderNavItem(<ComponentsIcon />, 'Components', '/components', c)}
-              </List>
-            </>
-          )}
-
           {/* FILE MANAGER */}
           {renderSectionLabel('File Manager', c)}
           <List disablePadding>
@@ -830,6 +817,15 @@ const Layout: React.FC = () => {
               <SmartToyIcon sx={{ fontSize: 21 }} />
             </IconButton>
           </Tooltip>
+
+          {/* Database Hub */}
+          {canSeeSidebarItem(user?.role, '/parts-master', userIsCoAdmin) && (
+            <Tooltip title="Database">
+              <IconButton onClick={() => navigate('/database')} sx={{ color: 'var(--text-secondary)', ml: 0.5, transition: 'all 0.15s ease', '&:hover': { bgcolor: 'var(--bg-sidebar-active)', color: PRIMARY } }}>
+                <StorageIcon sx={{ fontSize: 21 }} />
+              </IconButton>
+            </Tooltip>
+          )}
 
           {/* Settings */}
           <Tooltip title="Settings">

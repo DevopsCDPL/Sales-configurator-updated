@@ -45,6 +45,7 @@ import AddVendorPage from './pages/AddVendorPage';
 import BusinessAnalyticsPage from './pages/BusinessAnalyticsPage';
 // Material Master removed — Parts Master is the single source of truth
 import PartsMasterPage from './pages/PartsMasterPage';
+import DatabaseHubPage from './pages/DatabaseHubPage';
 import RawMaterialMasterPage from './pages/RawMaterialMasterPage';
 import VendorPOPage from './pages/VendorPOPage';
 import VendorProcurementPage from './pages/VendorProcurementPage';
@@ -173,6 +174,7 @@ const App: React.FC = () => {
           <Route path="raw-materials" element={<RBACRoute path="/raw-materials"><RawMaterialMasterPage /></RBACRoute>} />
           <Route path="parts-master" element={<RBACRoute path="/parts-master"><PartsMasterPage /></RBACRoute>} />
           <Route path="components" element={<RBACRoute path="/components"><ComponentsPage /></RBACRoute>} />
+          <Route path="database" element={<RBACRoute path="/parts-master"><DatabaseHubPage /></RBACRoute>} />
           <Route path="components/new" element={<RBACRoute path="/components"><AddComponentPage /></RBACRoute>} />
           <Route path="components/:id/edit" element={<RBACRoute path="/components"><AddComponentPage /></RBACRoute>} />
           <Route path="procurement" element={<RBACRoute path="/procurement"><MgmtProcurementPage /></RBACRoute>} />
