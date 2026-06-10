@@ -583,7 +583,7 @@ const ProjectsPage: React.FC = () => {
         <Grid item xs={12} md={12}>
           <Card sx={{ border: `1px solid #1E2235`, borderRadius: '16px',
             boxShadow: '0 1px 2px rgba(0,0,0,0.12), 0 4px 12px -2px rgba(0,0,0,0.20)', overflow: 'hidden',
-            background: '#0F0F18',
+            background: '#262635',
             position: 'relative',
             transition: 'box-shadow 0.22s ease, border-color 0.22s ease',
             '&:hover': { boxShadow: '0 1px 2px rgba(0,0,0,0.15), 0 10px 24px -6px rgba(0,200,255,0.10), 0 20px 48px -12px rgba(0,200,255,0.06)', borderColor: 'var(--border-strong)' },
@@ -650,15 +650,15 @@ const ProjectsPage: React.FC = () => {
                     size="small"
                     onClick={() => { setStatusFilter(tab.key); setCurrentPage(1); }}
                     sx={{
-                      fontSize: '12px', fontWeight: active ? 600 : 500,
+                      fontSize: '12px', fontWeight: active ? 700 : 500,
                       borderRadius: '999px', px: '12px', height: 30,
                       bgcolor: active ? UI.primary : 'var(--bg-surface-2)',
-                      color: active ? '#fff' : 'var(--text-secondary)',
+                      color: active ? '#000' : 'var(--text-secondary)',
                       border: active ? '1px solid #00c8ff' : '1px solid var(--border)',
                       cursor: 'pointer',
                       transition: 'all .2s cubic-bezier(.4,0,.2,1)',
                       '&:hover': active
-                        ? { bgcolor: '#0099cc' }
+                        ? { bgcolor: '#5ce0ff', color: '#000' }
                         : { bgcolor: 'var(--bg-canvas)', borderColor: 'var(--text-muted)', color: 'var(--text-primary)' },
                     }}
                   />
