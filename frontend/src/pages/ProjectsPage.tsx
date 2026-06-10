@@ -583,7 +583,7 @@ const ProjectsPage: React.FC = () => {
         <Grid item xs={12} md={12}>
           <Card sx={{ border: `1px solid #1E2235`, borderRadius: '16px',
             boxShadow: '0 1px 2px rgba(0,0,0,0.12), 0 4px 12px -2px rgba(0,0,0,0.20)', overflow: 'hidden',
-            background: '#1A1A26',
+            background: '#0F0F18',
             position: 'relative',
             transition: 'box-shadow 0.22s ease, border-color 0.22s ease',
             '&:hover': { boxShadow: '0 1px 2px rgba(0,0,0,0.15), 0 10px 24px -6px rgba(0,200,255,0.10), 0 20px 48px -12px rgba(0,200,255,0.06)', borderColor: 'var(--border-strong)' },
