@@ -613,7 +613,7 @@ const ProjectDetailPage: React.FC = () => {
       </Box>
 
       {/* â•â•â• Tab Content (12-step workflow) â•â•â• */}
-      <Box sx={{ pb: 4 }}>
+      <Box sx={{ pt: '14px', pb: 4 }}>
         <TabPanel value={activeTab} index={0}>
           <ProjectInfoTab project={project} onUpdate={loadProject} onProceedToEstimation={() => unlockAndGo(1)} />
         </TabPanel>
