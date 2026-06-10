@@ -534,14 +534,14 @@ const ProjectsPage: React.FC = () => {
             <Button variant="contained" startIcon={<AddIcon sx={{ fontSize: 17 }} />}
               onClick={openNewProject}
               sx={{
-                backgroundColor: '#00c8ff',
-                color: '#06151c',
+                backgroundColor: '#33d6ff',
+                color: '#000000',
                 textTransform: 'none', fontWeight: 700, fontSize: 13.5,
                 boxShadow: 'none',
                 borderRadius: '10px',
                 height: 36, px: '14px',
                 letterSpacing: '.01em',
-                '&:hover': { backgroundColor: '#33d4ff', boxShadow: 'none' },
+                '&:hover': { backgroundColor: '#5ce0ff', boxShadow: 'none' },
                 transition: 'background-color 0.2s ease',
               }}>
               New Project
