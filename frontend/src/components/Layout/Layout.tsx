@@ -626,16 +626,7 @@ const Layout: React.FC = () => {
             {renderNavItem(<ForumIcon />, 'Messages', '/messages', c)}
           </List>
 
-          {/* BUSINESS ANALYTICS */}
-          {(canSeeSidebarItem(user?.role, '/business-analytics', userIsCoAdmin) || canSeeSidebarItem(user?.role, '/risk-dashboard', userIsCoAdmin)) && (
-            <>
-              {renderSectionLabel('Business Analytics', c)}
-              <List disablePadding>
-                {canSeeSidebarItem(user?.role, '/business-analytics', userIsCoAdmin) && renderNavItem(<BarChartIcon />, 'Business Analytics', '/business-analytics', c)}
-                {canSeeSidebarItem(user?.role, '/risk-dashboard', userIsCoAdmin) && renderNavItem(<WarningIcon />, 'Risk Dashboard', '/risk-dashboard', c)}
-              </List>
-            </>
-          )}
+          {/* Business Analytics moved to top-right header icon (Analytics hub) */}
 
           {/* System section moved into Settings tabs (Users / Roles / Approvals / Sessions) */}
         </Box>
@@ -822,6 +813,15 @@ const Layout: React.FC = () => {
               <SettingsIcon sx={{ fontSize: 20 }} />
             </IconButton>
           </Tooltip>
+
+          {/* Analytics Hub */}
+          {canSeeSidebarItem(user?.role, '/business-analytics', userIsCoAdmin) && (
+            <Tooltip title="Analytics">
+              <IconButton onClick={() => navigate('/analytics-hub')} sx={{ color: 'var(--text-secondary)', ml: 0.5, transition: 'all 0.15s ease', '&:hover': { bgcolor: 'var(--bg-sidebar-active)', color: PRIMARY } }}>
+                <BarChartIcon sx={{ fontSize: 20 }} />
+              </IconButton>
+            </Tooltip>
+          )}
 
           {/* Calendar */}
           <Tooltip title="Calendar">

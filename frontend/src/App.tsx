@@ -46,6 +46,7 @@ import BusinessAnalyticsPage from './pages/BusinessAnalyticsPage';
 // Material Master removed — Parts Master is the single source of truth
 import PartsMasterPage from './pages/PartsMasterPage';
 import DatabaseHubPage from './pages/DatabaseHubPage';
+import AnalyticsHubPage from './pages/AnalyticsHubPage';
 import RawMaterialMasterPage from './pages/RawMaterialMasterPage';
 import VendorPOPage from './pages/VendorPOPage';
 import VendorProcurementPage from './pages/VendorProcurementPage';
@@ -190,6 +191,7 @@ const App: React.FC = () => {
           <Route path="approvals" element={<RBACRoute path="/approvals"><ApprovalWorkflowUI /></RBACRoute>} />
           <Route path="risk-dashboard" element={<RBACRoute path="/risk-dashboard"><RiskDashboard /></RBACRoute>} />
           {/* Other routes */}
+          <Route path="analytics-hub" element={<RBACRoute path="/business-analytics"><AnalyticsHubPage /></RBACRoute>} />
           <Route path="business-analytics" element={<RBACRoute path="/business-analytics"><BusinessAnalyticsPage /></RBACRoute>} />
           <Route path="analytics" element={<RBACRoute path="/analytics"><BusinessAnalyticsPage /></RBACRoute>} />
           <Route path="activity-timeline" element={<RBACRoute path="/activity-timeline"><ActivityTimelineView /></RBACRoute>} />
