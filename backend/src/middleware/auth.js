@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
-const { User, Setting, Session } = require('../models');
+const { User, Setting, Session, Company } = require('../models');
 const { CO_ADMIN_SLOTS, SUPER_ADMIN_ENTERPRISE_ALLOWED } = require('../config/rolePermissions');
 
 /**
@@ -77,6 +77,18 @@ const authenticate = async (req, res, next) => {
       });
     }
 
+    // Backfill company_id if missing but company_name is set (legacy main_admin accounts)
+    let resolvedCompanyId = user.company_id;
+    if (!resolvedCompanyId && user.company_name) {
+      try {
+        const company = await Company.findOne({ where: { name: user.company_name }, attributes: ['id'] });
+        if (company) {
+          resolvedCompanyId = company.id;
+          User.update({ company_id: company.id }, { where: { id: user.id } }).catch(() => {});
+        }
+      } catch (_) { /* non-fatal */ }
+    }
+
     req.user = {
       id: user.id,
       email: user.email,
@@ -84,7 +96,7 @@ const authenticate = async (req, res, next) => {
       role: user.role,
       position: user.position || '',
       company_name: user.company_name,
-      company_id: user.company_id,
+      company_id: resolvedCompanyId,
       created_by: user.created_by,
       module_permissions: user.module_permissions || {},
     };

@@ -155,11 +155,19 @@ class ClientService {
       } else if (requestingUser.company_id) {
         // All other roles: always scope to their own company
         companyId = requestingUser.company_id;
+      } else if (requestingUser.company_name) {
+        // main_admin whose company_id wasn't set — look it up by company_name
+        const company = await Company.findOne({ where: { name: requestingUser.company_name } });
+        if (company) {
+          companyId = company.id;
+          // Backfill the missing company_id on the user record so future requests work correctly
+          await User.update({ company_id: company.id }, { where: { id: requestingUser.id } });
+        }
       }
     }
 
     if (!companyId) {
-      throw new Error('Unable to determine company for this client. Your account may not be associated with a company.');
+      throw new Error('Unable to determine company for this client. Please ensure your account is linked to a company.');
     }
 
     const client = await Client.create({
