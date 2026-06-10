@@ -1592,11 +1592,44 @@ const initDatabase = async (retries = 3) => {
       const adminName     = process.env.ADMIN_NAME     || 'Admin';
       logger.info({ email: adminEmail }, 'Admin setup');
 
+      // --- Ensure a company record exists before creating/linking the admin user ---
+      // The companies table may be empty when settings-based company info exists.
+      // Seed a company from the settings table so admin can be linked to it.
+      try {
+        const [companyCount] = await sequelize.query(
+          `SELECT COUNT(*) AS cnt FROM companies`,
+          { type: sequelize.QueryTypes.SELECT }
+        );
+        if (parseInt(companyCount.cnt, 10) === 0) {
+          // Read company name from settings (stored as JSON under key 'company')
+          const [settingRow] = await sequelize.query(
+            `SELECT value FROM settings WHERE key = 'company' AND company_id IS NULL LIMIT 1`,
+            { type: sequelize.QueryTypes.SELECT }
+          );
+          const companyInfo = settingRow?.value || {};
+          const companyName = companyInfo.name || process.env.COMPANY_NAME || 'My Company';
+          await sequelize.query(
+            `INSERT INTO companies (id, name, address, phone, email, created_at, updated_at)
+             VALUES (gen_random_uuid(), :name, :address, :phone, :email, NOW(), NOW())
+             ON CONFLICT DO NOTHING`,
+            { replacements: {
+              name: companyName,
+              address: companyInfo.address || null,
+              phone: companyInfo.phone || null,
+              email: companyInfo.email || null,
+            }}
+          );
+          logger.info({ name: companyName }, 'Auto-seeded company from settings');
+        }
+      } catch (e) {
+        logger.warn({ err: e.message }, 'Company seed skipped');
+      }
+
       const salt = await bcrypt.genSalt(10);
       const password_hash = await bcrypt.hash(adminPassword, salt);
       // Use raw SQL so it never fails due to missing columns
       const [existing] = await sequelize.query(
-        `SELECT id, failed_login_attempts, locked_until FROM users WHERE email = :email LIMIT 1`,
+        `SELECT id, company_id, failed_login_attempts, locked_until FROM users WHERE email = :email LIMIT 1`,
         { replacements: { email: adminEmail }, type: sequelize.QueryTypes.SELECT }
       );
       if (existing) {
@@ -1610,11 +1643,13 @@ const initDatabase = async (retries = 3) => {
         
         // If admin has no company_id, link to first available company
         if (!existing.company_id) {
-          await sequelize.query(
+          const [linked] = await sequelize.query(
             `UPDATE users SET company_id = (SELECT id FROM companies ORDER BY created_at ASC LIMIT 1)
-             WHERE email = :email AND company_id IS NULL AND (SELECT COUNT(*) FROM companies) > 0`,
-            { replacements: { email: adminEmail } }
+             WHERE email = :email AND company_id IS NULL AND (SELECT COUNT(*) FROM companies) > 0
+             RETURNING company_id`,
+            { replacements: { email: adminEmail }, type: sequelize.QueryTypes.SELECT }
           );
+          if (linked) logger.info({ email: adminEmail, company_id: linked.company_id }, 'Admin company_id linked');
         }
 
         logger.info({ email: adminEmail }, 'Admin synced');
