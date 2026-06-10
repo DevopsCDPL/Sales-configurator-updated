@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
-const { User, Setting, Session, Company } = require('../models');
+const { User, Setting, Session } = require('../models');
 const { CO_ADMIN_SLOTS, SUPER_ADMIN_ENTERPRISE_ALLOWED } = require('../config/rolePermissions');
 
 /**
@@ -77,14 +77,26 @@ const authenticate = async (req, res, next) => {
       });
     }
 
-    // Backfill company_id if missing but company_name is set (legacy main_admin accounts)
+    // Backfill company_id if missing (legacy main_admin accounts not linked to a company)
     let resolvedCompanyId = user.company_id;
-    if (!resolvedCompanyId && user.company_name) {
+    if (!resolvedCompanyId) {
       try {
-        const company = await Company.findOne({ where: { name: user.company_name }, attributes: ['id'] });
-        if (company) {
-          resolvedCompanyId = company.id;
-          User.update({ company_id: company.id }, { where: { id: user.id } }).catch(() => {});
+        const { sequelize: sq } = require('../models');
+        // Try case-insensitive match on company_name first, then fall back to first company
+        const [found] = await sq.query(
+          user.company_name
+            ? `SELECT id FROM companies WHERE LOWER(name) = LOWER(:name) ORDER BY created_at ASC LIMIT 1`
+            : `SELECT id FROM companies ORDER BY created_at ASC LIMIT 1`,
+          { replacements: user.company_name ? { name: user.company_name } : {},
+            type: sq.QueryTypes.SELECT }
+        );
+        if (found) {
+          resolvedCompanyId = found.id;
+          // Permanently fix the user record so future requests don't need this lookup
+          sq.query(
+            `UPDATE users SET company_id = :cid WHERE id = :uid AND company_id IS NULL`,
+            { replacements: { cid: found.id, uid: user.id } }
+          ).catch(() => {});
         }
       } catch (_) { /* non-fatal */ }
     }

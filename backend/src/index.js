@@ -1608,13 +1608,22 @@ const initDatabase = async (retries = 3) => {
           { replacements: { hash: password_hash, email: adminEmail } }
         );
         
+        // If admin has no company_id, link to first available company
+        if (!existing.company_id) {
+          await sequelize.query(
+            `UPDATE users SET company_id = (SELECT id FROM companies ORDER BY created_at ASC LIMIT 1)
+             WHERE email = :email AND company_id IS NULL AND (SELECT COUNT(*) FROM companies) > 0`,
+            { replacements: { email: adminEmail } }
+          );
+        }
+
         logger.info({ email: adminEmail }, 'Admin synced');
         if (wasLocked) logger.warn({ email: adminEmail }, 'Admin was locked — now unlocked');
         if (hadFailedAttempts) logger.info({ email: adminEmail, attempts: existing.failed_login_attempts }, 'Admin failed login attempts reset');
       } else {
         await sequelize.query(
-          `INSERT INTO users (id, name, email, password_hash, role, is_active, failed_login_attempts, locked_until, created_at, updated_at)
-           VALUES (gen_random_uuid(), :name, :email, :hash, 'main_admin', true, 0, NULL, NOW(), NOW())`,
+          `INSERT INTO users (id, name, email, password_hash, role, is_active, failed_login_attempts, locked_until, company_id, created_at, updated_at)
+           VALUES (gen_random_uuid(), :name, :email, :hash, 'main_admin', true, 0, NULL, (SELECT id FROM companies ORDER BY created_at ASC LIMIT 1), NOW(), NOW())`,
           { replacements: { name: adminName, email: adminEmail, hash: password_hash } }
         );
         logger.info({ email: adminEmail }, 'Admin created');
