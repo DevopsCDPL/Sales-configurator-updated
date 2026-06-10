@@ -31,7 +31,12 @@ class ClientController {
 
   async create(req, res, next) {
     try {
-      const client = await clientService.createClient(req.body, req.user);
+      // Inject active tenant company_id (e.g. when platform_admin uses x-active-company-id header)
+      const body = { ...req.body };
+      if (!body.company_id && req.tenantScope?.company_id) {
+        body.company_id = req.tenantScope.company_id;
+      }
+      const client = await clientService.createClient(body, req.user);
       res.status(201).json({
         success: true,
         data: client

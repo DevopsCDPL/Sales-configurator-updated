@@ -150,12 +150,16 @@ class ClientService {
     let companyId = clientData.company_id || null;
     if (requestingUser) {
       if (requestingUser.role === 'platform_admin') {
-        // platform_admin can assign to any company via request body
-        companyId = clientData.company_id || null;
+        // platform_admin can assign to any company via request body, fall back to own company_id
+        companyId = clientData.company_id || requestingUser.company_id || null;
       } else if (requestingUser.company_id) {
         // All other roles: always scope to their own company
         companyId = requestingUser.company_id;
       }
+    }
+
+    if (!companyId) {
+      throw new Error('Unable to determine company for this client. Your account may not be associated with a company.');
     }
 
     const client = await Client.create({
