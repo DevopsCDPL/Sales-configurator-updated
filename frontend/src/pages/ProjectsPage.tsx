@@ -583,7 +583,7 @@ const ProjectsPage: React.FC = () => {
         <Grid item xs={12} md={12}>
           <Card sx={{ border: `1px solid #1E2235`, borderRadius: '16px',
             boxShadow: '0 1px 2px rgba(0,0,0,0.12), 0 4px 12px -2px rgba(0,0,0,0.20)', overflow: 'hidden',
-            background: '#262635',
+            background: '#2A2A38',
             position: 'relative',
             transition: 'box-shadow 0.22s ease, border-color 0.22s ease',
             '&:hover': { boxShadow: '0 1px 2px rgba(0,0,0,0.15), 0 10px 24px -6px rgba(0,200,255,0.10), 0 20px 48px -12px rgba(0,200,255,0.06)', borderColor: 'var(--border-strong)' },
@@ -708,7 +708,7 @@ const ProjectsPage: React.FC = () => {
 
               {/* Header */}
               <thead>
-                <tr style={{ backgroundColor: 'var(--bg-canvas)' }}>
+                <tr style={{ backgroundColor: 'transparent' }}>
                   <th style={{ padding: '8px 6px', textAlign: 'center', verticalAlign: 'middle', borderBottom: '1px solid var(--border)', fontWeight: 'normal' }}>
                     <Tooltip title={allSel ? 'Deselect all' : 'Select all'}>
                       <IconButton size="small" onClick={toggleAll} sx={{ p: .3, color: 'var(--text-muted)' }}>
@@ -767,7 +767,7 @@ const ProjectsPage: React.FC = () => {
                           <Box component="tr" key={project.id}
                             sx={{
                               height: 44, cursor: 'pointer',
-                              bgcolor: selected ? 'rgba(0, 200, 255, 0.06)' : idx % 2 === 1 ? 'var(--bg-surface-2)' : 'transparent',
+                              bgcolor: selected ? 'rgba(0, 200, 255, 0.06)' : idx % 2 === 1 ? 'rgba(255,255,255,0.025)' : 'transparent',
                               transition: 'all .15s',
                               borderLeft: '3px solid transparent',
                               '&:hover': { 
