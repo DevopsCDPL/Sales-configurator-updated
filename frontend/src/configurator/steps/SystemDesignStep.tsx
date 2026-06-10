@@ -118,9 +118,9 @@ const INPUT_SX = {
   '& .MuiOutlinedInput-root': {
     bgcolor: 'rgba(255,255,255,0.015)',
     color: '#f0f6ff',
-    fontSize: '0.82rem',
+    fontSize: '0.78rem',
     borderRadius: '6px',
-    minHeight: 38,
+    minHeight: 32,
     transition: 'border-color 120ms ease, background-color 120ms ease',
     '& fieldset': { borderColor: 'rgba(255,255,255,0.08)' },
     '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.18)' },
@@ -131,8 +131,8 @@ const INPUT_SX = {
     },
   },
   '& .MuiOutlinedInput-input': {
-    py: 1,
-    px: 1.25,
+    py: 0.55,
+    px: 1.1,
     color: '#f0f6ff',
     '&.Mui-disabled': { WebkitTextFillColor: 'rgba(240,246,255,0.45)' },
   },
@@ -147,8 +147,8 @@ function FieldGrid<T extends Record<string, string>>({ fields, values, onChange,
         gridTemplateColumns: columns
           ? { xs: '1fr', sm: 'repeat(2, 1fr)', md: `repeat(${Math.min(columns, 4)}, 1fr)`, lg: `repeat(${columns}, 1fr)` }
           : { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' },
-        columnGap: 2,
-        rowGap: 2,
+        columnGap: 1.5,
+        rowGap: 1.1,
       }}
     >
       {fields.map((f) => {
@@ -165,11 +165,11 @@ function FieldGrid<T extends Record<string, string>>({ fields, values, onChange,
               direction="row"
               alignItems="center"
               spacing={0.5}
-              sx={{ mb: 0.6, minHeight: 18 }}
+              sx={{ mb: 0.25, minHeight: 14 }}
             >
               <Typography
                 sx={{
-                  fontSize: '0.72rem',
+                  fontSize: '0.7rem',
                   fontWeight: 500,
                   color: 'rgba(217,228,251,0.62)',
                   letterSpacing: 0.1,
@@ -301,14 +301,14 @@ const SystemDesignStep: React.FC = () => {
           border: '1px solid rgba(255,255,255,0.14)',
           borderRadius: '8px',
           bgcolor: 'rgba(255,255,255,0.04)',
-          p: 2,
+          p: 1.25,
         }}
       >
         <Typography
           sx={{
             fontWeight: 600,
-            mb: 1.75,
-            fontSize: '0.85rem',
+            mb: 0.75,
+            fontSize: '0.78rem',
             color: '#f0f6ff',
             letterSpacing: 0.1,
           }}
@@ -356,15 +356,16 @@ const SystemDesignStep: React.FC = () => {
   );
 
   return (
-    <Box sx={{ color: '#f0f6ff', bgcolor: '#000', p: 2 }}>
-      {/* ── Sub-tab strip: System Parameters / Section N · Save (right) ── */}
+    <Box sx={{ color: '#f0f6ff', bgcolor: '#000', p: 1 }}>
+      {/* ── Sub-tab strip: System Parameters / Section N ──
+         (Save moved to unified hub header above) */}
       <Box
         sx={{
           display: 'flex',
           alignItems: 'center',
           gap: 1,
-          mb: 2.25,
-          pb: 1.5,
+          mb: 1,
+          pb: 0.5,
           borderBottom: '1px solid rgba(255,255,255,0.05)',
         }}
       >
@@ -378,49 +379,17 @@ const SystemDesignStep: React.FC = () => {
             renderTabChip(`section-${n}`, `Section${n}`, activeTab === `section-${n}`)
           )}
         </Stack>
-        <Button
-          size="small"
-          variant="contained"
-          startIcon={
-            saving ? (
-              <CircularProgress size={12} sx={{ color: '#06151c' }} />
-            ) : (
-              <SaveIcon sx={{ fontSize: 14 }} />
-            )
-          }
-          onClick={() => {
-            void flush();
-          }}
-          disabled={saving}
-          sx={{
-            flexShrink: 0,
-            textTransform: 'none',
-            fontWeight: 700,
-            fontSize: '0.78rem',
-            px: 2,
-            py: 0.5,
-            minWidth: 64,
-            borderRadius: '6px',
-            bgcolor: '#00c8ff',
-            color: '#06151c',
-            boxShadow: 'none',
-            '&:hover': { bgcolor: '#33d4ff', boxShadow: 'none' },
-            '&.Mui-disabled': { bgcolor: 'rgba(0,200,255,0.35)', color: 'rgba(6,21,28,0.7)' },
-          }}
-        >
-          {dirty ? 'Save' : 'Saved'}
-        </Button>
       </Box>
 
       <Box>
         {/* ══ SYSTEM PARAMETERS ══ */}
         {activeTab === 'systemParameters' && (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.25 }}>
             {renderGroupCard('Board Setup', BOARD_SETUP, BOARD_SETUP.length)}
             {renderGroupCard('Electrical System', ELEC_SYSTEM, ELEC_SYSTEM.length)}
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: '3fr 2fr' }, gap: 2, alignItems: 'start' }}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: '3fr 2fr' }, gap: 1.25, alignItems: 'start' }}>
               {renderGroupCard('Mechanical Layout', MECH_LAYOUT)}
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.25 }}>
                 {renderGroupCard('Environment', ENVIRONMENT)}
                 {renderGroupCard('Bus System', BUS_SYSTEM)}
               </Box>
