@@ -450,7 +450,7 @@ const PlatformDashboardPage: React.FC = () => {
   const firstName = user?.name?.split(' ')[0] || 'Admin';
 
   return (
-    <Box sx={{ maxWidth: 1400, mx: 'auto' }}>
+    <Box sx={{ width: '100%' }}>
 
       {/* ── Welcome Header + Quick Actions ── */}
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2, mb: 3 }}>

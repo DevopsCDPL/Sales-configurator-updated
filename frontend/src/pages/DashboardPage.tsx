@@ -487,7 +487,7 @@ const DashboardPage: React.FC = () => {
 
   /* --- Render --- */
   return (
-    <Box sx={{ maxWidth: 1400, mx: 'auto' }}>
+    <Box sx={{ width: '100%' }}>
 
       {/* Page Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: '24px' }}>

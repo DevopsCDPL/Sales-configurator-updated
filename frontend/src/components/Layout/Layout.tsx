@@ -1009,7 +1009,7 @@ const Layout: React.FC = () => {
       {/* Main Content */}
       <Box component="main" sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', width: { md: `calc(100% - ${drawerWidth}px)` }, height: '100vh', overflow: 'hidden', bgcolor: 'var(--bg-canvas)', transition: `width ${TRANSITION}` }}>
         <Toolbar sx={{ minHeight: `${HEADER_HEIGHT}px !important`, flexShrink: 0 }} />
-        <Box sx={{ flex: 1, overflow: 'auto' }}>
+        <Box sx={{ flex: 1, overflow: 'auto', p: '12px' }}>
           <Box className="animate-fadeIn" sx={{ width: '100%' }}><Outlet /></Box>
         </Box>
       </Box>

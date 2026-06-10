@@ -182,7 +182,7 @@ const RecycleBinPage: React.FC = () => {
   const thSx = { fontWeight: 700, fontSize: '0.75rem', color: '#64748B', textTransform: 'uppercase' as const };
 
   return (
-    <Box sx={{ p: { xs: 2, md: 3 }, maxWidth: 1400, mx: 'auto' }}>
+    <Box sx={{ width: '100%' }}>
       {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3, flexWrap: 'wrap', gap: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>

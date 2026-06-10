@@ -650,7 +650,7 @@ const MaterialStockPage = () => {
   };
 
   return (
-    <Box sx={{ p: { xs: 2, md: 3 }, maxWidth: 1400, mx: 'auto' }}>
+    <Box sx={{ width: '100%' }}>
 
       {/* ═══════ PAGE HEADER ═══════ */}
       <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: '14px', flexWrap: 'wrap', gap: 1.5 }}>

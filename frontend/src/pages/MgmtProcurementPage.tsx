@@ -340,7 +340,7 @@ const MgmtProcurementPage = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: 1400, mx: 'auto', py: 2, px: 2 }}>
+    <Box sx={{ width: '100%' }}>
       {/* Page header + inline stat cards */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
         <Box sx={{

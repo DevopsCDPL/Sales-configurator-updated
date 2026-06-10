@@ -162,7 +162,7 @@ const BusinessAnalyticsPage: React.FC = () => {
   /* ── Loading skeleton ── */
   if (loading && !data) {
     return (
-      <Box sx={{ p: { xs: 2, md: 3 }, maxWidth: 1360, mx: 'auto' }}>
+      <Box sx={{ width: '100%' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
           <Skeleton variant="text" width={200} height={36} />
           <Skeleton variant="rounded" width={140} height={36} />
@@ -205,7 +205,7 @@ const BusinessAnalyticsPage: React.FC = () => {
   }));
 
   return (
-    <Box sx={{ p: { xs: 2, md: 3 }, maxWidth: 1360, mx: 'auto', minHeight: '100vh' }}>
+    <Box sx={{ width: '100%', minHeight: '100vh' }}>
 
       {/* ═══════════ HEADER ═══════════ */}
       <Box sx={{

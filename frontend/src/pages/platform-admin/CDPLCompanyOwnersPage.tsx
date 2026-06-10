@@ -154,7 +154,7 @@ const CDPLCompanyOwnersPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: 1400, mx: 'auto' }}>
+    <Box sx={{ width: '100%' }}>
       {/* Header */}
       <Stack direction={{ xs: 'column', md: 'row' }} alignItems={{ xs: 'flex-start', md: 'center' }} justifyContent="space-between" spacing={2} sx={{ mb: 3 }}>
         <Box>

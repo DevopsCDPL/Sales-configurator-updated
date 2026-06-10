@@ -147,7 +147,7 @@ const CDPLAdminsPage: React.FC = () => {
   const closeMenu = () => { setMenuAnchor(null); setMenuAdmin(null); };
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
+    <Box sx={{ width: '100%' }}>
       {/* Header */}
       <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', mb: 3, gap: 2 }}>
         <Box>

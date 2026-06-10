@@ -47,7 +47,7 @@ const VendorPOPage: React.FC = () => {
   }
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: 'auto', py: 3, px: 2 }}>
+    <Box sx={{ width: '100%' }}>
       {/* Page header */}
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
