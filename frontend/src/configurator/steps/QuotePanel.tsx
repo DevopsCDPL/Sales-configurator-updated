@@ -54,6 +54,8 @@ export interface QuotePanelProps { switchboardId: string }
 
 const QuotePanel: React.FC<QuotePanelProps> = ({ switchboardId }) => {
   const [gmPctInput, setGmPctInput] = useState('');
+  const [unitsInput, setUnitsInput] = useState('1');
+  const [prorateDesign, setProrateDesign] = useState(true);
   const [adjustments, setAdjustments] = useState<(LaborAdjustment & { _id: string })[]>([]);
   const [preview, setPreview] = useState<QuotePreviewResponse | null>(null);
   const [revisions, setRevisions] = useState<QuoteRevisionRow[]>([]);
@@ -65,10 +67,12 @@ const QuotePanel: React.FC<QuotePanelProps> = ({ switchboardId }) => {
 
   const body = useCallback(() => ({
     ...(gmPctInput !== '' ? { gmPct: (Number(gmPctInput) || 30) / 100 } : {}),
+    units: Math.max(1, Number(unitsInput) || 1),
+    prorateDesign,
     laborAdjustments: adjustments
       .filter((a) => Number(a.hours) > 0)
       .map(({ _id, ...a }) => ({ ...a, hours: Number(a.hours) })),
-  }), [gmPctInput, adjustments]);
+  }), [gmPctInput, adjustments, unitsInput, prorateDesign]);
 
   const runPreview = useCallback(async () => {
     setLoading(true);
@@ -158,6 +162,28 @@ const QuotePanel: React.FC<QuotePanelProps> = ({ switchboardId }) => {
                 InputProps={{ endAdornment: <Typography sx={{ color: C.sub, fontSize: 12 }}>%</Typography> }}
               />
             </Box>
+
+            <Stack direction="row" spacing={1.5} alignItems="flex-end">
+              <Box>
+                <Typography sx={{ color: C.sub, fontSize: 11, mb: 0.5 }}>Identical units</Typography>
+                <TextField
+                  size="small" value={unitsInput} sx={{ ...input, width: 90 }}
+                  onChange={(e) => setUnitsInput(e.target.value.replace(/[^0-9]/g, ''))}
+                />
+              </Box>
+              {Number(unitsInput) > 1 && (
+                <Button
+                  size="small" onClick={() => setProrateDesign((v) => !v)}
+                  sx={{
+                    textTransform: 'none', fontSize: 11, mb: 0.25,
+                    color: prorateDesign ? C.green : C.sub,
+                    border: '1px solid ' + (prorateDesign ? C.green : C.border),
+                  }}
+                >
+                  {prorateDesign ? 'Design hours charged once ✓' : 'Design hours per unit'}
+                </Button>
+              )}
+            </Stack>
 
             <Box>
               <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.5 }}>
@@ -252,6 +278,28 @@ const QuotePanel: React.FC<QuotePanelProps> = ({ switchboardId }) => {
                 </Stack>
               </Box>
 
+              {preview!.multiUnit && (
+                <Box sx={{ bgcolor: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.3)', borderRadius: '8px', p: 1.5, mt: 1 }}>
+                  <Stack direction="row" justifyContent="space-between">
+                    <Typography sx={{ color: C.sub, fontSize: 12 }}>
+                      {preview!.multiUnit.units} units · {usd(preview!.multiUnit.perUnitPrice)}/unit
+                      {preview!.multiUnit.prorateDesign ? ' · design charged once' : ''}
+                    </Typography>
+                    <Typography sx={{ color: '#86EFAC', fontSize: 16, fontWeight: 800 }}>
+                      {usd(preview!.multiUnit.totalPrice)}
+                    </Typography>
+                  </Stack>
+                  <Stack direction="row" justifyContent="space-between">
+                    <Typography sx={{ color: C.sub, fontSize: 11 }}>
+                      Total cost {usd(preview!.multiUnit.totalCost)}
+                    </Typography>
+                    <Typography sx={{ color: C.sub, fontSize: 11 }}>
+                      GM {(preview!.multiUnit.actualGm * 100).toFixed(2)}% · profit {usd(preview!.multiUnit.profit)}
+                    </Typography>
+                  </Stack>
+                </Box>
+              )}
+
               {preview!.nonFirmCount > 0 && (
                 <Alert severity="warning" sx={{ mt: 1.5, bgcolor: 'rgba(217,119,6,0.08)', color: '#FCD34D', border: '1px solid ' + C.border, fontSize: 11.5, py: 0.25 }}>
                   {preview!.nonFirmCount} BOM line(s) are ESTIMATED / awaiting RFQ price — quote may move.
@@ -333,6 +381,13 @@ const QuotePanel: React.FC<QuotePanelProps> = ({ switchboardId }) => {
                       sx={{ color: C.sub, textTransform: 'none', fontSize: 11, minWidth: 0, mr: 0.5, '&:hover': { color: C.text } }}
                     >
                       PDF
+                    </Button>
+                    <Button
+                      size="small"
+                      onClick={() => configuratorV2Service.downloadEpicorExport(r.id, 'Epicor_' + r.quotation_number + '.xlsx')}
+                      sx={{ color: C.sub, textTransform: 'none', fontSize: 11, minWidth: 0, mr: 0.5, '&:hover': { color: C.text } }}
+                    >
+                      Epicor
                     </Button>
                     {r.id === revisions[0].id && r.status === 'draft' && (
                       <Button

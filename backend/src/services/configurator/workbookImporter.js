@@ -146,10 +146,78 @@ async function importCbDecoder(wb, out) {
   }
 }
 
+/** Guess a category for free-text MasterPricing rows. */
+function guessCategory(text) {
+  const t = String(text || '').toLowerCase();
+  if (/(e\d\.\d|xt\d|ekip|mtz|masterpact|3va|3wl|breaker|micrologic)/.test(t)) return 'CIRCUIT BREAKER';
+  if (/(enclosure|saginaw|rittal|hoffman|sce-|nema|subpan|junction box|wallmount)/.test(t)) return 'ENCLOSURE';
+  if (/(flexibus|copper bu|erico|bus bar|busbar)/.test(t)) return 'BUSSING';
+  if (/(camlock|camlok)/.test(t)) return 'CAMLOCK';
+  if (/(lug)/.test(t)) return 'LUGS';
+  if (/(ct\b|current transformer)/.test(t)) return 'CURRENT TRANSFORMER';
+  if (/(spd|surge)/.test(t)) return 'SPD';
+  if (/(relay)/.test(t)) return 'RELAY';
+  if (/(wire|cable)/.test(t)) return 'WIRE CABLE';
+  if (/(switch)/.test(t)) return 'SWITCH';
+  if (/(light)/.test(t)) return 'LIGHT';
+  return 'HARDWARE';
+}
+
+/** Pull a leading part-number-looking token from "PN , description". */
+function extractPartNumber(text) {
+  const first = String(text || '').split(',')[0].trim();
+  if (first.length >= 4 && first.length <= 40 && !/\s{2,}/.test(first)
+      && /\d/.test(first) && !/\s.*\s.*\s/.test(first)) {
+    return first.replace(/\s+/g, '');
+  }
+  return null;
+}
+
+/** MasterPricing sheet: 700+ free-text priced rows (price book). */
+async function importMasterPricing(wb, out) {
+  const ws = wb.getWorksheet('MasterPricing');
+  if (!ws) return;
+  const norm = (x) => String(x || '').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 80);
+  const existing = await models.ConfiguratorComponent.findAll({ attributes: ['id', 'name', 'price'] });
+  const byName = new Map(existing.map((c) => [norm(c.name), c]));
+
+  const rows = [];
+  ws.eachRow((row) => {
+    const text = str(unwrap(row.getCell(3).value));
+    const price = num(row.getCell(4).value);
+    if (text && price > 0 && text.length >= 6) rows.push({ text, price });
+  });
+
+  const seen = new Set();
+  for (const r of rows) {
+    const key = norm(r.text);
+    if (seen.has(key)) { out.mpSkipped += 1; continue; }
+    seen.add(key);
+    const match = byName.get(key);
+    if (match) {
+      if (Number(match.price) !== r.price) {
+        await match.update({ price: r.price, mat_cost: r.price, material_cost: r.price, price_status: 'FIRM' }).catch(() => {});
+        out.mpUpdated += 1;
+      } else out.mpSkipped += 1;
+      continue;
+    }
+    await models.ConfiguratorComponent.create({
+      category: guessCategory(r.text),
+      name: r.text.slice(0, 250),
+      part_number: extractPartNumber(r.text),
+      is_active: true,
+      price: r.price, mat_cost: r.price, material_cost: r.price,
+      price_status: 'FIRM',
+      specifications: { importedFrom: 'TPS_Estimate_23XX MasterPricing', importedAt: new Date().toISOString() },
+    }).catch((e) => out.warnings.push(`mp ${r.text.slice(0, 30)}: ${e.message}`));
+    out.mpCreated += 1;
+  }
+}
+
 async function importTpsWorkbook(buffer, { companyId = null } = {}) {
   const wb = new ExcelJS.Workbook();
   await wb.xlsx.load(buffer);
-  const out = { componentsCreated: 0, componentsUpdated: 0, busScheduleRows: 0, neutralRows: 0, copperPricePerLb: null, ratesFound: {}, cbEnriched: 0, cbCreated: 0, cbWithCatalogNumber: 0, cbPriced: 0, cbUnmatched: 0, warnings: [] };
+  const out = { componentsCreated: 0, componentsUpdated: 0, busScheduleRows: 0, neutralRows: 0, copperPricePerLb: null, ratesFound: {}, cbEnriched: 0, cbCreated: 0, cbWithCatalogNumber: 0, cbPriced: 0, cbUnmatched: 0, mpCreated: 0, mpUpdated: 0, mpSkipped: 0, warnings: [] };
 
   // CB decoder workbook? (CB_Selection sheet) — enrichment path
   if (wb.getWorksheet('CB_Selection')) {
@@ -204,6 +272,9 @@ async function importTpsWorkbook(buffer, { companyId = null } = {}) {
       }
     }
   } else out.warnings.push('COMPONENTS sheet not found');
+
+  /* ── 1b. MasterPricing price book (755 free-text rows) ── */
+  await importMasterPricing(wb, out);
 
   /* ── 2. CU_LOOKUP → copper price + phase/neutral bus schedules ── */
   const cu = wb.getWorksheet('CU_LOOKUP');

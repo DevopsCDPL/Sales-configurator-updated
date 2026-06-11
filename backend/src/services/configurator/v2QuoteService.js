@@ -17,6 +17,7 @@ const { Op } = require('sequelize');
 const { compileBoardBom } = require('./v2BomService');
 const { computeQuoteFromV2 } = require('./v2PricingAdapter');
 const { getCostingDefaults, toLookup } = require('./costingDefaults');
+const { roundup } = require('./pricingEngine');
 
 const DEFAULT_LOOKUP = Object.freeze({
   LBR_CU_rate: 85, LBR_ASM_rate: 75, LBR_CNT_rate: 95, LBR_QC_rate: 80,
@@ -104,6 +105,33 @@ async function computeBoardQuote(switchboardId, opts = {}) {
     pricing
   );
 
+  /* ── Multi-unit pricing (TPS SUMMARY "MULTIPLE UNITS" block) ──
+   * Design labour (ENG + CAD) is charged ONCE across all units when
+   * prorated; everything else scales linearly. */
+  const units = Math.max(1, parseInt(opts.units, 10) || 1);
+  const prorateDesign = opts.prorateDesign !== false; // default true
+  let multiUnit = null;
+  if (units > 1) {
+    const designCost = (Number(quote.labor_costs?.ENG) || 0) + (Number(quote.labor_costs?.CAD) || 0);
+    const designWithOverhead = designCost * (1 + (Number(lookup.OVERHEAD_PCT) || 0));
+    const base = quote.total_cost - (prorateDesign ? designWithOverhead : 0);
+    const totalCostN = base * units + (prorateDesign ? designWithOverhead : 0);
+    const perUnitCost = totalCostN / units;
+    const perUnitPrice = roundup(perUnitCost / (1 - gmPct), pricing.roundup_factor);
+    const totalPrice = perUnitPrice * units;
+    multiUnit = {
+      units,
+      prorateDesign,
+      designCostOnce: Math.round(designWithOverhead * 100) / 100,
+      perUnitCost: Math.round(perUnitCost * 100) / 100,
+      totalCost: Math.round(totalCostN * 100) / 100,
+      perUnitPrice,
+      totalPrice,
+      profit: Math.round((totalPrice - totalCostN) * 100) / 100,
+      actualGm: totalPrice ? (totalPrice - totalCostN) / totalPrice : 0,
+    };
+  }
+
   const labourHoursTotal = Object.values(quote.labor_hours ?? {})
     .reduce((a, b) => a + (Number(b) || 0), 0);
   const nonFirmCount = bom.totals.nonFirmCount;
@@ -122,7 +150,8 @@ async function computeBoardQuote(switchboardId, opts = {}) {
     bomTotals: bom.totals,
     copper,
     copperPricePerLb: compiled.copperPricePerLb,
-    inputs: { gmPct, roundupFactor: pricing.roundup_factor, laborAdjustments, lookup },
+    inputs: { gmPct, roundupFactor: pricing.roundup_factor, laborAdjustments, lookup, units, prorateDesign },
+    multiUnit,
     defaults,
     labourHoursTotal,
     nonFirmCount,
@@ -160,6 +189,7 @@ async function issueBoardQuote(switchboardId, opts = {}, ctx = {}) {
   const revision = latest ? (Number(latest.revision) || 0) + 1 : 0;
 
   const q = result.quote;
+  const mu = result.multiUnit;
   const labourTotal = Object.values(q.labor_costs ?? {}).reduce((a, b) => a + (Number(b) || 0), 0);
 
   const quotation = await models.ConfiguratorQuotation.create({
@@ -174,15 +204,16 @@ async function issueBoardQuote(switchboardId, opts = {}, ctx = {}) {
     material_total: q.totals.material_total,
     labour_total: labourTotal,
     overhead_total: q.totals.overhead_amount,
-    subtotal: q.total_cost,
-    margin_pct: q.pricing.actual_gm,
-    margin_total: q.pricing.actual_profit,
-    grand_total: q.pricing.rounded_price,
+    subtotal: mu ? mu.totalCost : q.total_cost,
+    margin_pct: mu ? mu.actualGm : q.pricing.actual_gm,
+    margin_total: mu ? mu.profit : q.pricing.actual_profit,
+    grand_total: mu ? mu.totalPrice : q.pricing.rounded_price,
     currency: 'USD',
     bom_snapshot: { rows: result.bomRows, copper: result.copper, copperPricePerLb: result.copperPricePerLb },
     pricing_spec: {
       switchboardId,
       quote: q,
+      multiUnit: mu,
       inputs: result.inputs,
       labourHoursTotal: result.labourHoursTotal,
       nonFirmCount: result.nonFirmCount,

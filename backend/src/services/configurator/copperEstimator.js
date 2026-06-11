@@ -55,7 +55,20 @@ function estimateCopper(std, input, settings = DEFAULT_SETTINGS) {
   const mainRunIn = input.sectionWidthsIn.reduce((a, b) => a + b, 0);
 
   const mainBusLbs = row.barsPerPhase * barArea * mainRunIn * 3 * density;
-  const neutralLbs = row.barsPerPhase * barArea * mainRunIn * density * (input.neutralPct / 100);
+
+  // Neutral: prefer TPS's dedicated neutral schedule (per rating + 50/100%);
+  // fall back to the pct-of-phase approximation.
+  let neutralLbs;
+  const nsRows = (std.neutralSchedule || [])
+    .filter((r) => Number(r.neutralPct) === Number(input.neutralPct) && r.ratingA >= input.mainBusRatingA)
+    .sort((a, b) => a.ratingA - b.ratingA);
+  const ns = nsRows[0] || null;
+  if (ns) {
+    neutralLbs = (Number(ns.bars) || 1) * (Number(ns.barThk_in) || 0.25) * (Number(ns.barW_in) || 0) * mainRunIn * density;
+    notes.push(`Neutral from TPS schedule: ${ns.bars}×${ns.barThk_in}"×${ns.barW_in}" @ ${ns.neutralPct}%`);
+  } else {
+    neutralLbs = row.barsPerPhase * barArea * mainRunIn * density * (input.neutralPct / 100);
+  }
   const groundLbs = input.groundBar.thkIn * input.groundBar.wIn * mainRunIn * density;
 
   // Risers per section — sized to section's largest device rating [SEED rule]

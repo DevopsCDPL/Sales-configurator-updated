@@ -33,6 +33,7 @@ const { compileBoardBom } = require('../services/configurator/v2BomService');
 const v2Quote = require('../services/configurator/v2QuoteService');
 const { importTpsWorkbook } = require('../services/configurator/workbookImporter');
 const { renderV2QuotationPdf } = require('../services/configurator/v2QuotePdf');
+const { buildEpicorWorkbook } = require('../services/configurator/epicorExport');
 const multer = require('multer');
 const wbUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20 * 1024 * 1024 } });
 
@@ -500,6 +501,19 @@ router.get('/quotations/:id/pdf', wrap(async (req, res) => {
       companyId: req.companyId ?? null,
     });
     res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(buffer);
+  } catch (e) {
+    if (e.status) return res.status(e.status).json({ error: e.message });
+    throw e;
+  }
+}));
+
+/** Epicor import workbook (TPS exact layout) for an issued revision. */
+router.get('/quotations/:id/epicor-export', wrap(async (req, res) => {
+  try {
+    const { buffer, filename } = await buildEpicorWorkbook(req.params.id);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     res.send(buffer);
   } catch (e) {

@@ -39,6 +39,7 @@ async function compileBoardBom(switchboardId, { copperPricePerLb = null } = {}) 
     stdRows('bus_support_spacing'),
     stdRows('frame_library'),
   ]);
+  const neutralSchedule = await stdRows('neutral_bus_schedule');
 
   const bd = board.board_data || {};
   const frameOf = (s) => s.layout?.frame
@@ -85,7 +86,7 @@ async function compileBoardBom(switchboardId, { copperPricePerLb = null } = {}) 
     }));
 
   const copper = estimateCopper(
-    { busSchedule, busSupportSpacing },
+    { busSchedule, busSupportSpacing, neutralSchedule },
     {
       mainBusRatingA: Number(bd.mainBusRating) || 0,
       material: bd.busMaterial === 'Aluminium' ? 'Al' : 'Cu',

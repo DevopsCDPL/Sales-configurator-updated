@@ -159,6 +159,17 @@ export interface QuotePreviewResponse {
   blockers: string[];
   canIssue: boolean;
   bomRows?: { category: string | null; quantity: number; unit_cost: number }[];
+  multiUnit?: {
+    units: number;
+    prorateDesign: boolean;
+    designCostOnce: number;
+    perUnitCost: number;
+    totalCost: number;
+    perUnitPrice: number;
+    totalPrice: number;
+    profit: number;
+    actualGm: number;
+  } | null;
 }
 
 export interface QuoteRevisionRow {
@@ -183,6 +194,8 @@ export interface QuoteRevisionRow {
 
 export interface QuoteRequestBody {
   gmPct?: number;
+  units?: number;
+  prorateDesign?: boolean;
   roundupFactor?: number;
   laborAdjustments?: LaborAdjustment[];
   copperPricePerLb?: number | null;
@@ -416,6 +429,19 @@ export const configuratorV2Service = {
     const a = document.createElement('a');
     a.href = url;
     a.download = filenameHint ?? 'quotation.pdf';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  },
+
+
+  async downloadEpicorExport(quotationId: string, filenameHint?: string): Promise<void> {
+    const res = await api.get(`${ROOT}/quotations/${quotationId}/epicor-export`, { responseType: 'blob' });
+    const url = URL.createObjectURL(new Blob([res.data]));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filenameHint ?? 'epicor-import.xlsx';
     document.body.appendChild(a);
     a.click();
     a.remove();
