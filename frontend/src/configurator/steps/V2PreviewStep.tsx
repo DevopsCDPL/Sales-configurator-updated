@@ -14,6 +14,8 @@ import { Box, Typography, Stack, Chip, Button, Alert, CircularProgress, Snackbar
 import SwitchboardCardsScreen, { SwitchboardCardData } from './SwitchboardCardsScreen';
 import IntakeStep from './IntakeStep';
 import BomViewer from './BomViewer';
+import QuotePanel from './QuotePanel';
+import DrawingsPanel from './DrawingsPanel';
 import { CIRCUIT_BREAKER_V2_DATA } from '../data/circuitBreakerV2Data';
 import type { CandidateDevice, LineupProposal, IntakeInput } from '../lib/lineup-proposal';
 import { generateSld, SldDevice } from '../lib/sld-generator';
@@ -148,7 +150,7 @@ const V2PreviewStep: React.FC = () => {
   const [sectionCounts, setSectionCounts] = useState<Record<string, number>>({});
   const [loadable, setLoadable] = useState<SwitchboardRow[]>([]);
   const [openBoard, setOpenBoard] = useState<FullBoard | null>(null);
-  const [boardView, setBoardView] = useState<'design' | 'bom'>('design');
+  const [boardView, setBoardView] = useState<'design' | 'bom' | 'quote' | 'drawings'>('design');
   const [svg, setSvg] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -376,7 +378,7 @@ const V2PreviewStep: React.FC = () => {
 
           {openBoard.sections.length > 0 && (
             <Stack direction="row" spacing={1} sx={{ px: 3, pt: 1.5 }}>
-              {([['design', 'Design'], ['bom', 'Bill of Materials']] as const).map(([key, label]) => (
+              {([['design', 'Design'], ['bom', 'Bill of Materials'], ['quote', 'Quote'], ['drawings', 'Drawings']] as const).map(([key, label]) => (
                 <Button
                   key={key}
                   size="small"
@@ -417,8 +419,12 @@ const V2PreviewStep: React.FC = () => {
                 </Box>
               )}
             </>
-          ) : (
+          ) : boardView === 'bom' ? (
             <BomViewer key={'bom-' + openBoard.board.id} switchboardId={openBoard.board.id} />
+          ) : boardView === 'quote' ? (
+            <QuotePanel key={'quote-' + openBoard.board.id} switchboardId={openBoard.board.id} />
+          ) : (
+            <DrawingsPanel key={'dwg-' + openBoard.board.id} switchboardId={openBoard.board.id} />
           )}
         </Box>
       )}

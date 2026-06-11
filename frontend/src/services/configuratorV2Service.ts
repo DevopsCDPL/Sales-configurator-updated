@@ -133,6 +133,81 @@ export interface BomResponse {
   };
 }
 
+
+/* ── Quote (parity-proven v1 engine over the live BOM) ── */
+export interface LaborAdjustment { bucket: 'CU'|'ASM'|'CNT'|'QC'|'TST'|'ENG'|'CAD'; hours: number; note?: string }
+
+export interface QuoteComputed {
+  generated_at: string;
+  calc_version: string;
+  totals: { material_total: number; section_cost_total: number; overhead_amount: number; copper_cost: number };
+  labor_costs: Record<string, number>;
+  labor_hours: Record<string, number>;
+  total_cost: number;
+  pricing: { target_price: number; rounded_price: number; actual_profit: number; actual_gm: number; roundup_factor: number };
+}
+
+export interface QuotePreviewResponse {
+  board: { id: string; name: string; status: string };
+  quote: QuoteComputed;
+  bomTotals: { materialTotal: number; rowCount: number; nonFirmCount: number; copperEstLbs: number };
+  copper: CopperEstimate;
+  copperPricePerLb: number;
+  inputs: { gmPct: number; roundupFactor: number; laborAdjustments: LaborAdjustment[] };
+  labourHoursTotal: number;
+  nonFirmCount: number;
+  blockers: string[];
+  canIssue: boolean;
+}
+
+export interface QuoteRevisionRow {
+  id: string;
+  quotation_number: string;
+  revision: number;
+  revision_reason: string | null;
+  parent_quotation_id: string | null;
+  status: string;
+  material_total: number;
+  labour_total: number;
+  overhead_total: number;
+  subtotal: number;
+  margin_pct: number;
+  margin_total: number;
+  grand_total: number;
+  created_at: string;
+  labourHoursTotal: number | null;
+  nonFirmCount: number | null;
+  forced: boolean;
+}
+
+export interface QuoteRequestBody {
+  gmPct?: number;
+  roundupFactor?: number;
+  laborAdjustments?: LaborAdjustment[];
+  copperPricePerLb?: number | null;
+  revisionReason?: string;
+}
+
+
+/* ── SolidWorks job queue ── */
+export interface SwJobRow {
+  id: string;
+  switchboard_id: string;
+  job_type: 'FULL' | 'DRAWINGS' | 'COPPER_ONLY';
+  status: 'queued' | 'leased' | 'running' | 'succeeded' | 'failed' | 'cancelled';
+  priority: number;
+  attempts: number;
+  max_attempts: number;
+  last_error_code: string | null;
+  last_error_message: string | null;
+  progress: Record<string, any> | null;
+  cancel_requested: boolean;
+  artifacts: { type?: string; name?: string; url?: string; path?: string }[] | null;
+  completed_at: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export const configuratorV2Service = {
   async catalogStatus(): Promise<{ count: number; withPrice: number }> {
     const res = await api.get(`${ROOT}/catalog/status`);
@@ -186,6 +261,39 @@ export const configuratorV2Service = {
   async getBom(id: string, copperPricePerLb?: number): Promise<BomResponse> {
     const qs = copperPricePerLb ? `?copperPricePerLb=${copperPricePerLb}` : '';
     const res = await api.get<BomResponse>(`${ROOT}/switchboards/${id}/bom${qs}`);
+    return res.data;
+  },
+
+
+  async quotePreview(id: string, body: QuoteRequestBody): Promise<QuotePreviewResponse> {
+    const res = await api.post<QuotePreviewResponse>(`${ROOT}/switchboards/${id}/quote/preview`, body);
+    return res.data;
+  },
+
+  async issueQuote(id: string, body: QuoteRequestBody): Promise<{ quotation: { id: string; quotation_number: string; revision: number } }> {
+    const res = await api.post(`${ROOT}/switchboards/${id}/quote`, body);
+    return res.data;
+  },
+
+  async listQuotes(id: string): Promise<QuoteRevisionRow[]> {
+    const res = await api.get<QuoteRevisionRow[]>(`${ROOT}/switchboards/${id}/quotes`);
+    return res.data ?? [];
+  },
+
+
+  async listSwJobs(switchboardId?: string): Promise<SwJobRow[]> {
+    const qs = switchboardId ? `?switchboardId=${switchboardId}` : '';
+    const res = await api.get<SwJobRow[]>(`${ROOT}/sw-jobs${qs}`);
+    return res.data ?? [];
+  },
+
+  async enqueueSwJob(switchboardId: string, jobType: 'FULL' | 'DRAWINGS' | 'COPPER_ONLY', extra?: { estimatedCopperLbs?: number; copperPricePerLb?: number }): Promise<{ jobId: string; deduped: boolean }> {
+    const res = await api.post(`${ROOT}/sw-jobs`, { switchboardId, jobType, ...extra });
+    return res.data;
+  },
+
+  async cancelSwJob(jobId: string): Promise<{ ok: boolean; status?: string }> {
+    const res = await api.post(`${ROOT}/sw-jobs/${jobId}/cancel`);
     return res.data;
   },
 

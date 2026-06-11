@@ -71,6 +71,11 @@ module.exports = (sequelize) => {
 
       // Free-form breakdown used by PDF generator and parity caches
       bom_spec: { type: DataTypes.JSONB, allowNull: true, defaultValue: {} },
+      // Phase D §7 revision chain (columns added by V2 spine migration)
+      revision: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+      parent_quotation_id: { type: DataTypes.UUID, allowNull: true },
+      revision_reason: { type: DataTypes.STRING(500), allowNull: true },
+      bom_snapshot: { type: DataTypes.JSONB, allowNull: true },
       pricing_spec: { type: DataTypes.JSONB, allowNull: true, defaultValue: {} },
       terms: { type: DataTypes.TEXT, allowNull: true },
       notes: { type: DataTypes.TEXT, allowNull: true },

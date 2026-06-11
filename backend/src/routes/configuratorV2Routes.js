@@ -28,6 +28,8 @@ const { evaluateCompleteness } = require('../services/configurator/completenessE
 const handoff = require('../services/configurator/handoffService');
 const { compileBomV2 } = require('../services/configurator/bomEngineV2');
 const { estimateCopper } = require('../services/configurator/copperEstimator');
+const { compileBoardBom } = require('../services/configurator/v2BomService');
+const v2Quote = require('../services/configurator/v2QuoteService');
 
 // Default ON in this private instance; set CONFIGURATOR_V2_SPINE=false to disable.
 const FLAG = () => String(process.env.CONFIGURATOR_V2_SPINE ?? 'true').toLowerCase() !== 'false';
@@ -260,7 +262,11 @@ router.post('/price-rfqs/:id/receive', wrap(async (req, res) => {
 
 // SW jobs (UI)
 router.get('/sw-jobs', wrap(async (req, res) => {
+  const where = {};
+  if (req.query.switchboardId) where.switchboard_id = req.query.switchboardId;
+  if (req.query.status) where.status = req.query.status;
   const rows = await models.ConfiguratorSolidworksJob.findAll({
+    where,
     order: [['created_at', 'DESC']], limit: 200,
     attributes: { exclude: ['payload'] },
   });
@@ -330,103 +336,77 @@ router.get('/switchboards/:id/full', wrap(async (req, res) => {
 
 /* ── Bill of Materials (compiled live from persisted design) ──────────
  * GET /switchboards/:id/bom[?copperPricePerLb=5.50]
- * Single source: DB rows + current Engineering Standards. Generator
- * rows (GEN-*) and the parametric copper estimate are computed here —
- * never persisted, so the BOM always tracks the latest design.       */
-const stdRows = async (tableKey) => {
-  const row = await models.ConfiguratorEngineeringStandard.findOne({
-    where: { table_key: tableKey, is_current: true },
-    order: [['version', 'DESC']],
-  });
-  return Array.isArray(row?.rows) ? row.rows : [];
-};
-
+ * Single source: v2BomService (shared with the quote pipeline).       */
 router.get('/switchboards/:id/bom', wrap(async (req, res) => {
-  const board = await models.ConfiguratorSwitchboard.findByPk(req.params.id);
-  if (!board) return res.status(404).json({ error: 'not found' });
+  try {
+    const out = await compileBoardBom(req.params.id, {
+      copperPricePerLb: Number(req.query.copperPricePerLb) || null,
+    });
+    res.json({
+      board: { id: out.board.id, name: out.board.name, status: out.board.status, board_data: out.board.board_data },
+      sectionCount: out.sections.length,
+      copper: out.copper,
+      copperPricePerLb: out.copperPricePerLb,
+      ...out.bom,
+    });
+  } catch (e) {
+    if (e.status === 404) return res.status(404).json({ error: 'not found' });
+    throw e;
+  }
+}));
 
-  const [sectionRows, lineRows, busSchedule, busSupportSpacing, frameLibrary] = await Promise.all([
-    models.ConfiguratorSystemSection.findAll({
-      where: { switchboard_id: board.id }, order: [['section_number', 'ASC']],
-    }),
-    models.ConfiguratorComponentLine.findAll({
-      where: { switchboard_id: board.id }, order: [['created_at', 'ASC']],
-    }),
-    stdRows('bus_schedule'),
-    stdRows('bus_support_spacing'),
-    stdRows('frame_library'),
-  ]);
+/* ── Quote (parity-proven v1 pricing engine over the live BOM) ────────
+ * POST /switchboards/:id/quote/preview  — compute only, never persists
+ * POST /switchboards/:id/quote          — issue next revision (immutable chain)
+ * GET  /switchboards/:id/quotes         — revision history
+ * Body: { gmPct (0–1), roundupFactor, laborAdjustments:[{bucket,hours,note}],
+ *         copperPricePerLb, revisionReason, force }                     */
+router.post('/switchboards/:id/quote/preview', wrap(async (req, res) => {
+  try {
+    const out = await v2Quote.computeBoardQuote(req.params.id, req.body || {});
+    res.json(out);
+  } catch (e) {
+    if (e.status) return res.status(e.status).json({ error: e.message, details: e.details });
+    throw e;
+  }
+}));
 
-  const bd = board.board_data || {};
-  const frameOf = (s) => s.layout?.frame
-    ?? frameLibrary.find((f) => f.frameCode === s.layout?.frameCode)
-    ?? null;
+router.post('/switchboards/:id/quote', wrap(async (req, res) => {
+  try {
+    const out = await v2Quote.issueBoardQuote(req.params.id, req.body || {}, {
+      userId: req.user?.id ?? null,
+      companyId: req.companyId ?? null,
+      projectId: req.body?.projectId ?? null,
+      customerName: req.body?.customerName ?? null,
+    });
+    res.status(201).json(out);
+  } catch (e) {
+    if (e.status) return res.status(e.status).json({ error: e.message, details: e.details });
+    throw e;
+  }
+}));
 
-  const sections = sectionRows.map((s) => ({
-    id: s.id,
-    sectionIndex: s.section_number,
-    setup: s.setup || {},
-    layout: { ...(s.layout || {}), frame: frameOf(s) },
-    computed: s.computed || {},
-  }));
-
-  const lines = lineRows.map((l) => ({
-    id: l.id,
-    section_id: l.section_id,
-    scope: l.scope,
-    category: l.category,
-    part_number: l.part_number,
-    name: l.name,
-    quantity: Number(l.quantity) || 0,
-    unit_cost: Number(l.unit_cost) || 0,
-    price_status: l.price_status,
-    source: l.source,
-    meta: l.meta || {},
-    sectionIndex: l.meta?.sectionIndex ?? null,
-  }));
-
-  // Parametric copper estimate (pass 1 of the two-pass model)
-  const copperPricePerLb =
-    Number(req.query.copperPricePerLb) ||
-    Number(bd.copperPricePerLb) ||
-    Number(process.env.COPPER_PRICE_PER_LB) || 5.5; // [SEED] until COMEX feed
-  const devices = lines
-    .filter((l) => (l.category || '').toUpperCase() === 'CIRCUIT BREAKER')
-    .map((l) => ({
-      ratedA: Number(l.meta?.ratedA) || 0,
-      poles: Number(l.meta?.poles) || 3,
-      sectionIndex: Number(l.meta?.sectionIndex) || 1,
-    }));
-  const copper = estimateCopper(
-    { busSchedule, busSupportSpacing },
-    {
-      mainBusRatingA: Number(bd.mainBusRating) || 0,
-      material: bd.busMaterial === 'Aluminium' ? 'Al' : 'Cu',
-      neutralPct: Number(String(bd.neutralRating ?? '100').replace('%', '')) || 100,
-      sccrKA: Number(bd.shortCircuitRating) || 65,
-      sectionWidthsIn: sections.map((s) => Number(s.layout?.frame?.width_in) || 0),
-      busZoneHeightsIn: sections.map((s) => Number(s.layout?.frame?.topBusZone_in) || 12),
-      devices,
-      groundBar: { thkIn: 0.25, wIn: 2 }, // [SEED]
-      pricePerLb: copperPricePerLb,
-    }
-  );
-
-  const bom = compileBomV2(
-    { id: board.id, name: board.name, boardData: bd },
-    sections,
-    lines,
-    { busSchedule, busSupportSpacing, frameLibrary },
-    copper.estimatedLbs > 0 ? copper : null
-  );
-
-  res.json({
-    board: { id: board.id, name: board.name, status: board.status, board_data: bd },
-    sectionCount: sections.length,
-    copper,
-    copperPricePerLb,
-    ...bom,
-  });
+router.get('/switchboards/:id/quotes', wrap(async (req, res) => {
+  const rows = await v2Quote.listBoardQuotes(req.params.id);
+  res.json(rows.map((q) => ({
+    id: q.id,
+    quotation_number: q.quotation_number,
+    revision: q.revision,
+    revision_reason: q.revision_reason,
+    parent_quotation_id: q.parent_quotation_id,
+    status: q.status,
+    material_total: Number(q.material_total),
+    labour_total: Number(q.labour_total),
+    overhead_total: Number(q.overhead_total),
+    subtotal: Number(q.subtotal),
+    margin_pct: Number(q.margin_pct),
+    margin_total: Number(q.margin_total),
+    grand_total: Number(q.grand_total),
+    created_at: q.created_at,
+    labourHoursTotal: q.pricing_spec?.labourHoursTotal ?? null,
+    nonFirmCount: q.pricing_spec?.nonFirmCount ?? null,
+    forced: q.pricing_spec?.forced ?? false,
+  })));
 }));
 
 /**
