@@ -461,6 +461,17 @@ export const configuratorV2Service = {
     URL.revokeObjectURL(url);
   },
 
+
+  async raiseChangeOrder(switchboardId: string, body: { reason: string; origin?: 'customer' | 'internal'; scheduleImpact?: string }): Promise<{ ok: boolean; changeOrder: { id: string }; board: SwitchboardRow }> {
+    const res = await api.post(`${ROOT}/switchboards/${switchboardId}/change-order`, body);
+    return res.data;
+  },
+
+  async listChangeOrders(switchboardId: string): Promise<{ id: string; reason: string; origin: string; status: string; created_at: string }[]> {
+    const res = await api.get(`${ROOT}/switchboards/${switchboardId}/change-orders`);
+    return res.data ?? [];
+  },
+
   async applyProposal(id: string, payload: {
     intake: IntakeInput;
     boardPatch: LineupProposal['boardPatch'] & { totalFeederLoadA?: number; sldTopology?: unknown };

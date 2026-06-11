@@ -10,7 +10,7 @@
  * data meanwhile), section detail editing, BOM/quote from Designer.
  */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Box, Typography, Stack, Chip, Button, Alert, CircularProgress, Snackbar } from '@mui/material';
+import { Box, Typography, Stack, Chip, Button, Alert, CircularProgress, Snackbar, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
 import SwitchboardCardsScreen, { SwitchboardCardData } from './SwitchboardCardsScreen';
 import IntakeStep from './IntakeStep';
 import BomViewer from './BomViewer';
@@ -156,6 +156,9 @@ const V2PreviewStep: React.FC = () => {
   const [loadable, setLoadable] = useState<SwitchboardRow[]>([]);
   const [openBoard, setOpenBoard] = useState<FullBoard | null>(null);
   const [boardView, setBoardView] = useState<'design' | 'components' | 'bom' | 'quote' | 'drawings'>('design');
+  const [coDialog, setCoDialog] = useState(false);
+  const [coReason, setCoReason] = useState('');
+  const [coOrigin, setCoOrigin] = useState<'internal' | 'customer'>('internal');
   const [homeView, setHomeView] = useState<'boards' | 'catalog' | 'prices' | 'standards'>('boards');
   const [svg, setSvg] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -426,8 +429,71 @@ const V2PreviewStep: React.FC = () => {
                 color: openBoard.sections.length ? C.green : C.sub,
               }}
             />
+            {openBoard.board.status === 'locked' && (
+              <>
+                <Chip label="design frozen" size="small"
+                  sx={{ bgcolor: 'transparent', border: '1px solid ' + C.amber, color: C.amber, fontSize: 10.5, height: 20 }} />
+                <Button size="small" onClick={() => { setCoDialog(true); setCoReason(''); }}
+                  sx={{ color: C.amber, textTransform: 'none', fontSize: 11.5, border: '1px solid ' + C.border }}>
+                  Raise change order
+                </Button>
+              </>
+            )}
             {busy && <CircularProgress size={14} sx={{ color: C.blue }} />}
           </Stack>
+
+          <Dialog open={coDialog} onClose={() => setCoDialog(false)} maxWidth="sm" fullWidth
+            PaperProps={{ sx: { bgcolor: C.surface, border: '1px solid ' + C.border, backgroundImage: 'none' } }}>
+            <DialogTitle sx={{ color: C.text, fontSize: 15, fontWeight: 700 }}>
+              Raise change order — {openBoard.board.name}
+            </DialogTitle>
+            <DialogContent>
+              <Typography sx={{ color: C.sub, fontSize: 12, mb: 1.5 }}>
+                This design is frozen because its quote was accepted. A change order reopens it for
+                editing with a full audit trail — the next issued revision is linked to this change order.
+              </Typography>
+              <TextField
+                autoFocus fullWidth multiline minRows={2} placeholder="Reason (required) — what changed and why"
+                value={coReason} onChange={(e) => setCoReason(e.target.value)}
+                sx={{ mb: 1.5, '& .MuiOutlinedInput-root': { bgcolor: C.bg, color: C.text, fontSize: 13, '& fieldset': { borderColor: C.border } }, '& textarea': { color: C.text } }}
+              />
+              <Stack direction="row" spacing={1}>
+                {(['internal', 'customer'] as const).map((o) => (
+                  <Button key={o} size="small" onClick={() => setCoOrigin(o)}
+                    sx={{
+                      textTransform: 'none', fontSize: 11.5,
+                      color: coOrigin === o ? '#fff' : C.sub,
+                      bgcolor: coOrigin === o ? C.blue : 'transparent',
+                      border: '1px solid ' + (coOrigin === o ? C.blue : C.border),
+                    }}>
+                    {o === 'internal' ? 'Internal change' : 'Customer requested'}
+                  </Button>
+                ))}
+              </Stack>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setCoDialog(false)} sx={{ color: C.sub, textTransform: 'none' }}>Cancel</Button>
+              <Button
+                disabled={coReason.trim().length < 5 || busy}
+                onClick={async () => {
+                  setBusy(true);
+                  try {
+                    await configuratorV2Service.raiseChangeOrder(openBoard.board.id, { reason: coReason.trim(), origin: coOrigin });
+                    const full = await configuratorV2Service.getFull(openBoard.board.id);
+                    setOpenBoard(full);
+                    setCoDialog(false);
+                    setToast('Change order raised — design unlocked for editing');
+                  } catch (e: any) {
+                    setError(e?.response?.data?.error ?? 'Change order failed');
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
+                sx={{ bgcolor: C.amber, color: '#1A1206', textTransform: 'none', fontWeight: 700, '&:hover': { bgcolor: '#B45309' } }}>
+                Unlock design
+              </Button>
+            </DialogActions>
+          </Dialog>
 
           {openBoard.sections.length > 0 && (
             <Stack direction="row" spacing={1} sx={{ px: 3, pt: 1.5 }}>

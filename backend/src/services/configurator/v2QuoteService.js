@@ -223,6 +223,19 @@ async function issueBoardQuote(switchboardId, opts = {}, ctx = {}) {
     company_id: ctx.companyId ?? null,
   });
 
+  // Change-order linkage: the first revision issued after a CO unlock
+  // becomes its new_quotation_id (audit chain old -> CO -> new).
+  const coId = board.board_data?.activeChangeOrderId;
+  if (coId) {
+    await models.ConfiguratorChangeOrder.update(
+      { new_quotation_id: quotation.id },
+      { where: { id: coId } }
+    ).catch(() => {});
+    await board.update({
+      board_data: { ...(board.board_data || {}), activeChangeOrderId: null },
+    }).catch(() => {});
+  }
+
   return { quotation, computed: result };
 }
 

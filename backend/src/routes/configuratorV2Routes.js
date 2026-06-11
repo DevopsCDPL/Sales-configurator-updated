@@ -163,6 +163,45 @@ router.delete('/switchboards/:id', wrap(async (req, res) => {
   res.json({ ok: true });
 }));
 
+/* ── Change orders (Phase F §5) ───────────────────────────────────────
+ * A frozen (locked) board can only be reopened through a change order:
+ * reason required, prior quotation linked, board unlocked for editing.
+ * The NEXT issued revision links back as new_quotation_id.            */
+router.post('/switchboards/:id/change-order', wrap(async (req, res) => {
+  const board = await models.ConfiguratorSwitchboard.findByPk(req.params.id);
+  if (!board) return res.status(404).json({ error: 'not found' });
+  if (board.status !== 'locked') return res.status(422).json({ error: 'board is not frozen — change orders apply to accepted designs only' });
+  const reason = String(req.body?.reason ?? '').trim();
+  if (reason.length < 5) return res.status(400).json({ error: 'a meaningful reason is required (min 5 chars)' });
+
+  const quotes = await v2Quote.listBoardQuotes(board.id);
+  const co = await models.ConfiguratorChangeOrder.create({
+    configuration_id: board.configuration_id,
+    switchboard_id: board.id,
+    reason,
+    origin: req.body?.origin === 'customer' ? 'customer' : 'internal',
+    status: 'applied',
+    old_quotation_id: quotes[0]?.id ?? null,
+    schedule_impact: req.body?.scheduleImpact ?? null,
+    created_by: req.user?.id ?? null,
+    applied_at: new Date(),
+    company_id: req.companyId ?? null,
+  });
+  await board.update({
+    status: 'complete',
+    board_data: { ...(board.board_data || {}), activeChangeOrderId: co.id },
+  });
+  res.status(201).json({ ok: true, changeOrder: co, board });
+}));
+
+router.get('/switchboards/:id/change-orders', wrap(async (req, res) => {
+  const rows = await models.ConfiguratorChangeOrder.findAll({
+    where: { switchboard_id: req.params.id },
+    order: [['created_at', 'DESC']],
+  });
+  res.json(rows);
+}));
+
 // Component lines
 router.get('/switchboards/:id/lines', wrap(async (req, res) => {
   const rows = await models.ConfiguratorComponentLine.findAll({
