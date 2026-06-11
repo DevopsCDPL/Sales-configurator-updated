@@ -17,6 +17,7 @@
  */
 
 const express = require('express');
+const { Op } = require('sequelize');
 const router = express.Router();
 const { authenticate } = require('../middleware/auth');
 const { tenantScope } = require('../middleware/tenantScope');
@@ -258,6 +259,87 @@ router.post('/price-rfqs/:id/receive', wrap(async (req, res) => {
     l.update({ meta: { ...(l.meta ?? {}), requote_review: true } })
   ));
   res.json({ ok: true, flaggedLines: lines.length });
+}));
+
+/* ── Price queue (Awaiting-Price loop, Phase A §4.1) ──────────────────
+ * GET  /price-queue          — pending lines grouped by part + open RFQs
+ * POST /price-queue/receive  — { partNumber, price }: component → FIRM,
+ *                              all non-FIRM lines updated + flagged      */
+router.get('/price-queue', wrap(async (req, res) => {
+  const lines = await models.ConfiguratorComponentLine.findAll({
+    where: { price_status: ['PENDING_RFQ', 'ESTIMATED'] },
+    order: [['created_at', 'ASC']],
+  });
+  const boards = await models.ConfiguratorSwitchboard.findAll({
+    where: { id: [...new Set(lines.map((l) => l.switchboard_id).filter(Boolean))] },
+    attributes: ['id', 'name'],
+  }).catch(() => []);
+  const boardName = new Map(boards.map((b) => [b.id, b.name]));
+
+  const grouped = new Map();
+  for (const l of lines) {
+    const key = l.part_number || l.name || l.id;
+    const prev = grouped.get(key) ?? {
+      partNumber: l.part_number,
+      name: l.name,
+      category: l.category,
+      priceStatus: l.price_status,
+      lineCount: 0,
+      totalQty: 0,
+      boards: new Set(),
+      componentId: l.component_id ?? null,
+    };
+    prev.lineCount += 1;
+    prev.totalQty += Number(l.quantity) || 0;
+    if (l.switchboard_id) prev.boards.add(boardName.get(l.switchboard_id) ?? 'unknown board');
+    if (l.price_status === 'PENDING_RFQ') prev.priceStatus = 'PENDING_RFQ';
+    grouped.set(key, prev);
+  }
+
+  const rfqs = await models.ConfiguratorPriceRfq.findAll({
+    where: { status: ['open', 'sent'] },
+    order: [['created_at', 'DESC']],
+    limit: 200,
+  });
+
+  res.json({
+    pending: [...grouped.values()].map((g) => ({ ...g, boards: [...g.boards] })),
+    rfqs,
+  });
+}));
+
+router.post('/price-queue/receive', wrap(async (req, res) => {
+  const { partNumber, price } = req.body || {};
+  const p = Number(price);
+  if (!partNumber || !Number.isFinite(p) || p <= 0) {
+    return res.status(400).json({ error: 'partNumber and a positive price are required' });
+  }
+
+  const [compUpd] = await models.ConfiguratorComponent.update(
+    { price: p, mat_cost: p, material_cost: p, price_status: 'FIRM' },
+    { where: { part_number: partNumber } }
+  ).catch(() => [0]);
+
+  const lines = await models.ConfiguratorComponentLine.findAll({
+    where: { part_number: partNumber, price_status: ['PENDING_RFQ', 'ESTIMATED'] },
+  });
+  for (const l of lines) {
+    await l.update({
+      unit_cost: p,
+      price_status: 'FIRM',
+      meta: { ...(l.meta ?? {}), requote_review: true, priced_at: new Date().toISOString() },
+    });
+  }
+
+  const comp = await models.ConfiguratorComponent.findOne({ where: { part_number: partNumber } });
+  if (comp) {
+    await models.ConfiguratorPriceRfq.update(
+      { status: 'received', received_price: p, received_at: new Date() },
+      { where: { component_id: comp.id, status: ['open', 'sent'] } }
+    ).catch(() => {});
+  }
+
+  res.json({ ok: true, componentsUpdated: compUpd, linesUpdated: lines.length });
 }));
 
 // SW jobs (UI)
@@ -533,8 +615,19 @@ router.post('/catalog/import-bundled', wrap(async (req, res) => {
     }).catch(() => {});
     created += 1;
   }
+  // Repair pass: rows imported before price_status was a model attribute
+  // defaulted to FIRM in the DB — re-align with the seed (idempotent).
+  let repaired = 0;
+  for (const row of seed) {
+    const want = row.price_status ?? (row.price ? 'FIRM' : 'PENDING_RFQ');
+    const [nUpd] = await models.ConfiguratorComponent.update(
+      { price_status: want },
+      { where: { part_number: row.part_number, price_status: { [Op.ne]: want } } }
+    ).catch(() => [0]);
+    repaired += nUpd;
+  }
   const count = await models.ConfiguratorComponent.count({ where: { category: 'CIRCUIT BREAKER' } });
-  res.json({ ok: true, created, skipped: seed.length - created, total: count });
+  res.json({ ok: true, created, repaired, skipped: seed.length - created, total: count });
 }));
 
 /** Lightweight CB list for the Designer's sync candidate provider. */

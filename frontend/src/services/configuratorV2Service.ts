@@ -208,6 +208,40 @@ export interface SwJobRow {
   updated_at?: string;
 }
 
+
+/* ── Price queue ── */
+export interface PendingPriceGroup {
+  partNumber: string | null;
+  name: string | null;
+  category: string | null;
+  priceStatus: 'PENDING_RFQ' | 'ESTIMATED';
+  lineCount: number;
+  totalQty: number;
+  boards: string[];
+  componentId: string | null;
+}
+
+export interface PriceRfqRow {
+  id: string;
+  component_id: string;
+  catalog_number: string;
+  manufacturer: string | null;
+  status: 'open' | 'sent' | 'received' | 'cancelled';
+  received_price: number | null;
+  created_at?: string;
+}
+
+/* ── Engineering standards ── */
+export interface StandardsTableRow {
+  id: string;
+  table_key: string;
+  version: number;
+  rows: any[];
+  notes: string | null;
+  is_current: boolean;
+  created_at?: string;
+}
+
 export const configuratorV2Service = {
   async catalogStatus(): Promise<{ count: number; withPrice: number }> {
     const res = await api.get(`${ROOT}/catalog/status`);
@@ -294,6 +328,27 @@ export const configuratorV2Service = {
 
   async cancelSwJob(jobId: string): Promise<{ ok: boolean; status?: string }> {
     const res = await api.post(`${ROOT}/sw-jobs/${jobId}/cancel`);
+    return res.data;
+  },
+
+
+  async priceQueue(): Promise<{ pending: PendingPriceGroup[]; rfqs: PriceRfqRow[] }> {
+    const res = await api.get(`${ROOT}/price-queue`);
+    return res.data;
+  },
+
+  async receivePrice(partNumber: string, price: number): Promise<{ ok: boolean; componentsUpdated: number; linesUpdated: number }> {
+    const res = await api.post(`${ROOT}/price-queue/receive`, { partNumber, price });
+    return res.data;
+  },
+
+  async getStandard(tableKey: string): Promise<StandardsTableRow | null> {
+    const res = await api.get<StandardsTableRow | null>(`${ROOT}/engineering-standards/${tableKey}`);
+    return res.data ?? null;
+  },
+
+  async saveStandard(tableKey: string, rows: any[], notes?: string): Promise<StandardsTableRow> {
+    const res = await api.put<StandardsTableRow>(`${ROOT}/engineering-standards/${tableKey}`, { rows, notes });
     return res.data;
   },
 

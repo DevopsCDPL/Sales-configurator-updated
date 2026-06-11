@@ -16,6 +16,8 @@ import IntakeStep from './IntakeStep';
 import BomViewer from './BomViewer';
 import QuotePanel from './QuotePanel';
 import DrawingsPanel from './DrawingsPanel';
+import PriceQueuePanel from './PriceQueuePanel';
+import StandardsPanel from './StandardsPanel';
 import { CIRCUIT_BREAKER_V2_DATA } from '../data/circuitBreakerV2Data';
 import type { CandidateDevice, LineupProposal, IntakeInput } from '../lib/lineup-proposal';
 import { generateSld, SldDevice } from '../lib/sld-generator';
@@ -151,6 +153,7 @@ const V2PreviewStep: React.FC = () => {
   const [loadable, setLoadable] = useState<SwitchboardRow[]>([]);
   const [openBoard, setOpenBoard] = useState<FullBoard | null>(null);
   const [boardView, setBoardView] = useState<'design' | 'bom' | 'quote' | 'drawings'>('design');
+  const [homeView, setHomeView] = useState<'boards' | 'prices' | 'standards'>('boards');
   const [svg, setSvg] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -312,6 +315,30 @@ const V2PreviewStep: React.FC = () => {
           <Typography sx={{ color: C.sub, fontSize: 12, mt: 1.5 }}>Loading switchboards…</Typography>
         </Stack>
       ) : !openBoard ? (
+        <Box>
+          <Stack direction="row" spacing={1} sx={{ px: 3, pt: 1.5 }}>
+            {([['boards', 'Boards'], ['prices', 'Awaiting price'], ['standards', 'Standards']] as const).map(([key, label]) => (
+              <Button
+                key={key}
+                size="small"
+                onClick={() => setHomeView(key)}
+                sx={{
+                  textTransform: 'none', fontSize: 12, px: 1.5,
+                  color: homeView === key ? '#fff' : C.sub,
+                  bgcolor: homeView === key ? C.blue : 'transparent',
+                  border: '1px solid ' + (homeView === key ? C.blue : C.border),
+                  '&:hover': { bgcolor: homeView === key ? '#1565C0' : 'rgba(255,255,255,0.04)' },
+                }}
+              >
+                {label}
+              </Button>
+            ))}
+          </Stack>
+          {homeView === 'prices' ? (
+            <PriceQueuePanel />
+          ) : homeView === 'standards' ? (
+            <StandardsPanel />
+          ) : (
         <SwitchboardCardsScreen
           boards={cards}
           loadableBoards={loadable.map((b) => ({
@@ -351,6 +378,8 @@ const V2PreviewStep: React.FC = () => {
             }
           }}
         />
+          )}
+        </Box>
       ) : (
         <Box>
           <Stack direction="row" alignItems="center" spacing={1.5} sx={{ px: 3, pt: 2 }}>

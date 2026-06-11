@@ -55,6 +55,22 @@ module.exports = (sequelize) => {
         comment: 'Material cost (from Excel "MAT COST" column)',
       },
 
+      // ── V2 spine columns (added by V2 migration) ──────────────
+      price_status: {
+        type: DataTypes.STRING(16),
+        allowNull: false,
+        defaultValue: 'FIRM',
+        validate: { isIn: [['FIRM', 'ESTIMATED', 'PENDING_RFQ']] },
+      },
+      standards_regime: { type: DataTypes.STRING(8), allowNull: true },
+      dims_h_in: { type: DataTypes.DECIMAL(8, 3), allowNull: true },
+      dims_w_in: { type: DataTypes.DECIMAL(8, 3), allowNull: true },
+      dims_d_in: { type: DataTypes.DECIMAL(8, 3), allowNull: true },
+      weight_lbs: { type: DataTypes.DECIMAL(10, 3), allowNull: true },
+      pct_rated: { type: DataTypes.INTEGER, allowNull: true },
+      ul_listing: { type: DataTypes.STRING(40), allowNull: true },
+      voltage_rating_type: { type: DataTypes.STRING(20), allowNull: true },
+
       // ── Labour-hour buckets (verbatim from configurator Excel import) ─
       lbr_cu: { type: DataTypes.DECIMAL(10, 4), allowNull: true, defaultValue: 0 },
       lbr_asm: { type: DataTypes.DECIMAL(10, 4), allowNull: true, defaultValue: 0 },
