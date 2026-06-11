@@ -73,6 +73,66 @@ export interface CatalogCb {
   priceStatus: 'FIRM' | 'ESTIMATED' | 'PENDING_RFQ';
 }
 
+
+/* ── BOM (compiled live by GET /switchboards/:id/bom) ── */
+export interface BomRow {
+  sectionIndex: number | null;
+  scope: 'board' | 'section';
+  category: string | null;
+  part_number: string | null;
+  description: string | null;
+  quantity: number;
+  unit: string;
+  unit_cost: number;
+  price_status: 'FIRM' | 'ESTIMATED' | 'PENDING_RFQ';
+  source: string;
+  generator_id: string | null;
+  copper_weight_lbs: number | null;
+}
+
+export interface CopperEstimate {
+  mainBusLbs: number;
+  neutralLbs: number;
+  groundLbs: number;
+  riserLbs: number;
+  stubLbs: number;
+  rawLbs: number;
+  estimatedLbs: number;
+  costUsd: number;
+  pricePerLb: number;
+  supports: number;
+  perSection: { sectionIndex: number; lbs: number }[];
+  notes: string[];
+}
+
+export interface MbomRow {
+  part_number: string | null;
+  category: string | null;
+  description: string | null;
+  quantity: number;
+  unit: string;
+  unit_cost: number;
+  price_status: 'FIRM' | 'ESTIMATED' | 'PENDING_RFQ';
+  whereUsed: string[];
+}
+
+export interface BomResponse {
+  board: { id: string; name: string; status: string };
+  sectionCount: number;
+  copper: CopperEstimate;
+  copperPricePerLb: number;
+  rows: BomRow[];
+  ebom: Record<string, Record<string, BomRow[]>>;
+  mbom: MbomRow[];
+  totals: {
+    materialTotal: number;
+    rowCount: number;
+    nonFirmCount: number;
+    copperEstLbs: number;
+    laborHours: Record<string, number>;
+  };
+}
+
 export const configuratorV2Service = {
   async catalogStatus(): Promise<{ count: number; withPrice: number }> {
     const res = await api.get(`${ROOT}/catalog/status`);
@@ -119,6 +179,13 @@ export const configuratorV2Service = {
 
   async getFull(id: string): Promise<FullBoard> {
     const res = await api.get<FullBoard>(`${ROOT}/switchboards/${id}/full`);
+    return res.data;
+  },
+
+
+  async getBom(id: string, copperPricePerLb?: number): Promise<BomResponse> {
+    const qs = copperPricePerLb ? `?copperPricePerLb=${copperPricePerLb}` : '';
+    const res = await api.get<BomResponse>(`${ROOT}/switchboards/${id}/bom${qs}`);
     return res.data;
   },
 

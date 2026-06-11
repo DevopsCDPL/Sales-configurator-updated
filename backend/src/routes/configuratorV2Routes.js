@@ -26,6 +26,8 @@ const swJobs = require('../services/configurator/swJobsService');
 const { buildSolidworksPayload } = require('../services/configurator/solidworksPayloadBuilder');
 const { evaluateCompleteness } = require('../services/configurator/completenessEngine');
 const handoff = require('../services/configurator/handoffService');
+const { compileBomV2 } = require('../services/configurator/bomEngineV2');
+const { estimateCopper } = require('../services/configurator/copperEstimator');
 
 // Default ON in this private instance; set CONFIGURATOR_V2_SPINE=false to disable.
 const FLAG = () => String(process.env.CONFIGURATOR_V2_SPINE ?? 'true').toLowerCase() !== 'false';
@@ -323,6 +325,108 @@ router.get('/switchboards/:id/full', wrap(async (req, res) => {
     order: [['created_at', 'ASC']],
   });
   res.json({ board, sections, lines });
+}));
+
+
+/* ── Bill of Materials (compiled live from persisted design) ──────────
+ * GET /switchboards/:id/bom[?copperPricePerLb=5.50]
+ * Single source: DB rows + current Engineering Standards. Generator
+ * rows (GEN-*) and the parametric copper estimate are computed here —
+ * never persisted, so the BOM always tracks the latest design.       */
+const stdRows = async (tableKey) => {
+  const row = await models.ConfiguratorEngineeringStandard.findOne({
+    where: { table_key: tableKey, is_current: true },
+    order: [['version', 'DESC']],
+  });
+  return Array.isArray(row?.rows) ? row.rows : [];
+};
+
+router.get('/switchboards/:id/bom', wrap(async (req, res) => {
+  const board = await models.ConfiguratorSwitchboard.findByPk(req.params.id);
+  if (!board) return res.status(404).json({ error: 'not found' });
+
+  const [sectionRows, lineRows, busSchedule, busSupportSpacing, frameLibrary] = await Promise.all([
+    models.ConfiguratorSystemSection.findAll({
+      where: { switchboard_id: board.id }, order: [['section_number', 'ASC']],
+    }),
+    models.ConfiguratorComponentLine.findAll({
+      where: { switchboard_id: board.id }, order: [['created_at', 'ASC']],
+    }),
+    stdRows('bus_schedule'),
+    stdRows('bus_support_spacing'),
+    stdRows('frame_library'),
+  ]);
+
+  const bd = board.board_data || {};
+  const frameOf = (s) => s.layout?.frame
+    ?? frameLibrary.find((f) => f.frameCode === s.layout?.frameCode)
+    ?? null;
+
+  const sections = sectionRows.map((s) => ({
+    id: s.id,
+    sectionIndex: s.section_number,
+    setup: s.setup || {},
+    layout: { ...(s.layout || {}), frame: frameOf(s) },
+    computed: s.computed || {},
+  }));
+
+  const lines = lineRows.map((l) => ({
+    id: l.id,
+    section_id: l.section_id,
+    scope: l.scope,
+    category: l.category,
+    part_number: l.part_number,
+    name: l.name,
+    quantity: Number(l.quantity) || 0,
+    unit_cost: Number(l.unit_cost) || 0,
+    price_status: l.price_status,
+    source: l.source,
+    meta: l.meta || {},
+    sectionIndex: l.meta?.sectionIndex ?? null,
+  }));
+
+  // Parametric copper estimate (pass 1 of the two-pass model)
+  const copperPricePerLb =
+    Number(req.query.copperPricePerLb) ||
+    Number(bd.copperPricePerLb) ||
+    Number(process.env.COPPER_PRICE_PER_LB) || 5.5; // [SEED] until COMEX feed
+  const devices = lines
+    .filter((l) => (l.category || '').toUpperCase() === 'CIRCUIT BREAKER')
+    .map((l) => ({
+      ratedA: Number(l.meta?.ratedA) || 0,
+      poles: Number(l.meta?.poles) || 3,
+      sectionIndex: Number(l.meta?.sectionIndex) || 1,
+    }));
+  const copper = estimateCopper(
+    { busSchedule, busSupportSpacing },
+    {
+      mainBusRatingA: Number(bd.mainBusRating) || 0,
+      material: bd.busMaterial === 'Aluminium' ? 'Al' : 'Cu',
+      neutralPct: Number(String(bd.neutralRating ?? '100').replace('%', '')) || 100,
+      sccrKA: Number(bd.shortCircuitRating) || 65,
+      sectionWidthsIn: sections.map((s) => Number(s.layout?.frame?.width_in) || 0),
+      busZoneHeightsIn: sections.map((s) => Number(s.layout?.frame?.topBusZone_in) || 12),
+      devices,
+      groundBar: { thkIn: 0.25, wIn: 2 }, // [SEED]
+      pricePerLb: copperPricePerLb,
+    }
+  );
+
+  const bom = compileBomV2(
+    { id: board.id, name: board.name, boardData: bd },
+    sections,
+    lines,
+    { busSchedule, busSupportSpacing, frameLibrary },
+    copper.estimatedLbs > 0 ? copper : null
+  );
+
+  res.json({
+    board: { id: board.id, name: board.name, status: board.status, board_data: bd },
+    sectionCount: sections.length,
+    copper,
+    copperPricePerLb,
+    ...bom,
+  });
 }));
 
 /**

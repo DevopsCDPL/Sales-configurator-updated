@@ -13,6 +13,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Box, Typography, Stack, Chip, Button, Alert, CircularProgress, Snackbar } from '@mui/material';
 import SwitchboardCardsScreen, { SwitchboardCardData } from './SwitchboardCardsScreen';
 import IntakeStep from './IntakeStep';
+import BomViewer from './BomViewer';
 import { CIRCUIT_BREAKER_V2_DATA } from '../data/circuitBreakerV2Data';
 import type { CandidateDevice, LineupProposal, IntakeInput } from '../lib/lineup-proposal';
 import { generateSld, SldDevice } from '../lib/sld-generator';
@@ -147,6 +148,7 @@ const V2PreviewStep: React.FC = () => {
   const [sectionCounts, setSectionCounts] = useState<Record<string, number>>({});
   const [loadable, setLoadable] = useState<SwitchboardRow[]>([]);
   const [openBoard, setOpenBoard] = useState<FullBoard | null>(null);
+  const [boardView, setBoardView] = useState<'design' | 'bom'>('design');
   const [svg, setSvg] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -184,6 +186,7 @@ const V2PreviewStep: React.FC = () => {
     try {
       const full = await configuratorV2Service.getFull(id);
       setOpenBoard(full);
+      setBoardView('design');
       setSectionCounts((m) => ({ ...m, [id]: full.sections.length || 1 }));
       setSvg(sldFromFull(full)?.svg ?? null);
     } catch (e: any) {
@@ -371,24 +374,51 @@ const V2PreviewStep: React.FC = () => {
             {busy && <CircularProgress size={14} sx={{ color: C.blue }} />}
           </Stack>
 
-          <IntakeStep
-            key={openBoard.board.id}
-            initial={(openBoard.board.intake as Partial<IntakeInput>) ?? undefined}
-            candidateProvider={provider}
-            onSaveIntake={saveIntake}
-            onAcceptProposal={acceptProposal}
-          />
+          {openBoard.sections.length > 0 && (
+            <Stack direction="row" spacing={1} sx={{ px: 3, pt: 1.5 }}>
+              {([['design', 'Design'], ['bom', 'Bill of Materials']] as const).map(([key, label]) => (
+                <Button
+                  key={key}
+                  size="small"
+                  onClick={() => setBoardView(key)}
+                  sx={{
+                    textTransform: 'none', fontSize: 12, px: 1.5,
+                    color: boardView === key ? '#fff' : C.sub,
+                    bgcolor: boardView === key ? C.blue : 'transparent',
+                    border: '1px solid ' + (boardView === key ? C.blue : C.border),
+                    '&:hover': { bgcolor: boardView === key ? '#1565C0' : 'rgba(255,255,255,0.04)' },
+                  }}
+                >
+                  {label}
+                </Button>
+              ))}
+            </Stack>
+          )}
 
-          {svg && (
-            <Box sx={{ px: 3, pb: 4 }}>
-              <Typography sx={{ color: '#CBD5E1', fontSize: 13.5, fontWeight: 600, mb: 1 }}>
-                One-Line Diagram (from saved design)
-              </Typography>
-              <Box
-                sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', p: 2, overflowX: 'auto' }}
-                dangerouslySetInnerHTML={{ __html: svg }}
+          {boardView === 'design' ? (
+            <>
+              <IntakeStep
+                key={openBoard.board.id}
+                initial={(openBoard.board.intake as Partial<IntakeInput>) ?? undefined}
+                candidateProvider={provider}
+                onSaveIntake={saveIntake}
+                onAcceptProposal={acceptProposal}
               />
-            </Box>
+
+              {svg && (
+                <Box sx={{ px: 3, pb: 4 }}>
+                  <Typography sx={{ color: '#CBD5E1', fontSize: 13.5, fontWeight: 600, mb: 1 }}>
+                    One-Line Diagram (from saved design)
+                  </Typography>
+                  <Box
+                    sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', p: 2, overflowX: 'auto' }}
+                    dangerouslySetInnerHTML={{ __html: svg }}
+                  />
+                </Box>
+              )}
+            </>
+          ) : (
+            <BomViewer key={'bom-' + openBoard.board.id} switchboardId={openBoard.board.id} />
           )}
         </Box>
       )}
