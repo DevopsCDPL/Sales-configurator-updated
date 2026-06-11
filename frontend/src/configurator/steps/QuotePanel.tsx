@@ -51,7 +51,7 @@ let adjSeq = 0;
 export interface QuotePanelProps { switchboardId: string }
 
 const QuotePanel: React.FC<QuotePanelProps> = ({ switchboardId }) => {
-  const [gmPctInput, setGmPctInput] = useState('30');
+  const [gmPctInput, setGmPctInput] = useState('');
   const [adjustments, setAdjustments] = useState<(LaborAdjustment & { _id: string })[]>([]);
   const [preview, setPreview] = useState<QuotePreviewResponse | null>(null);
   const [revisions, setRevisions] = useState<QuoteRevisionRow[]>([]);
@@ -62,7 +62,7 @@ const QuotePanel: React.FC<QuotePanelProps> = ({ switchboardId }) => {
   const [issued, setIssued] = useState<string | null>(null);
 
   const body = useCallback(() => ({
-    gmPct: (Number(gmPctInput) || 30) / 100,
+    ...(gmPctInput !== '' ? { gmPct: (Number(gmPctInput) || 30) / 100 } : {}),
     laborAdjustments: adjustments
       .filter((a) => Number(a.hours) > 0)
       .map(({ _id, ...a }) => ({ ...a, hours: Number(a.hours) })),
@@ -72,7 +72,9 @@ const QuotePanel: React.FC<QuotePanelProps> = ({ switchboardId }) => {
     setLoading(true);
     setError(null);
     try {
-      setPreview(await configuratorV2Service.quotePreview(switchboardId, body()));
+      const p = await configuratorV2Service.quotePreview(switchboardId, body());
+      setPreview(p);
+      setGmPctInput((g) => (g === '' ? String(Math.round(p.inputs.gmPct * 100)) : g));
     } catch (e: any) {
       setError(e?.response?.data?.error ?? e?.message ?? 'Quote preview failed');
     } finally {

@@ -18,6 +18,7 @@ import QuotePanel from './QuotePanel';
 import DrawingsPanel from './DrawingsPanel';
 import PriceQueuePanel from './PriceQueuePanel';
 import StandardsPanel from './StandardsPanel';
+import CatalogManagerPanel from './CatalogManagerPanel';
 import ComponentsPanel from './ComponentsPanel';
 import DeviceListPanel from './DeviceListPanel';
 import { CIRCUIT_BREAKER_V2_DATA } from '../data/circuitBreakerV2Data';
@@ -155,7 +156,7 @@ const V2PreviewStep: React.FC = () => {
   const [loadable, setLoadable] = useState<SwitchboardRow[]>([]);
   const [openBoard, setOpenBoard] = useState<FullBoard | null>(null);
   const [boardView, setBoardView] = useState<'design' | 'components' | 'bom' | 'quote' | 'drawings'>('design');
-  const [homeView, setHomeView] = useState<'boards' | 'prices' | 'standards'>('boards');
+  const [homeView, setHomeView] = useState<'boards' | 'catalog' | 'prices' | 'standards'>('boards');
   const [svg, setSvg] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -319,7 +320,7 @@ const V2PreviewStep: React.FC = () => {
       ) : !openBoard ? (
         <Box>
           <Stack direction="row" spacing={1} sx={{ px: 3, pt: 1.5 }}>
-            {([['boards', 'Boards'], ['prices', 'Awaiting price'], ['standards', 'Standards']] as const).map(([key, label]) => (
+            {([['boards', 'Boards'], ['catalog', 'Catalog'], ['prices', 'Awaiting price'], ['standards', 'Standards']] as const).map(([key, label]) => (
               <Button
                 key={key}
                 size="small"
@@ -336,7 +337,9 @@ const V2PreviewStep: React.FC = () => {
               </Button>
             ))}
           </Stack>
-          {homeView === 'prices' ? (
+          {homeView === 'catalog' ? (
+            <CatalogManagerPanel />
+          ) : homeView === 'prices' ? (
             <PriceQueuePanel />
           ) : homeView === 'standards' ? (
             <StandardsPanel />

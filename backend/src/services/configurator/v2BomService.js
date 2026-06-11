@@ -10,6 +10,7 @@
 const models = require('../../models');
 const { compileBomV2 } = require('./bomEngineV2');
 const { estimateCopper } = require('./copperEstimator');
+const { getCostingDefaults } = require('./costingDefaults');
 
 async function stdRows(tableKey) {
   const row = await models.ConfiguratorEngineeringStandard.findOne({
@@ -68,10 +69,12 @@ async function compileBoardBom(switchboardId, { copperPricePerLb = null } = {}) 
     sectionIndex: l.meta?.sectionIndex ?? null,
   }));
 
+  const defaults = await getCostingDefaults();
   const pricePerLb =
     Number(copperPricePerLb) ||
     Number(bd.copperPricePerLb) ||
-    Number(process.env.COPPER_PRICE_PER_LB) || 5.5; // [SEED] until COMEX feed
+    Number(defaults.copper_price_per_lb) ||
+    Number(process.env.COPPER_PRICE_PER_LB) || 5.5;
 
   const devices = lines
     .filter((l) => (l.category || '').toUpperCase() === 'CIRCUIT BREAKER')

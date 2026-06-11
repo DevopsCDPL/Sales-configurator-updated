@@ -16,6 +16,7 @@ const models = require('../../models');
 const { Op } = require('sequelize');
 const { compileBoardBom } = require('./v2BomService');
 const { computeQuoteFromV2 } = require('./v2PricingAdapter');
+const { getCostingDefaults, toLookup } = require('./costingDefaults');
 
 const DEFAULT_LOOKUP = Object.freeze({
   LBR_CU_rate: 85, LBR_ASM_rate: 75, LBR_CNT_rate: 95, LBR_QC_rate: 80,
@@ -75,10 +76,13 @@ async function computeBoardQuote(switchboardId, opts = {}) {
   }));
 
   const catalog = await buildCatalog(compiled.lines);
-  // Re-attach part numbers for hydration (labour buckets) without
-  // overriding the cost snapshot.
-  const lookup = { ...DEFAULT_LOOKUP, ...(opts.lookup || {}) };
-  const gmPct = Number.isFinite(Number(opts.gmPct)) ? Number(opts.gmPct) : 0.30;
+  // Defaults come from the editable costing_defaults standards table
+  // (TPS workbook values); explicit opts always win.
+  const defaults = await getCostingDefaults();
+  const lookup = { ...toLookup(defaults), ...(opts.lookup || {}) };
+  const gmPct = Number.isFinite(Number(opts.gmPct))
+    ? Number(opts.gmPct)
+    : (Number(defaults.default_gm_pct) || 0.30);
   if (gmPct >= 1 || gmPct < 0) {
     const err = new Error('gmPct must be a fraction between 0 and 1 (e.g. 0.30)');
     err.status = 422;
@@ -87,7 +91,9 @@ async function computeBoardQuote(switchboardId, opts = {}) {
   const pricing = {
     strategy: 'DESIRED GM%',
     desired_gm_pct: gmPct,
-    roundup_factor: Number.isInteger(opts.roundupFactor) ? opts.roundupFactor : -1,
+    roundup_factor: Number.isInteger(opts.roundupFactor)
+      ? opts.roundupFactor
+      : (Number.isInteger(defaults.roundup_factor) ? defaults.roundup_factor : -1),
   };
   const laborAdjustments = Array.isArray(opts.laborAdjustments) ? opts.laborAdjustments : [];
 
@@ -117,6 +123,7 @@ async function computeBoardQuote(switchboardId, opts = {}) {
     copper,
     copperPricePerLb: compiled.copperPricePerLb,
     inputs: { gmPct, roundupFactor: pricing.roundup_factor, laborAdjustments, lookup },
+    defaults,
     labourHoursTotal,
     nonFirmCount,
     blockers,

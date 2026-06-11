@@ -31,6 +31,9 @@ const { compileBomV2 } = require('../services/configurator/bomEngineV2');
 const { estimateCopper } = require('../services/configurator/copperEstimator');
 const { compileBoardBom } = require('../services/configurator/v2BomService');
 const v2Quote = require('../services/configurator/v2QuoteService');
+const { importTpsWorkbook } = require('../services/configurator/workbookImporter');
+const multer = require('multer');
+const wbUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20 * 1024 * 1024 } });
 
 // Default ON in this private instance; set CONFIGURATOR_V2_SPINE=false to disable.
 const FLAG = () => String(process.env.CONFIGURATOR_V2_SPINE ?? 'true').toLowerCase() !== 'false';
@@ -649,6 +652,13 @@ router.post('/catalog/import-bundled', wrap(async (req, res) => {
   }
   const count = await models.ConfiguratorComponent.count({ where: { category: 'CIRCUIT BREAKER' } });
   res.json({ ok: true, created, repaired, skipped: seed.length - created, total: count });
+}));
+
+/* ── TPS estimate workbook import (components + labour + standards) ── */
+router.post('/catalog/import-workbook', wbUpload.single('file'), wrap(async (req, res) => {
+  if (!req.file?.buffer) return res.status(400).json({ error: 'multipart file field "file" required (.xlsm/.xlsx)' });
+  const out = await importTpsWorkbook(req.file.buffer, { companyId: req.companyId ?? null });
+  res.json({ ok: true, ...out });
 }));
 
 /** Lightweight CB list for the Designer's sync candidate provider. */

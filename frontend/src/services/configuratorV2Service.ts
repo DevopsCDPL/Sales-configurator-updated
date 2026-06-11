@@ -394,6 +394,20 @@ export const configuratorV2Service = {
     return res.data;
   },
 
+
+  async importWorkbook(file: File): Promise<{
+    ok: boolean; componentsCreated: number; componentsUpdated: number;
+    busScheduleRows: number; neutralRows: number; copperPricePerLb: number | null;
+    ratesFound: Record<string, number>; warnings: string[];
+  }> {
+    const fd = new FormData();
+    fd.append('file', file);
+    const res = await api.post(`${ROOT}/catalog/import-workbook`, fd, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return res.data;
+  },
+
   async applyProposal(id: string, payload: {
     intake: IntakeInput;
     boardPatch: LineupProposal['boardPatch'] & { totalFeederLoadA?: number; sldTopology?: unknown };
