@@ -17,6 +17,7 @@ import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 import ContentPasteRoundedIcon from '@mui/icons-material/ContentPasteRounded';
 
 import { DEFAULT_STANDARDS, StandardsSet } from '../lib/us-standards';
+import { flowStore } from '../state/flowStore';
 import {
   proposeLineup, IntakeInput, FeederRowInput, LineupProposal, LineupOptions,
 } from '../lib/lineup-proposal';
@@ -127,6 +128,18 @@ export default function IntakeStep(props: IntakeStepProps) {
     });
   };
 
+  // Expose Save intake / Propose to the sticky Configuration bar
+  React.useEffect(() => {
+    flowStore.set({
+      intakeActions: {
+        save: () => props.onSaveIntake(intake),
+        propose: () => runProposal(),
+      },
+    });
+    return () => { flowStore.set({ intakeActions: null }); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [intake]);
+
   const runProposal = () => {
     const p = proposeLineup(std, intake, {
       maxSections: props.maxSections ?? 10,
@@ -136,27 +149,10 @@ export default function IntakeStep(props: IntakeStepProps) {
   };
 
   return (
-    <Box sx={{ p: 3, bgcolor: C.bg }}>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
-        <Box>
-          <Typography sx={{ color: C.text, fontWeight: 700, fontSize: 16 }}>Requirements Intake</Typography>
-          <Typography sx={{ color: C.sub, fontSize: 12 }}>
-            Capture the customer requirement — the engine proposes the full line-up from here.
-          </Typography>
-        </Box>
-        <Stack direction="row" spacing={1}>
-          <Button onClick={() => props.onSaveIntake(intake)} sx={{ color: C.sub, textTransform: 'none', border: `1px solid ${C.border}` }}>
-            Save intake
-          </Button>
-          <Button
-            variant="contained" startIcon={<AutoAwesomeRoundedIcon />}
-            onClick={runProposal}
-            sx={{ bgcolor: C.blue, textTransform: 'none', fontWeight: 600, '&:hover': { bgcolor: '#1565C0' } }}
-          >
-            Propose line-up
-          </Button>
-        </Stack>
-      </Stack>
+    <Box sx={{ p: 2, bgcolor: C.bg }}>
+      <Typography sx={{ color: C.sub, fontSize: 12, mb: 1.5 }}>
+        Capture the customer requirement — the engine proposes the full line-up (Save intake / Propose are in the top bar).
+      </Typography>
 
       {/* Board-level intake */}
       <Box sx={card}>

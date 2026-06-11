@@ -316,13 +316,52 @@ const ConfigurationTab: React.FC<ConfigurationTabProps> = ({ project, onUpdate, 
                 </IconButton>
               </Tooltip>
             )}
-            <Typography sx={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-secondary, #d9e4fb)', whiteSpace: 'nowrap' }}>
-              Configuration
-            </Typography>
+            {flow.boardOpen ? (
+              <>
+                <Button
+                  size="small"
+                  onClick={() => flow.closeBoard?.()}
+                  sx={{ color: 'var(--text-muted, #9ab0d0)', textTransform: 'none', fontSize: '0.72rem', minWidth: 0, px: 1, border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px' }}
+                >
+                  ← Boards
+                </Button>
+                <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: '#f0f6ff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {flow.boardName ?? 'Switchboard'}
+                </Typography>
+              </>
+            ) : (
+              <Typography sx={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-secondary, #d9e4fb)', whiteSpace: 'nowrap' }}>
+                Configuration
+              </Typography>
+            )}
           </Box>
 
           {/* RIGHT — refresh · config selector dropdown · new button */}
           <Stack direction="row" spacing={0.75} alignItems="center" sx={{ flexShrink: 0 }}>
+            {flow.boardOpen && flow.step === 'system' && flow.intakeActions && (
+              <>
+                <Button
+                  size="small"
+                  onClick={() => flow.intakeActions?.save()}
+                  sx={{ color: 'var(--text-muted, #9ab0d0)', textTransform: 'none', fontSize: '0.72rem', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', height: 28 }}
+                >
+                  Save intake
+                </Button>
+                <Button
+                  size="small"
+                  onClick={() => flow.intakeActions?.propose()}
+                  sx={{
+                    textTransform: 'none', fontWeight: 700, fontSize: '0.72rem', height: 28, px: 1.5,
+                    color: '#06151c', bgcolor: '#00c8ff', borderRadius: '8px',
+                    '&:hover': { bgcolor: '#33d4ff' },
+                  }}
+                >
+                  ✦ Propose line-up
+                </Button>
+              </>
+            )}
+            {!flow.boardOpen && (
+            <>
             <Tooltip title="Refresh">
               <span>
                 <IconButton size="small" onClick={reload} disabled={loading} sx={{ color: 'var(--text-muted, #9ab0d0)' }}>
@@ -454,9 +493,11 @@ const ConfigurationTab: React.FC<ConfigurationTabProps> = ({ project, onUpdate, 
             >
               New
             </Button>
+            </>
+            )}
 
             {/* ── Project-flow actions (single Save + Continue) ── */}
-            {activeConfig && shellState && (
+            {activeConfig && shellState && !flow.boardOpen && (
               <>
                 <Box sx={{ width: '1px', height: 20, bgcolor: 'rgba(255,255,255,0.10)', mx: 0.5 }} />
                 <Tooltip title={shellState.saving ? 'Saving…' : shellState.dirty ? 'Save draft' : 'All changes saved'}>

@@ -22,9 +22,15 @@ interface FlowState {
   step: FlowKey;
   boardOpen: boolean;
   accepted: boolean;
+  boardName: string | null;
+  closeBoard: (() => void) | null;
+  intakeActions: { save: () => void; propose: () => void } | null;
 }
 
-let state: FlowState = { step: 'system', boardOpen: false, accepted: false };
+let state: FlowState = {
+  step: 'system', boardOpen: false, accepted: false,
+  boardName: null, closeBoard: null, intakeActions: null,
+};
 const subs = new Set<() => void>();
 
 export const flowStore = {

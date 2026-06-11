@@ -226,7 +226,17 @@ const V2PreviewStep: React.FC = () => {
     try {
       const full = await configuratorV2Service.getFull(id);
       setOpenBoard(full);
-      flowStore.set({ boardOpen: true, accepted: full.sections.length > 0, step: 'system' });
+      flowStore.set({
+        boardOpen: true,
+        accepted: full.sections.length > 0,
+        step: 'system',
+        boardName: full.board.name,
+        closeBoard: () => {
+          setOpenBoard(null);
+          setSvg(null);
+          flowStore.set({ boardOpen: false, step: 'system', boardName: null, closeBoard: null });
+        },
+      });
       setSectionCounts((m) => ({ ...m, [id]: full.sections.length || 1 }));
       setSvg(sldFromFull(full)?.svg ?? null);
     } catch (e: any) {
@@ -319,7 +329,8 @@ const V2PreviewStep: React.FC = () => {
         </Alert>
       )}
 
-      <Stack direction="row" spacing={1} alignItems="center" sx={{ px: 3, pt: 2 }}>
+      {!openBoard && (
+      <Stack direction="row" spacing={1} alignItems="center" sx={{ px: 2, pt: 1.5 }}>
         {catalogStatus && catalogStatus.count > 0 ? (
           <Chip
             size="small"
@@ -344,6 +355,7 @@ const V2PreviewStep: React.FC = () => {
           </>
         )}
       </Stack>
+      )}
 
       {loading ? (
         <Stack alignItems="center" sx={{ py: 8 }}>
@@ -449,38 +461,21 @@ const V2PreviewStep: React.FC = () => {
         </Box>
       ) : (
         <Box>
-          <Stack direction="row" alignItems="center" spacing={1.5} sx={{ px: 3, pt: 2 }}>
-            <Button
-              size="small"
-              onClick={() => { setOpenBoard(null); setSvg(null); flowStore.set({ boardOpen: false, step: 'system' }); }}
-              sx={{ color: C.sub, textTransform: 'none', border: '1px solid ' + C.border }}
-            >
-              ← Boards
-            </Button>
-            <Typography sx={{ color: C.text, fontWeight: 700, fontSize: 15 }}>
-              {openBoard.board.name}
-            </Typography>
-            <Chip
-              label={openBoard.sections.length ? 'saved — ' + openBoard.sections.length + ' section(s)' : 'draft'}
-              size="small"
-              sx={{
-                bgcolor: 'transparent', fontSize: 10.5, height: 20,
-                border: '1px solid ' + (openBoard.sections.length ? C.green : C.border),
-                color: openBoard.sections.length ? C.green : C.sub,
-              }}
-            />
-            {openBoard.board.status === 'locked' && (
-              <>
-                <Chip label="design frozen" size="small"
-                  sx={{ bgcolor: 'transparent', border: '1px solid ' + C.amber, color: C.amber, fontSize: 10.5, height: 20 }} />
-                <Button size="small" onClick={() => { setCoDialog(true); setCoReason(''); }}
-                  sx={{ color: C.amber, textTransform: 'none', fontSize: 11.5, border: '1px solid ' + C.border }}>
-                  Raise change order
-                </Button>
-              </>
-            )}
-            {busy && <CircularProgress size={14} sx={{ color: C.blue }} />}
-          </Stack>
+          {(openBoard.board.status === 'locked' || busy) && (
+            <Stack direction="row" alignItems="center" spacing={1.5} sx={{ px: 2, pt: 1 }}>
+              {openBoard.board.status === 'locked' && (
+                <>
+                  <Chip label="design frozen" size="small"
+                    sx={{ bgcolor: 'transparent', border: '1px solid ' + C.amber, color: C.amber, fontSize: 10.5, height: 20 }} />
+                  <Button size="small" onClick={() => { setCoDialog(true); setCoReason(''); }}
+                    sx={{ color: C.amber, textTransform: 'none', fontSize: 11.5, border: '1px solid ' + C.border }}>
+                    Raise change order
+                  </Button>
+                </>
+              )}
+              {busy && <CircularProgress size={14} sx={{ color: C.blue }} />}
+            </Stack>
+          )}
 
           <Dialog open={coDialog} onClose={() => setCoDialog(false)} maxWidth="sm" fullWidth
             PaperProps={{ sx: { bgcolor: C.surface, border: '1px solid ' + C.border, backgroundImage: 'none' } }}>
@@ -559,7 +554,7 @@ const V2PreviewStep: React.FC = () => {
               />
             </Box>
           ) : boardView === 'sld' ? (
-            <Box sx={{ px: 3, pb: 4, pt: 1 }}>
+            <Box sx={{ px: 2, pb: 3, pt: 1 }}>
               <Typography sx={{ color: '#CBD5E1', fontSize: 13.5, fontWeight: 600, mb: 1 }}>
                 One-Line Diagram (from saved design)
               </Typography>
@@ -573,7 +568,7 @@ const V2PreviewStep: React.FC = () => {
               )}
             </Box>
           ) : boardView === 'elevation' ? (
-            <Box sx={{ px: 3, pb: 4, pt: 1 }}>
+            <Box sx={{ px: 2, pb: 3, pt: 1 }}>
               <Typography sx={{ color: '#CBD5E1', fontSize: 13.5, fontWeight: 600, mb: 1 }}>
                 Front Elevation (estimate only)
               </Typography>
