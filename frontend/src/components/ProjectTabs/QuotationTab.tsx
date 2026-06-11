@@ -35,6 +35,7 @@ import {
   quotationCompilerService,
   type QuotationRecord,
 } from '../../services/quotationCompilerService';
+import V2QuotationsPanel from '../../configurator/steps/V2QuotationsPanel';
 import { projectService } from '../../services/projectService';
 import api from '../../services/api';
 import { useNotification } from '../../contexts/NotificationContext';
@@ -611,6 +612,9 @@ const QuotationTab: React.FC<QuotationTabProps> = ({ project, onUpdate, onBack, 
 
   return (
     <TabContainer>
+
+      {/* Designer (V2) quotations — revision chain, proposal, handoff */}
+      {project?.id && <V2QuotationsPanel projectId={project.id} onChanged={onUpdate} />}
 
       {/* ================================================================
           PAGE HEADER
