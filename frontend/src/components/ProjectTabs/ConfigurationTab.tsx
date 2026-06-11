@@ -113,7 +113,9 @@ const ConfigurationTab: React.FC<ConfigurationTabProps> = ({ project, onUpdate, 
   const [stickyTop, setStickyTop] = useState(88);
   const [shellState, setShellState] = useState<ConfiguratorShellState | null>(null);
 
-  const orderedSubsteps: ConfiguratorSubstepKey[] = ['__v2', ...STANDARD_KEYS, '__preview'];
+  // V2 redesign: the Designer owns the full flow (System Design → … → Drawings)
+  // via its own chip strip; legacy per-category substeps removed from the UI.
+  const orderedSubsteps: ConfiguratorSubstepKey[] = ['__v2'];
 
   /* â”€â”€â”€ Load saved configurations for this project â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   const reload = useCallback(async () => {
@@ -519,8 +521,8 @@ const ConfigurationTab: React.FC<ConfigurationTabProps> = ({ project, onUpdate, 
           </Stack>
         </Box>
 
-        {/* ── Row 2: substep chips (only when a config is active) ── */}
-        {activeConfig && (
+        {/* ── Row 2: substep chips (hidden — Designer carries the flow) ── */}
+        {activeConfig && orderedSubsteps.length > 1 && (
           <Box
             sx={{
               display: 'flex',
