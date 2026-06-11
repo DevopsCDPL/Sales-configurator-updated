@@ -20,7 +20,7 @@ const express = require('express');
 const router = express.Router();
 const { authenticate } = require('../middleware/auth');
 const { tenantScope } = require('../middleware/tenantScope');
-const { models } = require('../models');
+const { models, sequelize } = require('../models');
 const swJobs = require('../services/configurator/swJobsService');
 const { buildSolidworksPayload } = require('../services/configurator/solidworksPayloadBuilder');
 const { evaluateCompleteness } = require('../services/configurator/completenessEngine');
@@ -295,6 +295,127 @@ router.post('/copper-reconciliations/:id/approve', wrap(async (req, res) => {
   if (!row) return res.status(404).json({ error: 'not found' });
   await row.update({ status: 'approved', reviewed_by: req.user?.id ?? null, reviewed_at: new Date(), notes: req.body?.notes ?? row.notes });
   res.json(row);
+}));
+
+// ── Designer persistence (Phase: actual application) ──────────────────
+
+// Company-wide board list (clone library for "Load Configuration")
+router.get('/switchboards', wrap(async (req, res) => {
+  const rows = await models.ConfiguratorSwitchboard.findAll({
+    order: [['updated_at', 'DESC']],
+    limit: 100,
+  });
+  res.json(rows);
+}));
+
+// Full board: switchboard + sections + lines in one call
+router.get('/switchboards/:id/full', wrap(async (req, res) => {
+  const board = await models.ConfiguratorSwitchboard.findByPk(req.params.id);
+  if (!board) return res.status(404).json({ error: 'not found' });
+  const sections = await models.ConfiguratorSystemSection.findAll({
+    where: { switchboard_id: board.id },
+    order: [['section_index', 'ASC']],
+  });
+  const lines = await models.ConfiguratorComponentLine.findAll({
+    where: { switchboard_id: board.id },
+    order: [['created_at', 'ASC']],
+  });
+  res.json({ board, sections, lines });
+}));
+
+/**
+ * Apply an accepted line-up proposal ATOMICALLY:
+ *   - patch board_data + intake (+ name)
+ *   - replace designer-managed sections and source='auto' lines
+ *   - user-added lines (source='user') are preserved at board scope
+ * Body: { intake, boardPatch:{...}, sections:[{sectionIndex, role, frame,
+ *         devices:[{designation, partNumber, manufacturer, frameModel,
+ *                   ratedA, poles, mounting, interruptingKA, price,
+ *                   priceStatus, componentId?}], usedHeightIn, remainingHeightIn }] }
+ */
+router.post('/switchboards/:id/apply-proposal', wrap(async (req, res) => {
+  const board = await models.ConfiguratorSwitchboard.findByPk(req.params.id);
+  if (!board) return res.status(404).json({ error: 'not found' });
+  if (board.status === 'locked') return res.status(423).json({ error: 'switchboard locked' });
+  const { intake, boardPatch = {}, sections = [] } = req.body || {};
+
+  const out = await sequelize.transaction(async (t) => {
+    // 1. Board envelope
+    const bd = { ...(board.board_data || {}) };
+    if (boardPatch.voltageSystemCode != null) bd.voltageSystemCode = boardPatch.voltageSystemCode;
+    if (boardPatch.mainBusRatingA != null) bd.mainBusRating = boardPatch.mainBusRatingA;
+    if (boardPatch.sccrKA != null) bd.shortCircuitRating = boardPatch.sccrKA;
+    if (boardPatch.sccrAssumed != null) bd.sccrAssumed = boardPatch.sccrAssumed;
+    if (boardPatch.nemaSuggestion != null) bd.nemaType = bd.nemaType || boardPatch.nemaSuggestion;
+    if (boardPatch.neutralPct != null) bd.neutralRating = boardPatch.neutralPct;
+    if (boardPatch.totalFeederLoadA != null) bd.totalFeederLoadA = boardPatch.totalFeederLoadA;
+    if (boardPatch.sldTopology != null) bd.sldTopology = boardPatch.sldTopology;
+    await board.update(
+      { board_data: bd, intake: intake ?? board.intake, status: 'complete' },
+      { transaction: t }
+    );
+
+    // 2. Wipe designer-managed rows
+    await models.ConfiguratorSystemSection.destroy({
+      where: { switchboard_id: board.id }, transaction: t,
+    });
+    await models.ConfiguratorComponentLine.destroy({
+      where: { switchboard_id: board.id, source: ['auto', 'builder'] }, transaction: t,
+    });
+
+    // 3. Recreate sections + device lines
+    const createdSections = [];
+    for (const sec of sections) {
+      const row = await models.ConfiguratorSystemSection.create({
+        switchboard_id: board.id,
+        section_index: sec.sectionIndex,
+        name: `Section ${sec.sectionIndex}`,
+        setup: { role: sec.role },
+        electrical: sec.electrical ?? {},
+        layout: { frameCode: sec.frame?.frameCode ?? null, frame: sec.frame ?? null },
+        computed: {
+          usedHeightIn: sec.usedHeightIn ?? null,
+          remainingHeightIn: sec.remainingHeightIn ?? null,
+        },
+        company_id: req.companyId ?? null,
+      }, { transaction: t });
+      createdSections.push(row);
+      for (const d of sec.devices ?? []) {
+        await models.ConfiguratorComponentLine.create({
+          switchboard_id: board.id,
+          scope: 'section',
+          section_id: row.id,
+          component_id: d.componentId && String(d.componentId).length === 36 ? d.componentId : null,
+          category: 'CIRCUIT BREAKER',
+          part_number: d.partNumber ?? null,
+          name: [d.manufacturer, d.frameModel].filter(Boolean).join(' ') || d.designation,
+          quantity: 1,
+          unit_cost: Number(d.price) || 0,
+          price_status: d.priceStatus ?? 'PENDING_RFQ',
+          source: 'auto',
+          meta: {
+            designation: d.designation,
+            role: d.role,
+            ratedA: d.ratedA,
+            poles: d.poles,
+            mounting: d.mounting,
+            interruptingKA: d.interruptingKA,
+            sectionIndex: sec.sectionIndex,
+          },
+          company_id: req.companyId ?? null,
+        }, { transaction: t });
+      }
+    }
+    return { sectionCount: createdSections.length };
+  });
+
+  const sectionsOut = await models.ConfiguratorSystemSection.findAll({
+    where: { switchboard_id: board.id }, order: [['section_index', 'ASC']],
+  });
+  const linesOut = await models.ConfiguratorComponentLine.findAll({
+    where: { switchboard_id: board.id }, order: [['created_at', 'ASC']],
+  });
+  res.json({ ok: true, ...out, board, sections: sectionsOut, lines: linesOut });
 }));
 
 // ERP handoff

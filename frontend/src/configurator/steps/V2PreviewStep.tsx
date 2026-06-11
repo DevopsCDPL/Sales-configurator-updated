@@ -1,48 +1,31 @@
 /**
- * V2PreviewStep — flag-gated sandbox for the V2 spine (Phases A–C demo).
+ * DesignerStep (file kept as V2PreviewStep.tsx for router stability)
  *
- * Visible ONLY when the URL contains ?v2=1 (persisted to localStorage
- * key cfg_v2 for the session). The client never sees this tab.
+ * THE actual switchgear designer — persistence-backed:
+ *   cards ⇄ DB switchboards · intake saved per board · accepted
+ *   proposals write sections + device lines atomically · reopening a
+ *   board rebuilds the SLD from what is stored. Refresh-safe.
  *
- * Everything runs client-side: switchboard cards → requirements intake
- * (paste-from-Excel) → greedy line-up proposal → generated SLD.
- * NOTHING is persisted — refresh resets. Candidate breakers come from
- * the bundled catalog data (until the DB catalog migration lands).
+ * Still pending (next build steps): DB catalog candidates (bundled CB
+ * data meanwhile), section detail editing, BOM/quote from Designer.
  */
-import React, { useMemo, useState } from 'react';
-import { Box, Typography, Stack, Chip, Button, Alert } from '@mui/material';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Box, Typography, Stack, Chip, Button, Alert, CircularProgress, Snackbar } from '@mui/material';
 import SwitchboardCardsScreen, { SwitchboardCardData } from './SwitchboardCardsScreen';
 import IntakeStep from './IntakeStep';
 import { CIRCUIT_BREAKER_V2_DATA } from '../data/circuitBreakerV2Data';
-import type { CandidateDevice, LineupProposal } from '../lib/lineup-proposal';
-import { generateSld } from '../lib/sld-generator';
+import type { CandidateDevice, LineupProposal, IntakeInput } from '../lib/lineup-proposal';
+import { generateSld, SldDevice } from '../lib/sld-generator';
 import type { SectionRole } from '../lib/safety-rules';
+import { useConfigurator } from '../state/ConfiguratorProvider';
+import configuratorV2Service, { FullBoard, SwitchboardRow } from '../../services/configuratorV2Service';
 
 const C = {
   bg: '#0D0D14', surface: '#13131E', border: '#1E2235', blue: '#1976D2',
-  text: '#E2E8F0', sub: '#64748B', amber: '#D97706', green: '#22C55E',
+  text: '#E2E8F0', sub: '#64748B', amber: '#D97706', green: '#22C55E', red: '#EF4444',
 };
 
-/** Show the V2 preview only for ?v2=1 visitors (sticky via localStorage). */
-export function isV2PreviewEnabled(): boolean {
-  try {
-    if (typeof window === 'undefined') return false;
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('v2') === '1') {
-      window.localStorage.setItem('cfg_v2', '1');
-      return true;
-    }
-    if (params.get('v2') === '0') {
-      window.localStorage.removeItem('cfg_v2');
-      return false;
-    }
-    return window.localStorage.getItem('cfg_v2') === '1';
-  } catch {
-    return false;
-  }
-}
-
-/** Candidate provider over the bundled CB catalog (lenient demo parsing). */
+/* candidate provider over bundled catalog (until DB catalog import) */
 function makeCandidateProvider() {
   const parsed: CandidateDevice[] = (CIRCUIT_BREAKER_V2_DATA as any[]).map((e: any, i: number) => {
     const ratedA = parseInt(String(e.ratedCurrentA), 10) || 0;
@@ -70,159 +53,293 @@ function makeCandidateProvider() {
 
   return (q: { role: SectionRole; designCurrentA: number; sccrKA: number; poles: number }) => {
     const wantClass = q.role === 'FEEDER' ? ['MCCB', 'MCB'] : ['ACB', 'ICCB'];
-    let pool = parsed.filter(
-      (c) => c.ratedA >= q.designCurrentA && wantClass.includes(c.deviceClass)
-    );
-    // demo leniency: ignore kA shortfalls if nothing matches (IEC data, US ratings pending)
+    let pool = parsed.filter((c) => c.ratedA >= q.designCurrentA && wantClass.includes(c.deviceClass));
     const kaOk = pool.filter((c) => c.interruptingKA >= q.sccrKA);
     if (kaOk.length) pool = kaOk;
-    if (!pool.length) {
-      pool = parsed.filter((c) => c.ratedA >= q.designCurrentA);
-    }
+    if (!pool.length) pool = parsed.filter((c) => c.ratedA >= q.designCurrentA);
     return pool.sort((a, b) => a.ratedA - b.ratedA).slice(0, 5);
   };
 }
 
-let demoSeq = 2;
+function rowToCard(b: SwitchboardRow, sectionCount?: number): SwitchboardCardData {
+  const bd = b.board_data || {};
+  return {
+    id: b.id,
+    name: b.name,
+    boardType: b.board_type ?? 'SWITCHBOARD_UL891',
+    status: b.status,
+    voltageSystem: bd.voltageSystemCode ?? null,
+    mainBusRatingA: Number(bd.mainBusRating) || null,
+    sccrKA: Number(bd.shortCircuitRating) || null,
+    sectionCount: sectionCount ?? (Number(bd.sectionCount) || 1),
+    drawingsStatus: b.drawings_status ?? 'none',
+    updatedAt: b.updated_at,
+  };
+}
+
+/** Rebuild SLD input from PERSISTED rows — refresh-safe rendering. */
+function sldFromFull(full: FullBoard): { svg: string } | null {
+  const bd = full.board.board_data || {};
+  const deviceLines = full.lines.filter((l) => (l.category || '').toUpperCase() === 'CIRCUIT BREAKER');
+  if (!deviceLines.length) return null;
+  const mains = deviceLines.filter((l) => l.meta?.role === 'MAIN');
+  const devices: SldDevice[] = deviceLines.map((l) => ({
+    designation: l.meta?.designation ?? '?',
+    role: (l.meta?.role ?? 'FEEDER') as SectionRole,
+    ratingA: Number(l.meta?.ratedA) || null,
+    frameModel: l.meta?.frameModel ?? l.name ?? undefined,
+    sectionIndex: Number(l.meta?.sectionIndex) || 1,
+    busSegment: l.meta?.role === 'MAIN' && l.meta?.designation === 'M2' ? 1 : 0,
+  }));
+  const twoSeg = mains.length >= 2;
+  const { svg } = generateSld({
+    title: full.board.name,
+    configCode: 'Saved design',
+    voltageSystem: bd.voltageSystemCode ?? '—',
+    mainBusRatingA: Number(bd.mainBusRating) || null,
+    sccrKA: Number(bd.shortCircuitRating) || null,
+    devices,
+    busSegments: twoSeg ? 2 : 1,
+  });
+  return { svg };
+}
 
 const V2PreviewStep: React.FC = () => {
+  const { configuration } = useConfigurator();
+  const configurationId = configuration?.id ?? null;
   const provider = useMemo(makeCandidateProvider, []);
-  const [boards, setBoards] = useState<SwitchboardCardData[]>([
-    {
-      id: 'demo-1', name: 'Switchboard 1', boardType: 'SWITCHBOARD_UL891', status: 'draft',
-      voltageSystem: null, mainBusRatingA: null, sccrKA: null, sectionCount: 1, drawingsStatus: 'none',
-    },
-  ]);
-  const [openBoardId, setOpenBoardId] = useState<string | null>(null);
-  const [result, setResult] = useState<{ proposal: LineupProposal; svg: string } | null>(null);
 
-  const patchBoard = (id: string, p: Partial<SwitchboardCardData>) =>
-    setBoards((bs) => bs.map((b) => (b.id === id ? { ...b, ...p } : b)));
+  const [boards, setBoards] = useState<SwitchboardRow[]>([]);
+  const [sectionCounts, setSectionCounts] = useState<Record<string, number>>({});
+  const [loadable, setLoadable] = useState<SwitchboardRow[]>([]);
+  const [openBoard, setOpenBoard] = useState<FullBoard | null>(null);
+  const [svg, setSvg] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const onAccept = (proposal: LineupProposal) => {
-    const devices = proposal.sections.flatMap((s) =>
-      s.devices.map((d) => ({
-        designation: d.designation,
-        role: d.role,
-        ratingA: d.device?.ratedA ?? d.recommendedRatingA,
-        frameModel: d.device?.frameModel,
-        sectionIndex: s.sectionIndex,
-        busSegment: d.role === 'MAIN' && d.designation === 'M2' ? 1 : 0,
-      }))
-    );
-    const { svg } = generateSld({
-      title: boards.find((b) => b.id === openBoardId)?.name ?? 'Switchboard',
-      configCode: 'V2 PREVIEW (not saved)',
-      voltageSystem: proposal.boardPatch.voltageSystemCode,
-      mainBusRatingA: proposal.boardPatch.mainBusRatingA,
-      sccrKA: proposal.boardPatch.sccrKA,
-      devices,
-      busSegments: devices.some((d) => d.busSegment === 1) ? 2 : 1,
-    });
-    setResult({ proposal, svg });
-    if (openBoardId) {
-      patchBoard(openBoardId, {
-        voltageSystem: proposal.boardPatch.voltageSystemCode,
-        mainBusRatingA: proposal.boardPatch.mainBusRatingA,
-        sccrKA: proposal.boardPatch.sccrKA,
-        sectionCount: proposal.sections.length,
-        status: 'complete',
-      });
+  const reload = useCallback(async () => {
+    if (!configurationId) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const [mine, all] = await Promise.all([
+        configuratorV2Service.listBoards(configurationId),
+        configuratorV2Service.listAllBoards(),
+      ]);
+      setLoadable(all);
+      if (!mine.length) {
+        const created = await configuratorV2Service.createBoard(configurationId, 'Switchboard 1');
+        setBoards([created]);
+      } else {
+        setBoards(mine);
+      }
+    } catch (e: any) {
+      setError(e?.response?.data?.error ?? e?.message ?? 'Failed to load switchboards');
+    } finally {
+      setLoading(false);
+    }
+  }, [configurationId]);
+
+  useEffect(() => { reload(); }, [reload]);
+
+  const openById = async (id: string) => {
+    setBusy(true);
+    setError(null);
+    try {
+      const full = await configuratorV2Service.getFull(id);
+      setOpenBoard(full);
+      setSectionCounts((m) => ({ ...m, [id]: full.sections.length || 1 }));
+      setSvg(sldFromFull(full)?.svg ?? null);
+    } catch (e: any) {
+      setError(e?.response?.data?.error ?? 'Failed to open switchboard');
+    } finally {
+      setBusy(false);
     }
   };
 
+  const saveIntake = async (intake: IntakeInput) => {
+    if (!openBoard) return;
+    setBusy(true);
+    try {
+      const updated = await configuratorV2Service.patchBoard(openBoard.board.id, { intake });
+      setOpenBoard({ ...openBoard, board: updated });
+      setBoards((bs) => bs.map((b) => (b.id === updated.id ? updated : b)));
+      setToast('Intake saved');
+    } catch (e: any) {
+      setError(e?.response?.data?.error ?? 'Save failed');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const acceptProposal = async (proposal: LineupProposal, intake: IntakeInput) => {
+    if (!openBoard) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const payload = {
+        intake,
+        boardPatch: { ...proposal.boardPatch, totalFeederLoadA: proposal.totalFeederLoadA },
+        sections: proposal.sections.map((s) => ({
+          sectionIndex: s.sectionIndex,
+          role: s.role,
+          frame: s.frame as any,
+          usedHeightIn: s.usedHeightIn,
+          remainingHeightIn: s.remainingHeightIn,
+          devices: s.devices.map((d) => ({
+            designation: d.designation,
+            role: d.role,
+            partNumber: d.device?.partNumber,
+            manufacturer: d.device?.manufacturer,
+            frameModel: d.device?.frameModel,
+            ratedA: d.device?.ratedA ?? d.recommendedRatingA,
+            poles: d.device?.poles ?? 3,
+            mounting: d.device?.mounting ?? 'Fixed',
+            interruptingKA: d.device?.interruptingKA,
+            price: d.device?.price ?? null,
+            priceStatus: d.device?.priceStatus ?? 'PENDING_RFQ',
+            componentId: d.device?.componentId,
+          })),
+        })),
+      };
+      const full = await configuratorV2Service.applyProposal(openBoard.board.id, payload);
+      setOpenBoard({ board: full.board, sections: full.sections, lines: full.lines });
+      setBoards((bs) => bs.map((b) => (b.id === full.board.id ? full.board : b)));
+      setSectionCounts((m) => ({ ...m, [full.board.id]: full.sections.length }));
+      setSvg(sldFromFull({ board: full.board, sections: full.sections, lines: full.lines })?.svg ?? null);
+      setToast('Line-up saved to database — ' + full.sections.length + ' section(s)');
+    } catch (e: any) {
+      setError(e?.response?.data?.error ?? 'Apply failed');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const cards = boards.map((b) => rowToCard(b, sectionCounts[b.id]));
+
+  if (!configurationId) {
+    return (
+      <Box sx={{ p: 4, bgcolor: C.bg }}>
+        <Typography sx={{ color: C.sub, fontSize: 13 }}>
+          Open or create a configuration (CFG) first — the Designer attaches switchboards to it.
+        </Typography>
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ bgcolor: C.bg, minHeight: 400 }}>
-      <Alert
-        severity="info"
-        sx={{
-          m: 2, mb: 0, bgcolor: 'rgba(25,118,210,0.08)', color: '#CBD5E1',
-          border: `1px solid ${C.border}`, fontSize: 12,
-        }}
-      >
-        DESIGNER (build in progress) — intake, line-up proposal and SLD run live; persistence
-        to the database is the next build step, so refresh still resets. Breaker candidates come from
-        the bundled catalog until the DB catalog import lands.
-      </Alert>
-
-      {!openBoardId && (
-        <SwitchboardCardsScreen
-          boards={boards}
-          loadableBoards={boards.map((b) => ({ id: b.id, name: b.name, project: 'This project' }))}
-          onOpen={(id) => { setOpenBoardId(id); setResult(null); }}
-          onCreateNew={(name) => {
-            const id = `demo-${++demoSeq}`;
-            setBoards((bs) => [...bs, {
-              id, name, boardType: 'SWITCHBOARD_UL891', status: 'draft',
-              voltageSystem: null, mainBusRatingA: null, sccrKA: null,
-              sectionCount: 1, drawingsStatus: 'none',
-            }]);
-          }}
-          onLoadFrom={(srcId, name) => {
-            const src = boards.find((b) => b.id === srcId);
-            if (!src) return;
-            const id = `demo-${++demoSeq}`;
-            setBoards((bs) => [...bs, { ...src, id, name, status: 'draft' }]);
-          }}
-          onRename={(id, name) => patchBoard(id, { name })}
-          onDuplicate={(id) => {
-            const src = boards.find((b) => b.id === id);
-            if (!src) return;
-            const nid = `demo-${++demoSeq}`;
-            setBoards((bs) => [...bs, { ...src, id: nid, name: `${src.name} (copy)` }]);
-          }}
-          onDelete={(id) => setBoards((bs) => bs.filter((b) => b.id !== id))}
-        />
+      {error && (
+        <Alert
+          severity="error"
+          onClose={() => setError(null)}
+          sx={{ m: 2, mb: 0, bgcolor: 'rgba(239,68,68,0.08)', color: '#FCA5A5', border: '1px solid ' + C.border, fontSize: 12 }}
+        >
+          {error}
+        </Alert>
       )}
 
-      {openBoardId && (
+      {loading ? (
+        <Stack alignItems="center" sx={{ py: 8 }}>
+          <CircularProgress size={26} sx={{ color: C.blue }} />
+          <Typography sx={{ color: C.sub, fontSize: 12, mt: 1.5 }}>Loading switchboards…</Typography>
+        </Stack>
+      ) : !openBoard ? (
+        <SwitchboardCardsScreen
+          boards={cards}
+          loadableBoards={loadable.map((b) => ({
+            id: b.id,
+            name: b.name,
+            project: b.configuration_id === configurationId ? 'This configuration' : 'Other configuration',
+          }))}
+          onOpen={openById}
+          onCreateNew={async (name) => {
+            const created = await configuratorV2Service.createBoard(configurationId, name);
+            setBoards((bs) => [...bs, created]);
+          }}
+          onLoadFrom={async (srcId, name) => {
+            const created = await configuratorV2Service.createBoard(configurationId, name, srcId);
+            setBoards((bs) => [...bs, created]);
+            setToast('Configuration cloned with all sections and components');
+          }}
+          onRename={async (id, name) => {
+            const updated = await configuratorV2Service.patchBoard(id, { name });
+            setBoards((bs) => bs.map((b) => (b.id === id ? updated : b)));
+          }}
+          onDuplicate={async (id) => {
+            const src = boards.find((b) => b.id === id);
+            const created = await configuratorV2Service.createBoard(
+              configurationId,
+              (src?.name ?? 'Switchboard') + ' (copy)',
+              id
+            );
+            setBoards((bs) => [...bs, created]);
+          }}
+          onDelete={async (id) => {
+            try {
+              await configuratorV2Service.deleteBoard(id);
+              setBoards((bs) => bs.filter((b) => b.id !== id));
+            } catch (e: any) {
+              setError(e?.response?.data?.error ?? 'Delete failed');
+            }
+          }}
+        />
+      ) : (
         <Box>
           <Stack direction="row" alignItems="center" spacing={1.5} sx={{ px: 3, pt: 2 }}>
             <Button
               size="small"
-              onClick={() => { setOpenBoardId(null); setResult(null); }}
-              sx={{ color: C.sub, textTransform: 'none', border: `1px solid ${C.border}` }}
+              onClick={() => { setOpenBoard(null); setSvg(null); }}
+              sx={{ color: C.sub, textTransform: 'none', border: '1px solid ' + C.border }}
             >
               ← Boards
             </Button>
             <Typography sx={{ color: C.text, fontWeight: 700, fontSize: 15 }}>
-              {boards.find((b) => b.id === openBoardId)?.name}
+              {openBoard.board.name}
             </Typography>
-            <Chip label="sandbox — not saved" size="small"
-              sx={{ bgcolor: 'transparent', border: `1px solid ${C.amber}`, color: C.amber, fontSize: 10.5, height: 20 }} />
+            <Chip
+              label={openBoard.sections.length ? 'saved — ' + openBoard.sections.length + ' section(s)' : 'draft'}
+              size="small"
+              sx={{
+                bgcolor: 'transparent', fontSize: 10.5, height: 20,
+                border: '1px solid ' + (openBoard.sections.length ? C.green : C.border),
+                color: openBoard.sections.length ? C.green : C.sub,
+              }}
+            />
+            {busy && <CircularProgress size={14} sx={{ color: C.blue }} />}
           </Stack>
 
           <IntakeStep
+            key={openBoard.board.id}
+            initial={(openBoard.board.intake as Partial<IntakeInput>) ?? undefined}
             candidateProvider={provider}
-            onSaveIntake={() => { /* sandbox: nothing persisted */ }}
-            onAcceptProposal={onAccept}
+            onSaveIntake={saveIntake}
+            onAcceptProposal={acceptProposal}
           />
 
-          {result && (
+          {svg && (
             <Box sx={{ px: 3, pb: 4 }}>
               <Typography sx={{ color: '#CBD5E1', fontSize: 13.5, fontWeight: 600, mb: 1 }}>
-                Generated One-Line Diagram
+                One-Line Diagram (from saved design)
               </Typography>
               <Box
-                sx={{
-                  bgcolor: C.surface, border: `1px solid ${C.border}`, borderRadius: '10px',
-                  p: 2, overflowX: 'auto',
-                }}
-                dangerouslySetInnerHTML={{ __html: result.svg }}
+                sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', p: 2, overflowX: 'auto' }}
+                dangerouslySetInnerHTML={{ __html: svg }}
               />
-              <Stack direction="row" spacing={2} sx={{ mt: 1.5 }}>
-                <Typography sx={{ color: C.sub, fontSize: 12 }}>
-                  Total load {result.proposal.totalFeederLoadA} A • Bus {result.proposal.boardPatch.mainBusRatingA ?? '—'} A •
-                  SCCR {result.proposal.boardPatch.sccrKA} kA • {result.proposal.sections.length} section(s)
-                </Typography>
-                {result.proposal.boardPatch.sccrAssumed && (
-                  <Typography sx={{ color: C.amber, fontSize: 12 }}>SCCR assumed — verify utility fault data</Typography>
-                )}
-              </Stack>
             </Box>
           )}
         </Box>
       )}
+
+      <Snackbar
+        open={!!toast}
+        autoHideDuration={3500}
+        onClose={() => setToast(null)}
+        message={toast}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      />
     </Box>
   );
 };
