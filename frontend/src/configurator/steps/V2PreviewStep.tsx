@@ -24,6 +24,7 @@ import DeviceListPanel from './DeviceListPanel';
 import { CIRCUIT_BREAKER_V2_DATA } from '../data/circuitBreakerV2Data';
 import type { CandidateDevice, LineupProposal, IntakeInput } from '../lib/lineup-proposal';
 import { generateSld, SldDevice } from '../lib/sld-generator';
+import { generateElevation, ElevationSection } from '../lib/elevation-generator';
 import type { SectionRole } from '../lib/safety-rules';
 import { useConfigurator } from '../state/ConfiguratorProvider';
 import configuratorV2Service, { FullBoard, SwitchboardRow, CatalogCb } from '../../services/configuratorV2Service';
@@ -114,6 +115,30 @@ function sldFromFull(full: FullBoard): { svg: string } | null {
     busSegments: twoSeg ? 2 : 1,
   });
   return { svg };
+}
+
+/** Front elevation from PERSISTED rows (frames + device lines). */
+function elevationFromFull(full: FullBoard): string {
+  const deviceLines = full.lines.filter((l) => (l.category || '').toUpperCase() === 'CIRCUIT BREAKER');
+  const sections: ElevationSection[] = full.sections.map((sec) => {
+    const f = sec.layout?.frame ?? {};
+    const devs = deviceLines
+      .filter((l) => l.section_id === sec.id)
+      .map((l) => ({
+        designation: l.meta?.designation ?? '?',
+        ratedA: Number(l.meta?.ratedA) || null,
+        heightIn: String(l.meta?.role ?? '').toUpperCase() !== 'FEEDER' ? 20 : 8,
+      }));
+    return {
+      sectionIndex: sec.section_number,
+      widthIn: Number(f.width_in) || 24,
+      heightIn: Number(f.height_in) || 90,
+      topBusZoneIn: Number(f.topBusZone_in) || 12,
+      bottomCableZoneIn: Number(f.bottomCableZone_in) || 16,
+      devices: devs,
+    };
+  });
+  return generateElevation({ title: full.board.name, sections }).svg;
 }
 
 const V2PreviewStep: React.FC = () => {
@@ -631,11 +656,14 @@ const V2PreviewStep: React.FC = () => {
               <Typography sx={{ color: '#CBD5E1', fontSize: 13.5, fontWeight: 600, mb: 1 }}>
                 Front Elevation (estimate only)
               </Typography>
-              <Box sx={{ bgcolor: C.surface, border: '1px dashed ' + C.border, borderRadius: '10px', p: 4, textAlign: 'center' }}>
-                <Typography sx={{ color: C.sub, fontSize: 12.5 }}>
-                  Parametric elevation drawing is being built next — it will render here from the saved frames and device layout.
-                </Typography>
-              </Box>
+              {openBoard.sections.length ? (
+                <Box
+                  sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', p: 2, overflowX: 'auto' }}
+                  dangerouslySetInnerHTML={{ __html: elevationFromFull(openBoard) }}
+                />
+              ) : (
+                <Typography sx={{ color: C.sub, fontSize: 12.5 }}>No saved design yet.</Typography>
+              )}
             </Box>
           ) : boardView === 'components' ? (
             <ComponentsPanel
