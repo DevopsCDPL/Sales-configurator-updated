@@ -25,6 +25,7 @@ import { CIRCUIT_BREAKER_V2_DATA } from '../data/circuitBreakerV2Data';
 import type { CandidateDevice, LineupProposal, IntakeInput } from '../lib/lineup-proposal';
 import { generateSld, SldDevice } from '../lib/sld-generator';
 import { generateElevation, ElevationSection } from '../lib/elevation-generator';
+import { FLOW_STEPS, useFlowState, flowStore, FlowKey } from '../state/flowStore';
 import type { SectionRole } from '../lib/safety-rules';
 import { useConfigurator } from '../state/ConfiguratorProvider';
 import configuratorV2Service, { FullBoard, SwitchboardRow, CatalogCb } from '../../services/configuratorV2Service';
@@ -180,18 +181,9 @@ const V2PreviewStep: React.FC = () => {
   const [sectionCounts, setSectionCounts] = useState<Record<string, number>>({});
   const [loadable, setLoadable] = useState<SwitchboardRow[]>([]);
   const [openBoard, setOpenBoard] = useState<FullBoard | null>(null);
-  const FLOW_STEPS = [
-    ['system', 'System Design'],
-    ['sections', 'Section Design'],
-    ['components', 'Components'],
-    ['sld', 'SLD'],
-    ['elevation', 'Elevation'],
-    ['bom', 'Bill of Materials'],
-    ['quote', 'Quote'],
-    ['drawings', 'Drawings'],
-  ] as const;
-  type FlowKey = typeof FLOW_STEPS[number][0];
-  const [boardView, setBoardView] = useState<FlowKey>('system');
+  const flow = useFlowState();
+  const boardView = flow.step;
+  const setBoardView = (k: FlowKey) => flowStore.set({ step: k });
   const [coDialog, setCoDialog] = useState(false);
   const [coReason, setCoReason] = useState('');
   const [coOrigin, setCoOrigin] = useState<'internal' | 'customer'>('internal');
@@ -226,6 +218,7 @@ const V2PreviewStep: React.FC = () => {
   }, [configurationId]);
 
   useEffect(() => { reload(); refreshCatalog(); }, [reload, refreshCatalog]);
+  useEffect(() => () => { flowStore.set({ boardOpen: false, step: 'system' }); }, []);
 
   const openById = async (id: string) => {
     setBusy(true);
@@ -233,7 +226,7 @@ const V2PreviewStep: React.FC = () => {
     try {
       const full = await configuratorV2Service.getFull(id);
       setOpenBoard(full);
-      setBoardView('system');
+      flowStore.set({ boardOpen: true, accepted: full.sections.length > 0, step: 'system' });
       setSectionCounts((m) => ({ ...m, [id]: full.sections.length || 1 }));
       setSvg(sldFromFull(full)?.svg ?? null);
     } catch (e: any) {
@@ -294,7 +287,7 @@ const V2PreviewStep: React.FC = () => {
       setSectionCounts((m) => ({ ...m, [full.board.id]: full.sections.length }));
       setSvg(sldFromFull({ board: full.board, sections: full.sections, lines: full.lines })?.svg ?? null);
       setToast('Line-up saved to database — ' + full.sections.length + ' section(s)');
-      setBoardView('sections');
+      flowStore.set({ accepted: true, step: 'sections' });
     } catch (e: any) {
       setError(e?.response?.data?.error ?? 'Apply failed');
     } finally {
@@ -459,7 +452,7 @@ const V2PreviewStep: React.FC = () => {
           <Stack direction="row" alignItems="center" spacing={1.5} sx={{ px: 3, pt: 2 }}>
             <Button
               size="small"
-              onClick={() => { setOpenBoard(null); setSvg(null); }}
+              onClick={() => { setOpenBoard(null); setSvg(null); flowStore.set({ boardOpen: false, step: 'system' }); }}
               sx={{ color: C.sub, textTransform: 'none', border: '1px solid ' + C.border }}
             >
               ← Boards
@@ -541,78 +534,6 @@ const V2PreviewStep: React.FC = () => {
               </Button>
             </DialogActions>
           </Dialog>
-
-          {/* ── Engineering flow chips (old strip style: black/grey/sky-blue) ── */}
-          {(() => {
-            const accepted = openBoard.sections.length > 0;
-            const idx = FLOW_STEPS.findIndex(([k]) => k === boardView);
-            const enabled = (k: FlowKey) => k === 'system' || accepted;
-            return (
-              <Box sx={{ px: 3, pt: 1.5 }}>
-                <Box sx={{
-                  display: 'flex', gap: 0.75, overflowX: 'auto', alignItems: 'center',
-                  pb: 1, borderBottom: '1px solid rgba(255,255,255,0.04)',
-                  '&::-webkit-scrollbar': { height: 0 },
-                }}>
-                  {FLOW_STEPS.map(([key, label], i) => {
-                    const active = boardView === key;
-                    const ok = enabled(key);
-                    const accent = '#00c8ff';
-                    return (
-                      <Chip
-                        key={key}
-                        size="small"
-                        label={(i + 1) + '. ' + label}
-                        onClick={() => ok && setBoardView(key)}
-                        sx={{
-                          flexShrink: 0,
-                          cursor: ok ? 'pointer' : 'not-allowed',
-                          opacity: ok ? 1 : 0.35,
-                          fontWeight: active ? 700 : 500,
-                          fontSize: '0.745rem', height: 28, px: 0.5,
-                          border: '1px solid ' + (active ? accent : 'rgba(255,255,255,0.07)'),
-                          bgcolor: active ? accent : 'transparent',
-                          color: active ? '#06151c' : 'rgba(217,228,251,0.78)',
-                          borderRadius: '8px',
-                          '& .MuiChip-label': { px: 1 },
-                          '&:hover': ok ? {
-                            bgcolor: active ? accent : 'rgba(255,255,255,0.05)',
-                            borderColor: active ? accent : 'rgba(255,255,255,0.16)',
-                          } : {},
-                        }}
-                      />
-                    );
-                  })}
-                  <Box sx={{ flex: 1 }} />
-                  <Button
-                    size="small" disabled={idx <= 0}
-                    onClick={() => setBoardView(FLOW_STEPS[idx - 1][0])}
-                    sx={{ flexShrink: 0, color: C.sub, textTransform: 'none', fontSize: 11.5, minWidth: 0, border: '1px solid ' + C.border }}
-                  >
-                    ← Back
-                  </Button>
-                  <Button
-                    size="small"
-                    disabled={idx >= FLOW_STEPS.length - 1 || !enabled(FLOW_STEPS[idx + 1][0])}
-                    onClick={() => setBoardView(FLOW_STEPS[idx + 1][0])}
-                    sx={{
-                      flexShrink: 0, textTransform: 'none', fontSize: 11.5, fontWeight: 700, minWidth: 0,
-                      color: '#06151c', bgcolor: '#00c8ff', px: 1.5,
-                      '&:hover': { bgcolor: '#33d4ff' },
-                      '&.Mui-disabled': { bgcolor: 'rgba(0,200,255,0.15)', color: 'rgba(6,21,28,0.5)' },
-                    }}
-                  >
-                    Next →
-                  </Button>
-                </Box>
-                {!accepted && (
-                  <Typography sx={{ color: C.sub, fontSize: 11, mt: 0.75 }}>
-                    Steps 2–8 unlock after you propose and accept a line-up in System Design.
-                  </Typography>
-                )}
-              </Box>
-            );
-          })()}
 
           {boardView === 'system' ? (
             <IntakeStep

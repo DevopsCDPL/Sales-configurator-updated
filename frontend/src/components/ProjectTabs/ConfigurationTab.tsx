@@ -69,6 +69,7 @@ import type {
 import { ProjectFlowFooter } from './ProjectFlowFooter';
 import type { Project } from '../../types';
 import ConfiguratorShell, { SUBSTEP_LABELS, STANDARD_KEYS } from '../../configurator/steps/ConfiguratorShell';
+import { FLOW_STEPS, useFlowState, flowStore, FlowKey } from '../../configurator/state/flowStore';
 import type { ConfiguratorShellState } from '../../configurator/steps/ConfiguratorShell';
 import type { ConfiguratorSubstepKey } from '../../configurator/steps/StepRouter';
 
@@ -111,6 +112,7 @@ const ConfigurationTab: React.FC<ConfigurationTabProps> = ({ project, onUpdate, 
   const [activeSubstep, setActiveSubstep] = useState<ConfiguratorSubstepKey>('__v2');
   const [configMenuAnchor, setConfigMenuAnchor] = useState<null | HTMLElement>(null);
   const [stickyTop, setStickyTop] = useState(88);
+  const flow = useFlowState();
   const [shellState, setShellState] = useState<ConfiguratorShellState | null>(null);
 
   // V2 redesign: the Designer owns the full flow (System Design → … → Drawings)
@@ -521,8 +523,76 @@ const ConfigurationTab: React.FC<ConfigurationTabProps> = ({ project, onUpdate, 
           </Stack>
         </Box>
 
-        {/* ── Row 2: substep chips (hidden — Designer carries the flow) ── */}
-        {activeConfig && orderedSubsteps.length > 1 && (
+        {/* ── Row 2: board flow chips (sticky, old strip position/style) ── */}
+        {activeConfig && flow.boardOpen && (
+          <Box
+            sx={{
+              display: 'flex', gap: 0.75, overflowX: 'auto', alignItems: 'center',
+              px: { xs: 1.5, md: 2.5 }, py: 1,
+              borderTop: '1px solid rgba(255,255,255,0.04)',
+              '&::-webkit-scrollbar': { height: 0 },
+            }}
+          >
+            {FLOW_STEPS.map(([key, label], i) => {
+              const active = flow.step === key;
+              const ok = key === 'system' || flow.accepted;
+              const accent = '#00c8ff';
+              return (
+                <Chip
+                  key={key}
+                  size="small"
+                  label={(i + 1) + '. ' + label}
+                  onClick={() => ok && flowStore.set({ step: key as FlowKey })}
+                  sx={{
+                    flexShrink: 0,
+                    cursor: ok ? 'pointer' : 'not-allowed',
+                    opacity: ok ? 1 : 0.35,
+                    fontWeight: active ? 700 : 500,
+                    fontSize: '0.745rem', height: 28, px: 0.5,
+                    border: `1px solid ${active ? accent : 'rgba(255,255,255,0.07)'}`,
+                    bgcolor: active ? accent : 'transparent',
+                    color: active ? '#06151c' : 'rgba(217,228,251,0.78)',
+                    borderRadius: '8px',
+                    '& .MuiChip-label': { px: 1 },
+                    '&:hover': ok ? {
+                      bgcolor: active ? accent : 'rgba(255,255,255,0.04)',
+                      borderColor: active ? accent : 'rgba(255,255,255,0.14)',
+                    } : {},
+                  }}
+                />
+              );
+            })}
+            <Box sx={{ flex: 1 }} />
+            {(() => {
+              const idx = FLOW_STEPS.findIndex(([k]) => k === flow.step);
+              const nextOk = idx < FLOW_STEPS.length - 1 && (FLOW_STEPS[idx + 1][0] === 'system' || flow.accepted);
+              return (
+                <>
+                  <Button
+                    size="small" disabled={idx <= 0}
+                    onClick={() => flowStore.set({ step: FLOW_STEPS[idx - 1][0] as FlowKey })}
+                    sx={{ flexShrink: 0, color: 'rgba(217,228,251,0.6)', textTransform: 'none', fontSize: '0.72rem', minWidth: 0, border: '1px solid rgba(255,255,255,0.08)', height: 28 }}
+                  >
+                    ← Back
+                  </Button>
+                  <Button
+                    size="small" disabled={!nextOk}
+                    onClick={() => flowStore.set({ step: FLOW_STEPS[idx + 1][0] as FlowKey })}
+                    sx={{
+                      flexShrink: 0, textTransform: 'none', fontSize: '0.72rem', fontWeight: 700, minWidth: 0, height: 28, px: 1.5,
+                      color: '#06151c', bgcolor: '#00c8ff',
+                      '&:hover': { bgcolor: '#33d4ff' },
+                      '&.Mui-disabled': { bgcolor: 'rgba(0,200,255,0.12)', color: 'rgba(217,228,251,0.35)' },
+                    }}
+                  >
+                    Next →
+                  </Button>
+                </>
+              );
+            })()}
+          </Box>
+        )}
+        {false && activeConfig && orderedSubsteps.length > 1 && (
           <Box
             sx={{
               display: 'flex',
@@ -595,6 +665,10 @@ const ConfigurationTab: React.FC<ConfigurationTabProps> = ({ project, onUpdate, 
             onNext={onNext}
             onShellStateChange={setShellState}
           />
+        ) : loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+            <CircularProgress size={26} sx={{ color: '#00c8ff' }} />
+          </Box>
         ) : (
           <Card
             variant="outlined"
