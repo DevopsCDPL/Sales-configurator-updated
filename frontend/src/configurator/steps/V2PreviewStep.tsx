@@ -18,6 +18,7 @@ import QuotePanel from './QuotePanel';
 import DrawingsPanel from './DrawingsPanel';
 import PriceQueuePanel from './PriceQueuePanel';
 import StandardsPanel from './StandardsPanel';
+import ComponentsPanel from './ComponentsPanel';
 import { CIRCUIT_BREAKER_V2_DATA } from '../data/circuitBreakerV2Data';
 import type { CandidateDevice, LineupProposal, IntakeInput } from '../lib/lineup-proposal';
 import { generateSld, SldDevice } from '../lib/sld-generator';
@@ -152,7 +153,7 @@ const V2PreviewStep: React.FC = () => {
   const [sectionCounts, setSectionCounts] = useState<Record<string, number>>({});
   const [loadable, setLoadable] = useState<SwitchboardRow[]>([]);
   const [openBoard, setOpenBoard] = useState<FullBoard | null>(null);
-  const [boardView, setBoardView] = useState<'design' | 'bom' | 'quote' | 'drawings'>('design');
+  const [boardView, setBoardView] = useState<'design' | 'components' | 'bom' | 'quote' | 'drawings'>('design');
   const [homeView, setHomeView] = useState<'boards' | 'prices' | 'standards'>('boards');
   const [svg, setSvg] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -407,7 +408,7 @@ const V2PreviewStep: React.FC = () => {
 
           {openBoard.sections.length > 0 && (
             <Stack direction="row" spacing={1} sx={{ px: 3, pt: 1.5 }}>
-              {([['design', 'Design'], ['bom', 'Bill of Materials'], ['quote', 'Quote'], ['drawings', 'Drawings']] as const).map(([key, label]) => (
+              {([['design', 'Design'], ['components', 'Components'], ['bom', 'Bill of Materials'], ['quote', 'Quote'], ['drawings', 'Drawings']] as const).map(([key, label]) => (
                 <Button
                   key={key}
                   size="small"
@@ -448,6 +449,12 @@ const V2PreviewStep: React.FC = () => {
                 </Box>
               )}
             </>
+          ) : boardView === 'components' ? (
+            <ComponentsPanel
+              key={'comp-' + openBoard.board.id}
+              board={openBoard}
+              onLinesChanged={(lines) => setOpenBoard((ob) => (ob ? { ...ob, lines } : ob))}
+            />
           ) : boardView === 'bom' ? (
             <BomViewer key={'bom-' + openBoard.board.id} switchboardId={openBoard.board.id} />
           ) : boardView === 'quote' ? (

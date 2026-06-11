@@ -26,7 +26,7 @@ export interface SwitchboardRow {
 export interface SectionRow {
   id: string;
   switchboard_id: string;
-  section_index: number;
+  section_number: number;
   setup?: Record<string, any> | null;
   electrical?: Record<string, any> | null;
   layout?: Record<string, any> | null;
@@ -356,6 +356,28 @@ export const configuratorV2Service = {
   async confirmOrder(quotationId: string): Promise<{ ok: boolean; results: Record<string, any>; stepErrors: [string, string][] }> {
     const res = await api.post(`${ROOT}/handoff/order-confirm`, { quotationId });
     return res.data;
+  },
+
+
+  async addLine(switchboardId: string, line: {
+    scope: 'board' | 'section';
+    section_id?: string | null;
+    component_id?: string | null;
+    category?: string | null;
+    part_number?: string | null;
+    name?: string | null;
+    quantity: number;
+    unit_cost?: number | null;
+    price_status?: 'FIRM' | 'ESTIMATED' | 'PENDING_RFQ';
+    source?: string;
+    meta?: Record<string, any>;
+  }): Promise<ComponentLineRow> {
+    const res = await api.post<ComponentLineRow>(`${ROOT}/switchboards/${switchboardId}/lines`, line);
+    return res.data;
+  },
+
+  async deleteLine(lineId: string, waiverReason?: string): Promise<void> {
+    await api.delete(`${ROOT}/lines/${lineId}`, { data: waiverReason ? { waiverReason } : undefined });
   },
 
   async applyProposal(id: string, payload: {
