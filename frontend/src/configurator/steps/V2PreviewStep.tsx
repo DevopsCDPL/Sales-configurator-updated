@@ -140,9 +140,9 @@ const V2PreviewStep: React.FC = () => {
           border: `1px solid ${C.border}`, fontSize: 12,
         }}
       >
-        V2 PREVIEW SANDBOX — visible only with ?v2=1. Nothing here is saved; engines run fully
-        in your browser (NEC load calc, line-up proposal, SLD). Catalog = bundled CB data until
-        the DB catalog migration lands.
+        DESIGNER (build in progress) — intake, line-up proposal and SLD run live; persistence
+        to the database is the next build step, so refresh still resets. Breaker candidates come from
+        the bundled catalog until the DB catalog import lands.
       </Alert>
 
       {!openBoardId && (

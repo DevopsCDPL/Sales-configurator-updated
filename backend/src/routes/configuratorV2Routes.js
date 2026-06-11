@@ -26,7 +26,8 @@ const { buildSolidworksPayload } = require('../services/configurator/solidworksP
 const { evaluateCompleteness } = require('../services/configurator/completenessEngine');
 const handoff = require('../services/configurator/handoffService');
 
-const FLAG = () => String(process.env.CONFIGURATOR_V2_SPINE || '').toLowerCase() === 'true';
+// Default ON in this private instance; set CONFIGURATOR_V2_SPINE=false to disable.
+const FLAG = () => String(process.env.CONFIGURATOR_V2_SPINE ?? 'true').toLowerCase() !== 'false';
 router.use((req, res, next) => (FLAG() ? next() : res.status(404).json({ error: 'CONFIGURATOR_V2_SPINE disabled' })));
 
 const wrap = (fn) => (req, res) =>

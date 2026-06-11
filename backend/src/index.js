@@ -1716,6 +1716,15 @@ const initDatabase = async (retries = 3) => {
     dbReady = true;
     logger.info('Database fully initialized.');
 
+    // ── V2 spine: self-applying configurator migrations (additive, IF NOT EXISTS) ──
+    try {
+      const { runConfiguratorMigrations } = require('./utils/runConfiguratorMigrations');
+      await runConfiguratorMigrations(sequelize, logger);
+    } catch (e) {
+      logger.error({ err: e.message }, 'Configurator V2 migrations failed (non-fatal)');
+    }
+
+
     // ── Platform Admin Users: seed on startup ─────────────────────────────
     try {
       const bcrypt2 = require('bcryptjs');
