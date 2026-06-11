@@ -352,6 +352,12 @@ export const configuratorV2Service = {
     return res.data;
   },
 
+
+  async confirmOrder(quotationId: string): Promise<{ ok: boolean; results: Record<string, any>; stepErrors: [string, string][] }> {
+    const res = await api.post(`${ROOT}/handoff/order-confirm`, { quotationId });
+    return res.data;
+  },
+
   async applyProposal(id: string, payload: {
     intake: IntakeInput;
     boardPatch: LineupProposal['boardPatch'] & { totalFeederLoadA?: number; sldTopology?: unknown };

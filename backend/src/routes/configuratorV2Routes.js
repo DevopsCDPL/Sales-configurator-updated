@@ -673,6 +673,7 @@ router.post('/handoff/order-confirm', wrap(async (req, res) => {
     quotation, configuration, switchboards,
     userId: req.user?.id, companyId: req.companyId ?? null,
   });
+  if (out.ok) await quotation.update({ status: 'accepted', sold: true, issued_at: quotation.issued_at ?? new Date() });
   res.json(out);
 }));
 

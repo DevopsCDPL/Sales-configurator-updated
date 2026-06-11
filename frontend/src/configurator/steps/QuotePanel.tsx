@@ -86,6 +86,26 @@ const QuotePanel: React.FC<QuotePanelProps> = ({ switchboardId }) => {
 
   useEffect(() => { runPreview(); loadRevisions(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const [confirming, setConfirming] = useState<string | null>(null);
+
+  const confirmOrder = async (quotationId: string) => {
+    setConfirming(quotationId);
+    setError(null);
+    try {
+      const out = await configuratorV2Service.confirmOrder(quotationId);
+      const jobs = out.results?.swJobs?.result?.jobs?.length ?? 0;
+      const demands = out.results?.demands?.result?.demandCount ?? 0;
+      setIssued(out.stepErrors?.length
+        ? 'Order recorded with ' + out.stepErrors.length + ' retryable step error(s) — see handoff events.'
+        : 'Order confirmed — design frozen, ' + jobs + ' CAD job(s) queued, ' + demands + ' material demand(s) raised.');
+      await loadRevisions();
+    } catch (e: any) {
+      setError(e?.response?.data?.error ?? 'Order confirmation failed');
+    } finally {
+      setConfirming(null);
+    }
+  };
+
   const issue = async () => {
     setIssuing(true);
     setError(null);
@@ -281,6 +301,7 @@ const QuotePanel: React.FC<QuotePanelProps> = ({ switchboardId }) => {
                 <TableCell sx={headSx} align="right">GM</TableCell>
                 <TableCell sx={headSx}>REASON</TableCell>
                 <TableCell sx={headSx}>DATE</TableCell>
+                <TableCell sx={headSx} />
               </TableRow>
             </TableHead>
             <TableBody>
@@ -297,6 +318,21 @@ const QuotePanel: React.FC<QuotePanelProps> = ({ switchboardId }) => {
                   <TableCell sx={cellSx} align="right">{(r.margin_pct * 100).toFixed(1)}%</TableCell>
                   <TableCell sx={{ ...cellSx, color: C.sub }}>{r.revision_reason ?? '—'}</TableCell>
                   <TableCell sx={{ ...cellSx, color: C.sub }}>{new Date(r.created_at).toLocaleString()}</TableCell>
+                  <TableCell sx={cellSx}>
+                    {r.id === revisions[0].id && r.status === 'draft' && (
+                      <Button
+                        size="small"
+                        disabled={confirming === r.id}
+                        onClick={() => confirmOrder(r.id)}
+                        sx={{ color: C.green, textTransform: 'none', fontSize: 11, border: '1px solid ' + C.border, whiteSpace: 'nowrap' }}
+                      >
+                        {confirming === r.id ? 'Confirming…' : 'Accept & hand off'}
+                      </Button>
+                    )}
+                    {r.status !== 'draft' && (
+                      <Chip label={r.status} size="small" sx={{ bgcolor: 'transparent', border: '1px solid ' + C.green, color: C.green, fontSize: 9.5, height: 18 }} />
+                    )}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
