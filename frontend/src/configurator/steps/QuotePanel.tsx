@@ -18,6 +18,7 @@ import RequestQuoteRoundedIcon from '@mui/icons-material/RequestQuoteRounded';
 import configuratorV2Service, {
   QuotePreviewResponse, QuoteRevisionRow, LaborAdjustment,
 } from '../../services/configuratorV2Service';
+import QuoteCharts from './QuoteCharts';
 
 const C = {
   bg: '#0D0D14', surface: '#13131E', border: '#1E2235', blue: '#1976D2',
@@ -284,6 +285,9 @@ const QuotePanel: React.FC<QuotePanelProps> = ({ switchboardId }) => {
           ) : null}
         </Box>
       </Stack>
+
+      {/* Visual review before issuing */}
+      {preview && q && <QuoteCharts preview={preview} revisions={revisions} />}
 
       {/* Revision chain */}
       {revisions.length > 0 && (

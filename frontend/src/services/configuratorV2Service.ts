@@ -158,6 +158,7 @@ export interface QuotePreviewResponse {
   nonFirmCount: number;
   blockers: string[];
   canIssue: boolean;
+  bomRows?: { category: string | null; quantity: number; unit_cost: number }[];
 }
 
 export interface QuoteRevisionRow {

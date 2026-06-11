@@ -51,10 +51,111 @@ async function saveStandardsVersion(tableKey, rows, notes) {
   });
 }
 
+/** Parse "Fixed 3P -301 x 276 x 209mm" → inches {h,w,d} (mm source). */
+function parseDims(s) {
+  const m = String(s || '').match(/(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)/i);
+  if (!m) return null;
+  const mm2in = (x) => Math.round((Number(x) / 25.4) * 100) / 100;
+  return { h: mm2in(m[1]), w: mm2in(m[2]), d: mm2in(m[3]) };
+}
+
+/** CB decoder workbook (CB_Selection sheet): enrich breaker catalog with
+ *  manufacturer catalog numbers, dimensions, prices. Match by
+ *  (frameModel, ratedA, mounting, poles); never rewrites part_number. */
+async function importCbDecoder(wb, out) {
+  const ws = wb.getWorksheet('CB_Selection');
+  const comps = await models.ConfiguratorComponent.findAll({ where: { category: 'CIRCUIT BREAKER' } });
+  const norm = (x) => String(x || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const rows = [];
+  ws.eachRow((row, rn) => { if (rn >= 4) rows.push(row); });
+
+  for (const row of rows) {
+    const get = (i) => unwrap(row.getCell(i).value);
+    const frame = str(get(5));
+    if (!frame) continue;
+    const type = str(get(2)) || 'MCCB';
+    const manufacturer = String(str(get(3)) || '').replace(/_/g, ' ');
+    const series = str(get(4));
+    const ratedA = parseInt(String(get(6)), 10) || 0;
+    const kA = parseInt(String(get(7)), 10) || 0;
+    const poles = parseInt(String(get(8)), 10) || 3;
+    const voltage = str(get(9));
+    const tripUnit = str(get(10));
+    const protection = str(get(11));
+    const mounting = /draw|with/i.test(String(get(12) || '')) ? 'Drawout' : 'Fixed';
+    const application = str(get(13));
+    const mfrRef = str(get(14));
+    const dims = parseDims(get(15));
+    const price = Number(String(get(16) || '').replace(/[^0-9.]/g, '')) || null;
+    if (!ratedA) { out.cbUnmatched += 1; continue; }
+
+    const spec = {
+      manufacturer, series, frameModel: frame,
+      deviceClass: ['ACB', 'ICCB', 'MCCB', 'MCB'].includes(String(type).toUpperCase()) ? String(type).toUpperCase() : 'MCCB',
+      ratedCurrentA: ratedA, interruptingKA: kA, poles,
+      voltageRating: voltage, tripUnitType: tripUnit, protectionFunctions: protection,
+      mounting, applicationType: application,
+      ...(mfrRef ? { catalogNumber: mfrRef } : {}),
+      source: 'CB Decoder.xlsx',
+    };
+    const fields = {
+      specifications: spec,
+      ...(dims ? { dims_h_in: dims.h, dims_w_in: dims.w, dims_d_in: dims.d } : {}),
+      ...(price ? { price, mat_cost: price, material_cost: price, price_status: 'FIRM' } : {}),
+    };
+
+    // Match existing: frame prefix + rating + poles + mounting
+    const match = comps.find((c) => {
+      const sp = c.specifications || {};
+      const fm = norm(sp.frameModel);
+      return fm && (norm(frame).startsWith(fm) || fm.startsWith(norm(frame)))
+        && (parseInt(sp.ratedCurrentA, 10) || 0) === ratedA
+        && (parseInt(sp.poles, 10) || 3) === poles
+        && String(sp.mounting || 'Fixed') === mounting;
+    });
+
+    if (match) {
+      await match.update({
+        ...fields,
+        specifications: { ...(match.specifications || {}), ...spec },
+        ...(price ? {} : {}), // price only when present; keep existing otherwise
+      }).catch((e) => out.warnings.push(`CB ${frame}: ${e.message}`));
+      out.cbEnriched += 1;
+    } else {
+      const partNumber = [String(manufacturer).replace(/\s+/g, '_'), frame.replace(/\s+/g, ''), ratedA, poles + 'P', mounting].join('-');
+      const exists = comps.find((c) => c.part_number === partNumber);
+      if (exists) { out.cbEnriched += 1; await exists.update(fields).catch(() => {}); }
+      else {
+        await models.ConfiguratorComponent.create({
+          category: 'CIRCUIT BREAKER',
+          component_type: 'CIRCUIT_BREAKER',
+          part_number: partNumber,
+          name: [manufacturer, series, frame].filter(Boolean).join(' '),
+          is_active: true,
+          price: price ?? 0, mat_cost: price ?? 0, material_cost: price ?? 0,
+          price_status: price ? 'FIRM' : 'PENDING_RFQ',
+          standards_regime: /UL|ANSI/i.test(String(voltage)) ? 'UL' : 'IEC',
+          ...(dims ? { dims_h_in: dims.h, dims_w_in: dims.w, dims_d_in: dims.d } : {}),
+          specifications: spec,
+        }).catch((e) => out.warnings.push(`CB create ${frame}: ${e.message}`));
+        out.cbCreated += 1;
+      }
+    }
+    if (mfrRef) out.cbWithCatalogNumber += 1;
+    if (price) out.cbPriced += 1;
+  }
+}
+
 async function importTpsWorkbook(buffer, { companyId = null } = {}) {
   const wb = new ExcelJS.Workbook();
   await wb.xlsx.load(buffer);
-  const out = { componentsCreated: 0, componentsUpdated: 0, busScheduleRows: 0, neutralRows: 0, copperPricePerLb: null, ratesFound: {}, warnings: [] };
+  const out = { componentsCreated: 0, componentsUpdated: 0, busScheduleRows: 0, neutralRows: 0, copperPricePerLb: null, ratesFound: {}, cbEnriched: 0, cbCreated: 0, cbWithCatalogNumber: 0, cbPriced: 0, cbUnmatched: 0, warnings: [] };
+
+  // CB decoder workbook? (CB_Selection sheet) — enrichment path
+  if (wb.getWorksheet('CB_Selection')) {
+    await importCbDecoder(wb, out);
+    return out;
+  }
 
   /* ── 1. COMPONENTS sheet → catalog with labour hours ── */
   const comp = wb.getWorksheet('COMPONENTS');

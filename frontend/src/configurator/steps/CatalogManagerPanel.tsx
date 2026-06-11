@@ -18,6 +18,8 @@ import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import UploadFileRoundedIcon from '@mui/icons-material/UploadFileRounded';
+import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
+import TableRowsRoundedIcon from '@mui/icons-material/TableRowsRounded';
 import { configuratorService, ConfiguratorComponent } from '../../services/configuratorService';
 import configuratorV2Service from '../../services/configuratorV2Service';
 
@@ -61,6 +63,7 @@ const CatalogManagerPanel: React.FC = () => {
   const [rows, setRows] = useState<ConfiguratorComponent[]>([]);
   const [loading, setLoading] = useState(true);
   const [edit, setEdit] = useState<EditState | null>(null);
+  const [view, setView] = useState<'cards' | 'list'>('cards');
   const [saving, setSaving] = useState(false);
   const [importing, setImporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -224,10 +227,78 @@ const CatalogManagerPanel: React.FC = () => {
           sx={{ ...inputSx, flex: 1, maxWidth: 420 }}
         />
         <Button onClick={search} sx={{ color: C.sub, textTransform: 'none', fontSize: 12, border: '1px solid ' + C.border }}>Search</Button>
+        <Box sx={{ flex: 1 }} />
+        <Stack direction="row" spacing={0}>
+          {([['cards', GridViewRoundedIcon], ['list', TableRowsRoundedIcon]] as const).map(([key, Icon]) => (
+            <IconButton
+              key={key} size="small" onClick={() => setView(key)}
+              sx={{
+                color: view === key ? '#fff' : C.sub, borderRadius: '6px',
+                bgcolor: view === key ? C.blue : 'transparent',
+                border: '1px solid ' + (view === key ? C.blue : C.border),
+                ml: key === 'list' ? 0.5 : 0,
+              }}
+            >
+              <Icon sx={{ fontSize: 16 }} />
+            </IconButton>
+          ))}
+        </Stack>
       </Stack>
 
       {loading ? (
         <Stack alignItems="center" sx={{ py: 5 }}><CircularProgress size={22} sx={{ color: C.blue }} /></Stack>
+      ) : view === 'cards' ? (
+        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: 1.5 }}>
+          {rows.map((r) => {
+            const hours = BUCKETS.map((b) => Number((r as any)[b]) || 0).reduce((a, b) => a + b, 0);
+            const rfq = (r as any).price_status === 'PENDING_RFQ';
+            return (
+              <Box
+                key={r.id}
+                sx={{
+                  bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', p: 1.5,
+                  transition: 'border-color .15s', '&:hover': { borderColor: '#2A3050' },
+                  display: 'flex', flexDirection: 'column', gap: 0.75,
+                }}
+              >
+                <Stack direction="row" alignItems="flex-start" spacing={1}>
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Typography sx={{ color: C.text, fontSize: 12.5, fontWeight: 600, lineHeight: 1.3 }} noWrap title={r.name ?? ''}>
+                      {r.name}
+                    </Typography>
+                    <Typography sx={{ color: C.sub, fontSize: 10.5 }} noWrap>
+                      {r.part_number ?? (r as any).specifications?.catalogNumber ?? '—'}
+                    </Typography>
+                  </Box>
+                  <Chip
+                    label={rfq ? 'RFQ' : 'FIRM'} size="small"
+                    sx={{ bgcolor: 'transparent', border: '1px solid ' + (rfq ? C.amber : C.green), color: rfq ? C.amber : C.green, fontSize: 8.5, height: 16 }}
+                  />
+                </Stack>
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <Chip label={r.category} size="small" sx={{ bgcolor: 'rgba(25,118,210,0.10)', color: '#60A5FA', fontSize: 9, height: 17 }} />
+                  <Box sx={{ flex: 1 }} />
+                  <Typography sx={{ color: C.text, fontSize: 13.5, fontWeight: 700 }}>
+                    {Number(r.price) ? usd(Number(r.price)) : '—'}
+                  </Typography>
+                </Stack>
+                <Stack direction="row" alignItems="center" spacing={0.5}>
+                  <Typography sx={{ color: C.sub, fontSize: 10.5, flex: 1 }}>
+                    {hours > 0 ? hours.toFixed(2) + ' h labour' : 'no labour hours'}
+                  </Typography>
+                  <IconButton size="small" onClick={() => openEdit(r)} sx={{ color: C.sub, p: 0.4, '&:hover': { color: C.blue } }}><EditRoundedIcon sx={{ fontSize: 14 }} /></IconButton>
+                  <IconButton size="small" onClick={() => openEdit(r, true)} sx={{ color: C.sub, p: 0.4, '&:hover': { color: C.blue } }}><ContentCopyRoundedIcon sx={{ fontSize: 13 }} /></IconButton>
+                  <IconButton size="small" onClick={() => remove(r)} sx={{ color: C.sub, p: 0.4, '&:hover': { color: C.red } }}><DeleteOutlineRoundedIcon sx={{ fontSize: 14 }} /></IconButton>
+                </Stack>
+              </Box>
+            );
+          })}
+          {!rows.length && (
+            <Typography sx={{ color: C.sub, fontSize: 12.5, p: 3 }}>
+              No components in this view — add one or import the TPS workbook.
+            </Typography>
+          )}
+        </Box>
       ) : (
         <Box sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', overflow: 'auto' }}>
           <Table size="small" sx={{ minWidth: 900 }}>
