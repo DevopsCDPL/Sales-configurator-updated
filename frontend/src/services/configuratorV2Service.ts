@@ -409,6 +409,19 @@ export const configuratorV2Service = {
     return res.data;
   },
 
+
+  async downloadQuotePdf(quotationId: string, filenameHint?: string): Promise<void> {
+    const res = await api.get(`${ROOT}/quotations/${quotationId}/pdf`, { responseType: 'blob' });
+    const url = URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filenameHint ?? 'quotation.pdf';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  },
+
   async applyProposal(id: string, payload: {
     intake: IntakeInput;
     boardPatch: LineupProposal['boardPatch'] & { totalFeederLoadA?: number; sldTopology?: unknown };

@@ -32,6 +32,7 @@ const { estimateCopper } = require('../services/configurator/copperEstimator');
 const { compileBoardBom } = require('../services/configurator/v2BomService');
 const v2Quote = require('../services/configurator/v2QuoteService');
 const { importTpsWorkbook } = require('../services/configurator/workbookImporter');
+const { renderV2QuotationPdf } = require('../services/configurator/v2QuotePdf');
 const multer = require('multer');
 const wbUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20 * 1024 * 1024 } });
 
@@ -488,6 +489,21 @@ router.post('/switchboards/:id/quote', wrap(async (req, res) => {
     res.status(201).json(out);
   } catch (e) {
     if (e.status) return res.status(e.status).json({ error: e.message, details: e.details });
+    throw e;
+  }
+}));
+
+/** Client-facing PDF for an issued V2 revision (download). */
+router.get('/quotations/:id/pdf', wrap(async (req, res) => {
+  try {
+    const { buffer, filename } = await renderV2QuotationPdf(req.params.id, {
+      companyId: req.companyId ?? null,
+    });
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(buffer);
+  } catch (e) {
+    if (e.status) return res.status(e.status).json({ error: e.message });
     throw e;
   }
 }));

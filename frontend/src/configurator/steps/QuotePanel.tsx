@@ -15,6 +15,7 @@ import {
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import RequestQuoteRoundedIcon from '@mui/icons-material/RequestQuoteRounded';
+import PictureAsPdfRoundedIcon from '@mui/icons-material/PictureAsPdfRounded';
 import configuratorV2Service, {
   QuotePreviewResponse, QuoteRevisionRow, LaborAdjustment,
 } from '../../services/configuratorV2Service';
@@ -325,6 +326,14 @@ const QuotePanel: React.FC<QuotePanelProps> = ({ switchboardId }) => {
                   <TableCell sx={{ ...cellSx, color: C.sub }}>{r.revision_reason ?? '—'}</TableCell>
                   <TableCell sx={{ ...cellSx, color: C.sub }}>{new Date(r.created_at).toLocaleString()}</TableCell>
                   <TableCell sx={cellSx}>
+                    <Button
+                      size="small"
+                      startIcon={<PictureAsPdfRoundedIcon sx={{ fontSize: 13 }} />}
+                      onClick={() => configuratorV2Service.downloadQuotePdf(r.id, r.quotation_number + '.pdf')}
+                      sx={{ color: C.sub, textTransform: 'none', fontSize: 11, minWidth: 0, mr: 0.5, '&:hover': { color: C.text } }}
+                    >
+                      PDF
+                    </Button>
                     {r.id === revisions[0].id && r.status === 'draft' && (
                       <Button
                         size="small"
