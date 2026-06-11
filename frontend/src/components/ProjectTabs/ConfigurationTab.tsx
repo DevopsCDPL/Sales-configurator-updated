@@ -69,6 +69,7 @@ import type {
 import { ProjectFlowFooter } from './ProjectFlowFooter';
 import type { Project } from '../../types';
 import ConfiguratorShell, { SUBSTEP_LABELS, STANDARD_KEYS } from '../../configurator/steps/ConfiguratorShell';
+import { isV2PreviewEnabled } from '../../configurator/steps/V2PreviewStep';
 import type { ConfiguratorShellState } from '../../configurator/steps/ConfiguratorShell';
 import type { ConfiguratorSubstepKey } from '../../configurator/steps/StepRouter';
 
@@ -113,7 +114,9 @@ const ConfigurationTab: React.FC<ConfigurationTabProps> = ({ project, onUpdate, 
   const [stickyTop, setStickyTop] = useState(88);
   const [shellState, setShellState] = useState<ConfiguratorShellState | null>(null);
 
-  const orderedSubsteps: ConfiguratorSubstepKey[] = [...STANDARD_KEYS, '__preview'];
+  const orderedSubsteps: ConfiguratorSubstepKey[] = isV2PreviewEnabled()
+    ? [...STANDARD_KEYS, '__preview', '__v2']
+    : [...STANDARD_KEYS, '__preview'];
 
   /* â”€â”€â”€ Load saved configurations for this project â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   const reload = useCallback(async () => {

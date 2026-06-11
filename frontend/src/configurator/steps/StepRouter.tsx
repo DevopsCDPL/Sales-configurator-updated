@@ -16,8 +16,9 @@ import CategoryComponentPicker from './CategoryComponentPicker';
 import PlusCompStep from './PlusCompStep';
 import SLDStep from './SLDStep';
 import PreviewStep from './PreviewStep';
+import V2PreviewStep from './V2PreviewStep';
 
-export type ConfiguratorPhantomStepKey = '__preview';
+export type ConfiguratorPhantomStepKey = '__preview' | '__v2';
 export type ConfiguratorSubstepKey = ConfiguratorStepKey | ConfiguratorPhantomStepKey;
 
 interface Props {
@@ -26,6 +27,7 @@ interface Props {
 
 const StepRouter: React.FC<Props> = ({ stepKey }) => {
   if (stepKey === '__preview') return <PreviewStep />;
+  if (stepKey === '__v2') return <V2PreviewStep />;
   if (stepKey === 'system_design') return <SystemDesignStep />;
   if (stepKey === 'plus_comp') return <PlusCompStep />;
   if (stepKey === 'sld') return <SLDStep />;

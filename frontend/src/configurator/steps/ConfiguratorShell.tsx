@@ -68,6 +68,7 @@ export const SUBSTEP_LABELS: Record<ConfiguratorSubstepKey, string> = {
   plus_comp: '+ Comp',
   sld: 'SLD',
   __preview: 'Preview',
+  __v2: 'V2 Preview',
 };
 
 export interface ConfiguratorShellProps {
