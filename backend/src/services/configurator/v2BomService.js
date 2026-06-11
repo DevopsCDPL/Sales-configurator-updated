@@ -40,6 +40,7 @@ async function compileBoardBom(switchboardId, { copperPricePerLb = null } = {}) 
     stdRows('frame_library'),
   ]);
   const neutralSchedule = await stdRows('neutral_bus_schedule');
+  const safetyItemsMap = await stdRows('safety_items_map');
 
   const bd = board.board_data || {};
   const frameOf = (s) => s.layout?.frame
@@ -101,10 +102,19 @@ async function compileBoardBom(switchboardId, { copperPricePerLb = null } = {}) 
   );
 
   const bom = compileBomV2(
-    { id: board.id, name: board.name, boardData: bd },
+    {
+      id: board.id, name: board.name,
+      boardData: {
+        ...bd,
+        _facts: {
+          serviceEntrance: !!board.service_entrance,
+          environment: board.intake?.environment ?? bd.environment ?? 'Indoor',
+        },
+      },
+    },
     sections,
     lines,
-    { busSchedule, busSupportSpacing, frameLibrary },
+    { busSchedule, busSupportSpacing, frameLibrary, safetyItemsMap },
     copper.estimatedLbs > 0 ? copper : null
   );
 

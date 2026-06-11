@@ -104,6 +104,35 @@ function compileBomV2(board, sections, lines, std, copperEst = null) {
     }
   }
 
+  // 6b. GEN-SAFETY — safety items map (rules R7–R10, Phase B §6)
+  //     qtyFormula-driven; rows priced 0/PENDING_RFQ until TPS maps SKUs.
+  const boardFacts = bd._facts ?? {};
+  const drawoutCount = lines.filter((l) =>
+    (l.category || '').toUpperCase() === 'CIRCUIT BREAKER'
+    && String(l.meta?.mounting ?? '').toLowerCase().includes('draw')).length;
+  const tieCount = lines.filter((l) => String(l.meta?.role ?? '').toUpperCase() === 'TIE').length;
+  for (const item of std.safetyItemsMap ?? []) {
+    // R7 only for service entrance; R10 only outdoor
+    if (item.ruleId === 'R7' && !boardFacts.serviceEntrance) continue;
+    if (item.ruleId === 'R10' && String(boardFacts.environment ?? 'Indoor') !== 'Outdoor') continue;
+    if (['R2', 'R3', 'R4'].includes(item.ruleId)) continue; // already generated above
+    let qty = 0;
+    switch (item.qtyFormula) {
+      case 'per_board': qty = 1; break;
+      case 'per_section': qty = Math.max(sections.length, 1); break;
+      case 'per_drawout_device': qty = drawoutCount; break;
+      case 'per_tie': qty = tieCount; break;
+      default: qty = 0;
+    }
+    if (qty <= 0) continue;
+    rows.push({
+      ...genRow(board, 'GEN-SAFETY', hashInputs({ r: item.ruleId, qty }), 'SAFETY',
+        `${item.description} [${item.ruleId}]`, qty, 'ea'),
+      part_number: item.partNumber ?? null,
+      price_status: item.partNumber ? 'FIRM' : 'PENDING_RFQ',
+    });
+  }
+
   // 7. GEN-LUG — terminations [v1: devices × poles]
   const deviceLines = lines.filter((l) => (l.category || '').toUpperCase() === 'CIRCUIT BREAKER');
   const lugQty = deviceLines.reduce((a, l) => a + (Number(l.meta?.poles) || 3) * (Number(l.quantity) || 1), 0);
