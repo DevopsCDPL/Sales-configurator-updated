@@ -34,6 +34,7 @@ const v2Quote = require('../services/configurator/v2QuoteService');
 const { importTpsWorkbook } = require('../services/configurator/workbookImporter');
 const { renderV2QuotationPdf } = require('../services/configurator/v2QuotePdf');
 const { buildEpicorWorkbook } = require('../services/configurator/epicorExport');
+const { buildProposalPdf } = require('../services/configurator/tpsProposalPdf');
 const multer = require('multer');
 const wbUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20 * 1024 * 1024 } });
 
@@ -514,6 +515,23 @@ router.get('/quotations/:id/epicor-export', wrap(async (req, res) => {
   try {
     const { buffer, filename } = await buildEpicorWorkbook(req.params.id);
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(buffer);
+  } catch (e) {
+    if (e.status) return res.status(e.status).json({ error: e.message });
+    throw e;
+  }
+}));
+
+/** CLIENT-FACING proposal (TPS template): all boards of the
+ *  configuration with issued quotations, max 4 items, sell prices only. */
+router.get('/configurations/:configId/proposal-pdf', wrap(async (req, res) => {
+  try {
+    const { buffer, filename } = await buildProposalPdf(req.params.configId, {
+      companyId: req.companyId ?? null,
+      user: req.user ? { name: req.user.name ?? [req.user.first_name, req.user.last_name].filter(Boolean).join(' '), email: req.user.email } : null,
+    });
+    res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     res.send(buffer);
   } catch (e) {

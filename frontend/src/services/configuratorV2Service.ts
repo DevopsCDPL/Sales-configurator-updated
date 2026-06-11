@@ -448,6 +448,19 @@ export const configuratorV2Service = {
     URL.revokeObjectURL(url);
   },
 
+
+  async downloadProposalPdf(configurationId: string): Promise<void> {
+    const res = await api.get(`${ROOT}/configurations/${configurationId}/proposal-pdf`, { responseType: 'blob' });
+    const url = URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'TPS_Proposal.pdf';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  },
+
   async applyProposal(id: string, payload: {
     intake: IntakeInput;
     boardPatch: LineupProposal['boardPatch'] & { totalFeederLoadA?: number; sldTopology?: unknown };

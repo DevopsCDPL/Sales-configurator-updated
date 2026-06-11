@@ -319,7 +319,7 @@ const V2PreviewStep: React.FC = () => {
         </Stack>
       ) : !openBoard ? (
         <Box>
-          <Stack direction="row" spacing={1} sx={{ px: 3, pt: 1.5 }}>
+          <Stack direction="row" spacing={1} sx={{ px: 3, pt: 1.5 }} alignItems="center">
             {([['boards', 'Boards'], ['catalog', 'Catalog'], ['prices', 'Awaiting price'], ['standards', 'Standards']] as const).map(([key, label]) => (
               <Button
                 key={key}
@@ -336,6 +336,25 @@ const V2PreviewStep: React.FC = () => {
                 {label}
               </Button>
             ))}
+            <Box sx={{ flex: 1 }} />
+            <Button
+              size="small"
+              onClick={async () => {
+                try {
+                  if (configurationId) await configuratorV2Service.downloadProposalPdf(configurationId);
+                } catch (e: any) {
+                  setError(e?.response?.status === 422
+                    ? 'No issued quotations yet — open a board, go to Quote and issue first.'
+                    : (e?.response?.data?.error ?? 'Proposal generation failed'));
+                }
+              }}
+              sx={{
+                textTransform: 'none', fontSize: 12, px: 1.5, color: '#fff',
+                bgcolor: C.green, fontWeight: 700, '&:hover': { bgcolor: '#16A34A' },
+              }}
+            >
+              Client proposal (PDF)
+            </Button>
           </Stack>
           {homeView === 'catalog' ? (
             <CatalogManagerPanel />
