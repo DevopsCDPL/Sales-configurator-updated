@@ -113,7 +113,8 @@ router.post('/configurations/:configId/switchboards', wrap(async (req, res) => {
     const idMap = new Map();
     for (const s of sections) {
       const ns = await models.ConfiguratorSystemSection.create({
-        switchboard_id: row.id, section_index: s.section_index,
+        configuration_id: row.configuration_id,
+        switchboard_id: row.id, section_number: s.section_number,
         setup: s.setup, electrical: s.electrical, layout: s.layout, computed: s.computed,
         company_id: req.companyId ?? null,
       }).catch(() => null);
@@ -217,7 +218,7 @@ router.post('/switchboards/:id/completeness', wrap(async (req, res) => {
     rules.map((r) => r.toJSON()),
     {
       boardType: board.board_type ?? '*',
-      sections: sections.map((s) => ({ sectionIndex: s.section_index, role: s.setup?.role ?? s.setup?.sectionType })),
+      sections: sections.map((s) => ({ sectionIndex: s.section_number, role: s.setup?.role ?? s.setup?.sectionType })),
       lines: lines.map((l) => ({ category: l.category, scope: l.scope, sectionIndex: null, quantity: Number(l.quantity) })),
       laborTotalHours: Number(req.body?.laborTotalHours ?? 0),
       waivers: req.body?.waivers ?? [],
@@ -315,7 +316,7 @@ router.get('/switchboards/:id/full', wrap(async (req, res) => {
   if (!board) return res.status(404).json({ error: 'not found' });
   const sections = await models.ConfiguratorSystemSection.findAll({
     where: { switchboard_id: board.id },
-    order: [['section_index', 'ASC']],
+    order: [['section_number', 'ASC']],
   });
   const lines = await models.ConfiguratorComponentLine.findAll({
     where: { switchboard_id: board.id },
@@ -368,8 +369,9 @@ router.post('/switchboards/:id/apply-proposal', wrap(async (req, res) => {
     const createdSections = [];
     for (const sec of sections) {
       const row = await models.ConfiguratorSystemSection.create({
+        configuration_id: board.configuration_id,
         switchboard_id: board.id,
-        section_index: sec.sectionIndex,
+        section_number: sec.sectionIndex,
         name: `Section ${sec.sectionIndex}`,
         setup: { role: sec.role },
         electrical: sec.electrical ?? {},
@@ -411,7 +413,7 @@ router.post('/switchboards/:id/apply-proposal', wrap(async (req, res) => {
   });
 
   const sectionsOut = await models.ConfiguratorSystemSection.findAll({
-    where: { switchboard_id: board.id }, order: [['section_index', 'ASC']],
+    where: { switchboard_id: board.id }, order: [['section_number', 'ASC']],
   });
   const linesOut = await models.ConfiguratorComponentLine.findAll({
     where: { switchboard_id: board.id }, order: [['created_at', 'ASC']],

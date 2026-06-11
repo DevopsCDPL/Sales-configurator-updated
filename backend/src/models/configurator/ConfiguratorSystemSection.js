@@ -31,6 +31,12 @@ module.exports = (sequelize) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
+      /** V2 spine: section belongs to a switchboard (nullable for legacy rows) */
+      switchboard_id: { type: DataTypes.UUID, allowNull: true },
+      setup: { type: DataTypes.JSONB, allowNull: true, defaultValue: {} },
+      electrical: { type: DataTypes.JSONB, allowNull: true, defaultValue: {} },
+      layout: { type: DataTypes.JSONB, allowNull: true, defaultValue: {} },
+      computed: { type: DataTypes.JSONB, allowNull: true, defaultValue: {} },
       name: { type: DataTypes.STRING(120), allowNull: true },
       definition: {
         type: DataTypes.JSONB,

@@ -108,12 +108,12 @@ const ConfigurationTab: React.FC<ConfigurationTabProps> = ({ project, onUpdate, 
   const [configurations, setConfigurations] = useState<ConfigurationSummary[]>([]);
   const [activeConfig, setActiveConfig] = useState<Configuration | null>(null);
   const [creating, setCreating] = useState(false);
-  const [activeSubstep, setActiveSubstep] = useState<ConfiguratorSubstepKey>('system_design');
+  const [activeSubstep, setActiveSubstep] = useState<ConfiguratorSubstepKey>('__v2');
   const [configMenuAnchor, setConfigMenuAnchor] = useState<null | HTMLElement>(null);
   const [stickyTop, setStickyTop] = useState(88);
   const [shellState, setShellState] = useState<ConfiguratorShellState | null>(null);
 
-  const orderedSubsteps: ConfiguratorSubstepKey[] = [...STANDARD_KEYS, '__preview', '__v2'];
+  const orderedSubsteps: ConfiguratorSubstepKey[] = ['__v2', ...STANDARD_KEYS, '__preview'];
 
   /* â”€â”€â”€ Load saved configurations for this project â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   const reload = useCallback(async () => {

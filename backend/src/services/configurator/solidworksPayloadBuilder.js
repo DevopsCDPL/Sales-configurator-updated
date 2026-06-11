@@ -18,7 +18,7 @@ async function buildSolidworksPayload(switchboardId, { requestedArtifacts = ['GA
 
   const sections = await models.ConfiguratorSystemSection.findAll({
     where: { switchboard_id: switchboardId },
-    order: [['section_index', 'ASC']],
+    order: [['section_number', 'ASC']],
   }).catch(() => []);
 
   const lines = await models.ConfiguratorComponentLine.findAll({
@@ -36,7 +36,7 @@ async function buildSolidworksPayload(switchboardId, { requestedArtifacts = ['GA
       .filter((l) => (l.category || '').toUpperCase() === 'CIRCUIT BREAKER')
       .map((l, i) => ({
         lineId: l.id,
-        designation: (l.meta && l.meta.designation) || `D${s.section_index}-${i + 1}`,
+        designation: (l.meta && l.meta.designation) || `D${s.section_number}-${i + 1}`,
         partNumber: l.part_number,
         manufacturer: l.component?.specifications?.manufacturer ?? l.meta?.manufacturer ?? null,
         frameModel: l.component?.specifications?.frameModel ?? l.meta?.frameModel ?? null,
@@ -51,7 +51,7 @@ async function buildSolidworksPayload(switchboardId, { requestedArtifacts = ['GA
         offsetFromTop_in: l.meta?.offsetFromTop_in ?? null,
       }));
     return {
-      sectionIndex: s.section_index,
+      sectionIndex: s.section_number,
       role: setup.role ?? setup.sectionType ?? null,
       frameCode: layout.frameCode ?? computed.requiredFrameCode ?? null,
       frame: layout.frame ?? null,
