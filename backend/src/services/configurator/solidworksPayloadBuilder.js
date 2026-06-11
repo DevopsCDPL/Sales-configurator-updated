@@ -8,7 +8,7 @@
  * need cost). Validated against a JSON shape check at enqueue.
  */
 
-const { models } = require('../../models');
+const models = require('../../models');
 
 const PAYLOAD_VERSION = '1.0';
 

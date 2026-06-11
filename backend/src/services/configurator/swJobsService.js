@@ -9,7 +9,8 @@
  */
 
 const crypto = require('crypto');
-const { models, sequelize } = require('../../models');
+const models = require('../../models');
+const { sequelize } = models;
 
 const RETRYABLE = new Set(['SW_HUNG', 'SW_CRASH', 'LICENSE_UNAVAILABLE', 'GEOMETRY_FAIL', 'UPLOAD_FAIL']);
 const BACKOFF_MIN = [1, 5, 15]; // Phase E §1 E1-3

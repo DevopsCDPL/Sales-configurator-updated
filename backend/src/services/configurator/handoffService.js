@@ -9,7 +9,7 @@
  * is never rolled back.
  */
 
-const { models } = require('../../models');
+const models = require('../../models');
 const swJobs = require('./swJobsService');
 const { buildSolidworksPayload } = require('./solidworksPayloadBuilder');
 

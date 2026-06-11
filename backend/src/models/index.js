@@ -906,6 +906,8 @@ for (const Model of uniqueTenantModels) {
 
 module.exports = {
   sequelize,
+  // V2 spine: every configurator model auto-exported (Switchboard, ComponentLine, …)
+  ...configuratorModels,
   activateRls,
   isRlsActive,
   User,
