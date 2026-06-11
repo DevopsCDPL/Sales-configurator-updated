@@ -18,7 +18,7 @@ import type { CandidateDevice, LineupProposal, IntakeInput } from '../lib/lineup
 import { generateSld, SldDevice } from '../lib/sld-generator';
 import type { SectionRole } from '../lib/safety-rules';
 import { useConfigurator } from '../state/ConfiguratorProvider';
-import configuratorV2Service, { FullBoard, SwitchboardRow } from '../../services/configuratorV2Service';
+import configuratorV2Service, { FullBoard, SwitchboardRow, CatalogCb } from '../../services/configuratorV2Service';
 
 const C = {
   bg: '#0D0D14', surface: '#13131E', border: '#1E2235', blue: '#1976D2',
@@ -26,6 +26,17 @@ const C = {
 };
 
 /* candidate provider over bundled catalog (until DB catalog import) */
+function providerFromList(parsed: CandidateDevice[]) {
+  return (q: { role: SectionRole; designCurrentA: number; sccrKA: number; poles: number }) => {
+    const wantClass = q.role === 'FEEDER' ? ['MCCB', 'MCB'] : ['ACB', 'ICCB'];
+    let pool = parsed.filter((c) => c.ratedA >= q.designCurrentA && wantClass.includes(c.deviceClass));
+    const kaOk = pool.filter((c) => c.interruptingKA >= q.sccrKA);
+    if (kaOk.length) pool = kaOk;
+    if (!pool.length) pool = parsed.filter((c) => c.ratedA >= q.designCurrentA);
+    return pool.sort((a, b) => (a.price ?? Infinity) - (b.price ?? Infinity) || a.ratedA - b.ratedA).slice(0, 5);
+  };
+}
+
 function makeCandidateProvider() {
   const parsed: CandidateDevice[] = (CIRCUIT_BREAKER_V2_DATA as any[]).map((e: any, i: number) => {
     const ratedA = parseInt(String(e.ratedCurrentA), 10) || 0;
@@ -51,14 +62,7 @@ function makeCandidateProvider() {
     } as CandidateDevice;
   }).filter((c: CandidateDevice) => c.ratedA > 0);
 
-  return (q: { role: SectionRole; designCurrentA: number; sccrKA: number; poles: number }) => {
-    const wantClass = q.role === 'FEEDER' ? ['MCCB', 'MCB'] : ['ACB', 'ICCB'];
-    let pool = parsed.filter((c) => c.ratedA >= q.designCurrentA && wantClass.includes(c.deviceClass));
-    const kaOk = pool.filter((c) => c.interruptingKA >= q.sccrKA);
-    if (kaOk.length) pool = kaOk;
-    if (!pool.length) pool = parsed.filter((c) => c.ratedA >= q.designCurrentA);
-    return pool.sort((a, b) => a.ratedA - b.ratedA).slice(0, 5);
-  };
+  return providerFromList(parsed);
 }
 
 function rowToCard(b: SwitchboardRow, sectionCount?: number): SwitchboardCardData {
@@ -107,7 +111,37 @@ function sldFromFull(full: FullBoard): { svg: string } | null {
 const V2PreviewStep: React.FC = () => {
   const { configuration } = useConfigurator();
   const configurationId = configuration?.id ?? null;
-  const provider = useMemo(makeCandidateProvider, []);
+  const [catalogCbs, setCatalogCbs] = useState<CatalogCb[] | null>(null);
+  const [catalogStatus, setCatalogStatus] = useState<{ count: number; withPrice: number } | null>(null);
+  const [importing, setImporting] = useState(false);
+
+  const provider = useMemo(() => {
+    if (catalogCbs && catalogCbs.length > 0) {
+      return providerFromList(catalogCbs.map((c) => ({ ...c, frameModel: c.frameModel ?? '', manufacturer: c.manufacturer ?? '' } as CandidateDevice)));
+    }
+    return makeCandidateProvider();
+  }, [catalogCbs]);
+
+  const refreshCatalog = useCallback(async () => {
+    try {
+      const status = await configuratorV2Service.catalogStatus();
+      setCatalogStatus(status);
+      if (status.count > 0) setCatalogCbs(await configuratorV2Service.catalogCbs());
+    } catch { /* fall back to bundled silently */ }
+  }, []);
+
+  const importCatalog = async () => {
+    setImporting(true);
+    try {
+      const out = await configuratorV2Service.catalogImportBundled();
+      setToast('Catalog imported - ' + out.total + ' breakers in database');
+      await refreshCatalog();
+    } catch (e: any) {
+      setError(e?.response?.data?.error ?? 'Catalog import failed');
+    } finally {
+      setImporting(false);
+    }
+  };
 
   const [boards, setBoards] = useState<SwitchboardRow[]>([]);
   const [sectionCounts, setSectionCounts] = useState<Record<string, number>>({});
@@ -142,7 +176,7 @@ const V2PreviewStep: React.FC = () => {
     }
   }, [configurationId]);
 
-  useEffect(() => { reload(); }, [reload]);
+  useEffect(() => { reload(); refreshCatalog(); }, [reload, refreshCatalog]);
 
   const openById = async (id: string) => {
     setBusy(true);
@@ -240,6 +274,32 @@ const V2PreviewStep: React.FC = () => {
           {error}
         </Alert>
       )}
+
+      <Stack direction="row" spacing={1} alignItems="center" sx={{ px: 3, pt: 2 }}>
+        {catalogStatus && catalogStatus.count > 0 ? (
+          <Chip
+            size="small"
+            label={'Catalog: ' + catalogStatus.count + ' breakers in database (' + catalogStatus.withPrice + ' priced)'}
+            sx={{ bgcolor: 'transparent', border: '1px solid ' + C.green, color: C.green, fontSize: 11, height: 22 }}
+          />
+        ) : (
+          <>
+            <Chip
+              size="small"
+              label="Catalog: bundled fallback (not in database)"
+              sx={{ bgcolor: 'transparent', border: '1px solid ' + C.amber, color: C.amber, fontSize: 11, height: 22 }}
+            />
+            <Button
+              size="small"
+              disabled={importing}
+              onClick={importCatalog}
+              sx={{ color: C.blue, textTransform: 'none', fontSize: 12, border: '1px solid ' + C.border }}
+            >
+              {importing ? 'Importing...' : 'Import 308 breakers to database'}
+            </Button>
+          </>
+        )}
+      </Stack>
 
       {loading ? (
         <Stack alignItems="center" sx={{ py: 8 }}>

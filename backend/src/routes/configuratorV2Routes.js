@@ -421,6 +421,68 @@ router.post('/switchboards/:id/apply-proposal', wrap(async (req, res) => {
   res.json({ ok: true, ...out, board, sections: sectionsOut, lines: linesOut });
 }));
 
+// ── CB Catalog (DB-backed candidates) ─────────────────────────────────
+
+router.get('/catalog/status', wrap(async (req, res) => {
+  const count = await models.ConfiguratorComponent.count({ where: { category: 'CIRCUIT BREAKER' } });
+  const withPrice = await models.ConfiguratorComponent.count({
+    where: { category: 'CIRCUIT BREAKER', price_status: 'FIRM' },
+  });
+  res.json({ count, withPrice });
+}));
+
+/** Idempotent import of the bundled CB seed (308 breakers, parsed specs/dims). */
+router.post('/catalog/import-bundled', wrap(async (req, res) => {
+  const seed = require('../seeds/cbCatalogSeed.json');
+  const existing = await models.ConfiguratorComponent.findAll({
+    where: { category: 'CIRCUIT BREAKER' },
+    attributes: ['part_number'],
+  });
+  const have = new Set(existing.map((r) => r.part_number));
+  let created = 0;
+  for (const row of seed) {
+    if (have.has(row.part_number)) continue;
+    await models.ConfiguratorComponent.create({
+      ...row,
+      mat_cost: row.price ?? 0,
+      company_id: req.companyId ?? null,
+    }).catch(() => {});
+    created += 1;
+  }
+  const count = await models.ConfiguratorComponent.count({ where: { category: 'CIRCUIT BREAKER' } });
+  res.json({ ok: true, created, skipped: seed.length - created, total: count });
+}));
+
+/** Lightweight CB list for the Designer's sync candidate provider. */
+router.get('/catalog/cbs', wrap(async (req, res) => {
+  const rows = await models.ConfiguratorComponent.findAll({
+    where: { category: 'CIRCUIT BREAKER' },
+    attributes: ['id', 'part_number', 'name', 'price', 'price_status',
+      'dims_h_in', 'dims_w_in', 'dims_d_in', 'specifications'],
+    limit: 2000,
+  });
+  res.json(rows.map((r) => {
+    const sp = r.specifications || {};
+    return {
+      componentId: r.id,
+      partNumber: r.part_number,
+      manufacturer: sp.manufacturer ?? null,
+      frameModel: sp.frameModel ?? null,
+      deviceClass: sp.deviceClass ?? 'MCCB',
+      ratedA: Number(sp.ratedCurrentA) || 0,
+      interruptingKA: Number(sp.interruptingKA) || 0,
+      poles: Number(sp.poles) || 3,
+      mounting: sp.mounting ?? 'Fixed',
+      pctRated: 80,
+      heightIn: r.dims_h_in != null ? Number(r.dims_h_in) : null,
+      widthIn: r.dims_w_in != null ? Number(r.dims_w_in) : null,
+      depthIn: r.dims_d_in != null ? Number(r.dims_d_in) : null,
+      price: r.price != null ? Number(r.price) : null,
+      priceStatus: r.price_status ?? 'PENDING_RFQ',
+    };
+  }));
+}));
+
 // ERP handoff
 router.post('/handoff/order-confirm', wrap(async (req, res) => {
   const { quotationId } = req.body || {};

@@ -55,7 +55,40 @@ export interface FullBoard {
   lines: ComponentLineRow[];
 }
 
+export interface CatalogCb {
+  componentId: string;
+  partNumber: string;
+  manufacturer: string | null;
+  frameModel: string | null;
+  deviceClass: 'ACB' | 'ICCB' | 'MCCB' | 'MCB';
+  ratedA: number;
+  interruptingKA: number;
+  poles: number;
+  mounting: 'Fixed' | 'Drawout';
+  pctRated: 80 | 100;
+  heightIn: number | null;
+  widthIn: number | null;
+  depthIn: number | null;
+  price: number | null;
+  priceStatus: 'FIRM' | 'ESTIMATED' | 'PENDING_RFQ';
+}
+
 export const configuratorV2Service = {
+  async catalogStatus(): Promise<{ count: number; withPrice: number }> {
+    const res = await api.get(`${ROOT}/catalog/status`);
+    return res.data;
+  },
+
+  async catalogImportBundled(): Promise<{ ok: boolean; created: number; total: number }> {
+    const res = await api.post(`${ROOT}/catalog/import-bundled`);
+    return res.data;
+  },
+
+  async catalogCbs(): Promise<CatalogCb[]> {
+    const res = await api.get<CatalogCb[]>(`${ROOT}/catalog/cbs`);
+    return res.data ?? [];
+  },
+
   async listBoards(configurationId: string): Promise<SwitchboardRow[]> {
     const res = await api.get<SwitchboardRow[]>(`${ROOT}/configurations/${configurationId}/switchboards`);
     return res.data ?? [];
