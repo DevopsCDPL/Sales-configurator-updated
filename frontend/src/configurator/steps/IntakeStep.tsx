@@ -101,6 +101,32 @@ export default function IntakeStep(props: IntakeStepProps) {
     return { rows: intake.feeders.length, devices: n };
   }, [intake.feeders]);
 
+  /** Engineer overrides the engine's pick with a close alternative. */
+  const swapDevice = (sectionIndex: number, designation: string, partNumber: string) => {
+    setProposal((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        sections: prev.sections.map((sec) => {
+          if (sec.sectionIndex !== sectionIndex) return sec;
+          return {
+            ...sec,
+            devices: sec.devices.map((d) => {
+              if (d.designation !== designation || !d.device) return d;
+              const pool = [d.device, ...d.alternatives];
+              const next = pool.find((c) => c.partNumber === partNumber);
+              if (!next || next === d.device) return d;
+              const alternatives = pool.filter((c) => c !== next).slice(0, 5);
+              const warnings = d.warnings.filter((w) => !w.startsWith('Selected device price'));
+              if (next.priceStatus !== 'FIRM') warnings.push(`Selected device price is ${next.priceStatus}`);
+              return { ...d, device: next, alternatives, warnings };
+            }),
+          };
+        }),
+      };
+    });
+  };
+
   const runProposal = () => {
     const p = proposeLineup(std, intake, {
       maxSections: props.maxSections ?? 10,
@@ -315,9 +341,25 @@ export default function IntakeStep(props: IntakeStepProps) {
                     <Stack key={d.designation} direction="row" spacing={1.5} alignItems="center" sx={{ mt: 0.75 }}>
                       <Chip label={d.designation} size="small"
                         sx={{ bgcolor: C.blueSoft, color: C.blue, fontWeight: 700, fontSize: 11, height: 20 }} />
-                      <Typography sx={{ color: C.text, fontSize: 12.5 }}>
-                        {d.device ? `${d.device.manufacturer} ${d.device.frameModel} — ${d.device.ratedA} A, ${d.device.interruptingKA} kA, ${d.device.mounting}` : 'No candidate found'}
-                      </Typography>
+                      {d.device && d.alternatives.length > 0 ? (
+                        <Select
+                          size="small"
+                          value={d.device.partNumber}
+                          onChange={(e) => swapDevice(s.sectionIndex, d.designation, e.target.value)}
+                          sx={{ minWidth: 320, bgcolor: C.bg, color: C.text, fontSize: 12, '& fieldset': { borderColor: C.border } }}
+                        >
+                          {[d.device, ...d.alternatives].map((c) => (
+                            <MenuItem key={c.partNumber} value={c.partNumber} sx={{ fontSize: 12 }}>
+                              {c.manufacturer} {c.frameModel} — {c.ratedA} A, {c.interruptingKA} kA, {c.mounting}
+                              {c.price != null ? ` · $${c.price.toLocaleString()}` : ' · RFQ'}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      ) : (
+                        <Typography sx={{ color: C.text, fontSize: 12.5 }}>
+                          {d.device ? `${d.device.manufacturer} ${d.device.frameModel} — ${d.device.ratedA} A, ${d.device.interruptingKA} kA, ${d.device.mounting}` : 'No candidate found'}
+                        </Typography>
+                      )}
                       <Typography sx={{ color: C.muted, fontSize: 11 }}>
                         design {d.designCurrentA} A → {d.recommendedRatingA ?? '—'} A
                       </Typography>

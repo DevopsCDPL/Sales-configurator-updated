@@ -59,6 +59,8 @@ export interface ProposedDevice {
   feederRowId: string | null;
   role: SectionRole;
   device: CandidateDevice | null; // null = no candidate found
+  /** Close alternatives (same filters, price-sorted) — engineer may swap. */
+  alternatives: CandidateDevice[];
   designCurrentA: number;
   recommendedRatingA: number | null;
   warnings: string[];
@@ -151,7 +153,7 @@ export function proposeLineup(
       const designation = `F${fIdx}`;
       if (row.loadType === 'Spare') {
         feederDevices.push({
-          designation, feederRowId: row.rowId, role: 'FEEDER', device: null,
+          designation, feederRowId: row.rowId, role: 'FEEDER', device: null, alternatives: [],
           designCurrentA: row.loadValue || 0, recommendedRatingA: row.loadValue || null,
           warnings: ['Spare — device rating set manually or copied from neighbor'],
         });
@@ -180,6 +182,7 @@ export function proposeLineup(
       else if (picked.priceStatus !== 'FIRM') w.push(`Selected device price is ${picked.priceStatus}`);
       feederDevices.push({
         designation, feederRowId: row.rowId, role: 'FEEDER', device: picked,
+        alternatives: cands.filter((c) => c !== picked).slice(0, 5),
         designCurrentA: res.designCurrentA, recommendedRatingA: res.recommendedRatingA, warnings: w,
       });
     }
@@ -199,7 +202,7 @@ export function proposeLineup(
     const picked = pickCheapest(cands);
     const w: string[] = [];
     if (!picked) w.push(`No valid ${role} device candidate found`);
-    return { designation, feederRowId: null, role, device: picked, designCurrentA: requiredA, recommendedRatingA: nextLadder(std.deviceLadder_A, requiredA), warnings: w };
+    return { designation, feederRowId: null, role, device: picked, alternatives: cands.filter((c) => c !== picked).slice(0, 5), designCurrentA: requiredA, recommendedRatingA: nextLadder(std.deviceLadder_A, requiredA), warnings: w };
   };
 
   if (intake.sourceScheme === 'SINGLE') {

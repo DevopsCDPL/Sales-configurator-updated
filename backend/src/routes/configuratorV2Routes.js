@@ -175,6 +175,27 @@ router.post('/switchboards/:id/lines', wrap(async (req, res) => {
   res.status(201).json(row);
 }));
 
+/** Swap / edit a line in place (e.g. engineer picks a different breaker).
+ *  Cost-bearing fields update together; meta is merged; the board must
+ *  not be locked. Swapped auto-lines keep source but are flagged. */
+router.patch('/lines/:lineId', wrap(async (req, res) => {
+  const row = await models.ConfiguratorComponentLine.findByPk(req.params.lineId);
+  if (!row) return res.status(404).json({ error: 'not found' });
+  const board = await models.ConfiguratorSwitchboard.findByPk(row.switchboard_id);
+  if (board?.status === 'locked') return res.status(423).json({ error: 'switchboard locked — raise a change order' });
+
+  const allowed = ['component_id', 'part_number', 'name', 'quantity', 'unit_cost', 'price_status'];
+  const patch = Object.fromEntries(Object.entries(req.body || {}).filter(([k]) => allowed.includes(k)));
+  const meta = { ...(row.meta ?? {}), ...(req.body?.meta ?? {}) };
+  if (patch.part_number && patch.part_number !== row.part_number) {
+    meta.swapped = true;
+    meta.swapped_from = row.part_number;
+    meta.requote_review = true;
+  }
+  await row.update({ ...patch, meta });
+  res.json(row);
+}));
+
 router.delete('/lines/:lineId', wrap(async (req, res) => {
   const row = await models.ConfiguratorComponentLine.findByPk(req.params.lineId);
   if (!row) return res.status(404).json({ error: 'not found' });

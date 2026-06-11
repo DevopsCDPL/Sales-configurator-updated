@@ -1,0 +1,210 @@
+/**
+ * DeviceListPanel — persisted devices of the saved design, with SWAP.
+ *
+ * The engine proposes the cheapest passing breaker, but the engineer
+ * has the final word: swap any device for a close alternative (same or
+ * higher rating, adequate interrupting kA, role-appropriate class) from
+ * the DB catalog. Swaps update cost immediately, flag the line for
+ * re-quote review and keep an audit trail (swapped_from).
+ */
+import React, { useMemo, useState } from 'react';
+import {
+  Box, Typography, Stack, Chip, Button, Dialog, DialogTitle, DialogContent,
+  DialogActions, Table, TableHead, TableRow, TableCell, TableBody, Alert,
+} from '@mui/material';
+import SwapHorizRoundedIcon from '@mui/icons-material/SwapHorizRounded';
+import configuratorV2Service, { ComponentLineRow, CatalogCb } from '../../services/configuratorV2Service';
+
+const C = {
+  bg: '#0D0D14', surface: '#13131E', border: '#1E2235', blue: '#1976D2',
+  text: '#E2E8F0', sub: '#64748B', green: '#22C55E', amber: '#D97706', red: '#EF4444',
+};
+
+const cellSx = { color: C.text, fontSize: 12, borderBottom: '1px solid ' + C.border, py: 0.6 };
+const headSx = { color: C.sub, fontSize: 10.5, fontWeight: 700, letterSpacing: 0.5, borderBottom: '1px solid ' + C.border, py: 0.7 };
+
+const usd = (n: number) =>
+  n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 });
+
+export interface DeviceListPanelProps {
+  lines: ComponentLineRow[];
+  catalogCbs: CatalogCb[] | null;
+  sccrKA: number;
+  locked: boolean;
+  onSwapped: () => Promise<void>;
+}
+
+const DeviceListPanel: React.FC<DeviceListPanelProps> = ({ lines, catalogCbs, sccrKA, locked, onSwapped }) => {
+  const [swapLine, setSwapLine] = useState<ComponentLineRow | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const deviceLines = useMemo(
+    () => lines.filter((l) => (l.category || '').toUpperCase() === 'CIRCUIT BREAKER'),
+    [lines]
+  );
+
+  const candidatesFor = (line: ComponentLineRow): CatalogCb[] => {
+    if (!catalogCbs) return [];
+    const role = String(line.meta?.role ?? 'FEEDER').toUpperCase();
+    const wantClass = role === 'FEEDER' ? ['MCCB', 'MCB'] : ['ACB', 'ICCB'];
+    const ratedA = Number(line.meta?.ratedA) || 0;
+    return catalogCbs
+      .filter((c) =>
+        wantClass.includes(c.deviceClass)
+        && c.ratedA >= ratedA
+        && c.interruptingKA >= sccrKA
+        && c.partNumber !== line.part_number)
+      .sort((a, b) => (a.price ?? Infinity) - (b.price ?? Infinity) || a.ratedA - b.ratedA)
+      .slice(0, 12);
+  };
+
+  const doSwap = async (line: ComponentLineRow, c: CatalogCb) => {
+    setBusy(true);
+    setError(null);
+    try {
+      await configuratorV2Service.patchLine(line.id, {
+        component_id: c.componentId && c.componentId.length === 36 ? c.componentId : null,
+        part_number: c.partNumber,
+        name: [c.manufacturer, c.frameModel].filter(Boolean).join(' ') || c.partNumber,
+        unit_cost: c.price ?? 0,
+        price_status: c.priceStatus,
+        meta: {
+          ratedA: c.ratedA,
+          poles: c.poles,
+          mounting: c.mounting,
+          interruptingKA: c.interruptingKA,
+          frameModel: c.frameModel,
+          manufacturer: c.manufacturer,
+        },
+      });
+      setSwapLine(null);
+      await onSwapped();
+    } catch (e: any) {
+      setError(e?.response?.data?.error ?? 'Swap failed');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (!deviceLines.length) return null;
+  const cands = swapLine ? candidatesFor(swapLine) : [];
+
+  return (
+    <Box sx={{ px: 3, pb: 2 }}>
+      <Typography sx={{ color: '#CBD5E1', fontSize: 13.5, fontWeight: 600, mb: 1 }}>
+        Devices (saved design) — engineer may swap any pick
+      </Typography>
+      <Box sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', overflow: 'hidden' }}>
+        <Table size="small">
+          <TableHead>
+            <TableRow>
+              <TableCell sx={headSx}>DESIG.</TableCell>
+              <TableCell sx={headSx}>ROLE</TableCell>
+              <TableCell sx={headSx}>DEVICE</TableCell>
+              <TableCell sx={headSx}>PART #</TableCell>
+              <TableCell sx={headSx} align="right">RATING</TableCell>
+              <TableCell sx={headSx} align="right">COST</TableCell>
+              <TableCell sx={headSx}>PRICE</TableCell>
+              <TableCell sx={headSx} />
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {deviceLines.map((l) => (
+              <TableRow key={l.id}>
+                <TableCell sx={cellSx}>
+                  <Chip label={l.meta?.designation ?? '?'} size="small" sx={{ bgcolor: 'rgba(25,118,210,0.12)', color: '#60A5FA', fontWeight: 700, fontSize: 10.5, height: 20 }} />
+                </TableCell>
+                <TableCell sx={{ ...cellSx, color: C.sub }}>{l.meta?.role ?? '—'}</TableCell>
+                <TableCell sx={cellSx}>
+                  {l.name}
+                  {l.meta?.swapped && (
+                    <Chip label={'swapped (was ' + (l.meta?.swapped_from ?? '?') + ')'} size="small" sx={{ ml: 1, bgcolor: 'transparent', border: '1px solid ' + C.amber, color: C.amber, fontSize: 9, height: 16 }} />
+                  )}
+                </TableCell>
+                <TableCell sx={{ ...cellSx, color: C.sub }}>{l.part_number ?? '—'}</TableCell>
+                <TableCell sx={cellSx} align="right">{l.meta?.ratedA ?? '—'} A / {l.meta?.interruptingKA ?? '—'} kA</TableCell>
+                <TableCell sx={cellSx} align="right">{Number(l.unit_cost) ? usd(Number(l.unit_cost)) : '—'}</TableCell>
+                <TableCell sx={cellSx}>
+                  <Chip
+                    label={l.price_status === 'PENDING_RFQ' ? 'RFQ' : l.price_status}
+                    size="small"
+                    sx={{ bgcolor: 'transparent', border: '1px solid ' + (l.price_status === 'FIRM' ? C.green : C.amber), color: l.price_status === 'FIRM' ? C.green : C.amber, fontSize: 9.5, height: 18 }}
+                  />
+                </TableCell>
+                <TableCell sx={cellSx} align="right">
+                  <Button
+                    size="small" startIcon={<SwapHorizRoundedIcon sx={{ fontSize: 14 }} />}
+                    disabled={locked}
+                    onClick={() => { setSwapLine(l); setError(null); }}
+                    sx={{ color: C.blue, textTransform: 'none', fontSize: 11.5, border: '1px solid ' + C.border }}
+                  >
+                    Swap
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Box>
+
+      <Dialog open={!!swapLine} onClose={() => setSwapLine(null)} maxWidth="md" fullWidth
+        PaperProps={{ sx: { bgcolor: C.surface, border: '1px solid ' + C.border, backgroundImage: 'none' } }}>
+        <DialogTitle sx={{ color: C.text, fontSize: 15, fontWeight: 700 }}>
+          Swap {swapLine?.meta?.designation} — alternatives ≥ {swapLine?.meta?.ratedA} A, ≥ {sccrKA} kA
+        </DialogTitle>
+        <DialogContent>
+          {error && (
+            <Alert severity="error" sx={{ mb: 1.5, bgcolor: 'rgba(239,68,68,0.08)', color: '#FCA5A5', border: '1px solid ' + C.border, fontSize: 12 }}>
+              {error}
+            </Alert>
+          )}
+          {!cands.length ? (
+            <Typography sx={{ color: C.sub, fontSize: 12.5 }}>
+              No alternative in the catalog meets the constraints (class, rating, interrupting kA).
+            </Typography>
+          ) : (
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={headSx}>MANUFACTURER</TableCell>
+                  <TableCell sx={headSx}>FRAME</TableCell>
+                  <TableCell sx={headSx} align="right">RATING</TableCell>
+                  <TableCell sx={headSx}>MOUNTING</TableCell>
+                  <TableCell sx={headSx} align="right">PRICE</TableCell>
+                  <TableCell sx={headSx} />
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {cands.map((c) => (
+                  <TableRow key={c.partNumber}>
+                    <TableCell sx={cellSx}>{c.manufacturer ?? '—'}</TableCell>
+                    <TableCell sx={cellSx}>{c.frameModel ?? c.partNumber}</TableCell>
+                    <TableCell sx={cellSx} align="right">{c.ratedA} A / {c.interruptingKA} kA</TableCell>
+                    <TableCell sx={{ ...cellSx, color: C.sub }}>{c.mounting}</TableCell>
+                    <TableCell sx={cellSx} align="right">
+                      {c.price != null
+                        ? usd(c.price)
+                        : <Chip label="RFQ" size="small" sx={{ bgcolor: 'transparent', border: '1px solid ' + C.amber, color: C.amber, fontSize: 9.5, height: 18 }} />}
+                    </TableCell>
+                    <TableCell sx={cellSx} align="right">
+                      <Button size="small" disabled={busy} onClick={() => swapLine && doSwap(swapLine, c)}
+                        sx={{ color: C.green, textTransform: 'none', fontSize: 11.5, border: '1px solid ' + C.border }}>
+                        Use this
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setSwapLine(null)} sx={{ color: C.sub, textTransform: 'none' }}>Close</Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
+  );
+};
+
+export default DeviceListPanel;

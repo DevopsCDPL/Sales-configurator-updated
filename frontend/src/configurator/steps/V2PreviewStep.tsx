@@ -19,6 +19,7 @@ import DrawingsPanel from './DrawingsPanel';
 import PriceQueuePanel from './PriceQueuePanel';
 import StandardsPanel from './StandardsPanel';
 import ComponentsPanel from './ComponentsPanel';
+import DeviceListPanel from './DeviceListPanel';
 import { CIRCUIT_BREAKER_V2_DATA } from '../data/circuitBreakerV2Data';
 import type { CandidateDevice, LineupProposal, IntakeInput } from '../lib/lineup-proposal';
 import { generateSld, SldDevice } from '../lib/sld-generator';
@@ -39,7 +40,7 @@ function providerFromList(parsed: CandidateDevice[]) {
     const kaOk = pool.filter((c) => c.interruptingKA >= q.sccrKA);
     if (kaOk.length) pool = kaOk;
     if (!pool.length) pool = parsed.filter((c) => c.ratedA >= q.designCurrentA);
-    return pool.sort((a, b) => (a.price ?? Infinity) - (b.price ?? Infinity) || a.ratedA - b.ratedA).slice(0, 5);
+    return pool.sort((a, b) => (a.price ?? Infinity) - (b.price ?? Infinity) || a.ratedA - b.ratedA).slice(0, 8);
   };
 }
 
@@ -435,6 +436,19 @@ const V2PreviewStep: React.FC = () => {
                 candidateProvider={provider}
                 onSaveIntake={saveIntake}
                 onAcceptProposal={acceptProposal}
+              />
+
+              <DeviceListPanel
+                lines={openBoard.lines}
+                catalogCbs={catalogCbs}
+                sccrKA={Number(openBoard.board.board_data?.shortCircuitRating) || 65}
+                locked={openBoard.board.status === 'locked'}
+                onSwapped={async () => {
+                  const full = await configuratorV2Service.getFull(openBoard.board.id);
+                  setOpenBoard(full);
+                  setSvg(sldFromFull(full)?.svg ?? null);
+                  setToast('Device swapped — cost updated, quote flagged for review');
+                }}
               />
 
               {svg && (

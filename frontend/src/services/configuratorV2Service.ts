@@ -380,6 +380,20 @@ export const configuratorV2Service = {
     await api.delete(`${ROOT}/lines/${lineId}`, { data: waiverReason ? { waiverReason } : undefined });
   },
 
+
+  async patchLine(lineId: string, patch: {
+    component_id?: string | null;
+    part_number?: string | null;
+    name?: string | null;
+    quantity?: number;
+    unit_cost?: number | null;
+    price_status?: 'FIRM' | 'ESTIMATED' | 'PENDING_RFQ';
+    meta?: Record<string, any>;
+  }): Promise<ComponentLineRow> {
+    const res = await api.patch<ComponentLineRow>(`${ROOT}/lines/${lineId}`, patch);
+    return res.data;
+  },
+
   async applyProposal(id: string, payload: {
     intake: IntakeInput;
     boardPatch: LineupProposal['boardPatch'] & { totalFeederLoadA?: number; sldTopology?: unknown };
