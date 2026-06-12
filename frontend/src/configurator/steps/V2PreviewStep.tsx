@@ -16,9 +16,6 @@ import IntakeStep from './IntakeStep';
 import BomViewer from './BomViewer';
 import QuotePanel from './QuotePanel';
 import DrawingsPanel from './DrawingsPanel';
-import PriceQueuePanel from './PriceQueuePanel';
-import StandardsPanel from './StandardsPanel';
-import CatalogManagerPanel from './CatalogManagerPanel';
 import ComponentsPanel from './ComponentsPanel';
 import DeviceListPanel from './DeviceListPanel';
 import { CIRCUIT_BREAKER_V2_DATA } from '../data/circuitBreakerV2Data';
@@ -187,7 +184,6 @@ const V2PreviewStep: React.FC = () => {
   const [coDialog, setCoDialog] = useState(false);
   const [coReason, setCoReason] = useState('');
   const [coOrigin, setCoOrigin] = useState<'internal' | 'customer'>('internal');
-  const [homeView, setHomeView] = useState<'boards' | 'catalog' | 'prices' | 'standards'>('boards');
   const [svg, setSvg] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -340,60 +336,6 @@ const V2PreviewStep: React.FC = () => {
         </Stack>
       ) : !openBoard ? (
         <Box>
-          <Stack direction="row" spacing={1} sx={{ px: 3, pt: 1.5 }} alignItems="center">
-            {homeView !== 'boards' ? (
-              <Button size="small" onClick={() => setHomeView('boards')}
-                sx={{ color: C.sub, textTransform: 'none', fontSize: 12, border: '1px solid ' + C.border }}>
-                ← Boards
-              </Button>
-            ) : (
-              <Typography sx={{ color: C.sub, fontSize: 11, letterSpacing: 0.5 }}>LIBRARY:</Typography>
-            )}
-            {([['catalog', 'Catalog'], ['prices', 'Awaiting price'], ['standards', 'Standards']] as const).map(([key, label]) => (
-              <Button
-                key={key}
-                size="small"
-                onClick={() => setHomeView(key)}
-                sx={{
-                  textTransform: 'none', fontSize: 11.5, px: 1, minWidth: 0,
-                  color: homeView === key ? '#00c8ff' : C.sub,
-                  bgcolor: 'transparent',
-                  border: 'none',
-                  textDecoration: homeView === key ? 'none' : 'underline',
-                  textUnderlineOffset: '3px',
-                  '&:hover': { color: '#00c8ff', bgcolor: 'transparent' },
-                }}
-              >
-                {label}
-              </Button>
-            ))}
-            <Box sx={{ flex: 1 }} />
-            <Button
-              size="small"
-              onClick={async () => {
-                try {
-                  if (configurationId) await configuratorV2Service.downloadProposalPdf(configurationId);
-                } catch (e: any) {
-                  setError(e?.response?.status === 422
-                    ? 'No issued quotations yet — open a board, go to Quote and issue first.'
-                    : (e?.response?.data?.error ?? 'Proposal generation failed'));
-                }
-              }}
-              sx={{
-                textTransform: 'none', fontSize: 12, px: 1.5, color: '#fff',
-                bgcolor: C.green, fontWeight: 700, '&:hover': { bgcolor: '#16A34A' },
-              }}
-            >
-              Client proposal (PDF)
-            </Button>
-          </Stack>
-          {homeView === 'catalog' ? (
-            <CatalogManagerPanel />
-          ) : homeView === 'prices' ? (
-            <PriceQueuePanel />
-          ) : homeView === 'standards' ? (
-            <StandardsPanel />
-          ) : (
         <SwitchboardCardsScreen
           boards={cards}
           loadableBoards={loadable.map((b) => ({
@@ -433,7 +375,6 @@ const V2PreviewStep: React.FC = () => {
             }
           }}
         />
-          )}
         </Box>
       ) : (
         <Box>

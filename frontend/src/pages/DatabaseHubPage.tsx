@@ -23,6 +23,9 @@ import ClientsPage from './ClientsPage';
 import RawMaterialMasterPage from './RawMaterialMasterPage';
 import PartsMasterPage from './PartsMasterPage';
 import ComponentsPage from './ComponentsPage';
+import CatalogManagerPanel from '../configurator/steps/CatalogManagerPanel';
+import PriceQueuePanel from '../configurator/steps/PriceQueuePanel';
+import StandardsPanel from '../configurator/steps/StandardsPanel';
 
 import { configuratorService, type ConfigurationSummary } from '../services/configuratorService';
 import { marketDataService, type CopperPrice } from '../services/marketDataService';
@@ -47,6 +50,8 @@ const TABS: TabDef[] = [
   { key: 'raw-materials',  label: 'Raw Material',        icon: <ScienceIcon sx={{ fontSize: 16 }} /> },
   { key: 'parts',          label: 'Parts Master',        icon: <BuildIcon sx={{ fontSize: 16 }} /> },
   { key: 'components',     label: 'Components',          icon: <ComponentsIcon sx={{ fontSize: 16 }} /> },
+  { key: 'price-queue',    label: 'Price Queue',         icon: <BuildIcon sx={{ fontSize: 16 }} /> },
+  { key: 'engg-standards', label: 'Engg Standards',      icon: <ScienceIcon sx={{ fontSize: 16 }} /> },
   { key: 'saved-configs',  label: 'Saved Configuration', icon: <BookmarkIcon sx={{ fontSize: 16 }} /> },
   { key: 'comex',          label: 'Comex Copper',        icon: <TrendingUpIcon sx={{ fontSize: 16 }} /> },
 ];
@@ -114,7 +119,9 @@ const DatabaseHubPage: React.FC = () => {
         {active === 'clients' && <ClientsPage />}
         {active === 'raw-materials' && <RawMaterialMasterPage />}
         {active === 'parts' && <PartsMasterPage />}
-        {active === 'components' && <ComponentsPage />}
+        {active === 'components' && <CatalogManagerPanel />}
+        {active === 'price-queue' && <PriceQueuePanel />}
+        {active === 'engg-standards' && <StandardsPanel />}
         {active === 'saved-configs' && <SavedConfigurationsTab />}
         {active === 'comex' && <ComexCopperTab />}
       </Box>
