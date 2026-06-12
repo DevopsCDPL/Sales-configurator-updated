@@ -15,6 +15,7 @@ import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 import ContentPasteRoundedIcon from '@mui/icons-material/ContentPasteRounded';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 import { DEFAULT_STANDARDS, StandardsSet, nextLadder } from '../lib/us-standards';
 import { computeLoadV2 } from '../lib/load-calculation-v2';
@@ -161,11 +162,7 @@ export default function IntakeStep(props: IntakeStepProps) {
   };
 
   return (
-    <Box sx={{ p: 2, bgcolor: C.surface }}>
-      <Typography sx={{ color: C.sub, fontSize: 12, mb: 1.5 }}>
-        Capture the customer requirement — the engine proposes the full line-up from the schedule below.
-      </Typography>
-
+    <Box sx={{ p: 1.5, bgcolor: C.surface }}>
       {/* Board-level intake */}
       <Box sx={card}>
         <Typography sx={cardTitle}>System Parameters</Typography>
@@ -223,13 +220,16 @@ export default function IntakeStep(props: IntakeStepProps) {
       </Box>
 
       {/* Feeder schedule */}
-      <Box sx={{ ...card, mt: 2 }} onPaste={handlePaste}>
+      <Box sx={{ ...card, mt: 1.5 }} onPaste={handlePaste}>
         {pasteInfo && <Alert severity="info" sx={alertSx} onClose={() => setPasteInfo(null)}>{pasteInfo}</Alert>}
 
         <Stack direction="row" spacing={2} alignItems="flex-start" sx={{ mt: 0.5 }}>
         <Box sx={{ flex: 1, minWidth: 560 }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
-          <Typography sx={{ ...cardTitle, mb: 0 }}>Load &amp; Feeder Schedule</Typography>
+          <Stack direction="row" alignItems="center" spacing={0}>
+            <Typography sx={{ ...cardTitle, mb: 0 }}>Load &amp; Feeder Schedule</Typography>
+            <Tooltip title="Capture the customer requirement — the engine proposes the full line-up from this schedule. Paste rows from Excel anywhere in this panel."><InfoOutlinedIcon sx={{ fontSize: 15, color: '#64748B', ml: 0.5, cursor: 'help' }} /></Tooltip>
+          </Stack>
           <Stack direction="row" spacing={1} alignItems="center">
             <Button size="small" startIcon={<AddRoundedIcon />} onClick={() => patch({ feeders: [...intake.feeders, newRow()] })}
               sx={{ color: C.blue, textTransform: 'none', fontSize: 12, border: `1px solid ${C.border}` }}>
@@ -245,8 +245,10 @@ export default function IntakeStep(props: IntakeStepProps) {
             </Button>
           </Stack>
         </Stack>
+        <Box sx={{ maxHeight: '56vh', overflowY: 'auto', '&::-webkit-scrollbar': { width: 6 }, '&::-webkit-scrollbar-thumb': { bgcolor: '#1E2235', borderRadius: 3 } }}>
         <Table size="small" sx={{
           '& td, & th': { borderColor: C.border, color: C.text, fontSize: 12.5, py: 0.5 },
+          '& thead th': { position: 'sticky', top: 0, zIndex: 2, bgcolor: '#000' },
           '& td .MuiInputBase-root': {
             bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '6px',
             px: 0.75, minHeight: 28,
@@ -330,6 +332,7 @@ export default function IntakeStep(props: IntakeStepProps) {
           </TableBody>
         </Table>
         </Box>
+        </Box>
 
         {/* Right column: paste hint + sticky live summary */}
         <Box sx={{ width: 250, flexShrink: 0, alignSelf: 'flex-start' }}>
@@ -338,22 +341,22 @@ export default function IntakeStep(props: IntakeStepProps) {
             size="small" sx={{ mb: 1, mt: 0.25, height: 28, width: '100%', bgcolor: 'transparent', border: `1px solid ${C.border}`, color: C.sub, fontSize: 11 }} />
         </Tooltip>
         <Box sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', p: 1.5, position: 'sticky', top: 148 }}>
-          <Typography sx={{ color: C.sub, fontSize: 10.5, letterSpacing: 0.5, mb: 1 }}>LIVE LOAD SUMMARY</Typography>
+          <Typography sx={{ color: '#A9B6C9', fontSize: 10.5, letterSpacing: 0.5, mb: 1 }}>LIVE LOAD SUMMARY</Typography>
           <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.25 }}>
-            <Typography sx={{ color: C.sub, fontSize: 11.5 }}>Design current</Typography>
+            <Typography sx={{ color: '#A9B6C9', fontSize: 11.5 }}>Design current</Typography>
             <Typography sx={{ color: '#00c8ff', fontSize: 15, fontWeight: 800 }}>{summary.totalA} A</Typography>
           </Stack>
           <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.25 }}>
-            <Typography sx={{ color: C.sub, fontSize: 11.5 }}>Suggested main bus</Typography>
+            <Typography sx={{ color: '#A9B6C9', fontSize: 11.5 }}>Suggested main bus</Typography>
             <Typography sx={{ color: C.text, fontSize: 12.5, fontWeight: 700 }}>{summary.busA ? summary.busA + ' A' : '—'}</Typography>
           </Stack>
           <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.25 }}>
-            <Typography sx={{ color: C.sub, fontSize: 11.5 }}>Device positions</Typography>
+            <Typography sx={{ color: '#A9B6C9', fontSize: 11.5 }}>Device positions</Typography>
             <Typography sx={{ color: C.text, fontSize: 12.5, fontWeight: 700 }}>{summary.devices}</Typography>
           </Stack>
           {summary.largestMotorA > 0 && (
             <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.25 }}>
-              <Typography sx={{ color: C.sub, fontSize: 11.5 }}>Largest motor</Typography>
+              <Typography sx={{ color: '#A9B6C9', fontSize: 11.5 }}>Largest motor</Typography>
               <Typography sx={{ color: C.text, fontSize: 12.5, fontWeight: 700 }}>{summary.largestMotorA} A</Typography>
             </Stack>
           )}
@@ -362,8 +365,8 @@ export default function IntakeStep(props: IntakeStepProps) {
               {summary.byType.map(([t, a]) => (
                 <Box key={t} sx={{ mb: 0.75 }}>
                   <Stack direction="row" justifyContent="space-between">
-                    <Typography sx={{ color: C.sub, fontSize: 10.5 }}>{t}</Typography>
-                    <Typography sx={{ color: C.sub, fontSize: 10.5 }}>{Math.round(a)} A</Typography>
+                    <Typography sx={{ color: '#A9B6C9', fontSize: 10.5 }}>{t}</Typography>
+                    <Typography sx={{ color: '#A9B6C9', fontSize: 10.5 }}>{Math.round(a)} A</Typography>
                   </Stack>
                   <Box sx={{ height: 4, bgcolor: '#000000', borderRadius: 2 }}>
                     <Box sx={{ height: 4, width: `${summary.totalA ? Math.min(100, (a / summary.totalA) * 100) : 0}%`, bgcolor: '#00c8ff', borderRadius: 2, opacity: 0.85 }} />
@@ -372,7 +375,7 @@ export default function IntakeStep(props: IntakeStepProps) {
               ))}
             </Box>
           )}
-          <Typography sx={{ color: C.muted, fontSize: 10, mt: 1 }}>
+          <Typography sx={{ color: '#8E9AAD', fontSize: 10, mt: 1 }}>
             NEC 125% continuous + motor rules applied per row. Propose line-up turns this into sections + breakers.
           </Typography>
         </Box>
@@ -486,8 +489,8 @@ function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
-const card = { bgcolor: C.bg, border: `1px solid ${C.border}`, borderRadius: '10px', p: 2.25 };
-const cardTitle = { color: '#CBD5E1', fontSize: 13.5, fontWeight: 600, mb: 1.5 };
+const card = { bgcolor: C.bg, border: `1px solid ${C.border}`, borderRadius: '10px', p: 1.75 };
+const cardTitle = { color: '#CBD5E1', fontSize: 13.5, fontWeight: 600, mb: 1 };
 const input = {
   color: C.text, fontSize: 13, bgcolor: C.surface,
   '& .MuiOutlinedInput-notchedOutline': { borderColor: C.border },
