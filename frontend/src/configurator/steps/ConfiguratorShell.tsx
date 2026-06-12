@@ -137,7 +137,7 @@ const InnerShell: React.FC<Props> = ({ configuration, onPersist, onShellStateCha
                       fontWeight: 500,
                       letterSpacing: '-0.005em',
                       color: active ? '#E2E8F0' : '#64748B',
-                      borderBottom: active ? '2px solid #1976D2' : '2px solid transparent',
+                      borderBottom: active ? '2px solid #00c8ff' : '2px solid transparent',
                       marginBottom: '-1px',
                       backgroundColor: 'transparent',
                       whiteSpace: 'nowrap',

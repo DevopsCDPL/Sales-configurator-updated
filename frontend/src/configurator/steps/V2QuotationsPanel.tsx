@@ -18,7 +18,7 @@ import { configuratorService } from '../../services/configuratorService';
 import configuratorV2Service, { QuoteRevisionRow, SwitchboardRow } from '../../services/configuratorV2Service';
 
 const C = {
-  bg: '#0D0D14', surface: '#13131E', border: '#1E2235', blue: '#1976D2',
+  bg: '#000000', surface: '#13131E', border: '#1E2235', blue: '#00c8ff',
   text: '#E2E8F0', sub: '#64748B', green: '#22C55E', amber: '#D97706', red: '#EF4444',
 };
 const cellSx = { color: C.text, fontSize: 12, borderBottom: '1px solid ' + C.border, py: 0.6 };
@@ -96,7 +96,7 @@ const V2QuotationsPanel: React.FC<{ projectId: string; onChanged?: () => void }>
         <Typography sx={{ color: C.text, fontWeight: 700, fontSize: 14.5 }}>
           Designer quotations
         </Typography>
-        <Chip label={groups.length + ' board(s)'} size="small" sx={{ bgcolor: 'rgba(25,118,210,0.12)', color: '#60A5FA', fontSize: 10, height: 18 }} />
+        <Chip label={groups.length + ' board(s)'} size="small" sx={{ bgcolor: 'rgba(0,200,255,0.12)', color: '#60A5FA', fontSize: 10, height: 18 }} />
         <Box sx={{ flex: 1 }} />
         {configIds.map((c) => (
           <Button
@@ -143,7 +143,7 @@ const V2QuotationsPanel: React.FC<{ projectId: string; onChanged?: () => void }>
                 <TableRow key={r.id}>
                   <TableCell sx={cellSx}>{r.quotation_number}</TableCell>
                   <TableCell sx={cellSx}>
-                    <Chip label={'R' + r.revision} size="small" sx={{ bgcolor: 'rgba(25,118,210,0.12)', color: '#60A5FA', fontSize: 10, height: 18 }} />
+                    <Chip label={'R' + r.revision} size="small" sx={{ bgcolor: 'rgba(0,200,255,0.12)', color: '#60A5FA', fontSize: 10, height: 18 }} />
                   </TableCell>
                   <TableCell sx={{ ...cellSx, fontWeight: 700 }} align="right">{usd(r.grand_total)}</TableCell>
                   <TableCell sx={cellSx} align="right">{(r.margin_pct * 100).toFixed(1)}%</TableCell>

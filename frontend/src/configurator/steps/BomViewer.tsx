@@ -15,7 +15,7 @@ import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 import configuratorV2Service, { BomResponse, BomRow } from '../../services/configuratorV2Service';
 
 const C = {
-  bg: '#0D0D14', surface: '#13131E', border: '#1E2235', blue: '#1976D2',
+  bg: '#000000', surface: '#13131E', border: '#1E2235', blue: '#00c8ff',
   text: '#E2E8F0', sub: '#64748B', green: '#22C55E', amber: '#D97706', red: '#EF4444',
 };
 
@@ -151,10 +151,10 @@ const BomViewer: React.FC<BomViewerProps> = ({ switchboardId }) => {
             onClick={() => setView(v)}
             sx={{
               textTransform: 'none', fontSize: 12, px: 1.5,
-              color: view === v ? '#fff' : C.sub,
+              color: view === v ? '#06151c' : C.sub,
               bgcolor: view === v ? C.blue : 'transparent',
               border: '1px solid ' + (view === v ? C.blue : C.border),
-              '&:hover': { bgcolor: view === v ? '#1565C0' : 'rgba(255,255,255,0.04)' },
+              '&:hover': { bgcolor: view === v ? '#33d4ff' : 'rgba(255,255,255,0.04)' },
             }}
           >
             {v === 'ebom' ? 'eBOM — by section' : 'mBOM — by part (where-used)'}
@@ -202,7 +202,7 @@ const BomViewer: React.FC<BomViewerProps> = ({ switchboardId }) => {
                       <TableCell sx={cellSx}>
                         {r.source === 'generator' ? (
                           <Tooltip title={'Auto-generated (' + (r.generator_id ?? '') + ') — recomputed from the design, cannot drift'}>
-                            <Chip label={r.generator_id ?? 'GEN'} size="small" sx={{ bgcolor: 'rgba(25,118,210,0.12)', color: '#60A5FA', fontSize: 9.5, height: 18 }} />
+                            <Chip label={r.generator_id ?? 'GEN'} size="small" sx={{ bgcolor: 'rgba(0,200,255,0.12)', color: '#60A5FA', fontSize: 9.5, height: 18 }} />
                           </Tooltip>
                         ) : (
                           <Typography sx={{ color: C.sub, fontSize: 11 }}>{r.source}</Typography>

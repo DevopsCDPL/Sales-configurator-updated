@@ -24,7 +24,7 @@ import { configuratorService, ConfiguratorComponent } from '../../services/confi
 import configuratorV2Service from '../../services/configuratorV2Service';
 
 const C = {
-  bg: '#0D0D14', surface: '#13131E', border: '#1E2235', blue: '#1976D2',
+  bg: '#000000', surface: '#13131E', border: '#1E2235', blue: '#00c8ff',
   text: '#E2E8F0', sub: '#64748B', green: '#22C55E', amber: '#D97706', red: '#EF4444',
 };
 
@@ -189,7 +189,7 @@ const CatalogManagerPanel: React.FC = () => {
         <Button
           startIcon={<AddRoundedIcon sx={{ fontSize: 16 }} />}
           onClick={() => openEdit()}
-          sx={{ bgcolor: C.blue, color: '#fff', textTransform: 'none', fontWeight: 600, fontSize: 12.5, '&:hover': { bgcolor: '#1565C0' } }}
+          sx={{ bgcolor: C.blue, color: '#06151c', textTransform: 'none', fontWeight: 600, fontSize: 12.5, '&:hover': { bgcolor: '#33d4ff' } }}
         >
           Add component
         </Button>
@@ -202,7 +202,7 @@ const CatalogManagerPanel: React.FC = () => {
       <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap sx={{ mb: 1.5 }}>
         <Chip
           label="All" size="small" onClick={() => setCategory('')}
-          sx={{ bgcolor: !category ? C.blue : 'transparent', color: !category ? '#fff' : C.sub, border: '1px solid ' + (!category ? C.blue : C.border), fontSize: 11 }}
+          sx={{ bgcolor: !category ? C.blue : 'transparent', color: !category ? '#06151c' : C.sub, border: '1px solid ' + (!category ? C.blue : C.border), fontSize: 11 }}
         />
         {counts.map((c) => (
           <Chip
@@ -212,7 +212,7 @@ const CatalogManagerPanel: React.FC = () => {
             onClick={() => setCategory(c.category)}
             sx={{
               bgcolor: category === c.category ? C.blue : 'transparent',
-              color: category === c.category ? '#fff' : C.sub,
+              color: category === c.category ? '#06151c' : C.sub,
               border: '1px solid ' + (category === c.category ? C.blue : C.border), fontSize: 11,
             }}
           />
@@ -233,7 +233,7 @@ const CatalogManagerPanel: React.FC = () => {
             <IconButton
               key={key} size="small" onClick={() => setView(key)}
               sx={{
-                color: view === key ? '#fff' : C.sub, borderRadius: '6px',
+                color: view === key ? '#06151c' : C.sub, borderRadius: '6px',
                 bgcolor: view === key ? C.blue : 'transparent',
                 border: '1px solid ' + (view === key ? C.blue : C.border),
                 ml: key === 'list' ? 0.5 : 0,
@@ -276,7 +276,7 @@ const CatalogManagerPanel: React.FC = () => {
                   />
                 </Stack>
                 <Stack direction="row" alignItems="center" spacing={1}>
-                  <Chip label={r.category} size="small" sx={{ bgcolor: 'rgba(25,118,210,0.10)', color: '#60A5FA', fontSize: 9, height: 17 }} />
+                  <Chip label={r.category} size="small" sx={{ bgcolor: 'rgba(0,200,255,0.10)', color: '#60A5FA', fontSize: 9, height: 17 }} />
                   <Box sx={{ flex: 1 }} />
                   <Typography sx={{ color: C.text, fontSize: 13.5, fontWeight: 700 }}>
                     {Number(r.price) ? usd(Number(r.price)) : '—'}
@@ -390,7 +390,7 @@ const CatalogManagerPanel: React.FC = () => {
         )}
         <DialogActions>
           <Button onClick={() => setEdit(null)} sx={{ color: C.sub, textTransform: 'none' }}>Cancel</Button>
-          <Button disabled={saving} onClick={save} sx={{ bgcolor: C.blue, color: '#fff', textTransform: 'none', fontWeight: 600, '&:hover': { bgcolor: '#1565C0' } }}>
+          <Button disabled={saving} onClick={save} sx={{ bgcolor: C.blue, color: '#06151c', textTransform: 'none', fontWeight: 600, '&:hover': { bgcolor: '#33d4ff' } }}>
             {saving ? 'Saving…' : 'Save'}
           </Button>
         </DialogActions>

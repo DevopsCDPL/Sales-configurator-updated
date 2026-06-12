@@ -17,7 +17,7 @@ const C = {
   surface: '#13131E', border: '#1E2235', text: '#E2E8F0', sub: '#64748B',
 };
 /** Calm, dark-friendly categorical palette (blue-led, no yellow). */
-const PALETTE = ['#1976D2', '#22C55E', '#8B5CF6', '#06B6D4', '#F472B6', '#94A3B8', '#FB7185', '#34D399'];
+const PALETTE = ['#00c8ff', '#22C55E', '#8B5CF6', '#06B6D4', '#F472B6', '#94A3B8', '#FB7185', '#34D399'];
 
 const usd = (n: number) =>
   n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
@@ -105,7 +105,7 @@ export const QuoteCharts: React.FC<{ preview: QuotePreviewResponse; revisions: Q
               <XAxis dataKey="name" tick={{ fill: '#64748B', fontSize: 11 }} axisLine={{ stroke: '#1E2235' }} tickLine={false} />
               <YAxis tick={{ fill: '#64748B', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v) => '$' + (v / 1000) + 'k'} />
               <Tooltip contentStyle={tooltipStyle} formatter={(v: any, n: any) => [usd(Number(v)), n === 'cost' ? 'Cost' : 'Profit']} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
-              <Bar dataKey="cost" stackId="a" fill="#1976D2" radius={[0, 0, 4, 4]} />
+              <Bar dataKey="cost" stackId="a" fill="#00c8ff" radius={[0, 0, 4, 4]} />
               <Bar dataKey="profit" stackId="a" fill="#22C55E" radius={[4, 4, 0, 0]}>
                 <LabelList dataKey="profit" position="top" formatter={(v: any) => (Number(v) ? '+' + usd(Number(v)) : '')} style={{ fill: '#86EFAC', fontSize: 11 }} />
               </Bar>
@@ -122,7 +122,7 @@ export const QuoteCharts: React.FC<{ preview: QuotePreviewResponse; revisions: Q
                 <XAxis dataKey="name" tick={{ fill: '#64748B', fontSize: 11 }} axisLine={{ stroke: '#1E2235' }} tickLine={false} />
                 <YAxis tick={{ fill: '#64748B', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v) => '$' + (v / 1000) + 'k'} />
                 <Tooltip contentStyle={tooltipStyle} formatter={(v: any, n: any) => (n === 'sell' ? [usd(Number(v)), 'Sell'] : [v + '%', 'GM'])} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
-                <Bar dataKey="sell" fill="#1976D2" radius={[4, 4, 0, 0]}>
+                <Bar dataKey="sell" fill="#00c8ff" radius={[4, 4, 0, 0]}>
                   <LabelList dataKey="gm" position="top" formatter={(v: any) => v + '%'} style={{ fill: '#94A3B8', fontSize: 10 }} />
                 </Bar>
               </BarChart>

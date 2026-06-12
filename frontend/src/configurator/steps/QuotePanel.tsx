@@ -22,7 +22,7 @@ import configuratorV2Service, {
 import QuoteCharts from './QuoteCharts';
 
 const C = {
-  bg: '#0D0D14', surface: '#13131E', border: '#1E2235', blue: '#1976D2',
+  bg: '#000000', surface: '#13131E', border: '#1E2235', blue: '#00c8ff',
   text: '#E2E8F0', sub: '#64748B', green: '#22C55E', amber: '#D97706', red: '#EF4444',
 };
 
@@ -235,7 +235,7 @@ const QuotePanel: React.FC<QuotePanelProps> = ({ switchboardId }) => {
 
             <Button
               onClick={runPreview} disabled={loading}
-              sx={{ bgcolor: C.blue, color: '#fff', textTransform: 'none', fontWeight: 600, '&:hover': { bgcolor: '#1565C0' } }}
+              sx={{ bgcolor: C.blue, color: '#06151c', textTransform: 'none', fontWeight: 600, '&:hover': { bgcolor: '#33d4ff' } }}
             >
               {loading ? 'Computing…' : 'Recompute quote'}
             </Button>
@@ -267,7 +267,7 @@ const QuotePanel: React.FC<QuotePanelProps> = ({ switchboardId }) => {
                 <Typography sx={{ color: C.text, fontSize: 13, fontWeight: 700 }}>Total cost</Typography>
                 <Typography sx={{ color: C.text, fontSize: 13, fontWeight: 700 }}>{usd(q.total_cost)}</Typography>
               </Stack>
-              <Box sx={{ bgcolor: 'rgba(25,118,210,0.08)', border: '1px solid rgba(25,118,210,0.35)', borderRadius: '8px', p: 1.5, mt: 1 }}>
+              <Box sx={{ bgcolor: 'rgba(0,200,255,0.08)', border: '1px solid rgba(0,200,255,0.35)', borderRadius: '8px', p: 1.5, mt: 1 }}>
                 <Stack direction="row" justifyContent="space-between">
                   <Typography sx={{ color: C.sub, fontSize: 12 }}>Sell price (rounded)</Typography>
                   <Typography sx={{ color: '#60A5FA', fontSize: 18, fontWeight: 800 }}>{usd(q.pricing.rounded_price)}</Typography>
@@ -364,7 +364,7 @@ const QuotePanel: React.FC<QuotePanelProps> = ({ switchboardId }) => {
                 <TableRow key={r.id}>
                   <TableCell sx={cellSx}>{r.quotation_number}</TableCell>
                   <TableCell sx={cellSx}>
-                    <Chip label={'R' + r.revision} size="small" sx={{ bgcolor: 'rgba(25,118,210,0.12)', color: '#60A5FA', fontSize: 10, height: 18 }} />
+                    <Chip label={'R' + r.revision} size="small" sx={{ bgcolor: 'rgba(0,200,255,0.12)', color: '#60A5FA', fontSize: 10, height: 18 }} />
                   </TableCell>
                   <TableCell sx={cellSx} align="right">{usd(r.material_total)}</TableCell>
                   <TableCell sx={cellSx} align="right">{usd(r.labour_total)}</TableCell>

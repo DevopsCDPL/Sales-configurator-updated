@@ -18,14 +18,13 @@ import ContentPasteRoundedIcon from '@mui/icons-material/ContentPasteRounded';
 
 import { DEFAULT_STANDARDS, StandardsSet, nextLadder } from '../lib/us-standards';
 import { computeLoadV2 } from '../lib/load-calculation-v2';
-import { flowStore } from '../state/flowStore';
 import {
   proposeLineup, IntakeInput, FeederRowInput, LineupProposal, LineupOptions,
 } from '../lib/lineup-proposal';
 
 const C = {
-  bg: '#0D0D14', surface: '#13131E', border: '#1E2235', blue: '#1976D2',
-  blueSoft: 'rgba(25,118,210,0.12)', text: '#E2E8F0', sub: '#64748B',
+  bg: '#000000', surface: '#13131E', border: '#1E2235', blue: '#00c8ff',
+  blueSoft: 'rgba(0,200,255,0.12)', text: '#E2E8F0', sub: '#64748B',
   muted: '#3D4663', green: '#22C55E', amber: '#D97706', red: '#EF4444',
 };
 
@@ -153,18 +152,6 @@ export default function IntakeStep(props: IntakeStepProps) {
     });
   };
 
-  // Expose Save intake / Propose to the sticky Configuration bar
-  React.useEffect(() => {
-    flowStore.set({
-      intakeActions: {
-        save: () => props.onSaveIntake(intake),
-        propose: () => runProposal(),
-      },
-    });
-    return () => { flowStore.set({ intakeActions: null }); };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [intake]);
-
   const runProposal = () => {
     const p = proposeLineup(std, intake, {
       maxSections: props.maxSections ?? 10,
@@ -176,7 +163,7 @@ export default function IntakeStep(props: IntakeStepProps) {
   return (
     <Box sx={{ p: 2, bgcolor: C.bg }}>
       <Typography sx={{ color: C.sub, fontSize: 12, mb: 1.5 }}>
-        Capture the customer requirement — the engine proposes the full line-up (Save intake / Propose are in the top bar).
+        Capture the customer requirement — the engine proposes the full line-up from the schedule below.
       </Typography>
 
       {/* Board-level intake */}
@@ -238,18 +225,26 @@ export default function IntakeStep(props: IntakeStepProps) {
       {/* Feeder schedule */}
       <Box sx={{ ...card, mt: 2 }} onPaste={handlePaste}>
         <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Typography sx={cardTitle}>Load &amp; Feeder Schedule</Typography>
+          <Typography sx={{ ...cardTitle, mb: 0 }}>Load &amp; Feeder Schedule</Typography>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Button size="small" startIcon={<AddRoundedIcon />} onClick={() => patch({ feeders: [...intake.feeders, newRow()] })}
+              sx={{ color: C.blue, textTransform: 'none', fontSize: 12, border: `1px solid ${C.border}` }}>
+              Add feeder
+            </Button>
+            <Button size="small" startIcon={<AutoAwesomeRoundedIcon sx={{ fontSize: 14 }} />} onClick={runProposal}
+              sx={{ bgcolor: C.blue, color: '#06151c', textTransform: 'none', fontWeight: 700, fontSize: 12, px: 1.5, '&:hover': { bgcolor: '#33d4ff' } }}>
+              Propose line-up
+            </Button>
+            <Button size="small" onClick={() => props.onSaveIntake(intake)}
+              sx={{ color: C.sub, textTransform: 'none', fontSize: 12, border: `1px solid ${C.border}` }}>
+              Save intake
+            </Button>
+          </Stack>
         </Stack>
         {pasteInfo && <Alert severity="info" sx={alertSx} onClose={() => setPasteInfo(null)}>{pasteInfo}</Alert>}
 
         <Stack direction="row" spacing={2} alignItems="flex-start" sx={{ mt: 0.5 }}>
         <Box sx={{ flex: 1, minWidth: 560 }}>
-        <Stack direction="row" justifyContent="flex-end" sx={{ mb: 0.5 }}>
-          <Button size="small" startIcon={<AddRoundedIcon />} onClick={() => patch({ feeders: [...intake.feeders, newRow()] })}
-            sx={{ color: C.blue, textTransform: 'none', fontSize: 12 }}>
-            Add feeder
-          </Button>
-        </Stack>
         <Table size="small" sx={{
           '& td, & th': { borderColor: C.border, color: C.text, fontSize: 12.5, py: 0.5 },
           '& td .MuiInputBase-root': {
@@ -337,12 +332,12 @@ export default function IntakeStep(props: IntakeStepProps) {
         </Box>
 
         {/* Right column: paste hint + sticky live summary */}
-        <Box sx={{ width: 250, flexShrink: 0, alignSelf: 'flex-start', position: 'sticky', top: 148 }}>
+        <Box sx={{ width: 250, flexShrink: 0, alignSelf: 'flex-start' }}>
         <Tooltip title="Copy rows in Excel (description, type, unit, value, PF, continuous, poles, qty) and paste anywhere in this panel">
           <Chip icon={<ContentPasteRoundedIcon sx={{ fontSize: 14 }} />} label="Paste from Excel supported"
             size="small" sx={{ mb: 1, width: '100%', bgcolor: 'transparent', border: `1px solid ${C.border}`, color: C.sub, fontSize: 11 }} />
         </Tooltip>
-        <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', p: 1.5 }}>
+        <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', p: 1.5, position: 'sticky', top: 148 }}>
           <Typography sx={{ color: C.sub, fontSize: 10.5, letterSpacing: 0.5, mb: 1 }}>LIVE LOAD SUMMARY</Typography>
           <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.25 }}>
             <Typography sx={{ color: C.sub, fontSize: 11.5 }}>Design current</Typography>

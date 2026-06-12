@@ -5,8 +5,8 @@
  * "+" → New Configuration (blank) | Load Configuration (clone picker).
  * Re-entering the project re-opens each card's saved state.
  *
- * Design language: #0D0D14 bg / #13131E surface / #1E2235 border /
- * #1976D2 primary — no gold, low contrast, generous spacing.
+ * Design language: #000000 bg / #13131E surface / #1E2235 border /
+ * #00c8ff primary — no gold, low contrast, generous spacing.
  */
 import React, { useState } from 'react';
 import {
@@ -22,12 +22,12 @@ import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
 import ArchitectureRoundedIcon from '@mui/icons-material/ArchitectureRounded';
 
 const C = {
-  bg: '#0D0D14',
+  bg: '#000000',
   surface: '#13131E',
   surfaceHover: '#171724',
   border: '#1E2235',
-  blue: '#1976D2',
-  blueSoft: 'rgba(25,118,210,0.12)',
+  blue: '#00c8ff',
+  blueSoft: 'rgba(0,200,255,0.12)',
   text: '#E2E8F0',
   sub: '#64748B',
   muted: '#3D4663',

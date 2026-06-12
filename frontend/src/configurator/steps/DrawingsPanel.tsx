@@ -16,7 +16,7 @@ import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 import configuratorV2Service, { SwJobRow } from '../../services/configuratorV2Service';
 
 const C = {
-  bg: '#0D0D14', surface: '#13131E', border: '#1E2235', blue: '#1976D2',
+  bg: '#000000', surface: '#13131E', border: '#1E2235', blue: '#00c8ff',
   text: '#E2E8F0', sub: '#64748B', green: '#22C55E', amber: '#D97706', red: '#EF4444',
 };
 
@@ -91,7 +91,7 @@ const DrawingsPanel: React.FC<DrawingsPanelProps> = ({ switchboardId }) => {
         </Alert>
       )}
       {info && (
-        <Alert severity="info" onClose={() => setInfo(null)} sx={{ mb: 2, bgcolor: 'rgba(25,118,210,0.08)', color: '#93C5FD', border: '1px solid ' + C.border, fontSize: 12 }}>
+        <Alert severity="info" onClose={() => setInfo(null)} sx={{ mb: 2, bgcolor: 'rgba(0,200,255,0.08)', color: '#93C5FD', border: '1px solid ' + C.border, fontSize: 12 }}>
           {info}
         </Alert>
       )}
@@ -107,7 +107,7 @@ const DrawingsPanel: React.FC<DrawingsPanelProps> = ({ switchboardId }) => {
                 sx={{
                   color: C.text, textTransform: 'none', fontSize: 12.5, px: 1.75,
                   border: '1px solid ' + C.border, bgcolor: C.surface,
-                  '&:hover': { borderColor: C.blue, bgcolor: 'rgba(25,118,210,0.08)' },
+                  '&:hover': { borderColor: C.blue, bgcolor: 'rgba(0,200,255,0.08)' },
                 }}
               >
                 {busyType === t.key ? 'Queuing…' : t.label}

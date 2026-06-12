@@ -31,7 +31,7 @@ import { useConfigurator } from '../state/ConfiguratorProvider';
 import configuratorV2Service, { FullBoard, SwitchboardRow, CatalogCb } from '../../services/configuratorV2Service';
 
 const C = {
-  bg: '#0D0D14', surface: '#13131E', border: '#1E2235', blue: '#1976D2',
+  bg: '#000000', surface: '#13131E', border: '#1E2235', blue: '#00c8ff',
   text: '#E2E8F0', sub: '#64748B', amber: '#D97706', green: '#22C55E', red: '#EF4444',
 };
 
@@ -470,7 +470,7 @@ const V2PreviewStep: React.FC = () => {
                   <Button key={o} size="small" onClick={() => setCoOrigin(o)}
                     sx={{
                       textTransform: 'none', fontSize: 11.5,
-                      color: coOrigin === o ? '#fff' : C.sub,
+                      color: coOrigin === o ? '#06151c' : C.sub,
                       bgcolor: coOrigin === o ? C.blue : 'transparent',
                       border: '1px solid ' + (coOrigin === o ? C.blue : C.border),
                     }}>

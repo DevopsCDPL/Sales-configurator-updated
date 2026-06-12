@@ -336,28 +336,6 @@ const ConfigurationTab: React.FC<ConfigurationTabProps> = ({ project, onUpdate, 
 
           {/* RIGHT — refresh · config selector dropdown · new button */}
           <Stack direction="row" spacing={0.75} alignItems="center" sx={{ flexShrink: 0 }}>
-            {flow.boardOpen && flow.step === 'system' && flow.intakeActions && (
-              <>
-                <Button
-                  size="small"
-                  onClick={() => flow.intakeActions?.save()}
-                  sx={{ color: 'var(--text-muted, #9ab0d0)', textTransform: 'none', fontSize: '0.72rem', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', height: 28 }}
-                >
-                  Save intake
-                </Button>
-                <Button
-                  size="small"
-                  onClick={() => flow.intakeActions?.propose()}
-                  sx={{
-                    textTransform: 'none', fontWeight: 700, fontSize: '0.72rem', height: 28, px: 1.5,
-                    color: '#06151c', bgcolor: '#00c8ff', borderRadius: '8px',
-                    '&:hover': { bgcolor: '#33d4ff' },
-                  }}
-                >
-                  ✦ Propose line-up
-                </Button>
-              </>
-            )}
             {!flow.boardOpen && (
             <>
             <Tooltip title="Refresh">

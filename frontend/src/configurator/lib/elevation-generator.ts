@@ -25,7 +25,7 @@ const COL = {
   bg: '#0F1722', frame: '#5B6B85', frameFill: '#141D2B',
   bus: 'rgba(0,200,255,0.12)', busLine: '#00c8ff',
   cable: 'rgba(148,163,184,0.08)',
-  device: '#1976D2', deviceFill: 'rgba(25,118,210,0.18)',
+  device: '#00c8ff', deviceFill: 'rgba(0,200,255,0.18)',
   text: '#E2E8F0', sub: '#94A3B8', dim: '#64748B',
 };
 

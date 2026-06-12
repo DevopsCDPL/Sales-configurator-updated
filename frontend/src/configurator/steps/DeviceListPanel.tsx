@@ -16,7 +16,7 @@ import SwapHorizRoundedIcon from '@mui/icons-material/SwapHorizRounded';
 import configuratorV2Service, { ComponentLineRow, CatalogCb } from '../../services/configuratorV2Service';
 
 const C = {
-  bg: '#0D0D14', surface: '#13131E', border: '#1E2235', blue: '#1976D2',
+  bg: '#000000', surface: '#13131E', border: '#1E2235', blue: '#00c8ff',
   text: '#E2E8F0', sub: '#64748B', green: '#22C55E', amber: '#D97706', red: '#EF4444',
 };
 
@@ -113,7 +113,7 @@ const DeviceListPanel: React.FC<DeviceListPanelProps> = ({ lines, catalogCbs, sc
             {deviceLines.map((l) => (
               <TableRow key={l.id}>
                 <TableCell sx={cellSx}>
-                  <Chip label={l.meta?.designation ?? '?'} size="small" sx={{ bgcolor: 'rgba(25,118,210,0.12)', color: '#60A5FA', fontWeight: 700, fontSize: 10.5, height: 20 }} />
+                  <Chip label={l.meta?.designation ?? '?'} size="small" sx={{ bgcolor: 'rgba(0,200,255,0.12)', color: '#60A5FA', fontWeight: 700, fontSize: 10.5, height: 20 }} />
                 </TableCell>
                 <TableCell sx={{ ...cellSx, color: C.sub }}>{l.meta?.role ?? '—'}</TableCell>
                 <TableCell sx={cellSx}>

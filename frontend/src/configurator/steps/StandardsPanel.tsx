@@ -17,7 +17,7 @@ import SaveRoundedIcon from '@mui/icons-material/SaveRounded';
 import configuratorV2Service, { StandardsTableRow } from '../../services/configuratorV2Service';
 
 const C = {
-  bg: '#0D0D14', surface: '#13131E', border: '#1E2235', blue: '#1976D2',
+  bg: '#000000', surface: '#13131E', border: '#1E2235', blue: '#00c8ff',
   text: '#E2E8F0', sub: '#64748B', green: '#22C55E', amber: '#D97706', red: '#EF4444',
 };
 
@@ -116,7 +116,7 @@ const StandardsPanel: React.FC = () => {
           {TABLES.map((t) => <MenuItem key={t.key} value={t.key} sx={{ fontSize: 13 }}>{t.label}</MenuItem>)}
         </Select>
         {table && (
-          <Chip label={'v' + table.version} size="small" sx={{ bgcolor: 'rgba(25,118,210,0.12)', color: '#60A5FA', fontSize: 10.5, height: 20 }} />
+          <Chip label={'v' + table.version} size="small" sx={{ bgcolor: 'rgba(0,200,255,0.12)', color: '#60A5FA', fontSize: 10.5, height: 20 }} />
         )}
         {seedCount > 0 && (
           <Chip label={seedCount + ' [SEED] rows — unverified by TPS'} size="small" sx={{ bgcolor: 'transparent', border: '1px solid ' + C.amber, color: C.amber, fontSize: 10.5, height: 20 }} />
@@ -131,7 +131,7 @@ const StandardsPanel: React.FC = () => {
             />
             <Button
               startIcon={<SaveRoundedIcon sx={{ fontSize: 15 }} />} disabled={saving} onClick={save}
-              sx={{ bgcolor: C.blue, color: '#fff', textTransform: 'none', fontWeight: 600, fontSize: 12.5, '&:hover': { bgcolor: '#1565C0' } }}
+              sx={{ bgcolor: C.blue, color: '#06151c', textTransform: 'none', fontWeight: 600, fontSize: 12.5, '&:hover': { bgcolor: '#33d4ff' } }}
             >
               {saving ? 'Saving…' : 'Save as v' + ((table?.version ?? 0) + 1)}
             </Button>

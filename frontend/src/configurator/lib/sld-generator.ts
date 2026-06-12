@@ -31,7 +31,7 @@ export interface SldInput {
 
 const FG = '#E2E8F0';
 const MUTED = '#64748B';
-const ACCENT = '#1976D2';
+const ACCENT = '#00c8ff';
 const BG = 'transparent';
 
 const COL_W = 110;
