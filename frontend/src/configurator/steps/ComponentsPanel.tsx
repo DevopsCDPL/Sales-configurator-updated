@@ -10,7 +10,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Box, Typography, Stack, Chip, Button, Alert, CircularProgress, TextField,
-  Table, TableHead, TableRow, TableCell, TableBody, MenuItem, Select, IconButton,
+  Table, TableHead, TableRow, TableCell, TableBody, MenuItem, Select, IconButton, Tooltip,
 } from '@mui/material';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
@@ -243,54 +243,99 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
             (hardware, terminations, wiring, identification…). No catalog match still creates
             a placeholder line so nothing is missed.
           </Typography>
-        ) : ruleGroups.map(([group, rows]) => (
-          <Box key={group}>
-            <Typography sx={{ color: '#A9B6C9', fontSize: 10.5, fontWeight: 700, letterSpacing: 0.5, px: 2, pt: 1, pb: 0.5, textTransform: 'uppercase' }}>
-              {group}
-            </Typography>
-            <Table size="small">
-              <TableBody>
-                {rows.map((l) => (
-                  <TableRow key={l.id}>
-                    <TableCell sx={{ ...cellSx, width: 260, color: C.sub }}>{l.meta?.ruleDescription ?? l.category}</TableCell>
-                    <TableCell sx={cellSx}>
-                      {l.meta?.placeholder ? (
-                        <Chip label={'NO CATALOG MATCH — ' + (l.meta?.ruleDescription ?? '')} size="small"
-                          sx={{ bgcolor: 'rgba(217,119,6,0.12)', color: '#FCD34D', fontSize: 9.5, height: 18 }} />
-                      ) : l.name}
-                      {l.meta?.swapped && (
-                        <Chip label="swapped" size="small" sx={{ ml: 0.5, bgcolor: 'transparent', border: '1px solid ' + C.amber, color: C.amber, fontSize: 8.5, height: 15 }} />
-                      )}
-                    </TableCell>
-                    <TableCell sx={{ ...cellSx, width: 90, color: C.sub, fontSize: 10.5 }}>{l.meta?.qtyFormula ?? ''}</TableCell>
-                    <TableCell sx={{ ...cellSx, width: 70 }}>
-                      <TextField
-                        size="small" defaultValue={l.quantity} key={l.id + ':' + l.quantity}
-                        onBlur={(e) => { const v = Number(e.target.value); if (v !== Number(l.quantity)) setLineQty(l, v); }}
-                        inputProps={{ style: { textAlign: 'center', padding: '4px 6px', fontSize: 12 } }}
-                        sx={{ width: 56, '& .MuiOutlinedInput-root': { bgcolor: C.bg, color: C.text, '& fieldset': { borderColor: C.border } } }}
-                      />
-                    </TableCell>
-                    <TableCell sx={{ ...cellSx, width: 90 }} align="right"><PriceSourceDot source={(l.meta as any)?.priceSource} />{Number(l.unit_cost) ? usd(Number(l.unit_cost)) : '—'}</TableCell>
-                    <TableCell sx={{ ...cellSx, width: 64 }}>
-                      <Chip label={l.price_status === 'PENDING_RFQ' ? 'RFQ' : l.price_status} size="small"
-                        sx={{ bgcolor: 'transparent', border: '1px solid ' + (l.price_status === 'FIRM' ? C.green : C.amber), color: l.price_status === 'FIRM' ? C.green : C.amber, fontSize: 9, height: 17 }} />
-                    </TableCell>
-                    <TableCell sx={{ ...cellSx, width: 110, whiteSpace: 'nowrap' }} align="right">
-                      <Button size="small" startIcon={<SwapHorizRoundedIcon sx={{ fontSize: 13 }} />} onClick={() => openSwap(l)}
-                        sx={{ color: '#00c8ff', textTransform: 'none', fontSize: 10.5, minWidth: 0, mr: 0.5 }}>
-                        Swap
-                      </Button>
-                      <IconButton size="small" disabled={busyId === l.id} onClick={() => remove(l)} sx={{ color: C.sub, p: 0.3, '&:hover': { color: C.red } }}>
-                        <DeleteOutlineRoundedIcon sx={{ fontSize: 15 }} />
-                      </IconButton>
+        ) : (
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7, width: 240 }}>COMPONENT</TableCell>
+                <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7 }}>CATALOG ITEM</TableCell>
+                <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7, width: 110 }}>QTY BASIS</TableCell>
+                <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7, width: 70 }}>QTY</TableCell>
+                <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7, width: 100 }} align="right">UNIT PRICE</TableCell>
+                <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7, width: 56 }} align="center">STATUS</TableCell>
+                <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7, width: 90 }} />
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {ruleGroups.map(([group, rows]) => (
+                <React.Fragment key={group}>
+                  <TableRow>
+                    <TableCell colSpan={7} sx={{ color: '#A9B6C9', fontSize: 10.5, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', borderBottom: '1px solid ' + C.border, bgcolor: 'rgba(0,200,255,0.04)', py: 0.6 }}>
+                      {group}
                     </TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Box>
-        ))}
+                  {rows.map((l) => {
+                    const unitCost = Number(l.unit_cost);
+                    const statusColor = l.price_status === 'FIRM' ? C.green : l.price_status === 'ESTIMATED' ? C.amber : C.red;
+                    const statusLabel = l.price_status === 'FIRM' ? 'Firm price' : l.price_status === 'ESTIMATED' ? 'Estimated price' : 'No firm price — RFQ required';
+                    return (
+                      <TableRow key={l.id}>
+                        <TableCell sx={{ ...cellSx, width: 240, verticalAlign: 'middle', py: 0.55, color: C.text, fontSize: 12 }}>
+                          {l.meta?.ruleDescription ?? l.category}
+                        </TableCell>
+                        <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.55 }}>
+                          {l.meta?.placeholder ? (
+                            <Box>
+                              <Chip label="NO CATALOG MATCH" size="small"
+                                sx={{ bgcolor: 'rgba(217,119,6,0.12)', color: '#FCD34D', fontSize: 9.5, height: 18 }} />
+                              <Typography sx={{ color: C.sub, fontSize: 10.5, fontStyle: 'italic', mt: 0.2 }}>
+                                add to catalog or swap
+                              </Typography>
+                            </Box>
+                          ) : (
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                              <Typography sx={{ color: C.text, fontSize: 12 }}>{l.name}</Typography>
+                              {l.meta?.swapped && (
+                                <Chip label="swapped" size="small" sx={{ bgcolor: 'transparent', border: '1px solid ' + C.amber, color: C.amber, fontSize: 8.5, height: 15 }} />
+                              )}
+                            </Box>
+                          )}
+                        </TableCell>
+                        <TableCell sx={{ ...cellSx, width: 110, verticalAlign: 'middle', py: 0.55, color: C.sub, fontSize: 10.5, whiteSpace: 'nowrap' }}>
+                          {l.meta?.qtyFormula ?? ''}
+                        </TableCell>
+                        <TableCell sx={{ ...cellSx, width: 70, verticalAlign: 'middle', py: 0.55 }}>
+                          <TextField
+                            size="small" defaultValue={l.quantity} key={l.id + ':' + l.quantity}
+                            onBlur={(e) => { const v = Number(e.target.value); if (v !== Number(l.quantity)) setLineQty(l, v); }}
+                            inputProps={{ style: { textAlign: 'center', padding: '4px 6px', fontSize: 12 } }}
+                            sx={{ width: 56, '& .MuiOutlinedInput-root': { bgcolor: C.bg, color: C.text, '& fieldset': { borderColor: C.border } } }}
+                          />
+                        </TableCell>
+                        <TableCell sx={{ ...cellSx, width: 100, verticalAlign: 'middle', py: 0.55 }} align="right">
+                          {unitCost > 0 ? (
+                            <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
+                              <PriceSourceDot source={(l.meta as any)?.priceSource} />
+                              {usd(unitCost)}
+                            </Box>
+                          ) : (
+                            <Tooltip title="No quote received yet — raise an RFQ" arrow>
+                              <Typography sx={{ color: C.red, fontWeight: 800, fontSize: 12, display: 'inline' }}>RFQ $</Typography>
+                            </Tooltip>
+                          )}
+                        </TableCell>
+                        <TableCell sx={{ ...cellSx, width: 56, verticalAlign: 'middle', py: 0.55 }} align="center">
+                          <Tooltip title={statusLabel} arrow>
+                            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: statusColor, boxShadow: '0 0 6px ' + statusColor, display: 'inline-block' }} />
+                          </Tooltip>
+                        </TableCell>
+                        <TableCell sx={{ ...cellSx, width: 90, verticalAlign: 'middle', py: 0.55, whiteSpace: 'nowrap' }} align="right">
+                          <Button size="small" startIcon={<SwapHorizRoundedIcon sx={{ fontSize: 13 }} />} onClick={() => openSwap(l)}
+                            sx={{ color: '#00c8ff', textTransform: 'none', fontSize: 10.5, minWidth: 0, mr: 0.5 }}>
+                            Swap
+                          </Button>
+                          <IconButton size="small" disabled={busyId === l.id} onClick={() => remove(l)} sx={{ color: C.sub, p: 0.3, '&:hover': { color: C.red } }}>
+                            <DeleteOutlineRoundedIcon sx={{ fontSize: 15 }} />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </React.Fragment>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </Box>
 
       {/* Swap dialog (same-category alternatives, cheapest first) */}
@@ -469,4 +514,4 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
   );
 };
 
-export default ComponentsPanel;
+export default ComponentsPanel
