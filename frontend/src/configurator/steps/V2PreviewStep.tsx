@@ -11,7 +11,7 @@
  */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { DEVICE_ENVELOPE_IN } from '../lib/lineup-proposal';
-import { Box, Typography, Stack, Chip, Button, Alert, CircularProgress, Snackbar, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Tabs, Tab } from '@mui/material';
+import { Box, Typography, Stack, Chip, Button, Alert, CircularProgress, Snackbar, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
 import SwitchboardCardsScreen, { SwitchboardCardData } from './SwitchboardCardsScreen';
 import IntakeStep from './IntakeStep';
 import BomViewer from './BomViewer';
@@ -204,7 +204,6 @@ const V2PreviewStep: React.FC = () => {
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [secTab, setSecTab] = useState(0);
 
   const reload = useCallback(async () => {
     if (!configurationId) return;
@@ -472,50 +471,31 @@ const V2PreviewStep: React.FC = () => {
               onAcceptProposal={acceptProposal}
             />
           ) : boardView === 'sections' ? (
-            <Box sx={{ pt: 1 }}>
-              {/* Section Design tabs */}
-              <Tabs
-                value={secTab}
-                onChange={(_e, v) => setSecTab(v as number)}
-                sx={{
-                  px: 2, mb: 0,
-                  '& .MuiTab-root': { textTransform: 'none', fontSize: 12.5, color: C.sub, minHeight: 36 },
-                  '& .Mui-selected': { color: C.blue },
-                  '& .MuiTabs-indicator': { bgcolor: C.blue },
-                }}
-              >
-                <Tab label="Section editor" />
-                <Tab label="Device picks" />
-              </Tabs>
-              {secTab === 0 && (
-                <SectionEditorPanel
-                  board={openBoard}
-                  locked={openBoard.board.status === 'locked'}
-                  onChanged={async () => {
-                    const full = await configuratorV2Service.getFull(openBoard.board.id);
-                    setOpenBoard(full);
-                    setSectionCounts((m) => ({ ...m, [full.board.id]: full.sections.length }));
-                    setSvg(sldFromFull(full)?.svg ?? null);
-                    setToast('Section design updated — BOM and quote will recompute');
-                  }}
-                />
-              )}
-              {secTab === 1 && (
-                <DeviceListPanel
-                  lines={openBoard.lines}
-                  intake={openBoard.board.intake as any}
-                  catalogCbs={catalogCbs}
-                  sccrKA={Number(openBoard.board.board_data?.shortCircuitRating) || 65}
-                  locked={openBoard.board.status === 'locked'}
-                  onSwapped={async () => {
-                    const full = await configuratorV2Service.getFull(openBoard.board.id);
-                    setOpenBoard(full);
-                    setSvg(sldFromFull(full)?.svg ?? null);
-                    setToast('Device swapped — cost updated, quote flagged for review');
-                  }}
-                />
-              )}
-            </Box>
+            <SectionEditorPanel
+              board={openBoard}
+              locked={openBoard.board.status === 'locked'}
+              onChanged={async () => {
+                const full = await configuratorV2Service.getFull(openBoard.board.id);
+                setOpenBoard(full);
+                setSectionCounts((m) => ({ ...m, [full.board.id]: full.sections.length }));
+                setSvg(sldFromFull(full)?.svg ?? null);
+                setToast('Section design updated — BOM and quote will recompute');
+              }}
+            />
+          ) : boardView === 'section_review' ? (
+            <DeviceListPanel
+              lines={openBoard.lines}
+              intake={openBoard.board.intake as any}
+              catalogCbs={catalogCbs}
+              sccrKA={Number(openBoard.board.board_data?.shortCircuitRating) || 65}
+              locked={openBoard.board.status === 'locked'}
+              onSwapped={async () => {
+                const full = await configuratorV2Service.getFull(openBoard.board.id);
+                setOpenBoard(full);
+                setSvg(sldFromFull(full)?.svg ?? null);
+                setToast('Device swapped — cost updated, quote flagged for review');
+              }}
+            />
           ) : boardView === 'sld' ? (
             <Box sx={{ px: 2, pb: 3, pt: 1 }}>
               <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
@@ -584,6 +564,14 @@ const V2PreviewStep: React.FC = () => {
           ) : boardView === 'components' ? (
             <ComponentsPanel
               key={'comp-' + openBoard.board.id}
+              view="picks"
+              board={openBoard}
+              onLinesChanged={(lines) => setOpenBoard((ob) => (ob ? { ...ob, lines } : ob))}
+            />
+          ) : boardView === 'component_review' ? (
+            <ComponentsPanel
+              key={'comp-review-' + openBoard.board.id}
+              view="review"
               board={openBoard}
               onLinesChanged={(lines) => setOpenBoard((ob) => (ob ? { ...ob, lines } : ob))}
             />

@@ -22,9 +22,11 @@ import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import SwapHorizRoundedIcon from '@mui/icons-material/SwapHorizRounded';
+import TuneRoundedIcon from '@mui/icons-material/TuneRounded';
 import configuratorV2Service, { FullBoard, SectionRow, ComponentLineRow } from '../../services/configuratorV2Service';
 import { ConfiguratorComponent } from '../../services/configuratorService';
 import ComponentPickerDialog from '../components/ComponentPickerDialog';
+import CatalogNumberBuilderDialog from '../components/CatalogNumberBuilderDialog';
 import DesignSummaryCard from '../components/DesignSummaryCard';
 import { displayCase } from '../lib/displayCase';
 import { DEVICE_ENVELOPE_IN } from '../lib/lineup-proposal';
@@ -94,6 +96,10 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
   // swap picker state
   const [swapLine, setSwapLine] = useState<ComponentLineRow | null>(null);
   const [swapPickerOpen, setSwapPickerOpen] = useState(false);
+  // Build Schneider breaker (builder) state
+  const [builderPickerOpen, setBuilderPickerOpen] = useState(false);
+  const [builderOpen, setBuilderOpen] = useState(false);
+  const [builderComponent, setBuilderComponent] = useState<ConfiguratorComponent | null>(null);
 
   const sccrKA = Number(board.board.board_data?.shortCircuitRating) || null;
 
@@ -381,11 +387,23 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
         <Box sx={{ flex: 1, minWidth: 0 }}>
           {/* Title row */}
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
-            <Typography sx={{ color: C.title, fontSize: 13.5, fontWeight: 600 }}>
-              Section editor — frames, capacity and device placement
-            </Typography>
+            <Box sx={{ flex: 1 }} />
             <Stack direction="row" alignItems="center" spacing={1}>
               {busyKey && <CircularProgress size={14} sx={{ color: C.blue }} />}
+              <Tooltip title="Build a Schneider Electric breaker catalog number">
+                <span>
+                  <Button
+                    size="small"
+                    startIcon={<TuneRoundedIcon sx={{ fontSize: 16 }} />}
+                    disabled={locked || !!busyKey}
+                    onClick={() => setBuilderPickerOpen(true)}
+                    variant="outlined"
+                    sx={{ color: C.text, textTransform: 'none', fontSize: 12, border: '1px solid ' + C.border, '&:hover': { borderColor: C.blue } }}
+                  >
+                    Build Schneider breaker
+                  </Button>
+                </span>
+              </Tooltip>
               <Tooltip title={sections.length >= MAX_SECTIONS ? `Maximum ${MAX_SECTIONS} sections` : 'Append a new section'}>
                 <span>
                   <Button
@@ -707,6 +725,30 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
         onPick={(c: ConfiguratorComponent, _qty: number) => {
           if (swapLine) doSwapDevice(swapLine, c);
         }}
+      />
+
+      {/* Build Schneider breaker — picker (pickOnly, locked to CIRCUIT BREAKER) */}
+      <ComponentPickerDialog
+        open={builderPickerOpen}
+        mode="add"
+        lockedCategory="CIRCUIT BREAKER"
+        pickOnly
+        onClose={() => setBuilderPickerOpen(false)}
+        onPick={(c: ConfiguratorComponent, _qty: number) => {
+          setBuilderPickerOpen(false);
+          setBuilderComponent(c);
+          setBuilderOpen(true);
+        }}
+      />
+
+      {/* Build Schneider breaker — catalog number builder dialog */}
+      <CatalogNumberBuilderDialog
+        open={builderOpen}
+        component={builderComponent}
+        switchboardId={board.board.id}
+        onClose={() => setBuilderOpen(false)}
+        onSaved={() => { /* catalog record updated; no line change needed */ }}
+        onAdded={() => { setBuilderOpen(false); onChanged(); }}
       />
     </Box>
   );

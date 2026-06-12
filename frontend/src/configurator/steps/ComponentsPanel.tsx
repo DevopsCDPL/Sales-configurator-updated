@@ -19,13 +19,11 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Box, Typography, Stack, Chip, Button, Alert, CircularProgress, TextField,
   Table, TableHead, TableRow, TableCell, TableBody, IconButton, Tooltip,
-  Tabs, Tab,
 } from '@mui/material';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 import SwapHorizRoundedIcon from '@mui/icons-material/SwapHorizRounded';
-import TuneRoundedIcon from '@mui/icons-material/TuneRounded';
 import { configuratorService, ConfiguratorComponent } from '../../services/configuratorService';
 import configuratorV2Service, { FullBoard, ComponentLineRow } from '../../services/configuratorV2Service';
 import PriceSourceDot from '../components/PriceSourceDot';
@@ -46,12 +44,12 @@ const usd = (n: number) =>
 
 export interface ComponentsPanelProps {
   board: FullBoard;
+  view: 'picks' | 'review';
   onLinesChanged: (lines: ComponentLineRow[]) => void;
 }
 
-const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged }) => {
+const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, view, onLinesChanged }) => {
   const switchboardId = board.board.id;
-  const [tab, setTab] = useState(0);
   const [lines, setLines] = useState<ComponentLineRow[]>(board.lines);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -90,14 +88,6 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
     setPickerCategory(line.category ?? null);
     setPickerPickOnly(false);
     setSwapLine(line);
-    setPickerOpen(true);
-  };
-
-  const openBuilderPicker = () => {
-    setPickerMode('add');
-    setPickerCategory('CIRCUIT BREAKER');
-    setPickerPickOnly(true);
-    setSwapLine(null);
     setPickerOpen(true);
   };
 
@@ -224,26 +214,8 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
         </Alert>
       )}
 
-      {/* ── Tabs ── */}
-      <Tabs
-        value={tab}
-        onChange={(_e, v) => setTab(v)}
-        sx={{
-          mb: 2, minHeight: 36,
-          '& .MuiTabs-indicator': { bgcolor: C.blue, height: 2 },
-          '& .MuiTab-root': {
-            textTransform: 'none', fontSize: 12.5, minHeight: 36,
-            color: 'rgba(217,228,251,0.7)',
-            '&.Mui-selected': { color: C.blue },
-          },
-        }}
-      >
-        <Tab label="Designer's pick" />
-        <Tab label="Manual additions" />
-      </Tabs>
-
-      {/* ── Tab 0: Auto components ── */}
-      {tab === 0 && (() => {
+      {/* ── Picks view: Auto components ── */}
+      {view === 'picks' && (() => {
         const ruleLines = lines.filter((l) => l.source === 'rule');
         const placeholderCount = ruleLines.filter((l) => l.meta?.placeholder).length;
         const catalogMatched = ruleLines.length - placeholderCount;
@@ -268,17 +240,7 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
             <Box sx={{ flex: 1, minWidth: 0 }}>
               <Box sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', mb: 2, overflow: 'hidden' }}>
                 <Stack direction="row" alignItems="center" sx={{ px: 2, py: 1, borderBottom: '1px solid ' + C.border }}>
-                  <Typography sx={{ color: '#CBD5E1', fontSize: 12.5, fontWeight: 700, flex: 1 }}>
-                    Auto components — engine-selected from the design (rules editable in Standards)
-                  </Typography>
-                  <Button
-                    size="small"
-                    startIcon={<TuneRoundedIcon sx={{ fontSize: 16 }} />}
-                    onClick={openBuilderPicker}
-                    sx={{ color: C.text, textTransform: 'none', fontSize: 12.5, border: '1px solid ' + C.border, bgcolor: C.bg, mr: 1, '&:hover': { borderColor: C.blue } }}
-                  >
-                    Build Schneider breaker
-                  </Button>
+                  <Box sx={{ flex: 1 }} />
                   <Button
                     size="small"
                     startIcon={<AddRoundedIcon sx={{ fontSize: 14 }} />}
@@ -471,11 +433,11 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
         );
       })()}
 
-      {/* ── Tab 1: Manual additions ── */}
-      {tab === 1 && (
+      {/* ── Review view: Manual additions ── */}
+      {view === 'review' && (
         <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', mb: 2, overflow: 'hidden' }}>
           <Typography sx={{ color: '#CBD5E1', fontSize: 12.5, fontWeight: 700, px: 2, py: 1, borderBottom: '1px solid ' + C.border }}>
-            Manual additions — {userLines.length} line(s) · picked via Add component
+            Component review — manual additions & audit ({userLines.length} line(s))
           </Typography>
           {!userLines.length ? (
             <Typography sx={{ color: C.sub, fontSize: 12, px: 2, py: 1.5, fontStyle: 'italic' }}>

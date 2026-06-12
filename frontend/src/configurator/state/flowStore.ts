@@ -8,7 +8,9 @@ import { useSyncExternalStore } from 'react';
 export const FLOW_STEPS = [
   ['system', 'System Design'],
   ['sections', 'Section Design'],
+  ['section_review', 'Section Review'],
   ['components', 'Components'],
+  ['component_review', 'Component Review'],
   ['sld', 'SLD'],
   ['elevation', 'Elevation'],
   ['bom', 'Bill of Materials'],
