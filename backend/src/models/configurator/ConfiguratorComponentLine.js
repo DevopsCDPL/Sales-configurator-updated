@@ -25,7 +25,7 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING(8),
         allowNull: false,
         defaultValue: 'board',
-        validate: { isIn: [['board', 'section', 'rule']] },
+        validate: { isIn: [['board', 'section']] },
       },
       section_id: {
         type: DataTypes.UUID,
@@ -58,7 +58,7 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING(16),
         allowNull: false,
         defaultValue: 'user',
-        validate: { isIn: [['user', 'auto', 'builder', 'standard', 'generator']] },
+        validate: { isIn: [['user', 'auto', 'builder', 'standard', 'generator', 'rule']] },
       },
       /** Part-number-builder decoder positions for generated catalog numbers */
       builder_payload: { type: DataTypes.JSONB, allowNull: true },
