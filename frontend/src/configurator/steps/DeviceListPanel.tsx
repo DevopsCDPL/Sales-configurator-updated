@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import SwapHorizRoundedIcon from '@mui/icons-material/SwapHorizRounded';
 import configuratorV2Service, { ComponentLineRow, CatalogCb } from '../../services/configuratorV2Service';
+import DesignSummaryCard from '../components/DesignSummaryCard';
 
 const C = {
   bg: '#000000', surface: '#0B0B0D', border: '#1E2235', blue: '#00c8ff',
@@ -21,7 +22,11 @@ const C = {
 };
 
 const cellSx = { color: C.text, fontSize: 12, borderBottom: '1px solid ' + C.border, py: 0.6 };
-const headSx = { color: C.sub, fontSize: 10.5, fontWeight: 700, letterSpacing: 0.5, borderBottom: '1px solid ' + C.border, py: 0.7 };
+const headSx = {
+  color: C.sub, fontSize: 10.5, fontWeight: 700, letterSpacing: 0.5,
+  borderBottom: '1px solid ' + C.border, py: 0.7,
+  bgcolor: '#0B0B0D', /* solid so rows don't bleed through stickyHeader */
+};
 
 const usd = (n: number) =>
   n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 });
@@ -113,19 +118,32 @@ const DeviceListPanel: React.FC<DeviceListPanelProps> = ({ lines, intake, catalo
   if (!deviceLines.length) return null;
   const cands = swapLine ? candidatesFor(swapLine) : [];
 
+  // Summary values for DesignSummaryCard
+  const summaryMains = deviceLines.filter((l) => String(l.meta?.role).toUpperCase() === 'MAIN').length;
+  const summaryFeeders = deviceLines.filter((l) => String(l.meta?.role).toUpperCase() === 'FEEDER').length;
+  const summaryDrawout = deviceLines.filter((l) => String(l.meta?.mounting || '').toLowerCase().includes('draw')).length;
+  const summaryDeviceCost = deviceLines.reduce((a, l) => a + (Number(l.unit_cost) || 0) * (Number(l.quantity) || 1), 0);
+
   return (
     <Box sx={{ px: 3, pb: 2 }}>
       <Typography sx={{ color: '#CBD5E1', fontSize: 13.5, fontWeight: 600, mb: 1 }}>
         Devices (saved design) — engineer may swap any pick
       </Typography>
       <Stack direction="row" spacing={2} alignItems="flex-start">
-        <Box sx={{ flex: 1, bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', overflow: 'hidden' }}>
-          <Table size="small">
+        {/* Scrollable table with sticky header */}
+        <Box
+          sx={{
+            flex: 1, minWidth: 0,
+            maxHeight: '62vh', overflow: 'auto',
+            bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px',
+          }}
+        >
+          <Table size="small" stickyHeader>
             <TableHead>
               <TableRow>
                 <TableCell sx={headSx}>DESIG.</TableCell>
                 <TableCell sx={headSx}>ROLE</TableCell>
-              <TableCell sx={headSx}>CONNECTED LOAD</TableCell>
+                <TableCell sx={headSx}>CONNECTED LOAD</TableCell>
                 <TableCell sx={headSx}>DEVICE</TableCell>
                 <TableCell sx={headSx}>PART #</TableCell>
                 <TableCell sx={headSx}>SECTION</TableCell>
@@ -144,7 +162,7 @@ const DeviceListPanel: React.FC<DeviceListPanelProps> = ({ lines, intake, catalo
                     <Chip label={l.meta?.designation ?? '?'} size="small" sx={{ bgcolor: 'rgba(0,200,255,0.12)', color: '#60A5FA', fontWeight: 700, fontSize: 10.5, height: 20 }} />
                   </TableCell>
                   <TableCell sx={{ ...cellSx, color: C.sub }}>{l.meta?.role ?? '—'}</TableCell>
-                <TableCell sx={cellSx}>{loadNameFor(l)}</TableCell>
+                  <TableCell sx={cellSx}>{loadNameFor(l)}</TableCell>
                   <TableCell sx={cellSx}>
                     {l.name}
                     {l.meta?.swapped && (
@@ -179,32 +197,15 @@ const DeviceListPanel: React.FC<DeviceListPanelProps> = ({ lines, intake, catalo
             </TableBody>
           </Table>
         </Box>
-        <Box sx={{ width: 250, flexShrink: 0, alignSelf: 'flex-start', position: 'sticky', top: 148, bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', p: 1.5 }}>
-          <Typography sx={{ color: '#A9B6C9', fontSize: 10.5, letterSpacing: 0.5, mb: 1 }}>DESIGN SUMMARY</Typography>
-          <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.25 }}>
-            <Typography sx={{ color: '#A9B6C9', fontSize: 11.5 }}>Devices</Typography>
-            <Typography sx={{ color: C.text, fontWeight: 700, fontSize: 12.5 }}>{deviceLines.length}</Typography>
-          </Stack>
-          <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.25 }}>
-            <Typography sx={{ color: '#A9B6C9', fontSize: 11.5 }}>Mains</Typography>
-            <Typography sx={{ color: C.text, fontWeight: 700, fontSize: 12.5 }}>{deviceLines.filter(l => String(l.meta?.role).toUpperCase() === 'MAIN').length}</Typography>
-          </Stack>
-          <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.25 }}>
-            <Typography sx={{ color: '#A9B6C9', fontSize: 11.5 }}>Feeders</Typography>
-            <Typography sx={{ color: C.text, fontWeight: 700, fontSize: 12.5 }}>{deviceLines.filter(l => String(l.meta?.role).toUpperCase() === 'FEEDER').length}</Typography>
-          </Stack>
-          <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.25 }}>
-            <Typography sx={{ color: '#A9B6C9', fontSize: 11.5 }}>Drawout</Typography>
-            <Typography sx={{ color: C.text, fontWeight: 700, fontSize: 12.5 }}>{deviceLines.filter(l => String(l.meta?.mounting || '').toLowerCase().includes('draw')).length}</Typography>
-          </Stack>
-          <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.25 }}>
-            <Typography sx={{ color: '#A9B6C9', fontSize: 11.5 }}>Device cost</Typography>
-            <Typography sx={{ color: C.text, fontWeight: 700, fontSize: 12.5 }}>{'$' + deviceLines.reduce((a, l) => a + (Number(l.unit_cost) || 0) * (Number(l.quantity) || 1), 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}</Typography>
-          </Stack>
-          <Typography sx={{ color: '#8E9AAD', fontSize: 10, mt: 1 }}>
-            Swap any pick — cost updates and the quote is flagged for review.
-          </Typography>
-        </Box>
+
+        {/* Sticky summary card */}
+        <DesignSummaryCard
+          devices={deviceLines.length}
+          mains={summaryMains}
+          feeders={summaryFeeders}
+          drawout={summaryDrawout}
+          deviceCost={summaryDeviceCost}
+        />
       </Stack>
 
       <Dialog open={!!swapLine} onClose={() => setSwapLine(null)} maxWidth="md" fullWidth

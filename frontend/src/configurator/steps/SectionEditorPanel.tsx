@@ -1,7 +1,7 @@
 /**
  * SectionEditorPanel — the Section Editor (chip 2 augmentation).
  *
- * A scrollable row of section cards. Each card: editable name + role, a
+ * A 4-up grid of section cards. Each card: editable name + role, a
  * frame selector (from the engineering-standards `frame_library`), a
  * utilization bar (device heights vs frame usable height — falls back to
  * device count when dimension data is missing), and the section's device
@@ -23,6 +23,7 @@ import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import configuratorV2Service, { FullBoard, SectionRow, ComponentLineRow } from '../../services/configuratorV2Service';
 import { ConfiguratorComponent } from '../../services/configuratorService';
 import ComponentPickerDialog from '../components/ComponentPickerDialog';
+import DesignSummaryCard from '../components/DesignSummaryCard';
 import { displayCase } from '../lib/displayCase';
 
 const C = {
@@ -112,6 +113,29 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
     }
     return m;
   }, [board.lines]);
+
+  // All CB lines across every section — used for the summary card
+  const allDeviceLines = useMemo(
+    () => board.lines.filter((l) => (l.category || '').toUpperCase() === 'CIRCUIT BREAKER'),
+    [board.lines]
+  );
+
+  const summaryMains = useMemo(
+    () => allDeviceLines.filter((l) => String(l.meta?.role).toUpperCase() === 'MAIN').length,
+    [allDeviceLines]
+  );
+  const summaryFeeders = useMemo(
+    () => allDeviceLines.filter((l) => String(l.meta?.role).toUpperCase() === 'FEEDER').length,
+    [allDeviceLines]
+  );
+  const summaryDrawout = useMemo(
+    () => allDeviceLines.filter((l) => String(l.meta?.mounting || '').toLowerCase().includes('draw')).length,
+    [allDeviceLines]
+  );
+  const summaryDeviceCost = useMemo(
+    () => allDeviceLines.reduce((a, l) => a + (Number(l.unit_cost) || 0) * (Number(l.quantity) || 1), 0),
+    [allDeviceLines]
+  );
 
   const frameFor = (sec: SectionRow): FrameRow | null => {
     const code = sec.layout?.frameCode ?? sec.layout?.frame?.frameCode ?? null;
@@ -288,247 +312,265 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
 
   return (
     <Box sx={{ px: 3, pt: 2, pb: 1 }}>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
-        <Typography sx={{ color: C.title, fontSize: 13.5, fontWeight: 600 }}>
-          Section editor — frames, capacity and device placement
-        </Typography>
-        <Stack direction="row" alignItems="center" spacing={1}>
-          {busyKey && <CircularProgress size={14} sx={{ color: C.blue }} />}
-          <Tooltip title={sections.length >= MAX_SECTIONS ? `Maximum ${MAX_SECTIONS} sections` : 'Append a new section'}>
-            <span>
-              <Button
-                size="small"
-                startIcon={<AddRoundedIcon sx={{ fontSize: 16 }} />}
-                disabled={locked || sections.length >= MAX_SECTIONS || !!busyKey}
-                onClick={addSection}
-                sx={{ bgcolor: C.blue, color: '#06151c', textTransform: 'none', fontWeight: 600, fontSize: 12, '&:hover': { bgcolor: '#33d4ff' } }}
-              >
-                Add section
-              </Button>
-            </span>
-          </Tooltip>
-        </Stack>
-      </Stack>
-
-      {error && (
-        <Alert
-          severity="error"
-          onClose={() => setError(null)}
-          sx={{ mb: 1.5, bgcolor: 'rgba(239,68,68,0.08)', color: '#FCA5A5', border: '1px solid ' + C.border, fontSize: 12 }}
-        >
-          {error}
-        </Alert>
-      )}
-
-      {!sections.length ? (
-        <Box sx={{ bgcolor: C.bg, border: '1px dashed ' + C.border, borderRadius: '10px', p: 3, textAlign: 'center' }}>
-          <Typography sx={{ color: C.sub, fontSize: 12.5 }}>
-            No sections yet — accept a line-up proposal, or add a section to start placing devices.
-          </Typography>
-        </Box>
-      ) : (
-        <Stack direction="row" spacing={1.5} sx={{ overflowX: 'auto', pb: 1.5, alignItems: 'stretch' }}>
-          {sections.map((sec) => {
-            const devices = devicesBySection.get(sec.id) ?? [];
-            const frame = frameFor(sec);
-            const util = utilizationFor(sec, devices);
-            const role = String(sec.setup?.role ?? 'FEEDER');
-            const idx = sections.findIndex((s) => s.id === sec.id);
-            return (
-              <Box
-                key={sec.id}
-                sx={{
-                  minWidth: 300, maxWidth: 320, flexShrink: 0,
-                  bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px',
-                  display: 'flex', flexDirection: 'column',
-                }}
-              >
-                {/* Header */}
-                <Box sx={{ p: 1.25, borderBottom: '1px solid ' + C.border }}>
-                  <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 0.5 }}>
-                    <Stack direction="row" alignItems="center" spacing={0.5}>
-                      <Typography sx={{ color: C.title, fontSize: 13, fontWeight: 700 }}>
-                        Section {sec.section_number}
-                      </Typography>
-                      <Tooltip title="Move section left">
-                        <span>
-                          <IconButton size="small" disabled={locked || idx === 0 || !!busyKey} onClick={() => reorderSection(sec, -1)} sx={{ color: C.sub, p: 0.25 }}>
-                            <ChevronLeftRoundedIcon sx={{ fontSize: 18 }} />
-                          </IconButton>
-                        </span>
-                      </Tooltip>
-                      <Tooltip title="Move section right">
-                        <span>
-                          <IconButton size="small" disabled={locked || idx === sections.length - 1 || !!busyKey} onClick={() => reorderSection(sec, 1)} sx={{ color: C.sub, p: 0.25 }}>
-                            <ChevronRightRoundedIcon sx={{ fontSize: 18 }} />
-                          </IconButton>
-                        </span>
-                      </Tooltip>
-                    </Stack>
-                    <Tooltip title={devices.length ? 'Move or remove devices before deleting this section' : 'Delete section'}>
-                      <span>
-                        <IconButton size="small" disabled={locked || !!busyKey || devices.length > 0} onClick={() => deleteSection(sec)} sx={{ color: devices.length ? C.sub : C.red, p: 0.25 }}>
-                          <DeleteOutlineRoundedIcon sx={{ fontSize: 16 }} />
-                        </IconButton>
-                      </span>
-                    </Tooltip>
-                  </Stack>
-
-                  {/* Editable name */}
-                  {editingName === sec.id ? (
-                    <TextField
-                      autoFocus size="small" fullWidth
-                      value={nameDraft[sec.id] ?? sec.name ?? ''}
-                      onChange={(e) => setNameDraft((m) => ({ ...m, [sec.id]: e.target.value }))}
-                      onBlur={() => renameSection(sec)}
-                      onKeyDown={(e) => { if (e.key === 'Enter') renameSection(sec); if (e.key === 'Escape') setEditingName(null); }}
-                      sx={{ ...inputSx, mb: 0.75 }}
-                    />
-                  ) : (
-                    <Typography
-                      onClick={() => { if (!locked) { setNameDraft((m) => ({ ...m, [sec.id]: sec.name ?? '' })); setEditingName(sec.id); } }}
-                      sx={{ color: C.text, fontSize: 12, mb: 0.75, cursor: locked ? 'default' : 'text', '&:hover': { color: locked ? C.text : C.blue } }}
-                    >
-                      {sec.name || 'Untitled section'}
-                    </Typography>
-                  )}
-
-                  {/* Role + frame */}
-                  <Stack direction="row" spacing={0.75} sx={{ mb: 0.75 }}>
-                    <Select
-                      size="small" value={role} disabled={locked || !!busyKey}
-                      onChange={(e) => setRole(sec, String(e.target.value))}
-                      sx={{ flex: 1, bgcolor: C.bg, color: C.text, fontSize: 11.5, '& fieldset': { borderColor: C.border } }}
-                    >
-                      {['MAIN', 'FEEDER', 'TIE', 'DISTRIBUTION', 'METERING'].map((r) => (
-                        <MenuItem key={r} value={r} sx={{ fontSize: 11.5 }}>{displayCase(r)}</MenuItem>
-                      ))}
-                    </Select>
-                  </Stack>
-                  <Select
-                    size="small" displayEmpty fullWidth disabled={locked || !!busyKey || !frames}
-                    value={frame?.frameCode ?? ''}
-                    onChange={(e) => setFrame(sec, String(e.target.value))}
-                    sx={{ bgcolor: C.bg, color: C.text, fontSize: 11.5, '& fieldset': { borderColor: C.border } }}
-                  >
-                    <MenuItem value="" sx={{ fontSize: 11.5 }}>{frames ? 'Select frame…' : 'Loading frames…'}</MenuItem>
-                    {(frames ?? []).map((f) => (
-                      <MenuItem key={f.frameCode} value={f.frameCode} sx={{ fontSize: 11.5 }}>
-                        {f.frameCode} — {f.width_in}×{f.depth_in}×{f.height_in}" · {f.maxBusRating_A}A
-                      </MenuItem>
-                    ))}
-                  </Select>
-
-                  {/* Utilization */}
-                  <Box sx={{ mt: 1 }}>
-                    {util.hasBar ? (
-                      <>
-                        <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.25 }}>
-                          <Typography sx={{ color: C.sub, fontSize: 10 }}>Utilization</Typography>
-                          <Typography sx={{ color: util.overflow ? C.red : util.pct > 85 ? C.amber : C.green, fontSize: 10, fontWeight: 700 }}>
-                            {util.usedIn}" / {util.usable}" · {util.pct}%
-                          </Typography>
-                        </Stack>
-                        <LinearProgress
-                          variant="determinate" value={util.pct}
-                          sx={{
-                            height: 5, borderRadius: 3, bgcolor: C.border,
-                            '& .MuiLinearProgress-bar': { bgcolor: util.overflow ? C.red : util.pct > 85 ? C.amber : C.green },
-                          }}
-                        />
-                      </>
-                    ) : (
-                      <Typography sx={{ color: C.sub, fontSize: 10 }}>
-                        {devices.length} device{devices.length === 1 ? '' : 's'}
-                        {frame ? '' : ' · select a frame for capacity'}
-                      </Typography>
-                    )}
-                  </Box>
-                </Box>
-
-                {/* Devices */}
-                <Box sx={{ p: 1, flex: 1 }}>
-                  {!devices.length ? (
-                    <Typography sx={{ color: C.sub, fontSize: 11, textAlign: 'center', py: 1.5 }}>No devices</Typography>
-                  ) : (
-                    <Stack spacing={0.5}>
-                      {devices.map((l) => (
-                        <Box key={l.id} sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '8px', p: 0.75 }}>
-                          <Stack direction="row" alignItems="center" justifyContent="space-between">
-                            <Stack direction="row" alignItems="center" spacing={0.5} sx={{ minWidth: 0 }}>
-                              {editingDesig === l.id ? (
-                                <TextField
-                                  autoFocus size="small"
-                                  value={desigDraft[l.id] ?? String(l.meta?.designation ?? '')}
-                                  onChange={(e) => setDesigDraft((m) => ({ ...m, [l.id]: e.target.value }))}
-                                  onBlur={() => renameDesignation(l)}
-                                  onKeyDown={(e) => { if (e.key === 'Enter') renameDesignation(l); if (e.key === 'Escape') setEditingDesig(null); }}
-                                  sx={{ ...inputSx, width: 64, '& input': { padding: '2px 6px', fontSize: 10.5, color: C.text } }}
-                                />
-                              ) : (
-                                <Chip
-                                  label={l.meta?.designation || '—'}
-                                  size="small"
-                                  onClick={() => { if (!locked) { setDesigDraft((m) => ({ ...m, [l.id]: String(l.meta?.designation ?? '') })); setEditingDesig(l.id); } }}
-                                  sx={{ bgcolor: 'rgba(0,200,255,0.12)', color: '#60A5FA', fontWeight: 700, fontSize: 10, height: 18, cursor: locked ? 'default' : 'pointer' }}
-                                />
-                              )}
-                            </Stack>
-                            <Stack direction="row" alignItems="center" spacing={0}>
-                              <Tooltip title="Move to previous section">
-                                <span>
-                                  <IconButton size="small" disabled={locked || idx === 0 || !!busyKey} onClick={() => moveDevice(l, sec, -1)} sx={{ color: C.sub, p: 0.2 }}>
-                                    <ChevronLeftRoundedIcon sx={{ fontSize: 16 }} />
-                                  </IconButton>
-                                </span>
-                              </Tooltip>
-                              <Tooltip title="Move to next section">
-                                <span>
-                                  <IconButton size="small" disabled={locked || idx === sections.length - 1 || !!busyKey} onClick={() => moveDevice(l, sec, 1)} sx={{ color: C.sub, p: 0.2 }}>
-                                    <ChevronRightRoundedIcon sx={{ fontSize: 16 }} />
-                                  </IconButton>
-                                </span>
-                              </Tooltip>
-                              <Tooltip title="Remove device">
-                                <span>
-                                  <IconButton size="small" disabled={locked || !!busyKey} onClick={() => removeDevice(l)} sx={{ color: C.red, p: 0.2 }}>
-                                    <DeleteOutlineRoundedIcon sx={{ fontSize: 14 }} />
-                                  </IconButton>
-                                </span>
-                              </Tooltip>
-                            </Stack>
-                          </Stack>
-                          <Typography sx={{ color: C.text, fontSize: 11, mt: 0.25, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                            {displayCase(l.name || l.part_number || '—')}
-                          </Typography>
-                          <Typography sx={{ color: C.sub, fontSize: 10 }}>
-                            {l.meta?.ratedA ?? '—'} A
-                            {l.meta?.interruptingKA ? ' / ' + l.meta.interruptingKA + ' kA' : ''}
-                            {' · '}{l.meta?.role ?? role}
-                          </Typography>
-                        </Box>
-                      ))}
-                    </Stack>
-                  )}
-                </Box>
-
-                {/* Footer */}
-                <Box sx={{ p: 1, borderTop: '1px solid ' + C.border }}>
+      {/* Outer row: left content + right sticky summary */}
+      <Stack direction="row" spacing={1.5} alignItems="flex-start">
+        {/* Left: title row + grid */}
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          {/* Title row */}
+          <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+            <Typography sx={{ color: C.title, fontSize: 13.5, fontWeight: 600 }}>
+              Section editor — frames, capacity and device placement
+            </Typography>
+            <Stack direction="row" alignItems="center" spacing={1}>
+              {busyKey && <CircularProgress size={14} sx={{ color: C.blue }} />}
+              <Tooltip title={sections.length >= MAX_SECTIONS ? `Maximum ${MAX_SECTIONS} sections` : 'Append a new section'}>
+                <span>
                   <Button
-                    size="small" fullWidth
-                    startIcon={<AddRoundedIcon sx={{ fontSize: 15 }} />}
-                    disabled={locked || !!busyKey}
-                    onClick={() => { setError(null); setPickerSectionId(sec.id); }}
-                    sx={{ color: C.blue, textTransform: 'none', fontSize: 11.5, border: '1px solid ' + C.border }}
+                    size="small"
+                    startIcon={<AddRoundedIcon sx={{ fontSize: 16 }} />}
+                    disabled={locked || sections.length >= MAX_SECTIONS || !!busyKey}
+                    onClick={addSection}
+                    sx={{ bgcolor: C.blue, color: '#06151c', textTransform: 'none', fontWeight: 600, fontSize: 12, '&:hover': { bgcolor: '#33d4ff' } }}
                   >
-                    Add device
+                    Add section
                   </Button>
-                </Box>
-              </Box>
-            );
-          })}
-        </Stack>
-      )}
+                </span>
+              </Tooltip>
+            </Stack>
+          </Stack>
+
+          {error && (
+            <Alert
+              severity="error"
+              onClose={() => setError(null)}
+              sx={{ mb: 1.5, bgcolor: 'rgba(239,68,68,0.08)', color: '#FCA5A5', border: '1px solid ' + C.border, fontSize: 12 }}
+            >
+              {error}
+            </Alert>
+          )}
+
+          {!sections.length ? (
+            <Box sx={{ bgcolor: C.bg, border: '1px dashed ' + C.border, borderRadius: '10px', p: 3, textAlign: 'center' }}>
+              <Typography sx={{ color: C.sub, fontSize: 12.5 }}>
+                No sections yet — accept a line-up proposal, or add a section to start placing devices.
+              </Typography>
+            </Box>
+          ) : (
+            /* 4-up wrapping grid — no horizontal scrollbar */
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1.5 }}>
+              {sections.map((sec) => {
+                const devices = devicesBySection.get(sec.id) ?? [];
+                const frame = frameFor(sec);
+                const util = utilizationFor(sec, devices);
+                const role = String(sec.setup?.role ?? 'FEEDER');
+                const idx = sections.findIndex((s) => s.id === sec.id);
+                return (
+                  <Box
+                    key={sec.id}
+                    sx={{
+                      minWidth: 0, /* let grid govern width */
+                      bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px',
+                      display: 'flex', flexDirection: 'column',
+                    }}
+                  >
+                    {/* Header */}
+                    <Box sx={{ p: 1.25, borderBottom: '1px solid ' + C.border }}>
+                      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 0.5 }}>
+                        <Stack direction="row" alignItems="center" spacing={0.5}>
+                          <Typography sx={{ color: C.title, fontSize: 13, fontWeight: 700 }}>
+                            Section {sec.section_number}
+                          </Typography>
+                          <Tooltip title="Move section left">
+                            <span>
+                              <IconButton size="small" disabled={locked || idx === 0 || !!busyKey} onClick={() => reorderSection(sec, -1)} sx={{ color: C.sub, p: 0.25 }}>
+                                <ChevronLeftRoundedIcon sx={{ fontSize: 18 }} />
+                              </IconButton>
+                            </span>
+                          </Tooltip>
+                          <Tooltip title="Move section right">
+                            <span>
+                              <IconButton size="small" disabled={locked || idx === sections.length - 1 || !!busyKey} onClick={() => reorderSection(sec, 1)} sx={{ color: C.sub, p: 0.25 }}>
+                                <ChevronRightRoundedIcon sx={{ fontSize: 18 }} />
+                              </IconButton>
+                            </span>
+                          </Tooltip>
+                        </Stack>
+                        <Tooltip title={devices.length ? 'Move or remove devices before deleting this section' : 'Delete section'}>
+                          <span>
+                            <IconButton size="small" disabled={locked || !!busyKey || devices.length > 0} onClick={() => deleteSection(sec)} sx={{ color: devices.length ? C.sub : C.red, p: 0.25 }}>
+                              <DeleteOutlineRoundedIcon sx={{ fontSize: 16 }} />
+                            </IconButton>
+                          </span>
+                        </Tooltip>
+                      </Stack>
+
+                      {/* Editable name */}
+                      {editingName === sec.id ? (
+                        <TextField
+                          autoFocus size="small" fullWidth
+                          value={nameDraft[sec.id] ?? sec.name ?? ''}
+                          onChange={(e) => setNameDraft((m) => ({ ...m, [sec.id]: e.target.value }))}
+                          onBlur={() => renameSection(sec)}
+                          onKeyDown={(e) => { if (e.key === 'Enter') renameSection(sec); if (e.key === 'Escape') setEditingName(null); }}
+                          sx={{ ...inputSx, mb: 0.75 }}
+                        />
+                      ) : (
+                        <Typography
+                          onClick={() => { if (!locked) { setNameDraft((m) => ({ ...m, [sec.id]: sec.name ?? '' })); setEditingName(sec.id); } }}
+                          sx={{ color: C.text, fontSize: 12, mb: 0.75, cursor: locked ? 'default' : 'text', '&:hover': { color: locked ? C.text : C.blue } }}
+                        >
+                          {sec.name || 'Untitled section'}
+                        </Typography>
+                      )}
+
+                      {/* Role + frame */}
+                      <Stack direction="row" spacing={0.75} sx={{ mb: 0.75 }}>
+                        <Select
+                          size="small" value={role} disabled={locked || !!busyKey}
+                          onChange={(e) => setRole(sec, String(e.target.value))}
+                          sx={{ flex: 1, bgcolor: C.bg, color: C.text, fontSize: 11.5, '& fieldset': { borderColor: C.border } }}
+                        >
+                          {['MAIN', 'FEEDER', 'TIE', 'DISTRIBUTION', 'METERING'].map((r) => (
+                            <MenuItem key={r} value={r} sx={{ fontSize: 11.5 }}>{displayCase(r)}</MenuItem>
+                          ))}
+                        </Select>
+                      </Stack>
+                      <Select
+                        size="small" displayEmpty fullWidth disabled={locked || !!busyKey || !frames}
+                        value={frame?.frameCode ?? ''}
+                        onChange={(e) => setFrame(sec, String(e.target.value))}
+                        sx={{ bgcolor: C.bg, color: C.text, fontSize: 11.5, '& fieldset': { borderColor: C.border } }}
+                      >
+                        <MenuItem value="" sx={{ fontSize: 11.5 }}>{frames ? 'Select frame…' : 'Loading frames…'}</MenuItem>
+                        {(frames ?? []).map((f) => (
+                          <MenuItem key={f.frameCode} value={f.frameCode} sx={{ fontSize: 11.5 }}>
+                            {f.frameCode} — {f.width_in}×{f.depth_in}×{f.height_in}" · {f.maxBusRating_A}A
+                          </MenuItem>
+                        ))}
+                      </Select>
+
+                      {/* Utilization */}
+                      <Box sx={{ mt: 1 }}>
+                        {util.hasBar ? (
+                          <>
+                            <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.25 }}>
+                              <Typography sx={{ color: C.sub, fontSize: 10 }}>Utilization</Typography>
+                              <Typography sx={{ color: util.overflow ? C.red : util.pct > 85 ? C.amber : C.green, fontSize: 10, fontWeight: 700 }}>
+                                {util.usedIn}" / {util.usable}" · {util.pct}%
+                              </Typography>
+                            </Stack>
+                            <LinearProgress
+                              variant="determinate" value={util.pct}
+                              sx={{
+                                height: 5, borderRadius: 3, bgcolor: C.border,
+                                '& .MuiLinearProgress-bar': { bgcolor: util.overflow ? C.red : util.pct > 85 ? C.amber : C.green },
+                              }}
+                            />
+                          </>
+                        ) : (
+                          <Typography sx={{ color: C.sub, fontSize: 10 }}>
+                            {devices.length} device{devices.length === 1 ? '' : 's'}
+                            {frame ? '' : ' · select a frame for capacity'}
+                          </Typography>
+                        )}
+                      </Box>
+                    </Box>
+
+                    {/* Devices */}
+                    <Box sx={{ p: 1, flex: 1 }}>
+                      {!devices.length ? (
+                        <Typography sx={{ color: C.sub, fontSize: 11, textAlign: 'center', py: 1.5 }}>No devices</Typography>
+                      ) : (
+                        <Stack spacing={0.5}>
+                          {devices.map((l) => (
+                            <Box key={l.id} sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '8px', p: 0.75 }}>
+                              <Stack direction="row" alignItems="center" justifyContent="space-between">
+                                <Stack direction="row" alignItems="center" spacing={0.5} sx={{ minWidth: 0 }}>
+                                  {editingDesig === l.id ? (
+                                    <TextField
+                                      autoFocus size="small"
+                                      value={desigDraft[l.id] ?? String(l.meta?.designation ?? '')}
+                                      onChange={(e) => setDesigDraft((m) => ({ ...m, [l.id]: e.target.value }))}
+                                      onBlur={() => renameDesignation(l)}
+                                      onKeyDown={(e) => { if (e.key === 'Enter') renameDesignation(l); if (e.key === 'Escape') setEditingDesig(null); }}
+                                      sx={{ ...inputSx, width: 64, '& input': { padding: '2px 6px', fontSize: 10.5, color: C.text } }}
+                                    />
+                                  ) : (
+                                    <Chip
+                                      label={l.meta?.designation || '—'}
+                                      size="small"
+                                      onClick={() => { if (!locked) { setDesigDraft((m) => ({ ...m, [l.id]: String(l.meta?.designation ?? '') })); setEditingDesig(l.id); } }}
+                                      sx={{ bgcolor: 'rgba(0,200,255,0.12)', color: '#60A5FA', fontWeight: 700, fontSize: 10, height: 18, cursor: locked ? 'default' : 'pointer' }}
+                                    />
+                                  )}
+                                </Stack>
+                                <Stack direction="row" alignItems="center" spacing={0}>
+                                  <Tooltip title="Move to previous section">
+                                    <span>
+                                      <IconButton size="small" disabled={locked || idx === 0 || !!busyKey} onClick={() => moveDevice(l, sec, -1)} sx={{ color: C.sub, p: 0.2 }}>
+                                        <ChevronLeftRoundedIcon sx={{ fontSize: 16 }} />
+                                      </IconButton>
+                                    </span>
+                                  </Tooltip>
+                                  <Tooltip title="Move to next section">
+                                    <span>
+                                      <IconButton size="small" disabled={locked || idx === sections.length - 1 || !!busyKey} onClick={() => moveDevice(l, sec, 1)} sx={{ color: C.sub, p: 0.2 }}>
+                                        <ChevronRightRoundedIcon sx={{ fontSize: 16 }} />
+                                      </IconButton>
+                                    </span>
+                                  </Tooltip>
+                                  <Tooltip title="Remove device">
+                                    <span>
+                                      <IconButton size="small" disabled={locked || !!busyKey} onClick={() => removeDevice(l)} sx={{ color: C.red, p: 0.2 }}>
+                                        <DeleteOutlineRoundedIcon sx={{ fontSize: 14 }} />
+                                      </IconButton>
+                                    </span>
+                                  </Tooltip>
+                                </Stack>
+                              </Stack>
+                              <Typography sx={{ color: C.text, fontSize: 11, mt: 0.25, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                {displayCase(l.name || l.part_number || '\u2014')}
+                              </Typography>
+                              <Typography sx={{ color: C.sub, fontSize: 10 }}>
+                                {l.meta?.ratedA ?? '\u2014'} A
+                                {l.meta?.interruptingKA ? ' / ' + l.meta.interruptingKA + ' kA' : ''}
+                                {' \u00b7 '}{l.meta?.role ?? role}
+                              </Typography>
+                            </Box>
+                          ))}
+                        </Stack>
+                      )}
+                    </Box>
+
+                    {/* Footer */}
+                    <Box sx={{ p: 1, borderTop: '1px solid ' + C.border }}>
+                      <Button
+                        size="small" fullWidth
+                        startIcon={<AddRoundedIcon sx={{ fontSize: 15 }} />}
+                        disabled={locked || !!busyKey}
+                        onClick={() => { setError(null); setPickerSectionId(sec.id); }}
+                        sx={{ color: C.blue, textTransform: 'none', fontSize: 11.5, border: '1px solid ' + C.border }}
+                      >
+                        Add device
+                      </Button>
+                    </Box>
+                  </Box>
+                );
+              })}
+            </Box>
+          )}
+        </Box>
+
+        {/* Right: sticky design summary card */}
+        <DesignSummaryCard
+          devices={allDeviceLines.length}
+          mains={summaryMains}
+          feeders={summaryFeeders}
+          drawout={summaryDrawout}
+          deviceCost={summaryDeviceCost}
+          note="Select a frame per section to see capacity utilization."
+        />
+      </Stack>
 
       <ComponentPickerDialog
         open={!!pickerSection}
