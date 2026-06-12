@@ -95,58 +95,92 @@ const DeviceListPanel: React.FC<DeviceListPanelProps> = ({ lines, catalogCbs, sc
       <Typography sx={{ color: '#CBD5E1', fontSize: 13.5, fontWeight: 600, mb: 1 }}>
         Devices (saved design) — engineer may swap any pick
       </Typography>
-      <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', overflow: 'hidden' }}>
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell sx={headSx}>DESIG.</TableCell>
-              <TableCell sx={headSx}>ROLE</TableCell>
-              <TableCell sx={headSx}>DEVICE</TableCell>
-              <TableCell sx={headSx}>PART #</TableCell>
-              <TableCell sx={headSx} align="right">RATING</TableCell>
-              <TableCell sx={headSx} align="right">COST</TableCell>
-              <TableCell sx={headSx}>PRICE</TableCell>
-              <TableCell sx={headSx} />
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {deviceLines.map((l) => (
-              <TableRow key={l.id}>
-                <TableCell sx={cellSx}>
-                  <Chip label={l.meta?.designation ?? '?'} size="small" sx={{ bgcolor: 'rgba(0,200,255,0.12)', color: '#60A5FA', fontWeight: 700, fontSize: 10.5, height: 20 }} />
-                </TableCell>
-                <TableCell sx={{ ...cellSx, color: C.sub }}>{l.meta?.role ?? '—'}</TableCell>
-                <TableCell sx={cellSx}>
-                  {l.name}
-                  {l.meta?.swapped && (
-                    <Chip label={'swapped (was ' + (l.meta?.swapped_from ?? '?') + ')'} size="small" sx={{ ml: 1, bgcolor: 'transparent', border: '1px solid ' + C.amber, color: C.amber, fontSize: 9, height: 16 }} />
-                  )}
-                </TableCell>
-                <TableCell sx={{ ...cellSx, color: C.sub }}>{l.part_number ?? '—'}</TableCell>
-                <TableCell sx={cellSx} align="right">{l.meta?.ratedA ?? '—'} A / {l.meta?.interruptingKA ?? '—'} kA</TableCell>
-                <TableCell sx={cellSx} align="right">{Number(l.unit_cost) ? usd(Number(l.unit_cost)) : '—'}</TableCell>
-                <TableCell sx={cellSx}>
-                  <Chip
-                    label={l.price_status === 'PENDING_RFQ' ? 'RFQ' : l.price_status}
-                    size="small"
-                    sx={{ bgcolor: 'transparent', border: '1px solid ' + (l.price_status === 'FIRM' ? C.green : C.amber), color: l.price_status === 'FIRM' ? C.green : C.amber, fontSize: 9.5, height: 18 }}
-                  />
-                </TableCell>
-                <TableCell sx={cellSx} align="right">
-                  <Button
-                    size="small" startIcon={<SwapHorizRoundedIcon sx={{ fontSize: 14 }} />}
-                    disabled={locked}
-                    onClick={() => { setSwapLine(l); setError(null); }}
-                    sx={{ color: C.blue, textTransform: 'none', fontSize: 11.5, border: '1px solid ' + C.border }}
-                  >
-                    Swap
-                  </Button>
-                </TableCell>
+      <Stack direction="row" spacing={2} alignItems="flex-start">
+        <Box sx={{ flex: 1, bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', overflow: 'hidden' }}>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell sx={headSx}>DESIG.</TableCell>
+                <TableCell sx={headSx}>ROLE</TableCell>
+                <TableCell sx={headSx}>DEVICE</TableCell>
+                <TableCell sx={headSx}>PART #</TableCell>
+                <TableCell sx={headSx}>SECTION</TableCell>
+                <TableCell sx={headSx}>POLES</TableCell>
+                <TableCell sx={headSx}>MOUNTING</TableCell>
+                <TableCell sx={headSx} align="right">RATING</TableCell>
+                <TableCell sx={headSx} align="right">COST</TableCell>
+                <TableCell sx={headSx}>PRICE</TableCell>
+                <TableCell sx={headSx} />
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Box>
+            </TableHead>
+            <TableBody>
+              {deviceLines.map((l) => (
+                <TableRow key={l.id}>
+                  <TableCell sx={cellSx}>
+                    <Chip label={l.meta?.designation ?? '?'} size="small" sx={{ bgcolor: 'rgba(0,200,255,0.12)', color: '#60A5FA', fontWeight: 700, fontSize: 10.5, height: 20 }} />
+                  </TableCell>
+                  <TableCell sx={{ ...cellSx, color: C.sub }}>{l.meta?.role ?? '—'}</TableCell>
+                  <TableCell sx={cellSx}>
+                    {l.name}
+                    {l.meta?.swapped && (
+                      <Chip label={'swapped (was ' + (l.meta?.swapped_from ?? '?') + ')'} size="small" sx={{ ml: 1, bgcolor: 'transparent', border: '1px solid ' + C.amber, color: C.amber, fontSize: 9, height: 16 }} />
+                    )}
+                  </TableCell>
+                  <TableCell sx={{ ...cellSx, color: C.sub }}>{l.part_number ?? '—'}</TableCell>
+                  <TableCell sx={cellSx}>{'S' + (l.meta?.sectionIndex ?? '?')}</TableCell>
+                  <TableCell sx={{ ...cellSx, color: C.sub }}>{String(l.meta?.poles ?? 3) + 'P'}</TableCell>
+                  <TableCell sx={{ ...cellSx, color: C.sub }}>{l.meta?.mounting ?? 'Fixed'}</TableCell>
+                  <TableCell sx={cellSx} align="right">{l.meta?.ratedA ?? '—'} A / {l.meta?.interruptingKA ?? '—'} kA</TableCell>
+                  <TableCell sx={cellSx} align="right">{Number(l.unit_cost) ? usd(Number(l.unit_cost)) : '—'}</TableCell>
+                  <TableCell sx={cellSx}>
+                    <Chip
+                      label={l.price_status === 'PENDING_RFQ' ? 'RFQ' : l.price_status}
+                      size="small"
+                      sx={{ bgcolor: 'transparent', border: '1px solid ' + (l.price_status === 'FIRM' ? C.green : C.amber), color: l.price_status === 'FIRM' ? C.green : C.amber, fontSize: 9.5, height: 18 }}
+                    />
+                  </TableCell>
+                  <TableCell sx={cellSx} align="right">
+                    <Button
+                      size="small" startIcon={<SwapHorizRoundedIcon sx={{ fontSize: 14 }} />}
+                      disabled={locked}
+                      onClick={() => { setSwapLine(l); setError(null); }}
+                      sx={{ color: C.blue, textTransform: 'none', fontSize: 11.5, border: '1px solid ' + C.border }}
+                    >
+                      Swap
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Box>
+        <Box sx={{ width: 250, flexShrink: 0, alignSelf: 'flex-start', position: 'sticky', top: 148, bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', p: 1.5 }}>
+          <Typography sx={{ color: '#A9B6C9', fontSize: 10.5, letterSpacing: 0.5, mb: 1 }}>DESIGN SUMMARY</Typography>
+          <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.25 }}>
+            <Typography sx={{ color: '#A9B6C9', fontSize: 11.5 }}>Devices</Typography>
+            <Typography sx={{ color: C.text, fontWeight: 700, fontSize: 12.5 }}>{deviceLines.length}</Typography>
+          </Stack>
+          <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.25 }}>
+            <Typography sx={{ color: '#A9B6C9', fontSize: 11.5 }}>Mains</Typography>
+            <Typography sx={{ color: C.text, fontWeight: 700, fontSize: 12.5 }}>{deviceLines.filter(l => String(l.meta?.role).toUpperCase() === 'MAIN').length}</Typography>
+          </Stack>
+          <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.25 }}>
+            <Typography sx={{ color: '#A9B6C9', fontSize: 11.5 }}>Feeders</Typography>
+            <Typography sx={{ color: C.text, fontWeight: 700, fontSize: 12.5 }}>{deviceLines.filter(l => String(l.meta?.role).toUpperCase() === 'FEEDER').length}</Typography>
+          </Stack>
+          <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.25 }}>
+            <Typography sx={{ color: '#A9B6C9', fontSize: 11.5 }}>Drawout</Typography>
+            <Typography sx={{ color: C.text, fontWeight: 700, fontSize: 12.5 }}>{deviceLines.filter(l => String(l.meta?.mounting || '').toLowerCase().includes('draw')).length}</Typography>
+          </Stack>
+          <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.25 }}>
+            <Typography sx={{ color: '#A9B6C9', fontSize: 11.5 }}>Device cost</Typography>
+            <Typography sx={{ color: C.text, fontWeight: 700, fontSize: 12.5 }}>{'$' + deviceLines.reduce((a, l) => a + (Number(l.unit_cost) || 0) * (Number(l.quantity) || 1), 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}</Typography>
+          </Stack>
+          <Typography sx={{ color: '#8E9AAD', fontSize: 10, mt: 1 }}>
+            Swap any pick — cost updates and the quote is flagged for review.
+          </Typography>
+        </Box>
+      </Stack>
 
       <Dialog open={!!swapLine} onClose={() => setSwapLine(null)} maxWidth="md" fullWidth
         PaperProps={{ sx: { bgcolor: C.bg, border: '1px solid ' + C.border, backgroundImage: 'none' } }}>

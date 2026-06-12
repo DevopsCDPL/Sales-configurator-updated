@@ -14,7 +14,6 @@ import {
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
-import ContentPasteRoundedIcon from '@mui/icons-material/ContentPasteRounded';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 import { DEFAULT_STANDARDS, StandardsSet, nextLadder } from '../lib/us-standards';
@@ -336,10 +335,6 @@ export default function IntakeStep(props: IntakeStepProps) {
 
         {/* Right column: paste hint + sticky live summary */}
         <Box sx={{ width: 250, flexShrink: 0, alignSelf: 'flex-start' }}>
-        <Tooltip title="Copy rows in Excel (description, type, unit, value, PF, continuous, poles, qty) and paste anywhere in this panel">
-          <Chip icon={<ContentPasteRoundedIcon sx={{ fontSize: 14 }} />} label="Paste from Excel supported"
-            size="small" sx={{ mb: 1, mt: 0.25, height: 28, width: '100%', bgcolor: 'transparent', border: `1px solid ${C.border}`, color: C.sub, fontSize: 11 }} />
-        </Tooltip>
         <Box sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', p: 1.5, position: 'sticky', top: 148 }}>
           <Typography sx={{ color: '#A9B6C9', fontSize: 10.5, letterSpacing: 0.5, mb: 1 }}>LIVE LOAD SUMMARY</Typography>
           <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.25 }}>
