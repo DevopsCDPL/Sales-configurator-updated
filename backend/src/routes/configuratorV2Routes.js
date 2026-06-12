@@ -771,6 +771,8 @@ router.post('/catalog/import-legacy', wrap(async (req, res) => {
     const old = row.specifications || {};
     const spec = { ...old, priceSource: 'vendor-import', legacySource: 'sales-configurator-v1' };
     if (row.subcategory && !spec.manufacturer) spec.manufacturer = row.subcategory;
+    if (row.subcategory && !spec.subcategory) spec.subcategory = row.subcategory;
+    if (row.type && !spec.legacyType) spec.legacyType = row.type;
     const hay = [row.name, row.description, row.type, old.sec1Desc].filter(Boolean).join(' ');
     if (!spec.deviceClass) {
       if (/MCCB/i.test(hay)) spec.deviceClass = 'MCCB';
@@ -783,9 +785,19 @@ router.post('/catalog/import-legacy', wrap(async (req, res) => {
     if (old.protectFunc && !spec.protectionFunctions) spec.protectionFunctions = String(old.protectFunc);
     if (old.cbDesc && !spec.catalogNumber && /^[A-Za-z0-9-]{8,}$/.test(String(old.cbDesc))) spec.catalogNumber = String(old.cbDesc);
     Object.keys(spec).forEach((k) => { if (spec[k] === undefined || spec[k] === '') delete spec[k]; });
+    // Recategorize: breaker accessories and unidentifiable parts out of CIRCUIT BREAKER
+    let category = row.category;
+    if (category === 'CIRCUIT BREAKER') {
+      const n = String(row.name || '');
+      if (/Cradle|Shunt Trip|UV Coil|Remote Reset|^Motor - |Aux Contacts|Kirk Key|Padlock|ATS Built In|Power Supply - |^RELT|Modbus Comm|Signaling Module|^Lugs .*MCB/i.test(n)) {
+        category = 'CB ACCESSORIES';
+      } else if (/Load Center|Panel Board|Panelboard/i.test(n)) {
+        category = 'UNKNOWN PARTS';
+      }
+    }
     const payload = {
       name: row.name,
-      category: row.category,
+      category,
       part_number: row.part_number,
       description: row.description ?? null,
       price,
