@@ -401,6 +401,20 @@ const ProjectDetailPage: React.FC = () => {
               },
             }}
           >
+            {/* Project-flow Previous (global) */}
+            <IconButton
+              size="small"
+              disabled={activeTab <= 0}
+              onClick={() => setActiveTab(Math.max(0, activeTab - 1))}
+              sx={{
+                mt: '6px', mr: { xs: 0.25, md: 0.75 }, flexShrink: 0,
+                color: '#06151c', bgcolor: '#00c8ff', width: 26, height: 26,
+                '&:hover': { bgcolor: '#33d4ff' },
+                '&.Mui-disabled': { bgcolor: 'rgba(0,200,255,0.15)', color: 'rgba(6,21,28,0.4)' },
+              }}
+            >
+              <ArrowBackIcon sx={{ fontSize: 15 }} />
+            </IconButton>
             {tabs.map((tab, i) => {
               const isActive = activeTab === i;
               const isCompleted = i < maxUnlockedTab && !isActive;
@@ -608,6 +622,20 @@ const ProjectDetailPage: React.FC = () => {
                 </React.Fragment>
               );
             })}
+            {/* Project-flow Continue (global) */}
+            <IconButton
+              size="small"
+              disabled={activeTab >= 10}
+              onClick={() => unlockAndGo(activeTab + 1)}
+              sx={{
+                mt: '6px', ml: { xs: 0.25, md: 0.75 }, flexShrink: 0,
+                color: '#06151c', bgcolor: '#00c8ff', width: 26, height: 26,
+                '&:hover': { bgcolor: '#33d4ff' },
+                '&.Mui-disabled': { bgcolor: 'rgba(0,200,255,0.15)', color: 'rgba(6,21,28,0.4)' },
+              }}
+            >
+              <ArrowBackIcon sx={{ fontSize: 15, transform: 'rotate(180deg)' }} />
+            </IconButton>
           </Box>
         </Box>
       </Box>

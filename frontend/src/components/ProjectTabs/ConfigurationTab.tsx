@@ -287,7 +287,8 @@ const ConfigurationTab: React.FC<ConfigurationTabProps> = ({ project, onUpdate, 
           borderBottom: '1px solid rgba(255,255,255,0.06)',
         }}
       >
-        {/* ── Row 1: context badges + controls ── */}
+        {/* ── Row 1: context badges + controls (hidden while a board is open) ── */}
+        {!flow.boardOpen && (
         <Box
           sx={{
             display: 'flex',
@@ -299,21 +300,7 @@ const ConfigurationTab: React.FC<ConfigurationTabProps> = ({ project, onUpdate, 
         >
           {/* LEFT — back arrow + project identifier */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1, minWidth: 0 }}>
-            {onBack && (
-              <Button
-                size="small"
-                onClick={onBack}
-                startIcon={<ArrowBackIcon sx={{ fontSize: 14 }} />}
-                sx={{
-                  textTransform: 'none', fontWeight: 600, fontSize: '0.75rem',
-                  px: 1.25, py: 0.45, minWidth: 0, borderRadius: '8px',
-                  color: '#06151c', bgcolor: '#00c8ff',
-                  '&:hover': { bgcolor: '#33d4ff' },
-                }}
-              >
-                Previous
-              </Button>
-            )}
+
             {flow.boardOpen ? (
               <>
                 <Button
@@ -513,32 +500,9 @@ const ConfigurationTab: React.FC<ConfigurationTabProps> = ({ project, onUpdate, 
               </>
             )}
 
-            {onNext && (
-              <Button
-                size="small"
-                onClick={onNext}
-                endIcon={<ArrowForwardIcon sx={{ fontSize: 14 }} />}
-                disabled={!activeConfig}
-                sx={{
-                  bgcolor: PRIMARY,
-                  color: '#06151c',
-                  textTransform: 'none',
-                  borderRadius: '8px',
-                  fontWeight: 700,
-                  fontSize: '0.75rem',
-                  px: 1.5,
-                  py: 0.45,
-                  minWidth: 0,
-                  boxShadow: 'none',
-                  '&:hover': { bgcolor: PRIMARY_LT },
-                  '&.Mui-disabled': { bgcolor: 'rgba(255,255,255,0.06)', color: 'rgba(217,228,251,0.45)' },
-                }}
-              >
-                Continue
-              </Button>
-            )}
           </Stack>
         </Box>
+        )}
 
         {/* ── Row 2: board flow chips (sticky, old strip position/style) ── */}
         {activeConfig && flow.boardOpen && (
@@ -550,6 +514,16 @@ const ConfigurationTab: React.FC<ConfigurationTabProps> = ({ project, onUpdate, 
               '&::-webkit-scrollbar': { height: 0 },
             }}
           >
+            <Button
+              size="small"
+              onClick={() => flow.closeBoard?.()}
+              sx={{ flexShrink: 0, color: 'rgba(217,228,251,0.6)', textTransform: 'none', fontSize: '0.72rem', minWidth: 0, px: 1, height: 28, border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px' }}
+            >
+              ← Boards
+            </Button>
+            <Typography sx={{ flexShrink: 0, fontSize: '0.8rem', fontWeight: 700, color: '#f0f6ff', whiteSpace: 'nowrap', mr: 0.5 }}>
+              {flow.boardName ?? 'Switchboard'}
+            </Typography>
             {FLOW_STEPS.map(([key, label], i) => {
               const active = flow.step === key;
               const ok = key === 'system' || flow.accepted;
