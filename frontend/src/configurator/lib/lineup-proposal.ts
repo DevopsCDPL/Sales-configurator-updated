@@ -101,6 +101,10 @@ export interface LineupProposal {
 }
 
 const INTERDEVICE_CLEARANCE_IN = 4;   // [SEED] Phase B §6.2.2
+/** [SEED] realistic device envelopes when catalog dims are missing (was a flat 18" — halved packing density). */
+export const DEVICE_ENVELOPE_IN: Record<string, number> = { FEEDER: 9, MAIN: 20, TIE: 20 };
+/** [SEED] max section fill — wire-bending space, UL 891 thermal headroom, future spares. */
+export const MAX_FILL_PCT = 0.8;
 const MAIN_DEDICATED_PCT = 0.5;       // [SEED] Phase C §4.2.4
 const DEFAULT_SCCR_KA = 65;           // [SEED] AP-04
 
@@ -233,12 +237,12 @@ export function proposeLineup(
   const open: OpenSection[] = [];
   const unplaced: ProposedDevice[] = [];
 
-  const deviceH = (d: ProposedDevice) => d.device?.heightIn ?? 18; // [SEED] fallback envelope
+  const deviceH = (d: ProposedDevice) => d.device?.heightIn ?? DEVICE_ENVELOPE_IN[d.role] ?? 9; // [SEED] role-based fallback envelope
   const place = (d: ProposedDevice, dedicated: boolean) => {
     const h = deviceH(d) + INTERDEVICE_CLEARANCE_IN;
     if (!dedicated) {
       for (const s of open) {
-        if (s.role === 'FEEDER' && d.role === 'FEEDER' && s.used + h <= s.frame.usableDeviceHeight_in) {
+        if (s.role === 'FEEDER' && d.role === 'FEEDER' && s.used + h <= MAX_FILL_PCT * s.frame.usableDeviceHeight_in) {
           s.devices.push(d); s.used += h; return;
         }
       }

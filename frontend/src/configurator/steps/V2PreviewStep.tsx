@@ -10,6 +10,7 @@
  * data meanwhile), section detail editing, BOM/quote from Designer.
  */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { DEVICE_ENVELOPE_IN } from '../lib/lineup-proposal';
 import { Box, Typography, Stack, Chip, Button, Alert, CircularProgress, Snackbar, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Tabs, Tab } from '@mui/material';
 import SwitchboardCardsScreen, { SwitchboardCardData } from './SwitchboardCardsScreen';
 import IntakeStep from './IntakeStep';
@@ -138,7 +139,7 @@ function elevationFromFull(full: FullBoard): string {
       .map((l) => ({
         designation: l.meta?.designation ?? '?',
         ratedA: Number(l.meta?.ratedA) || null,
-        heightIn: String(l.meta?.role ?? '').toUpperCase() !== 'FEEDER' ? 20 : 8,
+        heightIn: Number(l.meta?.heightIn) > 0 ? Number(l.meta?.heightIn) : (String(l.meta?.role ?? '').toUpperCase() !== 'FEEDER' ? DEVICE_ENVELOPE_IN.MAIN : DEVICE_ENVELOPE_IN.FEEDER),
       }));
     return {
       sectionIndex: sec.section_number,
@@ -198,6 +199,7 @@ const V2PreviewStep: React.FC = () => {
   const [coReason, setCoReason] = useState('');
   const [coOrigin, setCoOrigin] = useState<'internal' | 'customer'>('internal');
   const [svg, setSvg] = useState<string | null>(null);
+  const [sldFit, setSldFit] = useState(true);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
@@ -539,10 +541,26 @@ const V2PreviewStep: React.FC = () => {
                     Download SVG
                   </Button>
                 )}
+                {svg && (
+                  <Button
+                    size="small"
+                    onClick={() => setSldFit((f) => !f)}
+                    sx={{ ml: 1, color: sldFit ? '#06151c' : C.blue, bgcolor: sldFit ? C.blue : 'transparent', textTransform: 'none', fontSize: 11.5, border: '1px solid ' + (sldFit ? C.blue : C.border), '&:hover': { bgcolor: sldFit ? '#33d4ff' : 'transparent', borderColor: C.blue } }}
+                  >
+                    {sldFit ? 'Fit: A4 page' : 'Fit: actual size'}
+                  </Button>
+                )}
               </Stack>
               {svg ? (
                 <Box
-                  sx={{ bgcolor: '#FFFFFF', borderRadius: '8px', p: 2, overflow: 'auto', maxHeight: '72vh', boxShadow: '0 0 0 1px ' + C.border }}
+                  sx={{
+                    bgcolor: '#FFFFFF', borderRadius: '8px', p: 2, maxHeight: '72vh', boxShadow: '0 0 0 1px ' + C.border,
+                    overflowX: 'auto', overflowY: 'auto',
+                    '&::-webkit-scrollbar': { height: 10, width: 10 },
+                    '&::-webkit-scrollbar-thumb': { bgcolor: '#94A3B8', borderRadius: 5 },
+                    '&::-webkit-scrollbar-track': { bgcolor: '#E2E8F0' },
+                    ...(sldFit ? { aspectRatio: '297 / 210', '& svg': { width: '100%', height: 'auto', maxHeight: '100%' } } : {}),
+                  }}
                   dangerouslySetInnerHTML={{ __html: svg }}
                 />
               ) : (

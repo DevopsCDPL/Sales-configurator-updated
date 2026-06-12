@@ -34,9 +34,10 @@ const C = {
 };
 
 const MAX_SECTIONS = 10;
-/** Device height fallback (inches) by role when a line carries no dims. */
-const ACB_FALLBACK_H = 20;
-const FEEDER_FALLBACK_H = 8;
+/** Device height fallback (inches) by role — shared [SEED] envelopes with the lineup packer. */
+import { DEVICE_ENVELOPE_IN } from '../lib/lineup-proposal';
+const ACB_FALLBACK_H = DEVICE_ENVELOPE_IN.MAIN;
+const FEEDER_FALLBACK_H = DEVICE_ENVELOPE_IN.FEEDER;
 
 interface FrameRow {
   frameCode: string;
