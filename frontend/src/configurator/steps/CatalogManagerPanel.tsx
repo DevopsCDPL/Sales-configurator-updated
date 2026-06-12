@@ -26,6 +26,7 @@ import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import { configuratorService, ConfiguratorComponent } from '../../services/configuratorService';
 import configuratorV2Service from '../../services/configuratorV2Service';
 import PriceSourceDot from '../components/PriceSourceDot';
+import CbFilterPanel from '../components/CbFilterPanel';
 
 const C = {
   bg: '#000000', surface: '#0B0B0D', border: '#1E2235', blue: '#00c8ff',
@@ -65,6 +66,7 @@ const CatalogManagerPanel: React.FC = () => {
   const [category, setCategory] = useState('');
   const [q, setQ] = useState('');
   const [rows, setRows] = useState<ConfiguratorComponent[]>([]);
+  const [filteredRows, setFilteredRows] = useState<ConfiguratorComponent[]>([]);
   const [loading, setLoading] = useState(true);
   const [edit, setEdit] = useState<EditState | null>(null);
   const [view, setView] = useState<'cards' | 'list'>('cards');
@@ -95,6 +97,10 @@ const CatalogManagerPanel: React.FC = () => {
 
   useEffect(() => { loadCounts(); }, [loadCounts]);
   useEffect(() => { search(); }, [category]); // eslint-disable-line react-hooks/exhaustive-deps
+  // CIRCUIT BREAKER tab gets a cascading filter slot; others render all rows.
+  useEffect(() => { setFilteredRows(rows); }, [rows, category]);
+  const isCb = (category || '').toUpperCase() === 'CIRCUIT BREAKER';
+  const gridRows = isCb ? filteredRows : rows;
 
   const openEdit = (r?: ConfiguratorComponent, duplicate = false) => {
     if (!r) { setEdit(emptyEdit(category || undefined)); return; }
@@ -258,11 +264,15 @@ const CatalogManagerPanel: React.FC = () => {
         </Stack>
       </Stack>
 
+      {isCb && !loading && (
+        <CbFilterPanel items={rows} onFiltered={setFilteredRows} />
+      )}
+
       {loading ? (
         <Stack alignItems="center" sx={{ py: 5 }}><CircularProgress size={22} sx={{ color: C.blue }} /></Stack>
       ) : view === 'cards' ? (
         <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: 1.5 }}>
-          {rows.map((r) => {
+          {gridRows.map((r) => {
             const hours = BUCKETS.map((b) => Number((r as any)[b]) || 0).reduce((a, b) => a + b, 0);
             const rfq = (r as any).price_status === 'PENDING_RFQ';
             return (
@@ -306,7 +316,7 @@ const CatalogManagerPanel: React.FC = () => {
               </Box>
             );
           })}
-          {!rows.length && (
+          {!gridRows.length && (
             <Typography sx={{ color: C.sub, fontSize: 12.5, p: 3 }}>
               No components in this view — add one or import the TPS workbook.
             </Typography>
@@ -327,7 +337,7 @@ const CatalogManagerPanel: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map((r) => (
+              {gridRows.map((r) => (
                 <TableRow key={r.id} hover>
                   <TableCell sx={{ ...cellSx, color: C.sub }}>{r.category}</TableCell>
                   <TableCell sx={cellSx}>{r.name}</TableCell>
@@ -354,7 +364,7 @@ const CatalogManagerPanel: React.FC = () => {
               ))}
             </TableBody>
           </Table>
-          {!rows.length && (
+          {!gridRows.length && (
             <Typography sx={{ color: C.sub, fontSize: 12.5, p: 3, textAlign: 'center' }}>
               No components in this view — add one or import the TPS workbook.
             </Typography>
