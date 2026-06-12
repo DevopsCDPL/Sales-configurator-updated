@@ -117,8 +117,7 @@ async function importCbDecoder(wb, out) {
     if (match) {
       await match.update({
         ...fields,
-        specifications: { ...(match.specifications || {}), ...spec },
-        ...(price ? {} : {}), // price only when present; keep existing otherwise
+        specifications: { ...(match.specifications || {}), ...spec, ...(price ? { priceSource: 'vendor-import' } : {}) },
       }).catch((e) => out.warnings.push(`CB ${frame}: ${e.message}`));
       out.cbEnriched += 1;
     } else {
@@ -136,7 +135,7 @@ async function importCbDecoder(wb, out) {
           price_status: price ? 'FIRM' : 'PENDING_RFQ',
           standards_regime: /UL|ANSI/i.test(String(voltage)) ? 'UL' : 'IEC',
           ...(dims ? { dims_h_in: dims.h, dims_w_in: dims.w, dims_d_in: dims.d } : {}),
-          specifications: spec,
+          specifications: { ...spec, ...(price ? { priceSource: 'vendor-import' } : {}) },
         }).catch((e) => out.warnings.push(`CB create ${frame}: ${e.message}`));
         out.cbCreated += 1;
       }
@@ -196,7 +195,7 @@ async function importMasterPricing(wb, out) {
     const match = byName.get(key);
     if (match) {
       if (Number(match.price) !== r.price) {
-        await match.update({ price: r.price, mat_cost: r.price, material_cost: r.price, price_status: 'FIRM' }).catch(() => {});
+        await match.update({ price: r.price, mat_cost: r.price, material_cost: r.price, price_status: 'FIRM', specifications: { ...(match.specifications || {}), priceSource: 'vendor-import' } }).catch(() => {});
         out.mpUpdated += 1;
       } else out.mpSkipped += 1;
       continue;
@@ -208,7 +207,7 @@ async function importMasterPricing(wb, out) {
       is_active: true,
       price: r.price, mat_cost: r.price, material_cost: r.price,
       price_status: 'FIRM',
-      specifications: { importedFrom: 'TPS_Estimate_23XX MasterPricing', importedAt: new Date().toISOString() },
+      specifications: { importedFrom: 'TPS_Estimate_23XX MasterPricing', importedAt: new Date().toISOString(), priceSource: 'vendor-import' },
     }).catch((e) => out.warnings.push(`mp ${r.text.slice(0, 30)}: ${e.message}`));
     out.mpCreated += 1;
   }
@@ -256,7 +255,7 @@ async function importTpsWorkbook(buffer, { companyId = null } = {}) {
         price_status: r.mat > 0 ? 'FIRM' : 'PENDING_RFQ',
       };
       if (existing) {
-        await existing.update(fields);
+        await existing.update({ ...fields, specifications: { ...(existing.specifications || {}), priceSource: 'vendor-import' } });
         out.componentsUpdated += 1;
       } else {
         await models.ConfiguratorComponent.create({
@@ -264,7 +263,7 @@ async function importTpsWorkbook(buffer, { companyId = null } = {}) {
           name: r.name,
           description: r.comments,
           is_active: true,
-          specifications: { importedFrom: 'TPS_Estimate_23XX', importedAt: new Date().toISOString() },
+          specifications: { importedFrom: 'TPS_Estimate_23XX', importedAt: new Date().toISOString(), priceSource: 'vendor-import' },
           company_id: companyId,
           ...fields,
         }).catch((e) => out.warnings.push(`component ${r.name}: ${e.message}`));

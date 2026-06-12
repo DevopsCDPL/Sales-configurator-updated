@@ -22,6 +22,7 @@ import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
 import TableRowsRoundedIcon from '@mui/icons-material/TableRowsRounded';
 import { configuratorService, ConfiguratorComponent } from '../../services/configuratorService';
 import configuratorV2Service from '../../services/configuratorV2Service';
+import PriceSourceDot from '../components/PriceSourceDot';
 
 const C = {
   bg: '#000000', surface: '#0B0B0D', border: '#1E2235', blue: '#00c8ff',
@@ -279,7 +280,7 @@ const CatalogManagerPanel: React.FC = () => {
                   <Chip label={r.category} size="small" sx={{ bgcolor: 'rgba(0,200,255,0.10)', color: '#60A5FA', fontSize: 9, height: 17 }} />
                   <Box sx={{ flex: 1 }} />
                   <Typography sx={{ color: C.text, fontSize: 13.5, fontWeight: 700 }}>
-                    {Number(r.price) ? usd(Number(r.price)) : '—'}
+                    <PriceSourceDot source={(r as any).specifications?.priceSource} />{Number(r.price) ? usd(Number(r.price)) : '—'}
                   </Typography>
                 </Stack>
                 <Stack direction="row" alignItems="center" spacing={0.5}>
@@ -319,7 +320,7 @@ const CatalogManagerPanel: React.FC = () => {
                   <TableCell sx={{ ...cellSx, color: C.sub }}>{r.category}</TableCell>
                   <TableCell sx={cellSx}>{r.name}</TableCell>
                   <TableCell sx={{ ...cellSx, color: C.sub }}>{r.part_number ?? '—'}</TableCell>
-                  <TableCell sx={cellSx} align="right">{Number(r.price) ? usd(Number(r.price)) : '—'}</TableCell>
+                  <TableCell sx={cellSx} align="right"><PriceSourceDot source={(r as any).specifications?.priceSource} />{Number(r.price) ? usd(Number(r.price)) : '—'}</TableCell>
                   {BUCKETS.map((b) => (
                     <TableCell key={b} sx={{ ...cellSx, color: Number((r as any)[b]) ? C.text : '#2A3050' }} align="right">
                       {Number((r as any)[b]) || '·'}

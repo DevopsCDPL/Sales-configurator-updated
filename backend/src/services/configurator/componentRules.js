@@ -127,6 +127,7 @@ async function generateComponents(switchboardId, { companyId = null } = {}) {
         ruleId: rule.ruleId, group: rule.group, ruleDescription: rule.description,
         qtyFormula: `${rule.qtyFactor} × ${rule.qtyPer} (${basis})`,
         placeholder: !pick,
+        priceSource: pick?.specifications?.priceSource ?? null,
       },
       company_id: companyId,
     });

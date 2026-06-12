@@ -98,6 +98,9 @@ const getComponent = handle(async (req, res) => {
 const createComponent = handle(async (req, res) => {
   const payload = { ...req.body, company_id: req.user.company_id, created_by: req.user.id };
   if (payload.category) payload.category = canonicalDisplay(payload.category);
+  if (payload.price && !payload.specifications?.priceSource) {
+    payload.specifications = { ...(payload.specifications || {}), priceSource: 'manual' };
+  }
   const row = await ConfiguratorComponent.create(payload);
   res.status(201).json({ success: true, data: row });
 });
@@ -107,6 +110,9 @@ const updateComponent = handle(async (req, res) => {
   if (!row) return fail(res, 404, 'Component not found');
   const payload = { ...req.body };
   if (payload.category) payload.category = canonicalDisplay(payload.category);
+  if (payload.price && !payload.specifications?.priceSource) {
+    payload.specifications = { ...(row.specifications || {}), ...(payload.specifications || {}), priceSource: 'manual' };
+  }
   await row.update(payload);
   ok(res, row);
 });

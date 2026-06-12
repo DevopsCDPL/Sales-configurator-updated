@@ -329,10 +329,10 @@ router.post('/price-rfqs/:id/receive', wrap(async (req, res) => {
   const price = Number(req.body?.price);
   if (!Number.isFinite(price) || price <= 0) return res.status(400).json({ error: 'valid price required' });
   await rfq.update({ status: 'received', received_price: price, received_at: new Date() });
-  await models.ConfiguratorComponent.update(
-    { price, mat_cost: price, price_status: 'FIRM' },
-    { where: { id: rfq.component_id } }
-  );
+  const rfqComp = await models.ConfiguratorComponent.findByPk(rfq.component_id);
+  if (rfqComp) {
+    await rfqComp.update({ price, mat_cost: price, price_status: 'FIRM', specifications: { ...(rfqComp.specifications || {}), priceSource: 'rfq' } });
+  }
   // Flag dependent ESTIMATED/PENDING lines for re-quote review (Phase A §4.1)
   const lines = await models.ConfiguratorComponentLine.findAll({
     where: { component_id: rfq.component_id, price_status: ['ESTIMATED', 'PENDING_RFQ'] },
@@ -397,10 +397,11 @@ router.post('/price-queue/receive', wrap(async (req, res) => {
     return res.status(400).json({ error: 'partNumber and a positive price are required' });
   }
 
-  const [compUpd] = await models.ConfiguratorComponent.update(
-    { price: p, mat_cost: p, material_cost: p, price_status: 'FIRM' },
-    { where: { part_number: partNumber } }
-  ).catch(() => [0]);
+  const queueComps = await models.ConfiguratorComponent.findAll({ where: { part_number: partNumber } });
+  for (const qc of queueComps) {
+    await qc.update({ price: p, mat_cost: p, material_cost: p, price_status: 'FIRM', specifications: { ...(qc.specifications || {}), priceSource: 'rfq' } });
+  }
+  const compUpd = queueComps.length;
 
   const lines = await models.ConfiguratorComponentLine.findAll({
     where: { part_number: partNumber, price_status: ['PENDING_RFQ', 'ESTIMATED'] },

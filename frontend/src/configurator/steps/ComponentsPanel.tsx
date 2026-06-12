@@ -20,6 +20,7 @@ import SwapHorizRoundedIcon from '@mui/icons-material/SwapHorizRounded';
 import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { configuratorService, ConfiguratorComponent } from '../../services/configuratorService';
 import configuratorV2Service, { FullBoard, ComponentLineRow } from '../../services/configuratorV2Service';
+import PriceSourceDot from '../components/PriceSourceDot';
 
 const C = {
   bg: '#000000', surface: '#0B0B0D', border: '#1E2235', blue: '#00c8ff',
@@ -270,7 +271,7 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
                         sx={{ width: 56, '& .MuiOutlinedInput-root': { bgcolor: C.bg, color: C.text, '& fieldset': { borderColor: C.border } } }}
                       />
                     </TableCell>
-                    <TableCell sx={{ ...cellSx, width: 90 }} align="right">{Number(l.unit_cost) ? usd(Number(l.unit_cost)) : '—'}</TableCell>
+                    <TableCell sx={{ ...cellSx, width: 90 }} align="right"><PriceSourceDot source={(l.meta as any)?.priceSource} />{Number(l.unit_cost) ? usd(Number(l.unit_cost)) : '—'}</TableCell>
                     <TableCell sx={{ ...cellSx, width: 64 }}>
                       <Chip label={l.price_status === 'PENDING_RFQ' ? 'RFQ' : l.price_status} size="small"
                         sx={{ bgcolor: 'transparent', border: '1px solid ' + (l.price_status === 'FIRM' ? C.green : C.amber), color: l.price_status === 'FIRM' ? C.green : C.amber, fontSize: 9, height: 17 }} />
