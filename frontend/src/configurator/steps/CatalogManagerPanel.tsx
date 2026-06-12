@@ -12,7 +12,7 @@ import {
   Box, Typography, Stack, Chip, Button, Alert, CircularProgress, TextField,
   Table, TableHead, TableRow, TableCell, TableBody, IconButton, Dialog,
   DialogTitle, DialogContent, DialogActions, MenuItem,
-  Tabs, Tab, InputAdornment,
+  Tabs, Tab, InputAdornment, Tooltip,
 } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
@@ -271,47 +271,109 @@ const CatalogManagerPanel: React.FC = () => {
       {loading ? (
         <Stack alignItems="center" sx={{ py: 5 }}><CircularProgress size={22} sx={{ color: C.blue }} /></Stack>
       ) : view === 'cards' ? (
-        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: 1.5 }}>
+        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))', gap: 1.5 }}>
           {gridRows.map((r) => {
-            const hours = BUCKETS.map((b) => Number((r as any)[b]) || 0).reduce((a, b) => a + b, 0);
-            const rfq = (r as any).price_status === 'PENDING_RFQ';
+            const spec = (r as any).specifications ?? {};
+            const priceStatus = (r as any).price_status ?? 'PENDING_RFQ';
+            const isCbCard = (r.category ?? '').toUpperCase() === 'CIRCUIT BREAKER';
+            // Derive device class title
+            const deviceTitle = spec.deviceClass
+              ? spec.deviceClass
+              : (r.name ?? '').split(/[\s,_\-]+/).slice(0, 2).join(' ') || (r.category ?? '—');
+            // Specification row value
+            const specValue = isCbCard
+              ? [spec.ratedCurrentA && spec.ratedCurrentA + 'A', spec.interruptingKA && spec.interruptingKA + 'kA', spec.poles && spec.poles + 'P'].filter(Boolean).join(' / ') || '—'
+              : ((r.description ?? '').slice(0, 60) || '—');
+            // SKU display
+            const skuFull = r.part_number ?? '';
+            const skuShort = skuFull.length > 14 ? skuFull.slice(0, 14) + '…' : skuFull || '—';
+            // Price status chip
+            const psLabel = priceStatus === 'PENDING_RFQ' ? 'RFQ' : priceStatus;
+            const psBorder = priceStatus === 'FIRM' ? C.green : priceStatus === 'ESTIMATED' ? C.amber : C.red;
+            const psColor  = priceStatus === 'FIRM' ? C.green : priceStatus === 'ESTIMATED' ? C.amber : C.red;
             return (
               <Box
                 key={r.id}
                 sx={{
                   bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', p: 1.5,
-                  transition: 'border-color .15s, box-shadow .15s', '&:hover': { borderColor: '#00c8ff', boxShadow: '0 0 14px rgba(0,200,255,0.3)' },
-                  display: 'flex', flexDirection: 'column', gap: 0.75,
+                  transition: 'border-color .15s, box-shadow .15s',
+                  '&:hover': { borderColor: '#00c8ff', boxShadow: '0 0 14px rgba(0,200,255,0.3)' },
+                  display: 'flex', flexDirection: 'column', gap: 0.75, minHeight: 150,
                 }}
               >
-                <Stack direction="row" alignItems="flex-start" spacing={1}>
-                  <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Typography sx={{ color: C.text, fontSize: 12.5, fontWeight: 600, lineHeight: 1.3 }} noWrap title={r.name ?? ''}>
-                      {r.name}
-                    </Typography>
-                    <Typography sx={{ color: C.sub, fontSize: 10.5 }} noWrap>
-                      {r.part_number ?? (r as any).specifications?.catalogNumber ?? '—'}
-                    </Typography>
-                  </Box>
+                {/* ROW 1 — category chip + SKU chip + action icons */}
+                <Stack direction="row" alignItems="center" spacing={0.75}>
                   <Chip
-                    label={rfq ? 'RFQ' : 'FIRM'} size="small"
-                    sx={{ bgcolor: 'transparent', border: '1px solid ' + (rfq ? C.amber : C.green), color: rfq ? C.amber : C.green, fontSize: 8.5, height: 16 }}
+                    label={r.category}
+                    size="small"
+                    sx={{ bgcolor: 'rgba(0,200,255,0.10)', color: '#00c8ff', fontSize: 9.5, height: 18, maxWidth: 120, '& .MuiChip-label': { px: 1 } }}
                   />
-                </Stack>
-                <Stack direction="row" alignItems="center" spacing={1}>
-                  <Chip label={r.category} size="small" sx={{ bgcolor: 'rgba(0,200,255,0.10)', color: '#60A5FA', fontSize: 9, height: 17 }} />
                   <Box sx={{ flex: 1 }} />
-                  <Typography sx={{ color: C.text, fontSize: 13.5, fontWeight: 700 }}>
-                    <PriceSourceDot source={(r as any).specifications?.priceSource} />{Number(r.price) ? usd(Number(r.price)) : '—'}
-                  </Typography>
-                </Stack>
-                <Stack direction="row" alignItems="center" spacing={0.5}>
-                  <Typography sx={{ color: C.sub, fontSize: 10.5, flex: 1 }}>
-                    {hours > 0 ? hours.toFixed(2) + ' h labour' : 'no labour hours'}
-                  </Typography>
+                  <Tooltip title={skuFull || 'No part number'}>
+                    <Chip
+                      label={'SKU: ' + skuShort}
+                      size="small"
+                      sx={{ bgcolor: 'transparent', border: '1px solid #1E2235', color: '#A9B6C9', fontSize: 9.5, height: 18, '& .MuiChip-label': { px: 1 } }}
+                    />
+                  </Tooltip>
                   <IconButton size="small" onClick={() => openEdit(r)} sx={{ color: C.sub, p: 0.4, '&:hover': { color: C.blue } }}><EditRoundedIcon sx={{ fontSize: 14 }} /></IconButton>
                   <IconButton size="small" onClick={() => openEdit(r, true)} sx={{ color: C.sub, p: 0.4, '&:hover': { color: C.blue } }}><ContentCopyRoundedIcon sx={{ fontSize: 13 }} /></IconButton>
                   <IconButton size="small" onClick={() => remove(r)} sx={{ color: C.sub, p: 0.4, '&:hover': { color: C.red } }}><DeleteOutlineRoundedIcon sx={{ fontSize: 14 }} /></IconButton>
+                </Stack>
+
+                {/* ROW 2 — device class title + price-status chip */}
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <Typography sx={{ color: '#F0F6FF', fontSize: 17, fontWeight: 800, flex: 1, lineHeight: 1.15 }} noWrap title={deviceTitle}>
+                    {deviceTitle}
+                  </Typography>
+                  <Chip
+                    label={psLabel}
+                    size="small"
+                    variant="outlined"
+                    sx={{ borderColor: psBorder, color: psColor, fontSize: 9, height: 17, '& .MuiChip-label': { px: 0.75 } }}
+                  />
+                </Stack>
+
+                {/* ROW 3-5 — labeled info rows */}
+                {([
+                  ['Catalog Number', spec.catalogNumber ?? '—'],
+                  ['Manufacturer',   [spec.manufacturer, spec.series, spec.frameModel].filter(Boolean).join(', ') || '—'],
+                  ['Specification',  specValue],
+                ] as [string, string][]).map(([label, value]) => (
+                  <Stack key={label} direction="row" alignItems="flex-start" spacing={0.5}>
+                    <Typography sx={{ color: '#8E9AAD', fontSize: 11.5, width: 110, flexShrink: 0, lineHeight: 1.4 }}>{label}</Typography>
+                    <Typography sx={{ color: '#E2E8F0', fontSize: 11.5, flex: 1, lineHeight: 1.4 }} noWrap title={value}>{value}</Typography>
+                  </Stack>
+                ))}
+
+                {/* ROW 6 — footer: builder button (CB only) + price */}
+                <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mt: 'auto', pt: 0.5 }}>
+                  {isCbCard ? (
+                    <Tooltip title="Part-number builder — coming soon">
+                      <span>
+                        <Button
+                          disabled
+                          size="small"
+                          sx={{
+                            bgcolor: 'rgba(0,200,255,0.25)', color: '#06151c',
+                            textTransform: 'none', fontWeight: 700, fontSize: 11.5,
+                            px: 1.5, borderRadius: '8px', minWidth: 0,
+                            '&.Mui-disabled': { bgcolor: 'rgba(0,200,255,0.18)', color: 'rgba(6,21,28,0.6)' },
+                          }}
+                        >
+                          Generate Catalog No.
+                        </Button>
+                      </span>
+                    </Tooltip>
+                  ) : (
+                    <Box />
+                  )}
+                  <Stack direction="row" alignItems="center">
+                    <PriceSourceDot source={spec.priceSource} />
+                    <Typography sx={{ color: '#00c8ff', fontSize: 16, fontWeight: 800 }}>
+                      {Number(r.price) ? usd(Number(r.price)) : '—'}
+                    </Typography>
+                  </Stack>
                 </Stack>
               </Box>
             );
