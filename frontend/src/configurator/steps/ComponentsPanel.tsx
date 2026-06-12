@@ -155,7 +155,7 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
     }
   };
 
-  const setQty = async (line: ComponentLineRow, qty: number) => {
+  const setLineQty = async (line: ComponentLineRow, qty: number) => {
     if (!Number.isFinite(qty) || qty < 0) return;
     try {
       await configuratorV2Service.patchLine(line.id, { quantity: qty, meta: { qtyEdited: true } });
@@ -265,7 +265,7 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
                     <TableCell sx={{ ...cellSx, width: 70 }}>
                       <TextField
                         size="small" defaultValue={l.quantity} key={l.id + ':' + l.quantity}
-                        onBlur={(e) => { const v = Number(e.target.value); if (v !== Number(l.quantity)) setQty(l, v); }}
+                        onBlur={(e) => { const v = Number(e.target.value); if (v !== Number(l.quantity)) setLineQty(l, v); }}
                         inputProps={{ style: { textAlign: 'center', padding: '4px 6px', fontSize: 12 } }}
                         sx={{ width: 56, '& .MuiOutlinedInput-root': { bgcolor: C.bg, color: C.text, '& fieldset': { borderColor: C.border } } }}
                       />
