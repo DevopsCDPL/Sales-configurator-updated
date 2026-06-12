@@ -309,7 +309,7 @@ const V2PreviewStep: React.FC = () => {
 
   if (!configurationId) {
     return (
-      <Box sx={{ p: 4, bgcolor: C.bg }}>
+      <Box sx={{ p: 4, bgcolor: C.surface }}>
         <Typography sx={{ color: C.sub, fontSize: 13 }}>
           Open or create a configuration (CFG) first — the Designer attaches switchboards to it.
         </Typography>
@@ -318,7 +318,7 @@ const V2PreviewStep: React.FC = () => {
   }
 
   return (
-    <Box sx={{ bgcolor: C.bg, minHeight: 400 }}>
+    <Box sx={{ bgcolor: C.surface, minHeight: 400 }}>
       {error && (
         <Alert
           severity="error"
@@ -451,7 +451,7 @@ const V2PreviewStep: React.FC = () => {
           )}
 
           <Dialog open={coDialog} onClose={() => setCoDialog(false)} maxWidth="sm" fullWidth
-            PaperProps={{ sx: { bgcolor: C.surface, border: '1px solid ' + C.border, backgroundImage: 'none' } }}>
+            PaperProps={{ sx: { bgcolor: C.bg, border: '1px solid ' + C.border, backgroundImage: 'none' } }}>
             <DialogTitle sx={{ color: C.text, fontSize: 15, fontWeight: 700 }}>
               Raise change order — {openBoard.board.name}
             </DialogTitle>
@@ -463,7 +463,7 @@ const V2PreviewStep: React.FC = () => {
               <TextField
                 autoFocus fullWidth multiline minRows={2} placeholder="Reason (required) — what changed and why"
                 value={coReason} onChange={(e) => setCoReason(e.target.value)}
-                sx={{ mb: 1.5, '& .MuiOutlinedInput-root': { bgcolor: C.bg, color: C.text, fontSize: 13, '& fieldset': { borderColor: C.border } }, '& textarea': { color: C.text } }}
+                sx={{ mb: 1.5, '& .MuiOutlinedInput-root': { bgcolor: C.surface, color: C.text, fontSize: 13, '& fieldset': { borderColor: C.border } }, '& textarea': { color: C.text } }}
               />
               <Stack direction="row" spacing={1}>
                 {(['internal', 'customer'] as const).map((o) => (
@@ -533,7 +533,7 @@ const V2PreviewStep: React.FC = () => {
               </Typography>
               {svg ? (
                 <Box
-                  sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', p: 2, overflowX: 'auto' }}
+                  sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', p: 2, overflowX: 'auto' }}
                   dangerouslySetInnerHTML={{ __html: svg }}
                 />
               ) : (
@@ -547,7 +547,7 @@ const V2PreviewStep: React.FC = () => {
               </Typography>
               {openBoard.sections.length ? (
                 <Box
-                  sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', p: 2, overflowX: 'auto' }}
+                  sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', p: 2, overflowX: 'auto' }}
                   dangerouslySetInnerHTML={{ __html: elevationFromFull(openBoard) }}
                 />
               ) : (

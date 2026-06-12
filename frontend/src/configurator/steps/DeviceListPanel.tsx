@@ -95,7 +95,7 @@ const DeviceListPanel: React.FC<DeviceListPanelProps> = ({ lines, catalogCbs, sc
       <Typography sx={{ color: '#CBD5E1', fontSize: 13.5, fontWeight: 600, mb: 1 }}>
         Devices (saved design) — engineer may swap any pick
       </Typography>
-      <Box sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', overflow: 'hidden' }}>
+      <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', overflow: 'hidden' }}>
         <Table size="small">
           <TableHead>
             <TableRow>
@@ -149,7 +149,7 @@ const DeviceListPanel: React.FC<DeviceListPanelProps> = ({ lines, catalogCbs, sc
       </Box>
 
       <Dialog open={!!swapLine} onClose={() => setSwapLine(null)} maxWidth="md" fullWidth
-        PaperProps={{ sx: { bgcolor: C.surface, border: '1px solid ' + C.border, backgroundImage: 'none' } }}>
+        PaperProps={{ sx: { bgcolor: C.bg, border: '1px solid ' + C.border, backgroundImage: 'none' } }}>
         <DialogTitle sx={{ color: C.text, fontSize: 15, fontWeight: 700 }}>
           Swap {swapLine?.meta?.designation} — alternatives ≥ {swapLine?.meta?.ratedA} A, ≥ {sccrKA} kA
         </DialogTitle>

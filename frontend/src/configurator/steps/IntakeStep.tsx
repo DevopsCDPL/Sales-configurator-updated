@@ -161,7 +161,7 @@ export default function IntakeStep(props: IntakeStepProps) {
   };
 
   return (
-    <Box sx={{ p: 2, bgcolor: C.bg }}>
+    <Box sx={{ p: 2, bgcolor: C.surface }}>
       <Typography sx={{ color: C.sub, fontSize: 12, mb: 1.5 }}>
         Capture the customer requirement — the engine proposes the full line-up from the schedule below.
       </Typography>
@@ -248,7 +248,7 @@ export default function IntakeStep(props: IntakeStepProps) {
         <Table size="small" sx={{
           '& td, & th': { borderColor: C.border, color: C.text, fontSize: 12.5, py: 0.5 },
           '& td .MuiInputBase-root': {
-            bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '6px',
+            bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '6px',
             px: 0.75, minHeight: 28,
             '&:hover': { borderColor: '#2A3050' },
             '&.Mui-focused': { borderColor: C.blue },
@@ -365,7 +365,7 @@ export default function IntakeStep(props: IntakeStepProps) {
                     <Typography sx={{ color: C.sub, fontSize: 10.5 }}>{t}</Typography>
                     <Typography sx={{ color: C.sub, fontSize: 10.5 }}>{Math.round(a)} A</Typography>
                   </Stack>
-                  <Box sx={{ height: 4, bgcolor: '#000', borderRadius: 2 }}>
+                  <Box sx={{ height: 4, bgcolor: '#000000', borderRadius: 2 }}>
                     <Box sx={{ height: 4, width: `${summary.totalA ? Math.min(100, (a / summary.totalA) * 100) : 0}%`, bgcolor: '#00c8ff', borderRadius: 2, opacity: 0.85 }} />
                   </Box>
                 </Box>
@@ -385,7 +385,7 @@ export default function IntakeStep(props: IntakeStepProps) {
 
       {/* Proposal diff preview — nothing applies silently (Phase C §4.3) */}
       <Dialog open={!!proposal} onClose={() => setProposal(null)} fullWidth maxWidth="md"
-        PaperProps={{ sx: { bgcolor: C.surface, border: `1px solid ${C.border}`, backgroundImage: 'none' } }}>
+        PaperProps={{ sx: { bgcolor: C.bg, border: `1px solid ${C.border}`, backgroundImage: 'none' } }}>
         <DialogTitle sx={{ color: C.text, fontSize: 15 }}>
           Proposed Line-up — review before applying
         </DialogTitle>
@@ -423,7 +423,7 @@ export default function IntakeStep(props: IntakeStepProps) {
                           size="small"
                           value={d.device.partNumber}
                           onChange={(e) => swapDevice(s.sectionIndex, d.designation, e.target.value)}
-                          sx={{ minWidth: 320, bgcolor: C.bg, color: C.text, fontSize: 12, '& fieldset': { borderColor: C.border } }}
+                          sx={{ minWidth: 320, bgcolor: C.surface, color: C.text, fontSize: 12, '& fieldset': { borderColor: C.border } }}
                         >
                           {[d.device, ...d.alternatives].map((c) => (
                             <MenuItem key={c.partNumber} value={c.partNumber} sx={{ fontSize: 12 }}>
@@ -479,17 +479,17 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <Box sx={{ bgcolor: C.bg, border: `1px solid ${C.border}`, borderRadius: '8px', p: 1.25 }}>
+    <Box sx={{ bgcolor: C.surface, border: `1px solid ${C.border}`, borderRadius: '8px', p: 1.25 }}>
       <Typography sx={{ color: C.muted, fontSize: 9.5, fontWeight: 600, letterSpacing: '0.7px' }}>{label}</Typography>
       <Typography sx={{ color: C.text, fontSize: 16, fontWeight: 700, mt: 0.25 }}>{value}</Typography>
     </Box>
   );
 }
 
-const card = { bgcolor: C.surface, border: `1px solid ${C.border}`, borderRadius: '10px', p: 2.25 };
+const card = { bgcolor: C.bg, border: `1px solid ${C.border}`, borderRadius: '10px', p: 2.25 };
 const cardTitle = { color: '#CBD5E1', fontSize: 13.5, fontWeight: 600, mb: 1.5 };
 const input = {
-  color: C.text, fontSize: 13, bgcolor: C.bg,
+  color: C.text, fontSize: 13, bgcolor: C.surface,
   '& .MuiOutlinedInput-notchedOutline': { borderColor: C.border },
   '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: C.blue },
   '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: C.blue },

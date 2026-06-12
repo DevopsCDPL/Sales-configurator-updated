@@ -38,7 +38,7 @@ const headSx = { color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4
 const usd = (n: number) => n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 });
 const inputSx = {
   '& .MuiOutlinedInput-root': {
-    bgcolor: C.bg, color: C.text, fontSize: 12.5,
+    bgcolor: C.surface, color: C.text, fontSize: 12.5,
     '& fieldset': { borderColor: C.border },
     '&.Mui-focused fieldset': { borderColor: C.blue },
   },
@@ -182,7 +182,7 @@ const CatalogManagerPanel: React.FC = () => {
           startIcon={<UploadFileRoundedIcon sx={{ fontSize: 16 }} />}
           disabled={importing}
           onClick={() => fileRef.current?.click()}
-          sx={{ color: C.text, textTransform: 'none', fontSize: 12.5, border: '1px solid ' + C.border, bgcolor: C.surface, '&:hover': { borderColor: C.blue } }}
+          sx={{ color: C.text, textTransform: 'none', fontSize: 12.5, border: '1px solid ' + C.border, bgcolor: C.bg, '&:hover': { borderColor: C.blue } }}
         >
           {importing ? 'Importing…' : 'Import TPS workbook'}
         </Button>
@@ -256,7 +256,7 @@ const CatalogManagerPanel: React.FC = () => {
               <Box
                 key={r.id}
                 sx={{
-                  bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', p: 1.5,
+                  bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', p: 1.5,
                   transition: 'border-color .15s', '&:hover': { borderColor: '#2A3050' },
                   display: 'flex', flexDirection: 'column', gap: 0.75,
                 }}
@@ -300,7 +300,7 @@ const CatalogManagerPanel: React.FC = () => {
           )}
         </Box>
       ) : (
-        <Box sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', overflow: 'auto' }}>
+        <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', overflow: 'auto' }}>
           <Table size="small" sx={{ minWidth: 900 }}>
             <TableHead>
               <TableRow>
@@ -351,7 +351,7 @@ const CatalogManagerPanel: React.FC = () => {
 
       {/* Add/Edit dialog */}
       <Dialog open={!!edit} onClose={() => setEdit(null)} maxWidth="sm" fullWidth
-        PaperProps={{ sx: { bgcolor: C.surface, border: '1px solid ' + C.border, backgroundImage: 'none' } }}>
+        PaperProps={{ sx: { bgcolor: C.bg, border: '1px solid ' + C.border, backgroundImage: 'none' } }}>
         <DialogTitle sx={{ color: C.text, fontSize: 15, fontWeight: 700 }}>
           {edit?.id ? 'Edit component' : 'Add component'}
         </DialogTitle>
@@ -363,7 +363,7 @@ const CatalogManagerPanel: React.FC = () => {
                 <Select
                   size="small" value={edit.category}
                   onChange={(e) => setEdit({ ...edit, category: e.target.value })}
-                  sx={{ minWidth: 200, bgcolor: C.bg, color: C.text, fontSize: 13, '& fieldset': { borderColor: C.border } }}
+                  sx={{ minWidth: 200, bgcolor: C.surface, color: C.text, fontSize: 13, '& fieldset': { borderColor: C.border } }}
                 >
                   {[...new Set([edit.category, ...counts.map((c) => c.category)])].map((c) => (
                     <MenuItem key={c} value={c} sx={{ fontSize: 12.5 }}>{c}</MenuItem>

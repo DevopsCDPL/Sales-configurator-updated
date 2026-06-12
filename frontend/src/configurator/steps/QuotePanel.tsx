@@ -37,7 +37,7 @@ const usd = (n: number) =>
 
 const input = {
   '& .MuiOutlinedInput-root': {
-    bgcolor: C.bg, color: C.text, fontSize: 13,
+    bgcolor: C.surface, color: C.text, fontSize: 13,
     '& fieldset': { borderColor: C.border },
     '&:hover fieldset': { borderColor: '#2A3050' },
     '&.Mui-focused fieldset': { borderColor: C.blue },
@@ -150,7 +150,7 @@ const QuotePanel: React.FC<QuotePanelProps> = ({ switchboardId }) => {
 
       <Stack direction="row" spacing={2} alignItems="flex-start" flexWrap="wrap" useFlexGap>
         {/* Inputs column */}
-        <Box sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', p: 2, minWidth: 320, flex: '0 0 360px' }}>
+        <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', p: 2, minWidth: 320, flex: '0 0 360px' }}>
           <Typography sx={{ color: '#CBD5E1', fontSize: 13, fontWeight: 600, mb: 1.5 }}>Pricing inputs</Typography>
           <Stack spacing={1.5}>
             <Box>
@@ -204,7 +204,7 @@ const QuotePanel: React.FC<QuotePanelProps> = ({ switchboardId }) => {
                     <Select
                       size="small" value={a.bucket}
                       onChange={(e) => setAdjustments((arr) => arr.map((x) => (x._id === a._id ? { ...x, bucket: e.target.value as any } : x)))}
-                      sx={{ ...input, minWidth: 110, '& .MuiSelect-select': { color: C.text, fontSize: 12, py: 0.75 }, bgcolor: C.bg, border: 'none' }}
+                      sx={{ ...input, minWidth: 110, '& .MuiSelect-select': { color: C.text, fontSize: 12, py: 0.75 }, bgcolor: C.surface, border: 'none' }}
                     >
                       {BUCKETS.map((b) => (
                         <MenuItem key={b} value={b} sx={{ fontSize: 12 }}>{b} — {BUCKET_LABEL[b]}</MenuItem>
@@ -249,7 +249,7 @@ const QuotePanel: React.FC<QuotePanelProps> = ({ switchboardId }) => {
               <CircularProgress size={24} sx={{ color: C.blue }} />
             </Stack>
           ) : q ? (
-            <Box sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', p: 2 }}>
+            <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', p: 2 }}>
               <Typography sx={{ color: '#CBD5E1', fontSize: 13, fontWeight: 600, mb: 1.5 }}>
                 Cost build-up · engine v{q.calc_version}
               </Typography>
@@ -340,7 +340,7 @@ const QuotePanel: React.FC<QuotePanelProps> = ({ switchboardId }) => {
 
       {/* Revision chain */}
       {revisions.length > 0 && (
-        <Box sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', mt: 2, overflow: 'hidden' }}>
+        <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', mt: 2, overflow: 'hidden' }}>
           <Typography sx={{ color: '#CBD5E1', fontSize: 12.5, fontWeight: 700, px: 2, py: 1, borderBottom: '1px solid ' + C.border }}>
             Revision history (immutable)
           </Typography>

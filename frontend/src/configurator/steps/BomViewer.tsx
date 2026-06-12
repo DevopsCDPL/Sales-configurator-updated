@@ -37,7 +37,7 @@ const cellSx = { color: C.text, fontSize: 12, borderBottom: '1px solid ' + C.bor
 const headSx = { color: C.sub, fontSize: 10.5, fontWeight: 700, letterSpacing: 0.5, borderBottom: '1px solid ' + C.border, py: 0.7 };
 
 const Stat: React.FC<{ label: string; value: string; accent?: string }> = ({ label, value, accent }) => (
-  <Box sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', px: 2, py: 1.25, minWidth: 130 }}>
+  <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', px: 2, py: 1.25, minWidth: 130 }}>
     <Typography sx={{ color: C.sub, fontSize: 10.5, letterSpacing: 0.5, textTransform: 'uppercase' }}>{label}</Typography>
     <Typography sx={{ color: accent ?? C.text, fontSize: 17, fontWeight: 700 }}>{value}</Typography>
   </Box>
@@ -117,7 +117,7 @@ const BomViewer: React.FC<BomViewerProps> = ({ switchboardId }) => {
       )}
 
       {/* Copper estimate breakdown */}
-      <Box sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', p: 2, mb: 2 }}>
+      <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', p: 2, mb: 2 }}>
         <Typography sx={{ color: '#CBD5E1', fontSize: 13, fontWeight: 600, mb: 1 }}>
           Copper estimate — pass 1 (parametric) · {usd(bom.copperPricePerLb)}/lb · SolidWorks trues up at pass 2
         </Typography>
@@ -164,7 +164,7 @@ const BomViewer: React.FC<BomViewerProps> = ({ switchboardId }) => {
 
       {view === 'ebom' ? (
         Object.entries(bom.ebom).map(([secName, cats]) => (
-          <Box key={secName} sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', mb: 1.5, overflow: 'hidden' }}>
+          <Box key={secName} sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', mb: 1.5, overflow: 'hidden' }}>
             <Typography sx={{ color: '#CBD5E1', fontSize: 12.5, fontWeight: 700, px: 2, py: 1, borderBottom: '1px solid ' + C.border }}>
               {secName}
             </Typography>
@@ -216,7 +216,7 @@ const BomViewer: React.FC<BomViewerProps> = ({ switchboardId }) => {
           </Box>
         ))
       ) : (
-        <Box sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', overflow: 'hidden' }}>
+        <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', overflow: 'hidden' }}>
           <Table size="small">
             <TableHead>
               <TableRow>

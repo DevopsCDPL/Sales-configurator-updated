@@ -64,7 +64,7 @@ export const QuoteCharts: React.FC<{ preview: QuotePreviewResponse; revisions: Q
     })), [revisions]);
 
   return (
-    <Box sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', p: 2, mt: 2 }}>
+    <Box sx={{ bgcolor: '#000000', border: '1px solid ' + C.border, borderRadius: '10px', p: 2, mt: 2 }}>
       <Typography sx={{ color: '#CBD5E1', fontSize: 13, fontWeight: 600, mb: 1 }}>
         Quote review — where the money goes
       </Typography>

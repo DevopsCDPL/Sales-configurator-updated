@@ -34,7 +34,7 @@ const usd = (n: number) =>
 
 const inputSx = {
   '& .MuiOutlinedInput-root': {
-    bgcolor: C.bg, color: C.text, fontSize: 12.5,
+    bgcolor: C.surface, color: C.text, fontSize: 12.5,
     '& fieldset': { borderColor: C.border },
     '&.Mui-focused fieldset': { borderColor: C.blue },
   },
@@ -152,7 +152,7 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
       )}
 
       {/* Selected components (user lines) */}
-      <Box sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', mb: 2, overflow: 'hidden' }}>
+      <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', mb: 2, overflow: 'hidden' }}>
         <Typography sx={{ color: '#CBD5E1', fontSize: 12.5, fontWeight: 700, px: 2, py: 1, borderBottom: '1px solid ' + C.border }}>
           Selected components — {userLines.length} line(s) · flow straight into BOM &amp; Quote
         </Typography>
@@ -206,7 +206,7 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
       <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1.5 }} flexWrap="wrap" useFlexGap>
         <Select
           size="small" value={category} displayEmpty onChange={(e) => setCategory(e.target.value)}
-          sx={{ minWidth: 200, bgcolor: C.surface, color: C.text, fontSize: 12.5, '& fieldset': { borderColor: C.border } }}
+          sx={{ minWidth: 200, bgcolor: C.bg, color: C.text, fontSize: 12.5, '& fieldset': { borderColor: C.border } }}
         >
           <MenuItem value="" sx={{ fontSize: 12.5 }}>All categories</MenuItem>
           {categories.map((c) => (
@@ -232,13 +232,13 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
       {loading ? (
         <Stack alignItems="center" sx={{ py: 5 }}><CircularProgress size={22} sx={{ color: C.blue }} /></Stack>
       ) : !results.length ? (
-        <Box sx={{ bgcolor: C.surface, border: '1px dashed ' + C.border, borderRadius: '10px', p: 3, textAlign: 'center' }}>
+        <Box sx={{ bgcolor: C.bg, border: '1px dashed ' + C.border, borderRadius: '10px', p: 3, textAlign: 'center' }}>
           <Typography sx={{ color: C.sub, fontSize: 12.5 }}>
             No catalog items match. The catalog is shared with the legacy screens — anything added there is available here.
           </Typography>
         </Box>
       ) : (
-        <Box sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', overflow: 'hidden' }}>
+        <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', overflow: 'hidden' }}>
           <Table size="small">
             <TableHead>
               <TableRow>
@@ -273,7 +273,7 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
                       <Select
                         size="small" value={scope[r.id] ?? 'board'}
                         onChange={(e) => setScope((m) => ({ ...m, [r.id]: e.target.value }))}
-                        sx={{ minWidth: 110, bgcolor: C.bg, color: C.text, fontSize: 11.5, '& fieldset': { borderColor: C.border } }}
+                        sx={{ minWidth: 110, bgcolor: C.surface, color: C.text, fontSize: 11.5, '& fieldset': { borderColor: C.border } }}
                       >
                         <MenuItem value="board" sx={{ fontSize: 11.5 }}>Board</MenuItem>
                         {sections.map((s) => (

@@ -79,7 +79,7 @@ export default function SwitchboardCardsScreen(props: SwitchboardCardsScreenProp
   const [nameDraft, setNameDraft] = useState('');
 
   return (
-    <Box sx={{ p: 3, bgcolor: C.bg, minHeight: '100%' }}>
+    <Box sx={{ p: 3, bgcolor: C.surface, minHeight: '100%' }}>
       <Stack direction="row" alignItems="baseline" spacing={1.5} sx={{ mb: 2.5 }}>
         <Typography sx={{ color: C.text, fontWeight: 700, fontSize: 18 }}>Switchgear Configurations</Typography>
         <Typography sx={{ color: C.sub, fontSize: 12 }}>
@@ -95,7 +95,7 @@ export default function SwitchboardCardsScreen(props: SwitchboardCardsScreenProp
               key={b.id}
               onClick={() => props.onOpen(b.id)}
               sx={{
-                bgcolor: C.surface, border: `1px solid ${C.border}`, borderRadius: '10px',
+                bgcolor: C.bg, border: `1px solid ${C.border}`, borderRadius: '10px',
                 p: 2.25, cursor: 'pointer', transition: 'all .15s ease', position: 'relative',
                 '&:hover': { bgcolor: C.surfaceHover, borderColor: C.blue, transform: 'translateY(-2px)' },
               }}
@@ -175,7 +175,7 @@ export default function SwitchboardCardsScreen(props: SwitchboardCardsScreenProp
       {/* card menu */}
       <Menu
         anchorEl={menuAnchor?.el} open={!!menuAnchor} onClose={() => setMenuAnchor(null)}
-        PaperProps={{ sx: { bgcolor: C.surface, border: `1px solid ${C.border}`, color: C.text, minWidth: 160 } }}
+        PaperProps={{ sx: { bgcolor: C.bg, border: `1px solid ${C.border}`, color: C.text, minWidth: 160 } }}
       >
         <MenuItem onClick={() => { props.onOpen(menuAnchor!.id); setMenuAnchor(null); }} sx={{ fontSize: 13 }}>Open</MenuItem>
         <MenuItem
@@ -202,7 +202,7 @@ export default function SwitchboardCardsScreen(props: SwitchboardCardsScreenProp
       {/* add menu: New | Load */}
       <Menu
         anchorEl={addAnchor} open={!!addAnchor} onClose={() => setAddAnchor(null)}
-        PaperProps={{ sx: { bgcolor: C.surface, border: `1px solid ${C.border}`, color: C.text, minWidth: 220 } }}
+        PaperProps={{ sx: { bgcolor: C.bg, border: `1px solid ${C.border}`, color: C.text, minWidth: 220 } }}
       >
         <MenuItem onClick={() => { setNewOpen(true); setAddAnchor(null); }} sx={{ fontSize: 13 }}>
           <Box>
@@ -301,11 +301,11 @@ function Metric({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
-const dialogSx = { bgcolor: C.surface, border: `1px solid ${C.border}`, backgroundImage: 'none' };
+const dialogSx = { bgcolor: C.bg, border: `1px solid ${C.border}`, backgroundImage: 'none' };
 const fieldSx = {
   mt: 0.5,
   '& .MuiOutlinedInput-root': {
-    color: C.text, fontSize: 13, bgcolor: C.bg,
+    color: C.text, fontSize: 13, bgcolor: C.surface,
     '& fieldset': { borderColor: C.border },
     '&:hover fieldset': { borderColor: C.blue },
     '&.Mui-focused fieldset': { borderColor: C.blue },

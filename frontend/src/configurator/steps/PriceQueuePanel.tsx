@@ -25,7 +25,7 @@ const headSx = { color: C.sub, fontSize: 10.5, fontWeight: 700, letterSpacing: 0
 
 const input = {
   '& .MuiOutlinedInput-root': {
-    bgcolor: C.bg, color: C.text, fontSize: 12,
+    bgcolor: C.surface, color: C.text, fontSize: 12,
     '& fieldset': { borderColor: C.border },
     '&.Mui-focused fieldset': { borderColor: C.blue },
   },
@@ -109,13 +109,13 @@ const PriceQueuePanel: React.FC = () => {
           <CircularProgress size={24} sx={{ color: C.blue }} />
         </Stack>
       ) : !pending.length ? (
-        <Box sx={{ bgcolor: C.surface, border: '1px dashed ' + C.border, borderRadius: '10px', p: 4, textAlign: 'center' }}>
+        <Box sx={{ bgcolor: C.bg, border: '1px dashed ' + C.border, borderRadius: '10px', p: 4, textAlign: 'center' }}>
           <Typography sx={{ color: C.green, fontSize: 13, fontWeight: 600 }}>
             Nothing awaiting price — every BOM line is FIRM.
           </Typography>
         </Box>
       ) : (
-        <Box sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', overflow: 'hidden' }}>
+        <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', overflow: 'hidden' }}>
           <Table size="small">
             <TableHead>
               <TableRow>

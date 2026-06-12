@@ -81,7 +81,7 @@ const V2QuotationsPanel: React.FC<{ projectId: string; onChanged?: () => void }>
   }
   if (!groups.length) {
     return (
-      <Box sx={{ bgcolor: C.surface, border: '1px dashed ' + C.border, borderRadius: '10px', p: 2.5, mb: 2 }}>
+      <Box sx={{ bgcolor: C.bg, border: '1px dashed ' + C.border, borderRadius: '10px', p: 2.5, mb: 2 }}>
         <Typography sx={{ color: C.sub, fontSize: 12.5 }}>
           No Designer quotations issued yet — open Configuration → Designer, design a board and issue a quote.
           They will appear here for proposal generation and order acceptance.
@@ -118,7 +118,7 @@ const V2QuotationsPanel: React.FC<{ projectId: string; onChanged?: () => void }>
       {info && <Alert severity="success" onClose={() => setInfo(null)} sx={{ mb: 1, bgcolor: 'rgba(34,197,94,0.08)', color: '#86EFAC', border: '1px solid ' + C.border, fontSize: 12 }}>{info}</Alert>}
 
       {groups.map((g) => (
-        <Box key={g.board.id} sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', mb: 1.5, overflow: 'hidden' }}>
+        <Box key={g.board.id} sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', mb: 1.5, overflow: 'hidden' }}>
           <Stack direction="row" alignItems="center" spacing={1} sx={{ px: 2, py: 1, borderBottom: '1px solid ' + C.border }}>
             <Typography sx={{ color: '#CBD5E1', fontSize: 12.5, fontWeight: 700 }}>{g.board.name}</Typography>
             <Typography sx={{ color: C.sub, fontSize: 11 }}>{g.configCode}</Typography>

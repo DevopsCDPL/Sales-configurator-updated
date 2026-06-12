@@ -111,7 +111,7 @@ const StandardsPanel: React.FC = () => {
         </Box>
         <Select
           size="small" value={tableKey} onChange={(e) => setTableKey(e.target.value)}
-          sx={{ minWidth: 240, bgcolor: C.surface, color: C.text, fontSize: 13, '& fieldset': { borderColor: C.border } }}
+          sx={{ minWidth: 240, bgcolor: C.bg, color: C.text, fontSize: 13, '& fieldset': { borderColor: C.border } }}
         >
           {TABLES.map((t) => <MenuItem key={t.key} value={t.key} sx={{ fontSize: 13 }}>{t.label}</MenuItem>)}
         </Select>
@@ -127,7 +127,7 @@ const StandardsPanel: React.FC = () => {
             <TextField
               size="small" placeholder="Change note (who verified / source)" value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              sx={{ width: 260, '& .MuiOutlinedInput-root': { bgcolor: C.bg, color: C.text, fontSize: 12, '& fieldset': { borderColor: C.border } }, '& input': { color: C.text } }}
+              sx={{ width: 260, '& .MuiOutlinedInput-root': { bgcolor: C.surface, color: C.text, fontSize: 12, '& fieldset': { borderColor: C.border } }, '& input': { color: C.text } }}
             />
             <Button
               startIcon={<SaveRoundedIcon sx={{ fontSize: 15 }} />} disabled={saving} onClick={save}
@@ -156,11 +156,11 @@ const StandardsPanel: React.FC = () => {
       {loading ? (
         <Stack alignItems="center" sx={{ py: 6 }}><CircularProgress size={24} sx={{ color: C.blue }} /></Stack>
       ) : !rows.length ? (
-        <Box sx={{ bgcolor: C.surface, border: '1px dashed ' + C.border, borderRadius: '10px', p: 4, textAlign: 'center' }}>
+        <Box sx={{ bgcolor: C.bg, border: '1px dashed ' + C.border, borderRadius: '10px', p: 4, textAlign: 'center' }}>
           <Typography sx={{ color: C.sub, fontSize: 13 }}>No rows in this table yet.</Typography>
         </Box>
       ) : (
-        <Box sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', overflow: 'auto' }}>
+        <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', overflow: 'auto' }}>
           <Table size="small" sx={{ minWidth: 600 }}>
             <TableHead>
               <TableRow>

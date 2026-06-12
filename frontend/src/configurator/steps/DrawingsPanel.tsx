@@ -106,7 +106,7 @@ const DrawingsPanel: React.FC<DrawingsPanelProps> = ({ switchboardId }) => {
                 onClick={() => enqueue(t.key)}
                 sx={{
                   color: C.text, textTransform: 'none', fontSize: 12.5, px: 1.75,
-                  border: '1px solid ' + C.border, bgcolor: C.surface,
+                  border: '1px solid ' + C.border, bgcolor: C.bg,
                   '&:hover': { borderColor: C.blue, bgcolor: 'rgba(0,200,255,0.08)' },
                 }}
               >
@@ -125,14 +125,14 @@ const DrawingsPanel: React.FC<DrawingsPanelProps> = ({ switchboardId }) => {
       </Stack>
 
       {!jobs.length && !loading ? (
-        <Box sx={{ bgcolor: C.surface, border: '1px dashed ' + C.border, borderRadius: '10px', p: 4, textAlign: 'center' }}>
+        <Box sx={{ bgcolor: C.bg, border: '1px dashed ' + C.border, borderRadius: '10px', p: 4, textAlign: 'center' }}>
           <Typography sx={{ color: C.sub, fontSize: 13 }}>
             No drawing jobs yet. Queue one above — the payload is built from the saved design
             (pricing is stripped before anything reaches CAD).
           </Typography>
         </Box>
       ) : (
-        <Box sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', overflow: 'hidden' }}>
+        <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', overflow: 'hidden' }}>
           {hasActive && (
             <Stack direction="row" spacing={1} alignItems="center" sx={{ px: 2, py: 0.75, borderBottom: '1px solid ' + C.border }}>
               <CircularProgress size={12} sx={{ color: C.blue }} />
