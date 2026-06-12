@@ -23,7 +23,7 @@ import {
 } from '../lib/lineup-proposal';
 
 const C = {
-  bg: '#000000', surface: '#13131E', border: '#1E2235', blue: '#00c8ff',
+  bg: '#000000', surface: '#0B0B0D', border: '#1E2235', blue: '#00c8ff',
   blueSoft: 'rgba(0,200,255,0.12)', text: '#E2E8F0', sub: '#64748B',
   muted: '#3D4663', green: '#22C55E', amber: '#D97706', red: '#EF4444',
 };

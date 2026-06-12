@@ -14,7 +14,7 @@ import {
 import type { QuotePreviewResponse, QuoteRevisionRow } from '../../services/configuratorV2Service';
 
 const C = {
-  surface: '#13131E', border: '#1E2235', text: '#E2E8F0', sub: '#64748B',
+  surface: '#0B0B0D', border: '#1E2235', text: '#E2E8F0', sub: '#64748B',
 };
 /** Calm, dark-friendly categorical palette (blue-led, no yellow). */
 const PALETTE = ['#00c8ff', '#22C55E', '#8B5CF6', '#06B6D4', '#F472B6', '#94A3B8', '#FB7185', '#34D399'];

@@ -24,7 +24,7 @@ import { configuratorService, ConfiguratorComponent } from '../../services/confi
 import configuratorV2Service from '../../services/configuratorV2Service';
 
 const C = {
-  bg: '#000000', surface: '#13131E', border: '#1E2235', blue: '#00c8ff',
+  bg: '#000000', surface: '#0B0B0D', border: '#1E2235', blue: '#00c8ff',
   text: '#E2E8F0', sub: '#64748B', green: '#22C55E', amber: '#D97706', red: '#EF4444',
 };
 
@@ -257,7 +257,7 @@ const CatalogManagerPanel: React.FC = () => {
                 key={r.id}
                 sx={{
                   bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', p: 1.5,
-                  transition: 'border-color .15s', '&:hover': { borderColor: '#2A3050' },
+                  transition: 'border-color .15s, box-shadow .15s', '&:hover': { borderColor: '#00c8ff', boxShadow: '0 0 14px rgba(0,200,255,0.3)' },
                   display: 'flex', flexDirection: 'column', gap: 0.75,
                 }}
               >

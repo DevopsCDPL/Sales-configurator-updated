@@ -5,7 +5,7 @@
  * "+" → New Configuration (blank) | Load Configuration (clone picker).
  * Re-entering the project re-opens each card's saved state.
  *
- * Design language: #000000 bg / #13131E surface / #1E2235 border /
+ * Design language: #000000 bg / #0B0B0D surface / #1E2235 border /
  * #00c8ff primary — no gold, low contrast, generous spacing.
  */
 import React, { useState } from 'react';
@@ -23,8 +23,8 @@ import ArchitectureRoundedIcon from '@mui/icons-material/ArchitectureRounded';
 
 const C = {
   bg: '#000000',
-  surface: '#13131E',
-  surfaceHover: '#171724',
+  surface: '#0B0B0D',
+  surfaceHover: '#101014',
   border: '#1E2235',
   blue: '#00c8ff',
   blueSoft: 'rgba(0,200,255,0.12)',
@@ -97,7 +97,7 @@ export default function SwitchboardCardsScreen(props: SwitchboardCardsScreenProp
               sx={{
                 bgcolor: C.bg, border: `1px solid ${C.border}`, borderRadius: '10px',
                 p: 2.25, cursor: 'pointer', transition: 'all .15s ease', position: 'relative',
-                '&:hover': { bgcolor: C.surfaceHover, borderColor: C.blue, transform: 'translateY(-2px)' },
+                '&:hover': { bgcolor: C.surfaceHover, borderColor: '#00c8ff', boxShadow: '0 0 14px rgba(0,200,255,0.35)', transform: 'translateY(-2px)' },
               }}
             >
               <Stack direction="row" alignItems="flex-start" justifyContent="space-between">
@@ -164,7 +164,7 @@ export default function SwitchboardCardsScreen(props: SwitchboardCardsScreenProp
             border: `1.5px dashed ${C.border}`, borderRadius: '10px', minHeight: 168,
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
             gap: 1, cursor: 'pointer', color: C.muted, transition: 'all .15s ease',
-            '&:hover': { borderColor: C.blue, color: C.blue, bgcolor: C.blueSoft },
+            '&:hover': { borderColor: '#00c8ff', color: '#00c8ff', bgcolor: C.blueSoft, boxShadow: '0 0 14px rgba(0,200,255,0.3)' },
           }}
         >
           <AddRoundedIcon sx={{ fontSize: 30 }} />

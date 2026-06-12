@@ -16,7 +16,7 @@ import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 import configuratorV2Service, { SwJobRow } from '../../services/configuratorV2Service';
 
 const C = {
-  bg: '#000000', surface: '#13131E', border: '#1E2235', blue: '#00c8ff',
+  bg: '#000000', surface: '#0B0B0D', border: '#1E2235', blue: '#00c8ff',
   text: '#E2E8F0', sub: '#64748B', green: '#22C55E', amber: '#D97706', red: '#EF4444',
 };
 

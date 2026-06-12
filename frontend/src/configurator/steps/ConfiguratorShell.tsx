@@ -116,7 +116,7 @@ const InnerShell: React.FC<Props> = ({ configuration, onPersist, onShellStateCha
               sx={{
                 flexWrap: 'nowrap',
                 overflowX: 'auto',
-                bgcolor: '#13131E',
+                bgcolor: '#0B0B0D',
                 borderBottom: '1px solid #1E2235',
                 px: '24px',
               }}

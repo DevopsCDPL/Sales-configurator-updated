@@ -31,7 +31,7 @@ import { useConfigurator } from '../state/ConfiguratorProvider';
 import configuratorV2Service, { FullBoard, SwitchboardRow, CatalogCb } from '../../services/configuratorV2Service';
 
 const C = {
-  bg: '#000000', surface: '#13131E', border: '#1E2235', blue: '#00c8ff',
+  bg: '#000000', surface: '#0B0B0D', border: '#1E2235', blue: '#00c8ff',
   text: '#E2E8F0', sub: '#64748B', amber: '#D97706', green: '#22C55E', red: '#EF4444',
 };
 
