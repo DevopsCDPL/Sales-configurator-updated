@@ -25,7 +25,7 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING(8),
         allowNull: false,
         defaultValue: 'board',
-        validate: { isIn: [['board', 'section']] },
+        validate: { isIn: [['board', 'section', 'rule']] },
       },
       section_id: {
         type: DataTypes.UUID,
