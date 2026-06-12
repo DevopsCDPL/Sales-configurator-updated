@@ -16,7 +16,8 @@ import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 import ContentPasteRoundedIcon from '@mui/icons-material/ContentPasteRounded';
 
-import { DEFAULT_STANDARDS, StandardsSet } from '../lib/us-standards';
+import { DEFAULT_STANDARDS, StandardsSet, nextLadder } from '../lib/us-standards';
+import { computeLoadV2 } from '../lib/load-calculation-v2';
 import { flowStore } from '../state/flowStore';
 import {
   proposeLineup, IntakeInput, FeederRowInput, LineupProposal, LineupOptions,
@@ -28,7 +29,7 @@ const C = {
   muted: '#3D4663', green: '#22C55E', amber: '#D97706', red: '#EF4444',
 };
 
-const LOAD_TYPES = ['General', 'Motor', 'Lighting', 'HVAC', 'Capacitor', 'Spare', 'Space'] as const;
+const LOAD_TYPES = ['General', 'Motor', 'Fire Pump', 'HVAC', 'Lighting', 'Heating', 'Receptacle', 'UPS / IT', 'EV Charger', 'Transformer', 'Panel Feeder', 'Capacitor', 'Spare', 'Space'] as const;
 const MODES = ['kW', 'kVA', 'A', 'HP'] as const;
 
 export interface IntakeStepProps {
@@ -61,6 +62,30 @@ export default function IntakeStep(props: IntakeStepProps) {
   });
   const [proposal, setProposal] = useState<LineupProposal | null>(null);
   const [pasteInfo, setPasteInfo] = useState<string | null>(null);
+
+  /* Live NEC load summary — recomputes as the schedule is typed */
+  const summary = useMemo(() => {
+    const byType = new Map<string, number>();
+    let totalA = 0; let devices = 0; let largestMotorA = 0;
+    for (const f of intake.feeders) {
+      if (f.loadType === 'Space' || !f.loadValue) continue;
+      try {
+        const res = computeLoadV2(std, {
+          voltageSystemCode: intake.voltageSystemCode,
+          loadInputMode: f.loadInputMode, loadValue: f.loadValue,
+          powerFactor: f.powerFactor, continuous: f.continuous ?? true,
+          isLargestMotorInSection: f.loadType === 'Motor' || f.loadType === 'Fire Pump',
+        });
+        const a = (res.designCurrentA || 0) * Math.max(1, f.qty ?? 1);
+        totalA += a;
+        devices += Math.max(1, f.qty ?? 1);
+        byType.set(f.loadType, (byType.get(f.loadType) ?? 0) + a);
+        if ((f.loadType === 'Motor' || f.loadType === 'Fire Pump') && res.designCurrentA > largestMotorA) largestMotorA = res.designCurrentA;
+      } catch { /* incomplete row */ }
+    }
+    const busA = nextLadder(std.mainBusLadder_A, totalA);
+    return { totalA: Math.round(totalA * 10) / 10, devices, largestMotorA: Math.round(largestMotorA), busA, byType: [...byType.entries()].sort((a, b) => b[1] - a[1]) };
+  }, [intake.feeders, intake.voltageSystemCode, std]);
 
   const patch = (p: Partial<IntakeInput>) => setIntake((s) => ({ ...s, ...p }));
   const patchRow = (rowId: string, p: Partial<FeederRowInput>) =>
@@ -227,7 +252,17 @@ export default function IntakeStep(props: IntakeStepProps) {
         </Stack>
         {pasteInfo && <Alert severity="info" sx={alertSx} onClose={() => setPasteInfo(null)}>{pasteInfo}</Alert>}
 
-        <Table size="small" sx={{ mt: 1, '& td, & th': { borderColor: C.border, color: C.text, fontSize: 12.5, py: 0.6 } }}>
+        <Stack direction="row" spacing={2} alignItems="flex-start" sx={{ mt: 1 }}>
+        <Box sx={{ flex: 1, minWidth: 560 }}>
+        <Table size="small" sx={{
+          '& td, & th': { borderColor: C.border, color: C.text, fontSize: 12.5, py: 0.5 },
+          '& td .MuiInputBase-root': {
+            bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '6px',
+            px: 0.75, minHeight: 28,
+            '&:hover': { borderColor: '#2A3050' },
+            '&.Mui-focused': { borderColor: C.blue },
+          },
+        }}>
           <TableHead>
             <TableRow>
               {['#', 'Description', 'Load Type', 'Unit', 'Value', 'PF', 'Cont.', 'Poles', 'Qty', ''].map((h) => (
@@ -247,7 +282,7 @@ export default function IntakeStep(props: IntakeStepProps) {
                   <Select variant="standard" disableUnderline value={r.loadType} fullWidth sx={cell}
                     onChange={(e) => patchRow(r.rowId, {
                       loadType: e.target.value as any,
-                      loadInputMode: e.target.value === 'Motor' ? 'HP' : r.loadInputMode === 'HP' ? 'A' : r.loadInputMode,
+                      loadInputMode: (e.target.value === 'Motor' || e.target.value === 'Fire Pump') ? 'HP' : r.loadInputMode === 'HP' ? 'A' : r.loadInputMode,
                     })}>
                     {LOAD_TYPES.map((t) => <MenuItem key={t} value={t} sx={{ fontSize: 12.5 }}>{t}</MenuItem>)}
                   </Select>
@@ -255,7 +290,7 @@ export default function IntakeStep(props: IntakeStepProps) {
                 <TableCell sx={{ width: 70 }}>
                   <Select variant="standard" disableUnderline value={r.loadInputMode} fullWidth sx={cell}
                     onChange={(e) => patchRow(r.rowId, { loadInputMode: e.target.value as any })}>
-                    {MODES.filter((m) => (r.loadType === 'Motor' ? true : m !== 'HP')).map((m) => (
+                    {MODES.filter((m) => (r.loadType === 'Motor' || r.loadType === 'Fire Pump' ? true : m !== 'HP')).map((m) => (
                       <MenuItem key={m} value={m} sx={{ fontSize: 12.5 }}>{m}</MenuItem>
                     ))}
                   </Select>
@@ -297,6 +332,49 @@ export default function IntakeStep(props: IntakeStepProps) {
             ))}
           </TableBody>
         </Table>
+        </Box>
+
+        {/* Live load summary — updates as the schedule is typed */}
+        <Box sx={{ width: 250, flexShrink: 0, bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', p: 1.5, position: 'sticky', top: 140 }}>
+          <Typography sx={{ color: C.sub, fontSize: 10.5, letterSpacing: 0.5, mb: 1 }}>LIVE LOAD SUMMARY</Typography>
+          <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.25 }}>
+            <Typography sx={{ color: C.sub, fontSize: 11.5 }}>Design current</Typography>
+            <Typography sx={{ color: '#00c8ff', fontSize: 15, fontWeight: 800 }}>{summary.totalA} A</Typography>
+          </Stack>
+          <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.25 }}>
+            <Typography sx={{ color: C.sub, fontSize: 11.5 }}>Suggested main bus</Typography>
+            <Typography sx={{ color: C.text, fontSize: 12.5, fontWeight: 700 }}>{summary.busA ? summary.busA + ' A' : '—'}</Typography>
+          </Stack>
+          <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.25 }}>
+            <Typography sx={{ color: C.sub, fontSize: 11.5 }}>Device positions</Typography>
+            <Typography sx={{ color: C.text, fontSize: 12.5, fontWeight: 700 }}>{summary.devices}</Typography>
+          </Stack>
+          {summary.largestMotorA > 0 && (
+            <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.25 }}>
+              <Typography sx={{ color: C.sub, fontSize: 11.5 }}>Largest motor</Typography>
+              <Typography sx={{ color: C.text, fontSize: 12.5, fontWeight: 700 }}>{summary.largestMotorA} A</Typography>
+            </Stack>
+          )}
+          {summary.byType.length > 0 && (
+            <Box sx={{ mt: 1.25, pt: 1, borderTop: '1px solid ' + C.border }}>
+              {summary.byType.map(([t, a]) => (
+                <Box key={t} sx={{ mb: 0.75 }}>
+                  <Stack direction="row" justifyContent="space-between">
+                    <Typography sx={{ color: C.sub, fontSize: 10.5 }}>{t}</Typography>
+                    <Typography sx={{ color: C.sub, fontSize: 10.5 }}>{Math.round(a)} A</Typography>
+                  </Stack>
+                  <Box sx={{ height: 4, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+                    <Box sx={{ height: 4, width: `${summary.totalA ? Math.min(100, (a / summary.totalA) * 100) : 0}%`, bgcolor: '#00c8ff', borderRadius: 2, opacity: 0.85 }} />
+                  </Box>
+                </Box>
+              ))}
+            </Box>
+          )}
+          <Typography sx={{ color: C.muted, fontSize: 10, mt: 1 }}>
+            NEC 125% continuous + motor rules applied per row. Propose line-up turns this into sections + breakers.
+          </Typography>
+        </Box>
+        </Stack>
         <Typography sx={{ color: C.muted, fontSize: 11, mt: 1 }}>
           {totals.rows} row(s) • {totals.devices} device position(s) • Spare reserves a device, Space reserves room only
         </Typography>

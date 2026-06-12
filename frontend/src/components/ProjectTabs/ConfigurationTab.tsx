@@ -300,21 +300,19 @@ const ConfigurationTab: React.FC<ConfigurationTabProps> = ({ project, onUpdate, 
           {/* LEFT — back arrow + project identifier */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1, minWidth: 0 }}>
             {onBack && (
-              <Tooltip title="Back">
-                <IconButton
-                  size="small"
-                  onClick={onBack}
-                  sx={{
-                    color: 'var(--text-secondary, #d9e4fb)',
-                    bgcolor: 'rgba(255,255,255,0.04)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    borderRadius: '8px',
-                    '&:hover': { bgcolor: 'rgba(0,200,255,0.10)', color: PRIMARY, borderColor: 'rgba(0,200,255,0.35)' },
-                  }}
-                >
-                  <ArrowBackIcon sx={{ fontSize: 16 }} />
-                </IconButton>
-              </Tooltip>
+              <Button
+                size="small"
+                onClick={onBack}
+                startIcon={<ArrowBackIcon sx={{ fontSize: 14 }} />}
+                sx={{
+                  textTransform: 'none', fontWeight: 600, fontSize: '0.75rem',
+                  px: 1.25, py: 0.45, minWidth: 0, borderRadius: '8px',
+                  color: '#06151c', bgcolor: '#00c8ff',
+                  '&:hover': { bgcolor: '#33d4ff' },
+                }}
+              >
+                Previous
+              </Button>
             )}
             {flow.boardOpen ? (
               <>

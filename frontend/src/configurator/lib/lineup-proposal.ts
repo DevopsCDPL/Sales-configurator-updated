@@ -15,7 +15,7 @@ import type { SectionRole } from './safety-rules';
 export interface FeederRowInput {
   rowId: string;
   description: string;
-  loadType: 'General' | 'Motor' | 'Lighting' | 'HVAC' | 'Capacitor' | 'Spare' | 'Space';
+  loadType: 'General' | 'Motor' | 'Fire Pump' | 'Lighting' | 'HVAC' | 'Heating' | 'Receptacle' | 'UPS / IT' | 'EV Charger' | 'Transformer' | 'Panel Feeder' | 'Capacitor' | 'Spare' | 'Space';
   loadInputMode: 'kW' | 'kVA' | 'A' | 'HP';
   loadValue: number;
   powerFactor?: number;
@@ -165,7 +165,7 @@ export function proposeLineup(
         loadValue: row.loadValue,
         powerFactor: row.powerFactor,
         continuous: row.continuous ?? true,
-        isLargestMotorInSection: row.loadType === 'Motor',
+        isLargestMotorInSection: row.loadType === 'Motor' || row.loadType === 'Fire Pump',
       };
       const res = computeLoadV2(std, li);
       if (res.errors.length) {
