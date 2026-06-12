@@ -447,7 +447,7 @@ const V2PreviewStep: React.FC = () => {
                     const full = await configuratorV2Service.getFull(openBoard.board.id);
                     setOpenBoard(full);
                     setCoDialog(false);
-                    setToast('Change order raised — design unlocked for editing');
+                    setToast('Change order raised — pending approval. Board will unlock once approved.');
                   } catch (e: any) {
                     setError(e?.response?.data?.error ?? 'Change order failed');
                   } finally {
@@ -572,4 +572,3 @@ const V2PreviewStep: React.FC = () => {
 };
 
 export default V2PreviewStep;
-/* SLD: submittal-grade one-line wired (see sld-generator.ts). */
