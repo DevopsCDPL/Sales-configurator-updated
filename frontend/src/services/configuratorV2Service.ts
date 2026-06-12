@@ -45,7 +45,7 @@ export interface ComponentLineRow {
   quantity: number;
   unit_cost?: number | null;
   price_status: 'FIRM' | 'ESTIMATED' | 'PENDING_RFQ';
-  source: 'user' | 'auto' | 'builder' | 'standard' | 'generator';
+  source: 'user' | 'auto' | 'builder' | 'standard' | 'generator' | 'rule';
   meta?: Record<string, any> | null;
 }
 
