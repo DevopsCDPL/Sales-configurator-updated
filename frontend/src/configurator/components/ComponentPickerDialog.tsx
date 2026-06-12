@@ -1,8 +1,15 @@
 /**
  * ComponentPickerDialog — shared catalog picker for both "swap" and "add" flows.
  *
- * swap mode  → locked to the swapped line's category; closes after pick.
- * add mode   → full category select; stays open for multiple additions.
+ * swap mode  -> locked to the swapped line's category; closes after pick.
+ * add mode   -> full category select; stays open for multiple additions.
+ *
+ * When lockedCategory === 'CIRCUIT BREAKER' (or the active category is
+ * CIRCUIT BREAKER), two extra layers are active:
+ *   1. Suitability filter — toggle "Suitable only" (default ON) excludes
+ *      definite misfits: kA < sccrKA when both known; height > remaining
+ *      when both known. Parts with missing data are kept.
+ *   2. CbFilterPanel — cascading spec filters above the results table.
  */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
@@ -14,6 +21,7 @@ import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import StarRoundedIcon from '@mui/icons-material/StarRounded';
 import { configuratorService, ConfiguratorComponent } from '../../services/configuratorService';
 import { displayCase, compactSku } from '../lib/displayCase';
+import CbFilterPanel from './CbFilterPanel';
 
 const C = {
   bg: '#000000', surface: '#0B0B0D', border: '#1E2235', blue: '#00c8ff',
@@ -52,10 +60,16 @@ export interface ComponentPickerDialogProps {
    * existing add/swap behaviour unchanged.
    */
   pickOnly?: boolean;
+  /**
+   * Context from the parent board, used for CIRCUIT BREAKER suitability filter.
+   * sccrKA: board short-circuit rating in kA (null = unknown, skip kA filter).
+   * remainingHeightIn: remaining usable height in the target section (null = unknown).
+   */
+  boardContext?: { sccrKA?: number | null; remainingHeightIn?: number | null };
 }
 
 const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
-  open, mode, lockedCategory, onClose, onPick, pickOnly,
+  open, mode, lockedCategory, onClose, onPick, pickOnly, boardContext,
 }) => {
   const [categories, setCategories] = useState<{ category: string; count: number }[]>([]);
   const [category, setCategory] = useState<string>('');
@@ -67,6 +81,10 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
   const [addedNote, setAddedNote] = useState<string | null>(null);
   const noteTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [ratingSort, setRatingSort] = useState<'price' | 'rating'>('price');
+  // CB suitability toggle (default ON)
+  const [suitableOnly, setSuitableOnly] = useState(true);
+  // CB filter panel output
+  const [cbFiltered, setCbFiltered] = useState<ConfiguratorComponent[]>([]);
 
   // Load category counts (add mode only)
   useEffect(() => {
@@ -78,10 +96,11 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
       .catch(() => setCategories([]));
   }, [mode]);
 
-  // Active category — locked in swap mode, or in add mode when a
-  // lockedCategory is supplied (e.g. Section Editor adds CIRCUIT BREAKER).
+  // Active category
   const addLocked = mode === 'add' && !!lockedCategory;
   const activeCategory = (mode === 'swap' || addLocked) ? (lockedCategory ?? '') : category;
+
+  const isCbMode = activeCategory.toUpperCase() === 'CIRCUIT BREAKER';
 
   const search = useCallback(async (cat: string, qStr: string) => {
     setLoading(true);
@@ -90,12 +109,9 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
       if (cat) params.category = cat;
       if (qStr.trim()) params.q = qStr.trim();
       let rows = await configuratorService.listComponents(params);
-      // In add mode exclude engine-managed categories — UNLESS a lockedCategory
-      // explicitly targets one (Section Editor adds breakers into a section).
       if (mode === 'add' && !lockedCategory) {
         rows = rows.filter((r) => !EXCLUDED.has((r.category || '').toUpperCase()));
       }
-      // Swap mode: sort cheapest first; treat 0/null price as Infinity (sort last)
       if (mode === 'swap') {
         rows.sort((a, b) => {
           const pa = Number(a.price) || 0;
@@ -106,13 +122,13 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
         });
       }
       setResults(rows);
-      setRatingSort('price'); // reset to price on each new search
+      setRatingSort('price');
     } catch {
       setResults([]);
     } finally {
       setLoading(false);
     }
-  }, [mode]);
+  }, [mode, lockedCategory]);
 
   // Auto-search on open and when category changes
   useEffect(() => {
@@ -128,8 +144,30 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
     setResults([]);
     setQtyMap({});
     setAddedNote(null);
+    setSuitableOnly(true);
     if (mode === 'add') setCategory(lockedCategory ?? '');
   }, [open, mode, lockedCategory]);
+
+  /** Suitability filter: exclude only definite misfits when in CB mode. */
+  const suitableRows = React.useMemo<ConfiguratorComponent[]>(() => {
+    if (!isCbMode || !suitableOnly) return results;
+    const sccrKA = boardContext?.sccrKA ?? null;
+    const remaining = boardContext?.remainingHeightIn ?? null;
+    return results.filter((r) => {
+      const sp: any = (r as any).specifications ?? {};
+      // kA check: exclude only when BOTH values are known and item fails
+      const itemKA = sp.interruptingKA != null ? Number(sp.interruptingKA) : null;
+      if (sccrKA != null && itemKA != null && itemKA < sccrKA) return false;
+      // Height check: exclude only when BOTH heights are known and item fails
+      const itemH = (r as any).dims_h_in != null
+        ? Number((r as any).dims_h_in)
+        : sp.height_in != null ? Number(sp.height_in) : null;
+      if (remaining != null && itemH != null && itemH > remaining) return false;
+      return true;
+    });
+  }, [results, isCbMode, suitableOnly, boardContext]);
+
+  const excludedCount = results.length - suitableRows.length;
 
   const handlePick = async (c: ConfiguratorComponent) => {
     const qty = Math.max(1, Number(qtyMap[c.id]) || 1);
@@ -137,14 +175,12 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
     try {
       await onPick(c, qty);
       if (pickOnly) {
-        // pickOnly: caller takes over; dialog stays open until caller closes it
+        // pickOnly: caller takes over
       } else if (mode === 'add') {
-        // Stay open; show transient confirmation note
         if (noteTimer.current) clearTimeout(noteTimer.current);
         setAddedNote(displayCase(c.name));
         noteTimer.current = setTimeout(() => setAddedNote(null), 3000);
       }
-      // swap mode: caller closes dialog via onPick handler
     } finally {
       setBusyId(null);
     }
@@ -152,18 +188,41 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
 
   const handleCategoryChange = (val: string) => {
     setCategory(val);
-    // search will fire via useEffect on activeCategory
   };
 
   const title = mode === 'swap'
-    ? `Swap — pick a replacement (${displayCase(lockedCategory ?? '')})`
+    ? 'Swap — pick a replacement (' + displayCase(lockedCategory ?? '') + ')'
     : 'Add components from the catalog';
+
+  // Use lg maxWidth only when showing CB filters (6-col grid)
+  const dialogMaxWidth: 'lg' | 'md' = isCbMode ? 'lg' : 'md';
+
+  // Source rows for the CB filter panel (pre-suitability-filtered)
+  const cbPanelSource: ConfiguratorComponent[] = isCbMode
+    ? (suitableOnly ? suitableRows : results)
+    : [];
+
+  // Final display rows: CB mode uses cbFiltered (from CbFilterPanel), else results/sorted
+  const displayRows: ConfiguratorComponent[] = (() => {
+    if (isCbMode) return cbFiltered;
+    if (mode === 'add' && !pickOnly && ratingSort === 'rating') {
+      return [...results].sort((a, b) => {
+        const ra = (a as any).specifications?.qualityRating ?? 0;
+        const rb = (b as any).specifications?.qualityRating ?? 0;
+        if (rb !== ra) return rb - ra;
+        const pa = Number(a.price) || Infinity;
+        const pb = Number(b.price) || Infinity;
+        return pa - pb;
+      });
+    }
+    return results;
+  })();
 
   return (
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth="md"
+      maxWidth={dialogMaxWidth}
       fullWidth
       PaperProps={{ sx: { bgcolor: C.surface, border: '1px solid ' + C.border, backgroundImage: 'none' } }}
     >
@@ -171,7 +230,7 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
         {title}
         {addedNote && (
           <Typography component="span" sx={{ ml: 2, color: C.green, fontSize: 12, fontWeight: 500 }}>
-            Added ✓ — {addedNote}
+            Added — {addedNote}
           </Typography>
         )}
       </DialogTitle>
@@ -203,7 +262,7 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
           </Select>
           <TextField
             size="small"
-            placeholder="Search part #, name…"
+            placeholder="Search part #, name..."
             value={q}
             onChange={(e) => setQ(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') search(activeCategory, q); }}
@@ -219,8 +278,46 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
           </Button>
         </Stack>
 
-        {/* Sort toggle (add mode, when any result has a rating) */}
-        {mode === 'add' && !pickOnly && results.some((r) => (r as any).specifications?.qualityRating != null) && (
+        {/* CB suitability toggle */}
+        {isCbMode && !loading && results.length > 0 && (
+          <Box sx={{ mb: 1 }}>
+            <Stack direction="row" spacing={0.75} alignItems="center" flexWrap="wrap">
+              <Typography sx={{ color: C.sub, fontSize: 11 }}>Suitability:</Typography>
+              <Chip
+                label="Suitable only"
+                size="small"
+                onClick={() => setSuitableOnly(true)}
+                sx={{
+                  height: 20, fontSize: 11,
+                  bgcolor: suitableOnly ? 'rgba(0,200,255,0.15)' : 'transparent',
+                  color: suitableOnly ? C.blue : C.sub,
+                  border: '1px solid ' + (suitableOnly ? C.blue : C.border),
+                  cursor: 'pointer',
+                  '& .MuiChip-label': { px: 1 },
+                }}
+              />
+              <Chip
+                label={excludedCount > 0 ? 'All (+' + excludedCount + ' hidden)' : 'All'}
+                size="small"
+                onClick={() => setSuitableOnly(false)}
+                sx={{
+                  height: 20, fontSize: 11,
+                  bgcolor: !suitableOnly ? 'rgba(0,200,255,0.15)' : 'transparent',
+                  color: !suitableOnly ? C.blue : C.sub,
+                  border: '1px solid ' + (!suitableOnly ? C.blue : C.border),
+                  cursor: 'pointer',
+                  '& .MuiChip-label': { px: 1 },
+                }}
+              />
+            </Stack>
+            <Typography sx={{ color: C.sub, fontSize: 10.5, mt: 0.4 }}>
+              Items without kA/size data are kept — verify before adding.
+            </Typography>
+          </Box>
+        )}
+
+        {/* Sort toggle (non-CB add mode only) */}
+        {mode === 'add' && !pickOnly && !isCbMode && results.some((r) => (r as any).specifications?.qualityRating != null) && (
           <Stack direction="row" spacing={0.75} alignItems="center" sx={{ mb: 1 }}>
             <Typography sx={{ color: C.sub, fontSize: 11 }}>Sort:</Typography>
             {(['price', 'rating'] as const).map((s) => (
@@ -241,26 +338,24 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
             ))}
           </Stack>
         )}
+
+        {/* CB filter panel — above the results table, in CB mode */}
+        {isCbMode && !loading && (
+          <CbFilterPanel
+            items={cbPanelSource}
+            onFiltered={setCbFiltered}
+          />
+        )}
+
         {/* Results */}
         {loading ? (
           <Stack alignItems="center" sx={{ py: 4 }}>
             <CircularProgress size={22} sx={{ color: C.blue }} />
           </Stack>
-        ) : (() => {
-          const displayResults = mode === 'add' && !pickOnly && ratingSort === 'rating'
-            ? [...results].sort((a, b) => {
-                const ra = (a as any).specifications?.qualityRating ?? 0;
-                const rb = (b as any).specifications?.qualityRating ?? 0;
-                if (rb !== ra) return rb - ra;
-                const pa = Number(a.price) || Infinity;
-                const pb = Number(b.price) || Infinity;
-                return pa - pb;
-              })
-            : results;
-          return !displayResults.length ? (
+        ) : !displayRows.length ? (
           <Box sx={{ bgcolor: C.bg, border: '1px dashed ' + C.border, borderRadius: '10px', p: 3, textAlign: 'center' }}>
             <Typography sx={{ color: C.sub, fontSize: 12.5 }}>
-              No catalog items match — adjust search or add it in Database → Components.
+              No catalog items match — adjust search or add it in Database &rarr; Components.
             </Typography>
           </Box>
         ) : (
@@ -279,7 +374,7 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
                 </TableRow>
               </TableHead>
               <TableBody>
-                {displayResults.map((r) => {
+                {displayRows.map((r) => {
                   const price = Number(r.price ?? (r as any).mat_cost ?? (r as any).material_cost) || 0;
                   return (
                     <TableRow key={r.id} hover>
@@ -354,8 +449,7 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
               </TableBody>
             </Table>
           </Box>
-          );
-        })()}
+        )}
       </DialogContent>
 
       <DialogActions>

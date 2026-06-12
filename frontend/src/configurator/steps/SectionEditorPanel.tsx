@@ -5,11 +5,12 @@
  * frame selector (from the engineering-standards `frame_library`), a
  * utilization bar (device heights vs frame usable height — falls back to
  * device count when dimension data is missing), and the section's device
- * list with per-device move ◀ ▶ (fit-checked), remove (waiver prompt), and
- * a footer "+ Add device" that opens the shared ComponentPickerDialog in
- * add mode locked to CIRCUIT BREAKER. Row controls: + Add section (max 10),
- * per-card reorder ◀ ▶ and delete (only when empty). Every edit persists
- * immediately and triggers the parent reload so BOM/quote/SLD recompute.
+ * list with per-device move left/right (fit-checked), swap (opens picker
+ * in swap mode), remove (waiver prompt), and a footer "+ Add breaker" that
+ * opens the shared ComponentPickerDialog in add mode locked to CIRCUIT BREAKER.
+ * Row controls: + Add section (max 10), per-card reorder left/right and delete
+ * (only when empty). Every edit persists immediately and triggers the
+ * parent reload so BOM/quote/SLD recompute.
  */
 import React, { useCallback, useMemo, useState } from 'react';
 import {
@@ -20,6 +21,7 @@ import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import SwapHorizRoundedIcon from '@mui/icons-material/SwapHorizRounded';
 import configuratorV2Service, { FullBoard, SectionRow, ComponentLineRow } from '../../services/configuratorV2Service';
 import { ConfiguratorComponent } from '../../services/configuratorService';
 import ComponentPickerDialog from '../components/ComponentPickerDialog';
@@ -63,6 +65,12 @@ const inputSx = {
   '& input': { color: C.text },
 };
 
+/** Whether the height came from actual dims (false) or a role fallback (true). */
+function deviceHeightIsEstimate(l: ComponentLineRow): boolean {
+  const h = Number(l.meta?.heightIn ?? l.meta?.dims_h_in);
+  return !(Number.isFinite(h) && h > 0);
+}
+
 /** Device height in inches: prefer carried dims, else role-based fallback. */
 function deviceHeightIn(l: ComponentLineRow): number | null {
   const h = Number(l.meta?.heightIn ?? l.meta?.dims_h_in);
@@ -80,9 +88,13 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
   const [editingName, setEditingName] = useState<string | null>(null);
   const [editingDesig, setEditingDesig] = useState<string | null>(null);
   const [desigDraft, setDesigDraft] = useState<Record<string, string>>({});
+  // add picker state
   const [pickerSectionId, setPickerSectionId] = useState<string | null>(null);
+  // swap picker state
+  const [swapLine, setSwapLine] = useState<ComponentLineRow | null>(null);
+  const [swapPickerOpen, setSwapPickerOpen] = useState(false);
 
-  const sccrKA = Number(board.board.board_data?.shortCircuitRating) || 65;
+  const sccrKA = Number(board.board.board_data?.shortCircuitRating) || null;
 
   // Lazy-load the frame library from the engineering standards table.
   const loadFrames = useCallback(async () => {
@@ -114,7 +126,7 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
     return m;
   }, [board.lines]);
 
-  // All CB lines across every section — used for the summary card
+  // All CB lines across every section - used for the summary card
   const allDeviceLines = useMemo(
     () => board.lines.filter((l) => (l.category || '').toUpperCase() === 'CIRCUIT BREAKER'),
     [board.lines]
@@ -146,8 +158,7 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
     return (sec.layout?.frame as FrameRow) ?? null;
   };
 
-  /** Utilization: used device height / frame usable height. Returns null
-   *  when no frame usable height is known (caller shows count fallback). */
+  /** Utilization: used device height / frame usable height. */
   const utilizationFor = (sec: SectionRow, devices: ComponentLineRow[]) => {
     const frame = frameFor(sec);
     const usable = Number(frame?.usableDeviceHeight_in) || 0;
@@ -165,7 +176,7 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
   const wouldExceed = (sec: SectionRow, extraIn: number): boolean => {
     const frame = frameFor(sec);
     const usable = Number(frame?.usableDeviceHeight_in) || 0;
-    if (!usable) return false; // no dims → cannot fit-check, allow
+    if (!usable) return false;
     const used = (devicesBySection.get(sec.id) ?? []).reduce((a, l) => a + (deviceHeightIn(l) ?? 0), 0);
     return used + extraIn > usable;
   };
@@ -183,7 +194,7 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
     }
   };
 
-  // ── Section actions ──
+  // Section actions
   const addSection = () =>
     run('add-section', async () => {
       const last = sections[sections.length - 1];
@@ -225,7 +236,7 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
     run('sec-del-' + sec.id, () => configuratorV2Service.deleteSection(sec.id));
   };
 
-  // ── Device actions ──
+  // Device actions
   const renameDesignation = (line: ComponentLineRow) => {
     const next = (desigDraft[line.id] ?? '').trim();
     setEditingDesig(null);
@@ -240,7 +251,6 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
     if (!target) return;
     const h = deviceHeightIn(line) ?? 0;
     if (wouldExceed(target, h)) {
-      // Fit-check warning: still allow with explicit confirm.
       const ok = window.confirm(
         'Section ' + target.section_number + ' may exceed its frame capacity with this device. Move anyway?'
       );
@@ -249,9 +259,6 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
     run('dev-move-' + line.id, () => relinkLine(line, target));
   };
 
-  /** Re-link a device line to a different section (patchLine can't touch
-   *  section_id), by recreating the line under the target section and
-   *  removing the original. Preserves all device fields + meta. */
   const relinkLine = async (line: ComponentLineRow, target: SectionRow) => {
     await configuratorV2Service.addLine(board.board.id, {
       scope: 'section',
@@ -272,7 +279,7 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
   const removeDevice = (line: ComponentLineRow) => {
     const label = String(line.meta?.designation ?? line.part_number ?? 'device');
     const reason = window.prompt('Remove ' + label + '? Enter a waiver reason (required for auto-added lines):', '');
-    if (reason === null) return; // cancelled
+    if (reason === null) return;
     if (line.source === 'auto' && !reason.trim()) {
       setError('A waiver reason is required to remove this auto-added line.');
       return;
@@ -308,13 +315,68 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
     });
   };
 
+  /** Swap a device - mirrors DeviceListPanel.doSwap using patchLine. */
+  const doSwapDevice = (line: ComponentLineRow, c: ConfiguratorComponent) => {
+    const sp: any = (c as any).specifications ?? {};
+    return run('dev-swap-' + line.id, async () => {
+      await configuratorV2Service.patchLine(line.id, {
+        component_id: c.id && String(c.id).length === 36 ? c.id : null,
+        part_number: c.part_number ?? null,
+        name: c.name ?? c.part_number ?? null,
+        unit_cost: Number(c.price ?? (c as any).mat_cost ?? (c as any).material_cost) || 0,
+        price_status: Number(c.price) > 0 ? 'FIRM' : 'PENDING_RFQ',
+        meta: {
+          ratedA: Number(sp.ratedCurrentA) || null,
+          poles: Number(sp.poles) || 3,
+          mounting: sp.mounting ?? 'Fixed',
+          interruptingKA: Number(sp.interruptingKA) || null,
+          frameModel: sp.frameModel ?? null,
+          manufacturer: sp.manufacturer ?? null,
+          swapped: true,
+          swapped_from: line.part_number ?? null,
+        },
+      });
+      setSwapPickerOpen(false);
+      setSwapLine(null);
+    });
+  };
+
   const pickerSection = sections.find((s) => s.id === pickerSectionId) ?? null;
+
+  // boardContext for add picker
+  const addBoardContext = useMemo(() => {
+    if (!pickerSection) return undefined;
+    const frame = frameFor(pickerSection);
+    const usable = Number(frame?.usableDeviceHeight_in) || null;
+    const devices = devicesBySection.get(pickerSection.id) ?? [];
+    const used = devices.reduce((a, l) => a + (deviceHeightIn(l) ?? 0), 0);
+    const remaining = usable != null ? usable - used : null;
+    return { sccrKA: sccrKA ?? null, remainingHeightIn: remaining };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pickerSection, devicesBySection, frames, sccrKA]);
+
+  // boardContext for swap picker
+  const swapBoardContext = useMemo(() => {
+    if (!swapLine) return undefined;
+    let swapSec: SectionRow | undefined;
+    for (const sec of sections) {
+      const devs = devicesBySection.get(sec.id) ?? [];
+      if (devs.some((d) => d.id === swapLine.id)) { swapSec = sec; break; }
+    }
+    if (!swapSec) return { sccrKA: sccrKA ?? null, remainingHeightIn: null };
+    const frame = frameFor(swapSec);
+    const usable = Number(frame?.usableDeviceHeight_in) || null;
+    const devices = devicesBySection.get(swapSec.id) ?? [];
+    const used = devices.reduce((a, l) => a + (deviceHeightIn(l) ?? 0), 0);
+    const outgoingH = deviceHeightIn(swapLine) ?? 0;
+    const remaining = usable != null ? usable - used + outgoingH : null;
+    return { sccrKA: sccrKA ?? null, remainingHeightIn: remaining };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [swapLine, sections, devicesBySection, frames, sccrKA]);
 
   return (
     <Box sx={{ px: 3, pt: 2, pb: 1 }}>
-      {/* Outer row: left content + right sticky summary */}
       <Stack direction="row" spacing={1.5} alignItems="flex-start">
-        {/* Left: title row + grid */}
         <Box sx={{ flex: 1, minWidth: 0 }}>
           {/* Title row */}
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
@@ -356,7 +418,6 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
               </Typography>
             </Box>
           ) : (
-            /* 4-up wrapping grid — no horizontal scrollbar */
             <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1.5 }}>
               {sections.map((sec) => {
                 const devices = devicesBySection.get(sec.id) ?? [];
@@ -364,11 +425,41 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
                 const util = utilizationFor(sec, devices);
                 const role = String(sec.setup?.role ?? 'FEEDER');
                 const idx = sections.findIndex((s) => s.id === sec.id);
+
+                // Tooltip content for the utilization bar
+                const frameHeight = Number(frame?.height_in) || null;
+                const busCableZone = frameHeight && util.usable ? frameHeight - util.usable : null;
+                const utilTooltip = util.hasBar ? (
+                  <Box sx={{ fontSize: 11, minWidth: 180 }}>
+                    <Typography sx={{ fontSize: 11, color: C.sub, mb: 0.5 }}>
+                      {'Usable height: ' + util.usable.toFixed(1) + ' in' +
+                        (frameHeight ? ' (frame ' + frameHeight.toFixed(0) + ' in' +
+                          (busCableZone ? ' − bus/cable zones ' + busCableZone.toFixed(1) + ' in' : '') + ')' : '')}
+                    </Typography>
+                    {devices.map((d) => {
+                      const h = deviceHeightIn(d);
+                      const est = deviceHeightIsEstimate(d);
+                      const label = d.meta?.designation || d.part_number || d.name || '—';
+                      return (
+                        <Typography key={d.id} sx={{ fontSize: 11, color: C.text }}>
+                          {label + ' — ' + (h != null ? h.toFixed(1) : '?') + ' in' + (est ? ' (est.)' : '')}
+                        </Typography>
+                      );
+                    })}
+                    <Typography sx={{ fontSize: 11, color: C.text, mt: 0.5, borderTop: '1px solid #1E2235', pt: 0.5 }}>
+                      {'Used: ' + util.usedIn.toFixed(1) + ' in'}
+                    </Typography>
+                    <Typography sx={{ fontSize: 11, color: util.overflow ? C.red : C.green }}>
+                      {'Remaining: ' + (util.usable - util.usedIn).toFixed(1) + ' in'}
+                    </Typography>
+                  </Box>
+                ) : '';
+
                 return (
                   <Box
                     key={sec.id}
                     sx={{
-                      minWidth: 0, /* let grid govern width */
+                      minWidth: 0,
                       bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px',
                       display: 'flex', flexDirection: 'column',
                     }}
@@ -441,10 +532,10 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
                         onChange={(e) => setFrame(sec, String(e.target.value))}
                         sx={{ bgcolor: C.bg, color: C.text, fontSize: 11.5, '& fieldset': { borderColor: C.border } }}
                       >
-                        <MenuItem value="" sx={{ fontSize: 11.5 }}>{frames ? 'Select frame…' : 'Loading frames…'}</MenuItem>
+                        <MenuItem value="" sx={{ fontSize: 11.5 }}>{frames ? 'Select frame...' : 'Loading frames...'}</MenuItem>
                         {(frames ?? []).map((f) => (
                           <MenuItem key={f.frameCode} value={f.frameCode} sx={{ fontSize: 11.5 }}>
-                            {f.frameCode} — {f.width_in}×{f.depth_in}×{f.height_in}" · {f.maxBusRating_A}A
+                            {f.frameCode + ' — ' + f.width_in + '×' + f.depth_in + '×' + f.height_in + '" · ' + f.maxBusRating_A + 'A'}
                           </MenuItem>
                         ))}
                       </Select>
@@ -452,21 +543,31 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
                       {/* Utilization */}
                       <Box sx={{ mt: 1 }}>
                         {util.hasBar ? (
-                          <>
-                            <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.25 }}>
-                              <Typography sx={{ color: C.sub, fontSize: 10 }}>Utilization</Typography>
-                              <Typography sx={{ color: util.overflow ? C.red : util.pct > 85 ? C.amber : C.green, fontSize: 10, fontWeight: 700 }}>
-                                {util.usedIn}" / {util.usable}" · {util.pct}%
-                              </Typography>
-                            </Stack>
-                            <LinearProgress
-                              variant="determinate" value={util.pct}
-                              sx={{
-                                height: 5, borderRadius: 3, bgcolor: C.border,
-                                '& .MuiLinearProgress-bar': { bgcolor: util.overflow ? C.red : util.pct > 85 ? C.amber : C.green },
-                              }}
-                            />
-                          </>
+                          <Tooltip
+                            title={utilTooltip}
+                            placement="right"
+                            arrow
+                            componentsProps={{
+                              tooltip: { sx: { bgcolor: C.surface, border: '1px solid ' + C.border, p: 1, maxWidth: 280 } },
+                              arrow: { sx: { color: C.border } },
+                            }}
+                          >
+                            <Box sx={{ cursor: 'default' }}>
+                              <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.25 }}>
+                                <Typography sx={{ color: C.sub, fontSize: 10 }}>Utilization</Typography>
+                                <Typography sx={{ color: util.overflow ? C.red : util.pct > 85 ? C.amber : C.green, fontSize: 10, fontWeight: 700 }}>
+                                  {util.usedIn}{'"'} / {util.usable}{'"'} {'·'} {util.pct}{'%'}
+                                </Typography>
+                              </Stack>
+                              <LinearProgress
+                                variant="determinate" value={util.pct}
+                                sx={{
+                                  height: 5, borderRadius: 3, bgcolor: C.border,
+                                  '& .MuiLinearProgress-bar': { bgcolor: util.overflow ? C.red : util.pct > 85 ? C.amber : C.green },
+                                }}
+                              />
+                            </Box>
+                          </Tooltip>
                         ) : (
                           <Typography sx={{ color: C.sub, fontSize: 10 }}>
                             {devices.length} device{devices.length === 1 ? '' : 's'}
@@ -515,7 +616,19 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
                                   <Tooltip title="Move to next section">
                                     <span>
                                       <IconButton size="small" disabled={locked || idx === sections.length - 1 || !!busyKey} onClick={() => moveDevice(l, sec, 1)} sx={{ color: C.sub, p: 0.2 }}>
-                                        <ChevronRightRoundedIcon sx={{ fontSize: 16 }} />
+                                        <ChevronRightRoundedIcon sx={{ fontSize: 18 }} />
+                                      </IconButton>
+                                    </span>
+                                  </Tooltip>
+                                  <Tooltip title="Swap breaker">
+                                    <span>
+                                      <IconButton
+                                        size="small"
+                                        disabled={locked || !!busyKey}
+                                        onClick={() => { setSwapLine(l); setSwapPickerOpen(true); setError(null); }}
+                                        sx={{ color: C.blue, p: 0.2 }}
+                                      >
+                                        <SwapHorizRoundedIcon sx={{ fontSize: 14 }} />
                                       </IconButton>
                                     </span>
                                   </Tooltip>
@@ -529,12 +642,12 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
                                 </Stack>
                               </Stack>
                               <Typography sx={{ color: C.text, fontSize: 11, mt: 0.25, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                {displayCase(l.name || l.part_number || '\u2014')}
+                                {displayCase(l.name || l.part_number || '—')}
                               </Typography>
                               <Typography sx={{ color: C.sub, fontSize: 10 }}>
-                                {l.meta?.ratedA ?? '\u2014'} A
+                                {l.meta?.ratedA ?? '—'} A
                                 {l.meta?.interruptingKA ? ' / ' + l.meta.interruptingKA + ' kA' : ''}
-                                {' \u00b7 '}{l.meta?.role ?? role}
+                                {' · '}{l.meta?.role ?? role}
                               </Typography>
                             </Box>
                           ))}
@@ -548,10 +661,11 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
                         size="small" fullWidth
                         startIcon={<AddRoundedIcon sx={{ fontSize: 15 }} />}
                         disabled={locked || !!busyKey}
+                        aria-label="Add breaker"
                         onClick={() => { setError(null); setPickerSectionId(sec.id); }}
                         sx={{ color: C.blue, textTransform: 'none', fontSize: 11.5, border: '1px solid ' + C.border }}
                       >
-                        Add device
+                        Add breaker
                       </Button>
                     </Box>
                   </Box>
@@ -572,12 +686,26 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
         />
       </Stack>
 
+      {/* Add breaker picker */}
       <ComponentPickerDialog
         open={!!pickerSection}
         mode="add"
         lockedCategory="CIRCUIT BREAKER"
+        boardContext={addBoardContext}
         onClose={() => setPickerSectionId(null)}
         onPick={pickerSection ? addDeviceToSection(pickerSection) : async () => {}}
+      />
+
+      {/* Swap breaker picker */}
+      <ComponentPickerDialog
+        open={swapPickerOpen}
+        mode="swap"
+        lockedCategory="CIRCUIT BREAKER"
+        boardContext={swapBoardContext}
+        onClose={() => { setSwapPickerOpen(false); setSwapLine(null); }}
+        onPick={(c: ConfiguratorComponent, _qty: number) => {
+          if (swapLine) doSwapDevice(swapLine, c);
+        }}
       />
     </Box>
   );
