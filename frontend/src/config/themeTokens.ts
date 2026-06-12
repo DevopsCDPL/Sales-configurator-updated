@@ -56,7 +56,7 @@ export const LIGHT_TOKENS = {
 
 export const DARK_TOKENS = {
   bgCanvas:     '#000000',
-  bgSurface:    '#13131E',
+  bgSurface:    '#0B0B0D',
   bgSurface2:   '#181826',
   bgSurface3:   '#1E2235',
   bgInput:      '#000000',

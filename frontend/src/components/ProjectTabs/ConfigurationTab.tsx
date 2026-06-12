@@ -306,13 +306,10 @@ const ConfigurationTab: React.FC<ConfigurationTabProps> = ({ project, onUpdate, 
                 <Button
                   size="small"
                   onClick={() => flow.closeBoard?.()}
-                  sx={{ color: 'var(--text-muted, #9ab0d0)', textTransform: 'none', fontSize: '0.72rem', minWidth: 0, px: 1, border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px' }}
+                  sx={{ flexShrink: 0, textTransform: 'none', fontSize: '0.74rem', fontWeight: 700, px: 1.25, height: 28, mr: 0.5, color: '#00c8ff', bgcolor: 'rgba(0,200,255,0.08)', border: '1px dashed rgba(0,200,255,0.45)', borderRadius: '8px', '&:hover': { bgcolor: 'rgba(0,200,255,0.15)' } }}
                 >
-                  ← Boards
+                  {'Board: ' + (flow.boardName ?? 'Switchboard')}
                 </Button>
-                <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: '#f0f6ff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {flow.boardName ?? 'Switchboard'}
-                </Typography>
               </>
             ) : (
               <Typography sx={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-secondary, #d9e4fb)', whiteSpace: 'nowrap' }}>
@@ -517,13 +514,10 @@ const ConfigurationTab: React.FC<ConfigurationTabProps> = ({ project, onUpdate, 
             <Button
               size="small"
               onClick={() => flow.closeBoard?.()}
-              sx={{ flexShrink: 0, color: 'rgba(217,228,251,0.6)', textTransform: 'none', fontSize: '0.72rem', minWidth: 0, px: 1, height: 28, border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px' }}
+              sx={{ flexShrink: 0, textTransform: 'none', fontSize: '0.74rem', fontWeight: 700, px: 1.25, height: 28, mr: 0.5, color: '#00c8ff', bgcolor: 'rgba(0,200,255,0.08)', border: '1px dashed rgba(0,200,255,0.45)', borderRadius: '8px', '&:hover': { bgcolor: 'rgba(0,200,255,0.15)' } }}
             >
-              ← Boards
+              {'Board: ' + (flow.boardName ?? 'Switchboard')}
             </Button>
-            <Typography sx={{ flexShrink: 0, fontSize: '0.8rem', fontWeight: 700, color: '#f0f6ff', whiteSpace: 'nowrap', mr: 0.5 }}>
-              {flow.boardName ?? 'Switchboard'}
-            </Typography>
             {FLOW_STEPS.map(([key, label], i) => {
               const active = flow.step === key;
               const ok = key === 'system' || flow.accepted;

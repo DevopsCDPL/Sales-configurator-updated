@@ -582,7 +582,7 @@ const ProjectsPage: React.FC = () => {
         {/* Expanded Project Table (full width) */}
         <Grid item xs={12} md={12}>
           <Card
-            style={{ backgroundColor: '#2A2A38', backgroundImage: 'none' }}
+            style={{ backgroundColor: '#0B0B0D', backgroundImage: 'none' }}
             sx={{ border: `1px solid #1E2235`, borderRadius: '16px',
             boxShadow: '0 1px 2px rgba(0,0,0,0.12), 0 4px 12px -2px rgba(0,0,0,0.20)', overflow: 'hidden',
             position: 'relative',

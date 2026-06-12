@@ -30,7 +30,7 @@ import { useNotification } from '../contexts/NotificationContext';
 
 const PRIMARY = '#33d6ff';
 const PRIMARY_DK = '#00bce0';
-const SURFACE = '#13131E';
+const SURFACE = '#0B0B0D';
 const BORDER = '#1E2235';
 const TEXT = '#F1F5F9';
 const TEXT_DIM = '#94A3B8';

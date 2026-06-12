@@ -15,7 +15,7 @@ const PRIMARY_DKR  = '#0099b8';
 // Dark palette — premium industrial SaaS (deep neutral canvas, lifted slate surfaces)
 const c = {
   bgCanvas:      '#000000',
-  bgSurface:     '#13131E',
+  bgSurface:     '#0B0B0D',
   bgSurface2:    '#181826',
   bgSurface3:    '#1E2235',
   bgInput:       '#000000',
@@ -563,7 +563,7 @@ export const createAppTheme = (_mode?: PaletteMode) => {
             border: `1px solid ${c.border}`,
             backdropFilter: 'saturate(180%) blur(16px)',
             WebkitBackdropFilter: 'saturate(180%) blur(16px)',
-            backgroundColor: alpha('#13131E', 0.96),
+            backgroundColor: alpha('#0B0B0D', 0.96),
             padding: 4,
             marginTop: 4,
           },
@@ -613,7 +613,7 @@ export const createAppTheme = (_mode?: PaletteMode) => {
       MuiPopover: {
         styleOverrides: {
           paper: {
-            backgroundColor: alpha('#13131E', 0.96),
+            backgroundColor: alpha('#0B0B0D', 0.96),
             backdropFilter: 'saturate(180%) blur(16px)',
             WebkitBackdropFilter: 'saturate(180%) blur(16px)',
             border: `1px solid ${c.border}`,
@@ -626,7 +626,7 @@ export const createAppTheme = (_mode?: PaletteMode) => {
       MuiAutocomplete: {
         styleOverrides: {
           paper: {
-            backgroundColor: alpha('#13131E', 0.96),
+            backgroundColor: alpha('#0B0B0D', 0.96),
             backdropFilter: 'saturate(180%) blur(16px)',
             WebkitBackdropFilter: 'saturate(180%) blur(16px)',
             border: `1px solid ${c.border}`,

@@ -597,7 +597,7 @@ const FileManagerPage: React.FC = () => {
           <Typography sx={{ fontWeight: 700, fontSize: '0.9rem', color: PRIMARY, mb: 1, px: 1 }}>
             {title} ({filtered.length})
           </Typography>
-          <TableContainer sx={{ border: '1px solid', borderColor: 'var(--border)', borderRadius: 2, bgcolor: '#2A2A38' }}>
+          <TableContainer sx={{ border: '1px solid', borderColor: 'var(--border)', borderRadius: 2, bgcolor: '#0B0B0D' }}>
             <Table size="small" sx={{ '& .MuiTableCell-root': { py: 0.7, px: 1.2, borderBottom: '1px solid var(--border)', color: 'var(--text-primary)' } }}>
               <TableHead>
                 <TableRow sx={{ bgcolor: '#33334A' }}>
@@ -765,7 +765,7 @@ const FileManagerPage: React.FC = () => {
               <Typography sx={{ fontWeight: 700, fontSize: '0.95rem', color: PRIMARY, mb: 1 }}>
                 {selectedProjectSection}
               </Typography>
-              <TableContainer sx={{ border: '1px solid', borderColor: 'var(--border)', borderRadius: 2, bgcolor: '#2A2A38' }}>
+              <TableContainer sx={{ border: '1px solid', borderColor: 'var(--border)', borderRadius: 2, bgcolor: '#0B0B0D' }}>
                 <Table size="small" sx={{ tableLayout: 'fixed', '& .MuiTableCell-root': { py: 0.75, px: 1.2, borderBottom: '1px solid var(--border)', color: 'var(--text-primary)' } }}>
                   <TableHead>
                   <TableRow sx={{ bgcolor: '#33334A' }}>
@@ -855,7 +855,7 @@ const FileManagerPage: React.FC = () => {
         </Box>
 
         {filteredProjects.length > 0 ? (
-          <TableContainer sx={{ mx: 2, mb: 2, border: '1px solid', borderColor: 'var(--border)', borderRadius: 2, bgcolor: '#2A2A38', width: 'auto' }}>
+          <TableContainer sx={{ mx: 2, mb: 2, border: '1px solid', borderColor: 'var(--border)', borderRadius: 2, bgcolor: '#0B0B0D', width: 'auto' }}>
             <Table size="small" sx={{ '& .MuiTableCell-root': { py: 0.7, px: 1.2, borderBottom: '1px solid var(--border)', color: 'var(--text-primary)' } }}>
               <TableHead>
                 <TableRow sx={{ bgcolor: '#33334A' }}>
