@@ -478,18 +478,54 @@ router.get('/price-queue', wrap(async (req, res) => {
   }).catch(() => []);
   const boardName = new Map(boards.map((b) => [b.id, b.name]));
 
+  // Pull catalog component specs (manufacturer / assigned vendor) by part #.
+  const partNumbers = [...new Set(lines.map((l) => l.part_number).filter(Boolean))];
+  const comps = partNumbers.length
+    ? await models.ConfiguratorComponent.findAll({
+        where: { part_number: partNumbers },
+        attributes: ['id', 'part_number', 'specifications'],
+      }).catch(() => [])
+    : [];
+  const specByPart = new Map(comps.map((c) => [c.part_number, c.specifications || {}]));
+
+  // Open/sent RFQ rows keyed by part number (batch info for already-queued parts).
+  const openRfqs = await models.ConfiguratorPriceRfq.findAll({
+    where: { status: ['open', 'sent'] },
+    order: [['created_at', 'DESC']],
+    limit: 1000,
+  });
+  const rfqByPart = new Map();
+  for (const r of openRfqs) {
+    const m = r.meta || {};
+    const pn = m.part_number || r.catalog_number;
+    if (pn && !rfqByPart.has(pn)) {
+      rfqByPart.set(pn, {
+        rfqId: r.id,
+        batchCode: m.batch_code ?? null,
+        status: r.status,
+        sentAt: r.sent_at,
+        vendorName: m.vendor_name ?? null,
+      });
+    }
+  }
+
   const grouped = new Map();
   for (const l of lines) {
     const key = l.part_number || l.name || l.id;
+    const spec = (l.part_number && specByPart.get(l.part_number)) || {};
     const prev = grouped.get(key) ?? {
       partNumber: l.part_number,
       name: l.name,
       category: l.category,
       priceStatus: l.price_status,
+      manufacturer: spec.manufacturer ?? null,
+      vendorId: spec.vendorId ?? null,
+      vendorName: spec.vendorName ?? null,
       lineCount: 0,
       totalQty: 0,
       boards: new Set(),
       componentId: l.component_id ?? null,
+      openRfq: (l.part_number && rfqByPart.get(l.part_number)) || null,
     };
     prev.lineCount += 1;
     prev.totalQty += Number(l.quantity) || 0;
@@ -498,15 +534,9 @@ router.get('/price-queue', wrap(async (req, res) => {
     grouped.set(key, prev);
   }
 
-  const rfqs = await models.ConfiguratorPriceRfq.findAll({
-    where: { status: ['open', 'sent'] },
-    order: [['created_at', 'DESC']],
-    limit: 200,
-  });
-
   res.json({
     pending: [...grouped.values()].map((g) => ({ ...g, boards: [...g.boards] })),
-    rfqs,
+    rfqs: openRfqs,
   });
 }));
 
@@ -543,6 +573,228 @@ router.post('/price-queue/receive', wrap(async (req, res) => {
   }
 
   res.json({ ok: true, componentsUpdated: compUpd, linesUpdated: lines.length });
+}));
+
+/* ── RFQ batches (vendor-grouped procurement loop) ────────────────────
+ * POST /rfq-batches               — create a batch of ConfiguratorPriceRfq
+ *                                   rows for selected parts (status 'sent')
+ * GET  /rfq-batches               — list batches (grouped by batch code)
+ * GET  /rfq-batches/:code/xlsx    — RFQ workbook for a batch
+ * GET  /rfq-batches/:code/email   — prefilled email draft JSON            */
+
+// Generate a batch code RFQ-YYYYMMDD-NNN unique per day.
+async function nextBatchCode() {
+  const d = new Date();
+  const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+  const prefix = `RFQ-${ymd}-`;
+  const todays = await models.ConfiguratorPriceRfq.findAll({
+    where: models.sequelize.where(models.sequelize.json("meta.batch_code"), { [Op.like]: `${prefix}%` }),
+    attributes: ['meta'],
+  }).catch(() => []);
+  const seen = new Set();
+  for (const r of todays) {
+    const code = r.meta && r.meta.batch_code;
+    if (code) seen.add(code);
+  }
+  let n = seen.size + 1;
+  let code = `${prefix}${String(n).padStart(3, '0')}`;
+  while (seen.has(code)) { n += 1; code = `${prefix}${String(n).padStart(3, '0')}`; }
+  return code;
+}
+
+router.post('/rfq-batches', wrap(async (req, res) => {
+  const { vendorId, vendorName, partNumbers, neededBy, notes } = req.body || {};
+  const parts = Array.isArray(partNumbers) ? [...new Set(partNumbers.filter(Boolean))] : [];
+  if (!parts.length) return res.status(400).json({ error: 'partNumbers[] required' });
+
+  const batchCode = await nextBatchCode();
+  const now = new Date();
+  let count = 0;
+
+  for (const pn of parts) {
+    const comp = await models.ConfiguratorComponent.findOne({ where: { part_number: pn } }).catch(() => null);
+    if (!comp) continue;
+    const spec = comp.specifications || {};
+    const qLines = await models.ConfiguratorComponentLine.findAll({
+      where: { part_number: pn, price_status: ['PENDING_RFQ', 'ESTIMATED'] },
+      attributes: ['quantity'],
+    }).catch(() => []);
+    const qty = qLines.reduce((s, l) => s + (Number(l.quantity) || 0), 0) || 1;
+
+    const meta = {
+      batch_code: batchCode,
+      part_number: pn,
+      vendor_id: vendorId ?? spec.vendorId ?? null,
+      vendor_name: vendorName ?? spec.vendorName ?? null,
+      manufacturer: spec.manufacturer ?? null,
+      description: comp.name ?? null,
+      needed_by: neededBy ?? null,
+      qty,
+    };
+
+    const existing = await models.ConfiguratorPriceRfq.findOne({
+      where: { component_id: comp.id, status: ['open', 'sent'] },
+    }).catch(() => null);
+    if (existing) {
+      await existing.update({
+        status: 'sent',
+        sent_at: now,
+        manufacturer: meta.manufacturer,
+        notes: notes ?? existing.notes,
+        meta: { ...(existing.meta || {}), ...meta },
+      });
+    } else {
+      await models.ConfiguratorPriceRfq.create({
+        component_id: comp.id,
+        catalog_number: pn,
+        manufacturer: meta.manufacturer,
+        status: 'sent',
+        sent_at: now,
+        notes: notes ?? null,
+        company_id: comp.company_id ?? null,
+        meta,
+      });
+    }
+    count += 1;
+  }
+
+  if (!count) return res.status(400).json({ error: 'No catalog components matched the supplied part numbers' });
+  res.json({ batchCode, count });
+}));
+
+// Fetch every RFQ row belonging to a batch code.
+async function rfqRowsForBatch(code) {
+  return models.ConfiguratorPriceRfq.findAll({
+    where: models.sequelize.where(models.sequelize.json("meta.batch_code"), code),
+    order: [['created_at', 'ASC']],
+  });
+}
+
+router.get('/rfq-batches', wrap(async (req, res) => {
+  const rows = await models.ConfiguratorPriceRfq.findAll({
+    where: models.sequelize.where(models.sequelize.json("meta.batch_code"), { [Op.ne]: null }),
+    order: [['created_at', 'DESC']],
+    limit: 2000,
+  }).catch(() => []);
+
+  const byCode = new Map();
+  for (const r of rows) {
+    const m = r.meta || {};
+    const code = m.batch_code;
+    if (!code) continue;
+    const prev = byCode.get(code) ?? {
+      batchCode: code,
+      vendorName: m.vendor_name ?? null,
+      vendorId: m.vendor_id ?? null,
+      neededBy: m.needed_by ?? null,
+      count: 0,
+      received: 0,
+      sentAt: r.sent_at ?? null,
+    };
+    prev.count += 1;
+    if (r.status === 'received') prev.received += 1;
+    if (r.sent_at && (!prev.sentAt || new Date(r.sent_at) < new Date(prev.sentAt))) prev.sentAt = r.sent_at;
+    if (!prev.vendorName && m.vendor_name) prev.vendorName = m.vendor_name;
+    byCode.set(code, prev);
+  }
+
+  const batches = [...byCode.values()].map((b) => ({
+    ...b,
+    status: b.received === 0 ? 'open' : b.received >= b.count ? 'complete' : 'partial',
+  }));
+  res.json({ batches });
+}));
+
+router.get('/rfq-batches/:code/xlsx', wrap(async (req, res) => {
+  const code = req.params.code;
+  const rows = await rfqRowsForBatch(code);
+  if (!rows.length) return res.status(404).json({ error: 'batch not found' });
+
+  const first = rows[0].meta || {};
+  const vendorName = first.vendor_name || 'Vendor';
+  const neededBy = first.needed_by || '';
+
+  const wb = new ExcelJS.Workbook();
+  const ws = wb.addWorksheet('RFQ');
+
+  ws.mergeCells('A1:H1');
+  ws.getCell('A1').value = 'SWGPLAY — Request for quotation';
+  ws.getCell('A1').font = { bold: true, size: 14 };
+  ws.getCell('A2').value = 'Batch code'; ws.getCell('B2').value = code;
+  ws.getCell('A3').value = 'Vendor';     ws.getCell('B3').value = vendorName;
+  ws.getCell('A4').value = 'Needed by';  ws.getCell('B4').value = neededBy;
+  ws.getCell('A5').value = 'Please quote the following items.';
+  ['A2', 'A3', 'A4'].forEach((c) => { ws.getCell(c).font = { bold: true }; });
+  ws.getCell('A5').font = { italic: true };
+
+  const headerRowIdx = 7;
+  const cols = ['S.No', 'Part / Catalog #', 'Description', 'Manufacturer', 'Qty', 'Unit Price', 'Lead time', 'Notes'];
+  const hdr = ws.getRow(headerRowIdx);
+  cols.forEach((c, i) => { hdr.getCell(i + 1).value = c; hdr.getCell(i + 1).font = { bold: true }; });
+  hdr.commit();
+  ws.columns = [
+    { width: 6 }, { width: 24 }, { width: 38 }, { width: 22 },
+    { width: 8 }, { width: 14 }, { width: 14 }, { width: 28 },
+  ];
+
+  rows.forEach((r, i) => {
+    const m = r.meta || {};
+    ws.getRow(headerRowIdx + 1 + i).values = [
+      i + 1,
+      m.part_number || r.catalog_number || '',
+      m.description || '',
+      m.manufacturer || r.manufacturer || '',
+      Number(m.qty) || 1,
+      '',
+      '',
+      '',
+    ];
+  });
+
+  const filename = `${code}.xlsx`;
+  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  await wb.xlsx.write(res);
+  res.end();
+}));
+
+router.get('/rfq-batches/:code/email', wrap(async (req, res) => {
+  const code = req.params.code;
+  const rows = await rfqRowsForBatch(code);
+  if (!rows.length) return res.status(404).json({ error: 'batch not found' });
+
+  const first = rows[0].meta || {};
+  const vendorName = first.vendor_name || '';
+  const vendorId = first.vendor_id || null;
+  const neededBy = first.needed_by || '';
+
+  let to = '';
+  if (vendorId) {
+    const v = await models.Vendor.findByPk(vendorId).catch(() => null);
+    if (v && v.contact_email) to = v.contact_email;
+  }
+  if (!to && vendorName) {
+    const v = await models.Vendor.findOne({ where: { vendor_name: vendorName } }).catch(() => null);
+    if (v && v.contact_email) to = v.contact_email;
+  }
+
+  const subject = `Request for quotation — ${code}`;
+  const greeting = vendorName ? `Dear ${vendorName} team,` : 'Hello,';
+  const neededLine = neededBy ? `We would need pricing by ${neededBy}.` : 'Please advise your earliest availability.';
+  const body = [
+    greeting,
+    '',
+    `Please provide a quotation for the ${rows.length} item(s) listed in the attached spreadsheet (batch ${code}).`,
+    'For each line we need the unit price and the lead time.',
+    neededLine,
+    '',
+    'The attached xlsx lists catalog numbers, descriptions and quantities.',
+    '',
+    'Thank you,',
+    'Procurement',
+  ].join('\n');
+
+  res.json({ to, subject, body });
 }));
 
 // SW jobs (UI)

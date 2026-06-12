@@ -38,6 +38,12 @@ module.exports = (sequelize) => {
       received_price: { type: DataTypes.DECIMAL(14, 4), allowNull: true },
       received_at: { type: DataTypes.DATE, allowNull: true },
       notes: { type: DataTypes.TEXT, allowNull: true },
+      /**
+       * RFQ-batch metadata (additive 20260612000003): batch_code, vendor_id,
+       * vendor_name, needed_by, qty, part_number. Keeps `notes` free for
+       * user-facing text.
+       */
+      meta: { type: DataTypes.JSONB, allowNull: true, defaultValue: {} },
       company_id: {
         type: DataTypes.UUID,
         allowNull: true,

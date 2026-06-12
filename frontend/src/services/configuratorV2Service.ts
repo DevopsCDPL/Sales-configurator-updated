@@ -225,15 +225,44 @@ export interface SwJobRow {
 
 
 /* ── Price queue ── */
+export interface OpenRfqRef {
+  rfqId: string;
+  batchCode: string | null;
+  status: 'open' | 'sent' | 'received' | 'cancelled';
+  sentAt: string | null;
+  vendorName: string | null;
+}
+
 export interface PendingPriceGroup {
   partNumber: string | null;
   name: string | null;
   category: string | null;
   priceStatus: 'PENDING_RFQ' | 'ESTIMATED';
+  manufacturer?: string | null;
+  vendorId?: string | null;
+  vendorName?: string | null;
   lineCount: number;
   totalQty: number;
   boards: string[];
   componentId: string | null;
+  openRfq?: OpenRfqRef | null;
+}
+
+export interface RfqBatch {
+  batchCode: string;
+  vendorName: string | null;
+  vendorId: string | null;
+  neededBy: string | null;
+  count: number;
+  received: number;
+  sentAt: string | null;
+  status: 'open' | 'partial' | 'complete';
+}
+
+export interface RfqEmailDraft {
+  to: string;
+  subject: string;
+  body: string;
 }
 
 export interface PriceRfqRow {
@@ -354,6 +383,39 @@ export const configuratorV2Service = {
 
   async receivePrice(partNumber: string, price: number): Promise<{ ok: boolean; componentsUpdated: number; linesUpdated: number }> {
     const res = await api.post(`${ROOT}/price-queue/receive`, { partNumber, price });
+    return res.data;
+  },
+
+  async createRfqBatch(body: {
+    vendorId?: string;
+    vendorName?: string;
+    partNumbers: string[];
+    neededBy?: string;
+    notes?: string;
+  }): Promise<{ batchCode: string; count: number }> {
+    const res = await api.post(`${ROOT}/rfq-batches`, body);
+    return res.data;
+  },
+
+  async listRfqBatches(): Promise<RfqBatch[]> {
+    const res = await api.get<{ batches: RfqBatch[] }>(`${ROOT}/rfq-batches`);
+    return res.data?.batches ?? [];
+  },
+
+  async downloadRfqXlsx(batchCode: string): Promise<void> {
+    const res = await api.get(`${ROOT}/rfq-batches/${encodeURIComponent(batchCode)}/xlsx`, { responseType: 'blob' });
+    const url = URL.createObjectURL(new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${batchCode}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  },
+
+  async rfqEmailDraft(batchCode: string): Promise<RfqEmailDraft> {
+    const res = await api.get<RfqEmailDraft>(`${ROOT}/rfq-batches/${encodeURIComponent(batchCode)}/email`);
     return res.data;
   },
 
