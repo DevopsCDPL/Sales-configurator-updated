@@ -37,6 +37,20 @@ const SEED_RULES = [
   { ruleId: 'CR-15', group: 'Accessories', description: 'Breaker blanking / filler plates', qtyPer: 'section', qtyFactor: 1, catalogCategory: 'ENCLOSURE', match: 'filler|blank', when: {} },
   { ruleId: 'CR-16', group: 'Accessories', description: 'Drawout racking handle', qtyPer: 'board', qtyFactor: 1, catalogCategory: 'HARDWARE', match: 'rack|handle', when: { hasDrawout: true } },
   { ruleId: 'CR-17', group: 'Accessories', description: 'Document pocket / drawing holder', qtyPer: 'board', qtyFactor: 1, catalogCategory: 'HARDWARE', match: 'pocket|holder', when: {} },
+
+  /* CR-18..CR-24 — design-driven provisions (NEC-grounded, intake-gated).
+   * namePattern = extra regex AND-filter on candidate name; minAmpsFromFacts
+   * = parse a rating out of the name and require it ≥ the named fact (main
+   * bus amps), preferring the smallest adequate part. All gated on intake
+   * fields that default to off, so existing boards regenerate identically. */
+  { ruleId: 'CR-18', group: 'Provisions', description: 'Surge protective device — switchboard class (NEC 230.67 / spec)', qtyPer: 'board', qtyFactor: 1, catalogCategory: 'SPD', match: '', namePattern: 'Switchboard', when: { spdRequired: 'switchboard' } },
+  { ruleId: 'CR-19', group: 'Provisions', description: 'Surge protective device — panelboard class (NEC 230.67 / spec)', qtyPer: 'board', qtyFactor: 1, catalogCategory: 'SPD', match: '', namePattern: 'Panelboard', when: { spdRequired: 'panelboard' } },
+  { ruleId: 'CR-20', group: 'Provisions', description: 'Metering CT — one per phase', qtyPer: 'board', qtyFactor: 3, catalogCategory: 'CURRENT TRANSFORMER', match: '', minAmpsFromFacts: 'mainAmps', ampsPattern: 'CT,(\\d+):', when: { meteringScheme: ['ct', 'ct_pt', 'full'] } },
+  { ruleId: 'CR-21', group: 'Provisions', description: 'Potential transformer — open-delta pair', qtyPer: 'board', qtyFactor: 2, catalogCategory: 'VOLTAGE TRANSFORMER', match: '', namePattern: 'POTENTIAL|PT|468', when: { meteringScheme: ['ct_pt', 'full'] } },
+  { ruleId: 'CR-22', group: 'Provisions', description: 'Control power transformer', qtyPer: 'board', qtyFactor: 1, catalogCategory: 'VOLTAGE TRANSFORMER', match: '', namePattern: 'CPT', when: { controlPower: true } },
+  { ruleId: 'CR-23a', group: 'Provisions', description: 'Camlock load-bank tap — connectors (3Ø + N + G per set)', qtyPer: 'camlockSets', qtyFactor: 5, catalogCategory: 'CAMLOCK', match: '', namePattern: 'MALE.*STUD', when: { loadBankTap: true } },
+  { ruleId: 'CR-23b', group: 'Provisions', description: 'Camlock panel (load-bank tap) — mounting panel', qtyPer: 'board', qtyFactor: 1, catalogCategory: 'CAMLOCK', match: '', namePattern: 'CAMLOCK PANEL', when: { loadBankTap: true } },
+  { ruleId: 'CR-24', group: 'Provisions', description: 'Automatic transfer switch — sized to main', qtyPer: 'board', qtyFactor: 1, catalogCategory: 'ATS', match: '', minAmpsFromFacts: 'mainAmps', ampsPattern: '(\\d+)A ATS', when: { atsProvision: true } },
 ].map((r) => ({ ...r, seed: true, verified: false, enabled: true }));
 
 async function getRules() {
@@ -49,6 +63,29 @@ async function getRules() {
       table_key: 'component_rules', version: 1, rows: SEED_RULES,
       notes: 'Auto-created [SEED] — edit factors/conditions here', is_current: true,
     }).catch(() => null);
+  } else {
+    // Self-heal: append any seed rules the stored set is missing (e.g. the
+    // CR-18..CR-24 provisions added in this version) without disturbing user
+    // edits to existing rules. New seed rules are intake-gated and default
+    // off, so this is non-regressive for boards that don't set those fields.
+    const stored = Array.isArray(row.rows) ? row.rows : [];
+    const haveIds = new Set(stored.map((r) => r.ruleId));
+    const additions = SEED_RULES.filter((r) => !haveIds.has(r.ruleId));
+    if (additions.length) {
+      const merged = [...stored, ...additions];
+      const created = await models.ConfiguratorEngineeringStandard.create({
+        table_key: 'component_rules', version: (Number(row.version) || 1) + 1,
+        rows: merged, notes: `Auto-healed [SEED] — appended ${additions.map((a) => a.ruleId).join(', ')}`,
+        is_current: true,
+      }).catch(() => null);
+      if (created) {
+        await models.ConfiguratorEngineeringStandard.update(
+          { is_current: false },
+          { where: { table_key: 'component_rules', id: { [Op.ne]: created.id } } }
+        ).catch(() => {});
+        row = created;
+      }
+    }
   }
   return (row && Array.isArray(row.rows) ? row.rows : SEED_RULES).filter((r) => r.enabled !== false);
 }
@@ -72,6 +109,19 @@ async function generateComponents(switchboardId, { companyId = null } = {}) {
   };
   facts.hasDrawout = facts.drawout > 0;
 
+  // Design-driven provisions — read from the same opaque intake JSON the
+  // intake screen persists. Defensive defaults (absent -> off / none) so an
+  // existing board with no provisions data regenerates byte-identically.
+  const intake = board.intake || {};
+  facts.mainAmps = Number(board.board_data?.mainBusRating) || 0;
+  facts.spdRequired = intake.spdRequired ?? 'none';      // none | switchboard | panelboard
+  facts.meteringScheme = intake.meteringScheme ?? 'none'; // none | ct | ct_pt | full
+  // CPT implied when explicitly requested OR full metering OR any drawout main.
+  facts.controlPower = !!intake.controlPowerNeeded || facts.meteringScheme === 'full' || facts.hasDrawout;
+  facts.loadBankTap = (intake.loadBankTap ?? 'none') === 'camlock';
+  facts.camlockSets = facts.loadBankTap ? Math.max(1, Number(intake.camlockSets) || 1) : 0;
+  facts.atsProvision = !!intake.atsProvision;
+
   const rules = await getRules();
   const existing = new Map(
     lines.filter((l) => l.source === 'rule' && l.meta?.ruleId).map((l) => [l.meta.ruleId, l])
@@ -81,13 +131,19 @@ async function generateComponents(switchboardId, { companyId = null } = {}) {
   const activeRuleIds = new Set();
 
   for (const rule of rules) {
-    // condition check
+    // condition check — a `when` key matches when the corresponding fact
+    // equals the value, or (for array values) is a member of it. Unknown keys
+    // are compared generically so future conditions need no engine change.
     const w = rule.when || {};
-    if (w.environment && facts.environment !== w.environment) continue;
-    if (w.serviceEntrance != null && facts.serviceEntrance !== w.serviceEntrance) continue;
-    if (w.hasDrawout != null && facts.hasDrawout !== w.hasDrawout) continue;
+    let gated = false;
+    for (const [key, want] of Object.entries(w)) {
+      const have = facts[key];
+      const ok = Array.isArray(want) ? want.includes(have) : have === want;
+      if (!ok) { gated = true; break; }
+    }
+    if (gated) continue;
 
-    const basis = { board: 1, section: facts.sections, device: facts.devices, drawout: facts.drawout, joint: facts.joints }[rule.qtyPer] ?? 1;
+    const basis = { board: 1, section: facts.sections, device: facts.devices, drawout: facts.drawout, joint: facts.joints, camlockSets: facts.camlockSets }[rule.qtyPer] ?? 1;
     const qty = Math.max(0, Math.round(basis * (Number(rule.qtyFactor) || 1)));
     if (qty === 0) continue;
     activeRuleIds.add(rule.ruleId);
@@ -100,7 +156,35 @@ async function generateComponents(switchboardId, { companyId = null } = {}) {
       const filtered = candidates.filter((c) => re.test(c.name || '') || re.test(c.part_number || ''));
       if (filtered.length) candidates = filtered;
     }
-    candidates.sort((a, b) => ((Number(a.price) || Infinity) - (Number(b.price) || Infinity)));
+    // namePattern: optional AND-filter (e.g. SPD class, camlock type). Applied
+    // only when it leaves at least one candidate, so an under-stocked catalog
+    // still yields a (less specific) pick rather than a forced placeholder.
+    if (rule.namePattern) {
+      const np = new RegExp(rule.namePattern, 'i');
+      const filtered = candidates.filter((c) => np.test(c.name || '') || np.test(c.part_number || ''));
+      if (filtered.length) candidates = filtered;
+    }
+    // minAmpsFromFacts: parse an amp rating out of the name (ampsPattern, first
+    // capture group) and require it >= the named fact, preferring the smallest
+    // adequate part (ties broken by price). When no adequate part is parseable
+    // we fall through to the cheapest-in-category sort below.
+    const need = rule.minAmpsFromFacts ? (Number(facts[rule.minAmpsFromFacts]) || 0) : 0;
+    if (need > 0) {
+      const ampRe = new RegExp(rule.ampsPattern || '(\\d+)', 'i');
+      const ampsOf = (c) => {
+        const m = ampRe.exec(c.name || '') || ampRe.exec(c.part_number || '');
+        return m ? Number(m[1]) : NaN;
+      };
+      const adequate = candidates.filter((c) => { const a = ampsOf(c); return Number.isFinite(a) && a >= need; });
+      if (adequate.length) {
+        adequate.sort((a, b) => (ampsOf(a) - ampsOf(b)) || ((Number(a.price) || Infinity) - (Number(b.price) || Infinity)));
+        candidates = adequate;
+      } else {
+        candidates.sort((a, b) => ((Number(a.price) || Infinity) - (Number(b.price) || Infinity)));
+      }
+    } else {
+      candidates.sort((a, b) => ((Number(a.price) || Infinity) - (Number(b.price) || Infinity)));
+    }
     const pick = candidates[0] ?? null;
 
     const prev = existing.get(rule.ruleId);

@@ -33,6 +33,14 @@ export interface IntakeInput {
   environment: 'Indoor' | 'Outdoor';
   specialEnvironment: 'None' | 'Corrosive' | 'Marine' | 'Dusty';
   totalLoadHint?: number | null; // amps
+  /* Design-driven provisions — auto-select SPD / metering / camlock / ATS.
+   * All default to off so existing boards regenerate unchanged. */
+  spdRequired?: 'none' | 'switchboard' | 'panelboard';
+  meteringScheme?: 'none' | 'ct' | 'ct_pt' | 'full';
+  controlPowerNeeded?: boolean;
+  loadBankTap?: 'none' | 'camlock';
+  camlockSets?: number;
+  atsProvision?: boolean;
   feeders: FeederRowInput[];
 }
 

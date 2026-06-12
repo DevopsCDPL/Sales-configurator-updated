@@ -57,6 +57,12 @@ export default function IntakeStep(props: IntakeStepProps) {
     environment: props.initial?.environment ?? 'Indoor',
     specialEnvironment: props.initial?.specialEnvironment ?? 'None',
     totalLoadHint: props.initial?.totalLoadHint ?? null,
+    spdRequired: props.initial?.spdRequired ?? 'none',
+    meteringScheme: props.initial?.meteringScheme ?? 'none',
+    controlPowerNeeded: props.initial?.controlPowerNeeded ?? false,
+    loadBankTap: props.initial?.loadBankTap ?? 'none',
+    camlockSets: props.initial?.camlockSets ?? 1,
+    atsProvision: props.initial?.atsProvision ?? false,
     feeders: props.initial?.feeders?.length ? [...props.initial.feeders] : [newRow()],
   });
   const [proposal, setProposal] = useState<LineupProposal | null>(null);
@@ -216,6 +222,66 @@ export default function IntakeStep(props: IntakeStepProps) {
             Utility fault data unknown — SCCR will be assumed 65 kA [SEED]. Verify with the utility before issuing the quote.
           </Alert>
         )}
+
+        {/* Provisions — design-driven component auto-selection (CR-18..CR-24).
+            All default to off; setting them adds rule-driven lines on generate. */}
+        <Divider sx={{ borderColor: C.border, my: 1.5 }} />
+        <Stack direction="row" alignItems="center" spacing={0} sx={{ mb: 1 }}>
+          <Typography sx={{ ...cardTitle, mb: 0 }}>Provisions</Typography>
+          <Tooltip title="Optional design provisions. The engine auto-selects the matching catalog parts (surge, metering, load-bank tap, transfer switch) when set — nothing is added unless you ask for it.">
+            <InfoOutlinedIcon sx={{ fontSize: 15, color: C.sub, ml: 0.5, cursor: 'help' }} />
+          </Tooltip>
+        </Stack>
+        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 1.5 }}>
+          <Field label="Surge Protection (SPD)" hint="NEC 230.67 requires SPD on dwelling-unit services; for commercial it is spec-driven. Switchboard-class mounts integrally; panelboard-class is a downstream-rated unit.">
+            <Select size="small" value={intake.spdRequired ?? 'none'} onChange={(e) => patch({ spdRequired: e.target.value as any })} sx={input} fullWidth>
+              <MenuItem value="none" sx={{ fontSize: 13 }}>No</MenuItem>
+              <MenuItem value="switchboard" sx={{ fontSize: 13 }}>Yes — switchboard class</MenuItem>
+              <MenuItem value="panelboard" sx={{ fontSize: 13 }}>Yes — panelboard class</MenuItem>
+            </Select>
+          </Field>
+          <Field label="Metering Scheme" hint="Utility CT metering adds 3 metering CTs (one per phase). Power metering adds the open-delta PT pair. Full metering adds a control power transformer (CPT) as well.">
+            <Select size="small" value={intake.meteringScheme ?? 'none'} onChange={(e) => patch({ meteringScheme: e.target.value as any })} sx={input} fullWidth>
+              <MenuItem value="none" sx={{ fontSize: 13 }}>None</MenuItem>
+              <MenuItem value="ct" sx={{ fontSize: 13 }}>Utility CT metering</MenuItem>
+              <MenuItem value="ct_pt" sx={{ fontSize: 13 }}>Power metering (CT + PT)</MenuItem>
+              <MenuItem value="full" sx={{ fontSize: 13 }}>Full metering (CT + PT + CPT)</MenuItem>
+            </Select>
+          </Field>
+          <Field label="Load-bank Tap" hint="Camlock panel provides a quick-connect tap for portable load banks / generators. One set = 5 camlocks (3Ø + neutral + ground).">
+            <Select size="small" value={intake.loadBankTap ?? 'none'} onChange={(e) => patch({ loadBankTap: e.target.value as any })} sx={input} fullWidth>
+              <MenuItem value="none" sx={{ fontSize: 13 }}>None</MenuItem>
+              <MenuItem value="camlock" sx={{ fontSize: 13 }}>Camlock panel (load-bank tap)</MenuItem>
+            </Select>
+          </Field>
+          {intake.loadBankTap === 'camlock' && (
+            <Field label="Camlock Sets" hint="Number of camlock sets per phase. Each set = 5 camlocks (3Ø + N + G).">
+              <TextField
+                size="small" type="number" fullWidth
+                value={intake.camlockSets ?? 1}
+                onChange={(e) => patch({ camlockSets: Math.min(4, Math.max(1, Number(e.target.value) || 1)) })}
+                inputProps={{ min: 1, max: 4 }}
+                sx={input}
+              />
+            </Field>
+          )}
+          <Field label="Control Power (CPT)" hint="Adds a control power transformer. Auto-implied when full metering is chosen or any electrically-operated / drawout main exists — leave on for those designs.">
+            <Stack direction="row" alignItems="center" spacing={0.5} sx={{ height: 38 }}>
+              <Checkbox size="small" checked={!!intake.controlPowerNeeded}
+                onChange={(e) => patch({ controlPowerNeeded: e.target.checked })}
+                sx={{ color: C.muted, '&.Mui-checked': { color: C.blue }, p: 0.25 }} />
+              <Typography sx={{ color: C.text, fontSize: 12.5 }}>CPT required</Typography>
+            </Stack>
+          </Field>
+          <Field label="Transfer Provision" hint="Adds an automatic transfer switch (ATS) line sized to the main bus rating — for utility/generator or dual-utility transfer.">
+            <Stack direction="row" alignItems="center" spacing={0.5} sx={{ height: 38 }}>
+              <Checkbox size="small" checked={!!intake.atsProvision}
+                onChange={(e) => patch({ atsProvision: e.target.checked })}
+                sx={{ color: C.muted, '&.Mui-checked': { color: C.blue }, p: 0.25 }} />
+              <Typography sx={{ color: C.text, fontSize: 12.5 }}>ATS / transfer</Typography>
+            </Stack>
+          </Field>
+        </Box>
       </Box>
 
       {/* Feeder schedule */}
@@ -464,12 +530,19 @@ export default function IntakeStep(props: IntakeStepProps) {
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ label, children, hint }: { label: string; children: React.ReactNode; hint?: string }) {
   return (
     <Box>
-      <Typography sx={{ color: C.sub, fontSize: 10.5, fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase', mb: 0.5 }}>
-        {label}
-      </Typography>
+      <Stack direction="row" alignItems="center" spacing={0.25} sx={{ mb: 0.5 }}>
+        <Typography sx={{ color: C.sub, fontSize: 10.5, fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+          {label}
+        </Typography>
+        {hint && (
+          <Tooltip title={hint}>
+            <InfoOutlinedIcon sx={{ fontSize: 13, color: C.sub, cursor: 'help' }} />
+          </Tooltip>
+        )}
+      </Stack>
       {children}
     </Box>
   );
