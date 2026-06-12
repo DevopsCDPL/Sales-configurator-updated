@@ -181,7 +181,7 @@ export default function IntakeStep(props: IntakeStepProps) {
 
       {/* Board-level intake */}
       <Box sx={card}>
-        <Typography sx={cardTitle}>System</Typography>
+        <Typography sx={cardTitle}>System Parameters</Typography>
         <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 1.5 }}>
           <Field label="Voltage System">
             <Select size="small" value={intake.voltageSystemCode} onChange={(e) => patch({ voltageSystemCode: e.target.value })} sx={input} fullWidth>
@@ -238,22 +238,18 @@ export default function IntakeStep(props: IntakeStepProps) {
       {/* Feeder schedule */}
       <Box sx={{ ...card, mt: 2 }} onPaste={handlePaste}>
         <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Typography sx={cardTitle}>Feeder Schedule</Typography>
-          <Stack direction="row" spacing={1} alignItems="center">
-            <Tooltip title="Copy rows in Excel (description, type, unit, value, PF, continuous, poles, qty) and paste anywhere in this panel">
-              <Chip icon={<ContentPasteRoundedIcon sx={{ fontSize: 14 }} />} label="Paste from Excel supported"
-                size="small" sx={{ bgcolor: 'transparent', border: `1px solid ${C.border}`, color: C.sub, fontSize: 11 }} />
-            </Tooltip>
-            <Button size="small" startIcon={<AddRoundedIcon />} onClick={() => patch({ feeders: [...intake.feeders, newRow()] })}
-              sx={{ color: C.blue, textTransform: 'none', fontSize: 12 }}>
-              Add feeder
-            </Button>
-          </Stack>
+          <Typography sx={cardTitle}>Load &amp; Feeder Schedule</Typography>
         </Stack>
         {pasteInfo && <Alert severity="info" sx={alertSx} onClose={() => setPasteInfo(null)}>{pasteInfo}</Alert>}
 
-        <Stack direction="row" spacing={2} alignItems="flex-start" sx={{ mt: 1 }}>
+        <Stack direction="row" spacing={2} alignItems="flex-start" sx={{ mt: 0.5 }}>
         <Box sx={{ flex: 1, minWidth: 560 }}>
+        <Stack direction="row" justifyContent="flex-end" sx={{ mb: 0.5 }}>
+          <Button size="small" startIcon={<AddRoundedIcon />} onClick={() => patch({ feeders: [...intake.feeders, newRow()] })}
+            sx={{ color: C.blue, textTransform: 'none', fontSize: 12 }}>
+            Add feeder
+          </Button>
+        </Stack>
         <Table size="small" sx={{
           '& td, & th': { borderColor: C.border, color: C.text, fontSize: 12.5, py: 0.5 },
           '& td .MuiInputBase-root': {
@@ -262,10 +258,16 @@ export default function IntakeStep(props: IntakeStepProps) {
             '&:hover': { borderColor: '#2A3050' },
             '&.Mui-focused': { borderColor: C.blue },
           },
+          '& td input[type=number]': {
+            MozAppearance: 'textfield', textAlign: 'center', minWidth: 44,
+          },
+          '& td input[type=number]::-webkit-outer-spin-button, & td input[type=number]::-webkit-inner-spin-button': {
+            WebkitAppearance: 'none', margin: 0,
+          },
         }}>
           <TableHead>
             <TableRow>
-              {['#', 'Description', 'Load Type', 'Unit', 'Value', 'PF', 'Cont.', 'Poles', 'Qty', ''].map((h) => (
+              {['#', 'Description', 'Load Type', 'Unit', 'Load Value', 'PF', 'Cont.', 'Poles', 'Qty', ''].map((h) => (
                 <TableCell key={h} sx={{ color: C.muted, fontSize: 10.5, fontWeight: 600, letterSpacing: '0.5px' }}>{h}</TableCell>
               ))}
             </TableRow>
@@ -334,8 +336,13 @@ export default function IntakeStep(props: IntakeStepProps) {
         </Table>
         </Box>
 
-        {/* Live load summary — updates as the schedule is typed */}
-        <Box sx={{ width: 250, flexShrink: 0, bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', p: 1.5, position: 'sticky', top: 140 }}>
+        {/* Right column: paste hint + sticky live summary */}
+        <Box sx={{ width: 250, flexShrink: 0, alignSelf: 'flex-start', position: 'sticky', top: 148 }}>
+        <Tooltip title="Copy rows in Excel (description, type, unit, value, PF, continuous, poles, qty) and paste anywhere in this panel">
+          <Chip icon={<ContentPasteRoundedIcon sx={{ fontSize: 14 }} />} label="Paste from Excel supported"
+            size="small" sx={{ mb: 1, width: '100%', bgcolor: 'transparent', border: `1px solid ${C.border}`, color: C.sub, fontSize: 11 }} />
+        </Tooltip>
+        <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', p: 1.5 }}>
           <Typography sx={{ color: C.sub, fontSize: 10.5, letterSpacing: 0.5, mb: 1 }}>LIVE LOAD SUMMARY</Typography>
           <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.25 }}>
             <Typography sx={{ color: C.sub, fontSize: 11.5 }}>Design current</Typography>
@@ -373,6 +380,7 @@ export default function IntakeStep(props: IntakeStepProps) {
           <Typography sx={{ color: C.muted, fontSize: 10, mt: 1 }}>
             NEC 125% continuous + motor rules applied per row. Propose line-up turns this into sections + breakers.
           </Typography>
+        </Box>
         </Box>
         </Stack>
         <Typography sx={{ color: C.muted, fontSize: 11, mt: 1 }}>

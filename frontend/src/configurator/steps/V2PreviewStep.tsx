@@ -329,33 +329,6 @@ const V2PreviewStep: React.FC = () => {
         </Alert>
       )}
 
-      {!openBoard && (
-      <Stack direction="row" spacing={1} alignItems="center" sx={{ px: 2, pt: 1.5 }}>
-        {catalogStatus && catalogStatus.count > 0 ? (
-          <Chip
-            size="small"
-            label={'Catalog: ' + catalogStatus.count + ' breakers in database (' + catalogStatus.withPrice + ' priced)'}
-            sx={{ bgcolor: 'transparent', border: '1px solid ' + C.green, color: C.green, fontSize: 11, height: 22 }}
-          />
-        ) : (
-          <>
-            <Chip
-              size="small"
-              label="Catalog: bundled fallback (not in database)"
-              sx={{ bgcolor: 'transparent', border: '1px solid ' + C.amber, color: C.amber, fontSize: 11, height: 22 }}
-            />
-            <Button
-              size="small"
-              disabled={importing}
-              onClick={importCatalog}
-              sx={{ color: C.blue, textTransform: 'none', fontSize: 12, border: '1px solid ' + C.border }}
-            >
-              {importing ? 'Importing...' : 'Import 308 breakers to database'}
-            </Button>
-          </>
-        )}
-      </Stack>
-      )}
 
       {loading ? (
         <Stack alignItems="center" sx={{ py: 8 }}>
