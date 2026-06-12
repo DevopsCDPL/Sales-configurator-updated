@@ -518,6 +518,7 @@ const V2PreviewStep: React.FC = () => {
             <Box sx={{ pt: 1 }}>
               <DeviceListPanel
                 lines={openBoard.lines}
+                intake={openBoard.board.intake as any}
                 catalogCbs={catalogCbs}
                 sccrKA={Number(openBoard.board.board_data?.shortCircuitRating) || 65}
                 locked={openBoard.board.status === 'locked'}

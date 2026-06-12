@@ -28,13 +28,16 @@ const usd = (n: number) =>
 
 export interface DeviceListPanelProps {
   lines: ComponentLineRow[];
+  /** Board intake — used to derive load names for designs accepted
+   *  before loadDescription was persisted (display fallback only). */
+  intake?: { feeders?: { description?: string; loadType?: string; qty?: number }[] } | null;
   catalogCbs: CatalogCb[] | null;
   sccrKA: number;
   locked: boolean;
   onSwapped: () => Promise<void>;
 }
 
-const DeviceListPanel: React.FC<DeviceListPanelProps> = ({ lines, catalogCbs, sccrKA, locked, onSwapped }) => {
+const DeviceListPanel: React.FC<DeviceListPanelProps> = ({ lines, intake, catalogCbs, sccrKA, locked, onSwapped }) => {
   const [swapLine, setSwapLine] = useState<ComponentLineRow | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -43,6 +46,26 @@ const DeviceListPanel: React.FC<DeviceListPanelProps> = ({ lines, catalogCbs, sc
     () => lines.filter((l) => (l.category || '').toUpperCase() === 'CIRCUIT BREAKER'),
     [lines]
   );
+
+  /** Legacy fallback: engine assigns F1..Fn over the schedule rows
+   *  (qty-expanded, Space rows skipped) in order — reproduce that. */
+  const loadNameFor = useMemo(() => {
+    const expanded: string[] = [];
+    for (const f of intake?.feeders ?? []) {
+      if (String(f.loadType) === 'Space') continue;
+      const q = Math.max(1, Number(f.qty) || 1);
+      for (let i = 0; i < q; i++) expanded.push(f.description || String(f.loadType || ''));
+    }
+    return (l: ComponentLineRow): string => {
+      if (l.meta?.loadDescription) return String(l.meta.loadDescription);
+      const role = String(l.meta?.role ?? '').toUpperCase();
+      if (role === 'MAIN') return 'Incoming';
+      if (role === 'TIE') return 'Bus tie';
+      const m = String(l.meta?.designation ?? '').match(/^F(\d+)$/);
+      if (m) return expanded[Number(m[1]) - 1] ?? '—';
+      return '—';
+    };
+  }, [intake, deviceLines.length]);
 
   const candidatesFor = (line: ComponentLineRow): CatalogCb[] => {
     if (!catalogCbs) return [];
@@ -121,7 +144,7 @@ const DeviceListPanel: React.FC<DeviceListPanelProps> = ({ lines, catalogCbs, sc
                     <Chip label={l.meta?.designation ?? '?'} size="small" sx={{ bgcolor: 'rgba(0,200,255,0.12)', color: '#60A5FA', fontWeight: 700, fontSize: 10.5, height: 20 }} />
                   </TableCell>
                   <TableCell sx={{ ...cellSx, color: C.sub }}>{l.meta?.role ?? '—'}</TableCell>
-                <TableCell sx={cellSx}>{l.meta?.loadDescription ?? '—'}</TableCell>
+                <TableCell sx={cellSx}>{loadNameFor(l)}</TableCell>
                   <TableCell sx={cellSx}>
                     {l.name}
                     {l.meta?.swapped && (
