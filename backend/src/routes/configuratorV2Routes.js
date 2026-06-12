@@ -1640,7 +1640,7 @@ router.get('/catalog/enrich-template', wrap(async (_req, res) => {
   });
 }));
 
-router.post('/catalog/enrich-json', wrap(async (req, res) => {
+const enrichJsonHandler = wrap(async (req, res) => {
   const rows = Array.isArray(req.body?.rows) ? req.body.rows : [];
   if (!rows.length) return res.status(400).json({ error: 'body.rows must be a non-empty array' });
 
@@ -1777,6 +1777,28 @@ router.post('/catalog/enrich-json', wrap(async (req, res) => {
   }
 
   res.json({ created, updated, matched, offersAdded, errors, errorRows });
+});
+
+router.post('/catalog/enrich-json', enrichJsonHandler);
+
+/** Import ALL bundled scrape files (backend/src/seeds/enrichment/*.json) through the same safe merge. */
+router.post('/catalog/enrich-bundled', wrap(async (req, res) => {
+  const fsx = require('fs');
+  const pathx = require('path');
+  const dir = pathx.join(__dirname, '..', 'seeds', 'enrichment');
+  let rows = [];
+  const files = [];
+  if (fsx.existsSync(dir)) {
+    for (const f of fsx.readdirSync(dir).filter((x) => x.endsWith('.json')).sort()) {
+      try {
+        const arr = JSON.parse(fsx.readFileSync(pathx.join(dir, f), 'utf8'));
+        if (Array.isArray(arr)) { rows = rows.concat(arr); files.push({ file: f, rows: arr.length }); }
+      } catch (e) { files.push({ file: f, error: e.message }); }
+    }
+  }
+  if (!rows.length) return res.status(404).json({ error: 'No enrichment seed files found', files });
+  req.body = { rows };
+  return enrichJsonHandler(req, res, () => {});
 }));
 
 module.exports = router;

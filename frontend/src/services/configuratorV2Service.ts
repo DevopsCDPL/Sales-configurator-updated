@@ -643,6 +643,11 @@ export const configuratorV2Service = {
     return res.data;
   },
 
+  async enrichBundled(): Promise<{ created: number; updated: number; matched: number; offersAdded: number; errors: number; errorRows: string[] }> {
+    const res = await api.post(`${ROOT}/catalog/enrich-bundled`);
+    return res.data;
+  },
+
   async enrichCatalog(rows: any[]): Promise<{
     created: number; updated: number; matched: number;
     offersAdded: number; errors: number; errorRows: string[];

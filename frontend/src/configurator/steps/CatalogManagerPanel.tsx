@@ -299,6 +299,22 @@ const CatalogManagerPanel: React.FC = () => {
           onChange={(e) => { const f = e.target.files?.[0]; if (f) importComponents(f); }}
         />
         <Button
+          disabled={importing}
+          onClick={async () => {
+            setImporting(true); setError(null);
+            try {
+              const out = await configuratorV2Service.enrichBundled();
+              setInfo(`Scraped catalog synced \u2014 ${out.created} new, ${out.updated} enriched, ${out.offersAdded} vendor offers${out.errors ? `, ${out.errors} errors` : ''}.`);
+              await Promise.all([search(), loadCounts()]);
+            } catch (e: any) {
+              setError(e?.response?.data?.error ?? 'Scrape sync failed \u2014 no bundled data yet?');
+            } finally { setImporting(false); }
+          }}
+          sx={{ color: C.text, textTransform: 'none', fontSize: 12.5, border: '1px solid ' + C.border, bgcolor: C.bg, '&:hover': { borderColor: C.blue } }}
+        >
+          Sync scraped catalog
+        </Button>
+        <Button
           startIcon={<FileDownloadRoundedIcon sx={{ fontSize: 16 }} />}
           disabled={importing}
           onClick={() => configuratorV2Service.exportCatalogXlsx().catch((e: any) => setError(e?.response?.data?.error ?? 'Export failed'))}
