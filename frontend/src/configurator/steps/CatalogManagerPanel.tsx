@@ -11,8 +11,10 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Box, Typography, Stack, Chip, Button, Alert, CircularProgress, TextField,
   Table, TableHead, TableRow, TableCell, TableBody, IconButton, Dialog,
-  DialogTitle, DialogContent, DialogActions, MenuItem, Select,
+  DialogTitle, DialogContent, DialogActions, MenuItem,
+  Tabs, Tab, InputAdornment,
 } from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
@@ -20,6 +22,7 @@ import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import UploadFileRoundedIcon from '@mui/icons-material/UploadFileRounded';
 import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
 import TableRowsRoundedIcon from '@mui/icons-material/TableRowsRounded';
+import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import { configuratorService, ConfiguratorComponent } from '../../services/configuratorService';
 import configuratorV2Service from '../../services/configuratorV2Service';
 import PriceSourceDot from '../components/PriceSourceDot';
@@ -174,6 +177,21 @@ const CatalogManagerPanel: React.FC = () => {
             One source for every screen — prices, part numbers and labour-hour buckets, separated by category.
           </Typography>
         </Box>
+        <TextField
+          size="small" placeholder="Search name, part #, description…" value={q}
+          onChange={(e) => setQ(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter') search(); }}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton size="small" onClick={search} sx={{ color: C.sub, p: 0.3, '&:hover': { color: C.blue } }}>
+                  <SearchRoundedIcon sx={{ fontSize: 15 }} />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+          sx={{ ...inputSx, maxWidth: 360 }}
+        />
         <Box sx={{ flex: 1 }} />
         <input
           ref={fileRef} type="file" accept=".xlsm,.xlsx" hidden
@@ -199,36 +217,30 @@ const CatalogManagerPanel: React.FC = () => {
       {error && <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 1.5, bgcolor: 'rgba(239,68,68,0.08)', color: '#FCA5A5', border: '1px solid ' + C.border, fontSize: 12 }}>{error}</Alert>}
       {info && <Alert severity="success" onClose={() => setInfo(null)} sx={{ mb: 1.5, bgcolor: 'rgba(34,197,94,0.08)', color: '#86EFAC', border: '1px solid ' + C.border, fontSize: 12 }}>{info}</Alert>}
 
-      {/* Category chips */}
-      <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap sx={{ mb: 1.5 }}>
-        <Chip
-          label="All" size="small" onClick={() => setCategory('')}
-          sx={{ bgcolor: !category ? C.blue : 'transparent', color: !category ? '#06151c' : C.sub, border: '1px solid ' + (!category ? C.blue : C.border), fontSize: 11 }}
-        />
+      {/* Category tabs */}
+      <Tabs
+        value={category}
+        onChange={(_e, v) => setCategory(v)}
+        variant="scrollable"
+        scrollButtons="auto"
+        sx={{
+          mb: 1.5,
+          minHeight: 36,
+          '& .MuiTabs-indicator': { bgcolor: '#00c8ff', height: 2 },
+          '& .MuiTab-root': {
+            textTransform: 'none', fontSize: '0.78rem', minHeight: 36,
+            color: 'rgba(217,228,251,0.7)',
+            '&.Mui-selected': { color: '#00c8ff' },
+          },
+        }}
+      >
+        <Tab label="All" value="" />
         {counts.map((c) => (
-          <Chip
-            key={c.category}
-            label={`${c.category} (${c.count})`}
-            size="small"
-            onClick={() => setCategory(c.category)}
-            sx={{
-              bgcolor: category === c.category ? C.blue : 'transparent',
-              color: category === c.category ? '#06151c' : C.sub,
-              border: '1px solid ' + (category === c.category ? C.blue : C.border), fontSize: 11,
-            }}
-          />
+          <Tab key={c.category} label={`${c.category} (${c.count})`} value={c.category} />
         ))}
-      </Stack>
+      </Tabs>
 
-      <Stack direction="row" spacing={1} sx={{ mb: 1.5 }}>
-        <TextField
-          size="small" placeholder="Search name, part #, description… (Enter)" value={q}
-          onChange={(e) => setQ(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter') search(); }}
-          sx={{ ...inputSx, flex: 1, maxWidth: 420 }}
-        />
-        <Button onClick={search} sx={{ color: C.sub, textTransform: 'none', fontSize: 12, border: '1px solid ' + C.border }}>Search</Button>
-        <Box sx={{ flex: 1 }} />
+      <Stack direction="row" justifyContent="flex-end" sx={{ mb: 1.5 }}>
         <Stack direction="row" spacing={0}>
           {([['cards', GridViewRoundedIcon], ['list', TableRowsRoundedIcon]] as const).map(([key, Icon]) => (
             <IconButton
@@ -361,15 +373,19 @@ const CatalogManagerPanel: React.FC = () => {
             <Stack spacing={1.5} sx={{ mt: 0.5 }}>
               <TextField size="small" label="Name *" value={edit.name} onChange={(e) => setEdit({ ...edit, name: e.target.value })} sx={inputSx} fullWidth />
               <Stack direction="row" spacing={1.5}>
-                <Select
-                  size="small" value={edit.category}
-                  onChange={(e) => setEdit({ ...edit, category: e.target.value })}
-                  sx={{ minWidth: 200, bgcolor: C.surface, color: C.text, fontSize: 13, '& fieldset': { borderColor: C.border } }}
-                >
-                  {[...new Set([edit.category, ...counts.map((c) => c.category)])].map((c) => (
-                    <MenuItem key={c} value={c} sx={{ fontSize: 12.5 }}>{c}</MenuItem>
-                  ))}
-                </Select>
+                <Autocomplete
+                  freeSolo
+                  options={[...new Set([edit.category, ...counts.map((c) => c.category)])]}
+                  value={edit.category}
+                  onInputChange={(_e, v) => setEdit({ ...edit, category: (v || '').toUpperCase() })}
+                  sx={{ minWidth: 200 }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params} size="small" label="Category (type to create new)"
+                      sx={inputSx}
+                    />
+                  )}
+                />
                 <TextField size="small" label="Part number" value={edit.part_number} onChange={(e) => setEdit({ ...edit, part_number: e.target.value })} sx={inputSx} fullWidth />
               </Stack>
               <Stack direction="row" spacing={1.5}>
