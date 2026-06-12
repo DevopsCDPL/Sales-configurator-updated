@@ -165,10 +165,10 @@ router.delete('/switchboards/:id', wrap(async (req, res) => {
   res.json({ ok: true });
 }));
 
-/* ── Change orders (Phase F §5) ───────────────────────────────────────
- * A frozen (locked) board can only be reopened through a change order:
- * reason required, prior quotation linked, board unlocked for editing.
- * The NEXT issued revision links back as new_quotation_id.            */
+/* ── Change orders (Phase F §5 + approval workflow) ──────────────────
+ * Approval flow: raise (pending_approval) → approve → applied / reject.
+ * Board is NOT unlocked at raise time; unlock happens at approve.
+ * The NEXT issued revision links back as new_quotation_id.           */
 router.post('/switchboards/:id/change-order', wrap(async (req, res) => {
   const board = await models.ConfiguratorSwitchboard.findByPk(req.params.id);
   if (!board) return res.status(404).json({ error: 'not found' });
@@ -177,21 +177,17 @@ router.post('/switchboards/:id/change-order', wrap(async (req, res) => {
   if (reason.length < 5) return res.status(400).json({ error: 'a meaningful reason is required (min 5 chars)' });
 
   const quotes = await v2Quote.listBoardQuotes(board.id);
+  // CO is created in pending_approval state — board stays locked until approved.
   const co = await models.ConfiguratorChangeOrder.create({
     configuration_id: board.configuration_id,
     switchboard_id: board.id,
     reason,
-    origin: req.body?.origin === 'customer' ? 'customer' : 'internal',
-    status: 'applied',
+    originator: req.body?.origin === 'customer' ? 'customer' : 'internal',
+    status: 'pending_approval',
     old_quotation_id: quotes[0]?.id ?? null,
     schedule_impact: req.body?.scheduleImpact ?? null,
     created_by: req.user?.id ?? null,
-    applied_at: new Date(),
     company_id: req.companyId ?? null,
-  });
-  await board.update({
-    status: 'complete',
-    board_data: { ...(board.board_data || {}), activeChangeOrderId: co.id },
   });
   res.status(201).json({ ok: true, changeOrder: co, board });
 }));
@@ -202,6 +198,57 @@ router.get('/switchboards/:id/change-orders', wrap(async (req, res) => {
     order: [['created_at', 'DESC']],
   });
   res.json(rows);
+}));
+
+/* ── CO approval / rejection ──────────────────────────────────────────
+ * POST /change-orders/:id/approve — stamps approved_by/approved_at,
+ *   performs the board unlock + activeChangeOrderId link, sets 'applied'.
+ * POST /change-orders/:id/reject  — body { reason } → 'rejected',
+ *   board stays frozen.
+ * TODO roles: in a multi-user setup, gate self-approval here.         */
+router.post('/change-orders/:id/approve', wrap(async (req, res) => {
+  const co = await models.ConfiguratorChangeOrder.findByPk(req.params.id);
+  if (!co) return res.status(404).json({ error: 'change order not found' });
+  if (co.status !== 'pending_approval') {
+    return res.status(422).json({ error: `change order is already '${co.status}' — only pending_approval COs can be approved` });
+  }
+
+  const board = await models.ConfiguratorSwitchboard.findByPk(co.switchboard_id);
+  if (!board) return res.status(404).json({ error: 'switchboard not found' });
+
+  const now = new Date();
+  // Collapse approved → applied in one step; timestamps preserve the history.
+  await co.update({
+    status: 'applied',
+    approved_by: req.user?.id ?? null, // TODO roles: gate self-approval here
+    approved_at: now,
+    applied_at: now,
+  });
+
+  // Now unlock the board for re-engineering and record the active CO.
+  await board.update({
+    status: 'complete',
+    board_data: { ...(board.board_data || {}), activeChangeOrderId: co.id },
+  });
+
+  res.json({ ok: true, changeOrder: co, board });
+}));
+
+router.post('/change-orders/:id/reject', wrap(async (req, res) => {
+  const co = await models.ConfiguratorChangeOrder.findByPk(req.params.id);
+  if (!co) return res.status(404).json({ error: 'change order not found' });
+  if (co.status !== 'pending_approval') {
+    return res.status(422).json({ error: `change order is already '${co.status}' — only pending_approval COs can be rejected` });
+  }
+
+  const reason = String(req.body?.reason ?? '').trim();
+  await co.update({
+    status: 'rejected',
+    rejected_reason: reason || null,
+  });
+
+  // Board stays locked — no board.update needed.
+  res.json({ ok: true, changeOrder: co });
 }));
 
 /* ── Component auto-rules (AP registry) ───────────────────────────────

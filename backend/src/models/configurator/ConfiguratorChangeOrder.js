@@ -27,9 +27,9 @@ module.exports = (sequelize) => {
       status: {
         type: DataTypes.STRING(20),
         allowNull: false,
-        defaultValue: 'draft',
+        defaultValue: 'pending_approval',
         validate: {
-          isIn: [['draft', 'impact_review', 'customer_approval', 'approved', 'rejected', 'applied']],
+          isIn: [['draft', 'impact_review', 'customer_approval', 'pending_approval', 'approved', 'rejected', 'applied']],
         },
       },
       old_quotation_id: { type: DataTypes.UUID, allowNull: true },
@@ -38,6 +38,8 @@ module.exports = (sequelize) => {
       customer_approval_doc_id: { type: DataTypes.UUID, allowNull: true },
       created_by: { type: DataTypes.UUID, allowNull: true },
       approved_by: { type: DataTypes.UUID, allowNull: true },
+      approved_at: { type: DataTypes.DATE, allowNull: true },
+      rejected_reason: { type: DataTypes.TEXT, allowNull: true },
       applied_at: { type: DataTypes.DATE, allowNull: true },
       company_id: {
         type: DataTypes.UUID,

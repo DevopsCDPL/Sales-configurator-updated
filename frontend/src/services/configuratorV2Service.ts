@@ -275,6 +275,24 @@ export interface PriceRfqRow {
   created_at?: string;
 }
 
+/* ── Change orders ── */
+export interface ChangeOrderRow {
+  id: string;
+  reason: string;
+  originator: string;
+  /** pending_approval | applied | rejected (legacy rows may also be 'draft' or 'applied') */
+  status: 'pending_approval' | 'applied' | 'rejected' | 'draft' | 'impact_review' | 'customer_approval' | 'approved';
+  old_quotation_id: string | null;
+  new_quotation_id: string | null;
+  schedule_impact: string | null;
+  created_by: string | null;
+  approved_by: string | null;
+  approved_at: string | null;
+  rejected_reason: string | null;
+  applied_at: string | null;
+  created_at: string;
+}
+
 /* ── Engineering standards ── */
 export interface StandardsTableRow {
   id: string;
@@ -553,14 +571,24 @@ export const configuratorV2Service = {
   },
 
 
-  async raiseChangeOrder(switchboardId: string, body: { reason: string; origin?: 'customer' | 'internal'; scheduleImpact?: string }): Promise<{ ok: boolean; changeOrder: { id: string }; board: SwitchboardRow }> {
+  async raiseChangeOrder(switchboardId: string, body: { reason: string; origin?: 'customer' | 'internal'; scheduleImpact?: string }): Promise<{ ok: boolean; changeOrder: ChangeOrderRow; board: SwitchboardRow }> {
     const res = await api.post(`${ROOT}/switchboards/${switchboardId}/change-order`, body);
     return res.data;
   },
 
-  async listChangeOrders(switchboardId: string): Promise<{ id: string; reason: string; origin: string; status: string; created_at: string }[]> {
+  async listChangeOrders(switchboardId: string): Promise<ChangeOrderRow[]> {
     const res = await api.get(`${ROOT}/switchboards/${switchboardId}/change-orders`);
     return res.data ?? [];
+  },
+
+  async approveChangeOrder(id: string): Promise<{ ok: boolean; changeOrder: ChangeOrderRow; board: SwitchboardRow }> {
+    const res = await api.post(`${ROOT}/change-orders/${id}/approve`);
+    return res.data;
+  },
+
+  async rejectChangeOrder(id: string, reason: string): Promise<{ ok: boolean; changeOrder: ChangeOrderRow }> {
+    const res = await api.post(`${ROOT}/change-orders/${id}/reject`, { reason });
+    return res.data;
   },
 
 
