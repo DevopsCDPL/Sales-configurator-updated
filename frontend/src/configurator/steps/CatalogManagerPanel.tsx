@@ -55,12 +55,28 @@ const inputSx = {
 interface EditState {
   id?: string;
   name: string; category: string; part_number: string; description: string;
-  price: string; [k: string]: any;
+  price: string; priceType: string;
+  spec_deviceClass: string; spec_catalogNumber: string; spec_manufacturer: string;
+  spec_series: string; spec_frameModel: string; spec_ratedCurrentA: string;
+  spec_poles: string; spec_interruptingKA: string;
+  __origSpec?: any;
+  [k: string]: any;
 }
 const emptyEdit = (cat?: string): EditState => ({
   name: '', category: cat ?? 'HARDWARE', part_number: '', description: '', price: '',
+  priceType: 'FIRM',
   lbr_cu: '', lbr_asm: '', lbr_cnt: '', lbr_qc: '', lbr_tst: '', lbr_eng: '', lbr_cad: '',
+  spec_deviceClass: '', spec_catalogNumber: '', spec_manufacturer: '',
+  spec_series: '', spec_frameModel: '', spec_ratedCurrentA: '',
+  spec_poles: '', spec_interruptingKA: '',
+  __origSpec: {},
 });
+
+const DEFAULT_CATEGORIES = [
+  'CIRCUIT BREAKER','ENCLOSURE','BUSSING','HARDWARE','LUGS','TERMINALS','CONTROLS',
+  'WIRE CABLE','CONDUIT','CURRENT TRANSFORMER','SPD','RELAY','SWITCH','CAMLOCK',
+  'GLASTIC','LIGHT','STANDARD PRODUCT',
+];
 
 const CatalogManagerPanel: React.FC = () => {
   const [counts, setCounts] = useState<{ category: string; count: number }[]>([]);
@@ -113,6 +129,16 @@ const CatalogManagerPanel: React.FC = () => {
       part_number: duplicate ? '' : r.part_number ?? '',
       description: r.description ?? '',
       price: String(r.price ?? r.mat_cost ?? ''),
+      priceType: (r as any).price_status === 'ESTIMATED' ? 'ESTIMATED' : 'FIRM',
+      spec_deviceClass: String((r as any).specifications?.deviceClass ?? ''),
+      spec_catalogNumber: String((r as any).specifications?.catalogNumber ?? ''),
+      spec_manufacturer: String((r as any).specifications?.manufacturer ?? ''),
+      spec_series: String((r as any).specifications?.series ?? ''),
+      spec_frameModel: String((r as any).specifications?.frameModel ?? ''),
+      spec_ratedCurrentA: String((r as any).specifications?.ratedCurrentA ?? ''),
+      spec_poles: String((r as any).specifications?.poles ?? ''),
+      spec_interruptingKA: String((r as any).specifications?.interruptingKA ?? ''),
+      __origSpec: (r as any).specifications ?? {},
     };
     BUCKETS.forEach((b) => { e[b] = String((r as any)[b] ?? '') === '0' ? '' : String((r as any)[b] ?? ''); });
     setEdit(e);
@@ -131,10 +157,33 @@ const CatalogManagerPanel: React.FC = () => {
         price: Number(edit.price) || 0,
         mat_cost: Number(edit.price) || 0,
         material_cost: Number(edit.price) || 0,
-        price_status: (Number(edit.price) || 0) > 0 ? 'FIRM' : 'PENDING_RFQ',
+        price_status: (Number(edit.price) || 0) > 0 ? (edit.priceType === 'ESTIMATED' ? 'ESTIMATED' : 'FIRM') : 'PENDING_RFQ',
         is_active: true,
       };
       BUCKETS.forEach((b) => { payload[b] = Number(edit[b]) || 0; });
+      const isCbSave = edit.category.toUpperCase().trim() === 'CIRCUIT BREAKER';
+      const specFields = {
+        deviceClass: edit.spec_deviceClass, catalogNumber: edit.spec_catalogNumber,
+        manufacturer: edit.spec_manufacturer, series: edit.spec_series,
+        frameModel: edit.spec_frameModel, ratedCurrentA: edit.spec_ratedCurrentA,
+        poles: edit.spec_poles, interruptingKA: edit.spec_interruptingKA,
+      };
+      const hasAnySpec = Object.values(specFields).some((v) => v.trim() !== '');
+      if (isCbSave || hasAnySpec) {
+        const specEdits: any = {};
+        if (specFields.deviceClass.trim()) specEdits.deviceClass = specFields.deviceClass.trim();
+        if (specFields.catalogNumber.trim()) specEdits.catalogNumber = specFields.catalogNumber.trim();
+        if (specFields.manufacturer.trim()) specEdits.manufacturer = specFields.manufacturer.trim();
+        if (specFields.series.trim()) specEdits.series = specFields.series.trim();
+        if (specFields.frameModel.trim()) specEdits.frameModel = specFields.frameModel.trim();
+        const rca = specFields.ratedCurrentA.trim();
+        if (rca) specEdits.ratedCurrentA = /^[\d.]+$/.test(rca) ? Number(rca) : rca;
+        const pol = specFields.poles.trim();
+        if (pol) specEdits.poles = /^[\d.]+$/.test(pol) ? Number(pol) : pol;
+        const ika = specFields.interruptingKA.trim();
+        if (ika) specEdits.interruptingKA = /^[\d.]+$/.test(ika) ? Number(ika) : ika;
+        payload.specifications = { ...(edit.__origSpec ?? {}), ...specEdits };
+      }
       if (edit.id) await configuratorService.updateComponent(edit.id, payload);
       else await configuratorService.createComponent(payload);
       setInfo(edit.id ? 'Component updated' : 'Component added');
@@ -243,9 +292,21 @@ const CatalogManagerPanel: React.FC = () => {
         }}
       >
         <Tab label="All" value="" />
-        {counts.map((c) => (
-          <Tab key={c.category} label={`${c.category} (${c.count})`} value={c.category} />
-        ))}
+        {(() => {
+          const serverMap = new Map(counts.map((c) => [c.category.toUpperCase(), c.count]));
+          const merged: { category: string; count: number }[] = DEFAULT_CATEGORIES.map((cat) => ({
+            category: cat,
+            count: serverMap.get(cat) ?? 0,
+          }));
+          counts.forEach((c) => {
+            if (!DEFAULT_CATEGORIES.includes(c.category.toUpperCase())) {
+              merged.push({ category: c.category, count: c.count });
+            }
+          });
+          return merged.map((c) => (
+            <Tab key={c.category} label={`${c.category} (${c.count})`} value={c.category} />
+          ));
+        })()}
       </Tabs>
 
       <Stack direction="row" justifyContent="flex-end" sx={{ mb: 1.5 }}>
@@ -486,10 +547,47 @@ const CatalogManagerPanel: React.FC = () => {
                 />
                 <TextField size="small" label="Part number" value={edit.part_number} onChange={(e) => setEdit({ ...edit, part_number: e.target.value })} sx={inputSx} fullWidth />
               </Stack>
-              <Stack direction="row" spacing={1.5}>
-                <TextField size="small" label="Price ($)" value={edit.price} onChange={(e) => setEdit({ ...edit, price: e.target.value.replace(/[^0-9.]/g, '') })} sx={{ ...inputSx, width: 160 }} />
+              <Stack direction="row" spacing={1.5} alignItems="flex-start">
+                <TextField size="small" label="Price ($)" value={edit.price} onChange={(e) => setEdit({ ...edit, price: e.target.value.replace(/[^0-9.]/g, '') })} sx={{ ...inputSx, width: 140 }} />
+                <TextField
+                  select size="small" label="Price type" value={edit.priceType}
+                  onChange={(e) => setEdit({ ...edit, priceType: e.target.value })}
+                  sx={{ ...inputSx, width: 180 }}
+                >
+                  <MenuItem value="FIRM">Firm price</MenuItem>
+                  <MenuItem value="ESTIMATED">Approximate / estimated</MenuItem>
+                </TextField>
                 <TextField size="small" label="Description" value={edit.description} onChange={(e) => setEdit({ ...edit, description: e.target.value })} sx={inputSx} fullWidth />
               </Stack>
+              <Typography sx={{ color: C.sub, fontSize: 10.5 }}>
+                Leave price empty → component shows RFQ $ until a quote is received.
+              </Typography>
+              {edit.category.toUpperCase().trim() === 'CIRCUIT BREAKER' && (
+                <>
+                  <Typography sx={{ color: C.sub, fontSize: 11, fontWeight: 700, mt: 0.5 }}>
+                    Circuit breaker details (drive the card + filters)
+                  </Typography>
+                  <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1 }}>
+                    {([
+                      ['spec_deviceClass', 'Breaker Type (ACB / MCCB…)'],
+                      ['spec_catalogNumber', 'Catalog Number'],
+                      ['spec_manufacturer', 'Manufacturer'],
+                      ['spec_series', 'Series / Product Family'],
+                      ['spec_frameModel', 'Frame / Model'],
+                      ['spec_ratedCurrentA', 'Rated Current (A)'],
+                      ['spec_poles', 'No. of Poles'],
+                      ['spec_interruptingKA', 'Breaking Capacity (kA)'],
+                    ] as [string, string][]).map(([key, label]) => (
+                      <TextField
+                        key={key} size="small" label={label}
+                        value={edit[key] ?? ''}
+                        onChange={(e) => setEdit({ ...edit, [key]: e.target.value })}
+                        sx={inputSx}
+                      />
+                    ))}
+                  </Box>
+                </>
+              )}
               <Typography sx={{ color: C.sub, fontSize: 11.5 }}>Labour hours per unit (drive the quote automatically)</Typography>
               <Stack direction="row" spacing={1}>
                 {BUCKETS.map((b) => (

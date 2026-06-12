@@ -168,33 +168,42 @@ const CbFilterPanel: React.FC<CbFilterPanelProps> = ({ items, onFiltered }) => {
       <Box
         sx={{
           display: 'grid',
-          gridTemplateColumns: { xs: '1fr 1fr', sm: 'repeat(3, 1fr)', md: 'repeat(4, 1fr)' },
-          gap: 1,
+          gridTemplateColumns: 'repeat(6, 1fr)',
+          gap: 0.75,
         }}
       >
         {FIELDS.map((f) => {
           const opts = optionSets[f.key] || [];
           const disabled = opts.length === 0 && !filters[f.key];
           return (
-            <TextField
-              key={f.key}
-              select
-              size="small"
-              label={f.label}
-              value={filters[f.key]}
-              disabled={disabled}
-              onChange={(e) => handleChange(f.key, e.target.value)}
-              SelectProps={{ MenuProps: menuProps }}
-              sx={selectSx}
-              fullWidth
-            >
-              <MenuItem value="">
-                <em>All</em>
-              </MenuItem>
-              {opts.map((opt) => (
-                <MenuItem key={opt} value={opt}>{opt}</MenuItem>
-              ))}
-            </TextField>
+            <Box key={f.key} sx={{ minWidth: 0 }}>
+              <TextField
+                select
+                size="small"
+                label={f.label}
+                value={filters[f.key]}
+                disabled={disabled}
+                onChange={(e) => handleChange(f.key, e.target.value)}
+                SelectProps={{ MenuProps: menuProps }}
+                sx={{
+                  ...selectSx,
+                  '& .MuiOutlinedInput-root': {
+                    ...selectSx['& .MuiOutlinedInput-root'],
+                    py: 0,
+                    fontSize: 11.5,
+                  },
+                  '& .MuiInputLabel-root': { color: C.sub, fontSize: 11 },
+                }}
+                fullWidth
+              >
+                <MenuItem value="">
+                  <em>All</em>
+                </MenuItem>
+                {opts.map((opt) => (
+                  <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+                ))}
+              </TextField>
+            </Box>
           );
         })}
       </Box>
