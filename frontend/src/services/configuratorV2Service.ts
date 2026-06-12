@@ -409,6 +409,11 @@ export const configuratorV2Service = {
   },
 
 
+  async importLegacy(): Promise<{ ok: boolean; created: number; updated: number; skipped: number; total: number }> {
+    const res = await api.post(`${ROOT}/catalog/import-legacy`);
+    return res.data;
+  },
+
   async importWorkbook(file: File): Promise<{
     ok: boolean; componentsCreated: number; componentsUpdated: number;
     busScheduleRows: number; neutralRows: number; copperPricePerLb: number | null;

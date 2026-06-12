@@ -205,6 +205,20 @@ const CatalogManagerPanel: React.FC = () => {
     }
   };
 
+  const importLegacy = async () => {
+    setImporting(true);
+    setError(null);
+    try {
+      const out = await configuratorV2Service.importLegacy();
+      setInfo(`Legacy catalog imported \u2014 ${out.created} new, ${out.updated} updated, ${out.skipped} skipped. Catalog total: ${out.total}.`);
+      await Promise.all([search(), loadCounts()]);
+    } catch (e: any) {
+      setError(e?.response?.data?.error ?? 'Legacy import failed');
+    } finally {
+      setImporting(false);
+    }
+  };
+
   const importWb = async (file: File) => {
     setImporting(true);
     setError(null);
@@ -254,6 +268,13 @@ const CatalogManagerPanel: React.FC = () => {
           ref={fileRef} type="file" accept=".xlsm,.xlsx" hidden
           onChange={(e) => { const f = e.target.files?.[0]; if (f) importWb(f); }}
         />
+        <Button
+          disabled={importing}
+          onClick={importLegacy}
+          sx={{ color: C.text, textTransform: 'none', fontSize: 12.5, border: '1px solid ' + C.border, bgcolor: C.bg, '&:hover': { borderColor: C.blue } }}
+        >
+          {importing ? 'Importing\u2026' : 'Import legacy catalog'}
+        </Button>
         <Button
           startIcon={<UploadFileRoundedIcon sx={{ fontSize: 16 }} />}
           disabled={importing}
