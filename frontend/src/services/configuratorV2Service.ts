@@ -483,6 +483,7 @@ export const configuratorV2Service = {
       remainingHeightIn?: number;
       devices: Array<{
         designation: string;
+        loadDescription?: string | null;
         role: string;
         partNumber?: string;
         manufacturer?: string;

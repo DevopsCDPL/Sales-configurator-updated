@@ -102,6 +102,7 @@ const DeviceListPanel: React.FC<DeviceListPanelProps> = ({ lines, catalogCbs, sc
               <TableRow>
                 <TableCell sx={headSx}>DESIG.</TableCell>
                 <TableCell sx={headSx}>ROLE</TableCell>
+              <TableCell sx={headSx}>CONNECTED LOAD</TableCell>
                 <TableCell sx={headSx}>DEVICE</TableCell>
                 <TableCell sx={headSx}>PART #</TableCell>
                 <TableCell sx={headSx}>SECTION</TableCell>
@@ -120,6 +121,7 @@ const DeviceListPanel: React.FC<DeviceListPanelProps> = ({ lines, catalogCbs, sc
                     <Chip label={l.meta?.designation ?? '?'} size="small" sx={{ bgcolor: 'rgba(0,200,255,0.12)', color: '#60A5FA', fontWeight: 700, fontSize: 10.5, height: 20 }} />
                   </TableCell>
                   <TableCell sx={{ ...cellSx, color: C.sub }}>{l.meta?.role ?? '—'}</TableCell>
+                <TableCell sx={cellSx}>{l.meta?.loadDescription ?? '—'}</TableCell>
                   <TableCell sx={cellSx}>
                     {l.name}
                     {l.meta?.swapped && (

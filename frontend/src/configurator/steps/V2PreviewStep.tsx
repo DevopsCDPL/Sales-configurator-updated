@@ -277,6 +277,9 @@ const V2PreviewStep: React.FC = () => {
           remainingHeightIn: s.remainingHeightIn,
           devices: s.devices.map((d) => ({
             designation: d.designation,
+            loadDescription:
+              intake.feeders.find((f) => f.rowId === d.feederRowId)?.description
+              ?? (d.role !== 'FEEDER' ? 'Incoming' : null),
             role: d.role,
             partNumber: d.device?.partNumber,
             manufacturer: d.device?.manufacturer,

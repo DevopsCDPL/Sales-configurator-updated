@@ -676,6 +676,7 @@ router.post('/switchboards/:id/apply-proposal', wrap(async (req, res) => {
           meta: {
             designation: d.designation,
             role: d.role,
+            loadDescription: d.loadDescription ?? null,
             ratedA: d.ratedA,
             poles: d.poles,
             mounting: d.mounting,
