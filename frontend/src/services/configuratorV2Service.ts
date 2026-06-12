@@ -515,6 +515,19 @@ export const configuratorV2Service = {
     const res = await api.post(`${ROOT}/switchboards/${id}/apply-proposal`, payload);
     return res.data;
   },
+
+  async exportCatalogXlsx(): Promise<void> {
+    const res = await api.get(`${ROOT}/catalog/export-xlsx`, { responseType: 'blob' });
+    const url = URL.createObjectURL(new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+    const a = document.createElement('a'); a.href = url; a.download = 'component-catalog.xlsx';
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  },
+
+  async importComponentsXlsx(file: File): Promise<{ ok: boolean; created: number; skipped: number; errors: number; errorRows: string[]; total: number }> {
+    const fd = new FormData(); fd.append('file', file);
+    const res = await api.post(`${ROOT}/catalog/import-components-xlsx`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+    return res.data;
+  },
 };
 
 export default configuratorV2Service;

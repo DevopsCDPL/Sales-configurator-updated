@@ -29,6 +29,10 @@ import PriceSourceDot from '../components/PriceSourceDot';
 import CbFilterPanel from '../components/CbFilterPanel';
 import CatalogNumberBuilderDialog from '../components/CatalogNumberBuilderDialog';
 import { displayCase, compactSku } from '../lib/displayCase';
+import { vendorService } from '../../services/vendorService';
+import { Vendor } from '../../types';
+import FileDownloadRoundedIcon from '@mui/icons-material/FileDownloadRounded';
+import FileUploadRoundedIcon from '@mui/icons-material/FileUploadRounded';
 
 const C = {
   bg: '#000000', surface: '#0B0B0D', border: '#1E2235', blue: '#00c8ff',
@@ -60,6 +64,8 @@ interface EditState {
   spec_deviceClass: string; spec_catalogNumber: string; spec_manufacturer: string;
   spec_series: string; spec_frameModel: string; spec_ratedCurrentA: string;
   spec_poles: string; spec_interruptingKA: string;
+  vendorId: string;
+  vendorName: string;
   __origSpec?: any;
   [k: string]: any;
 }
@@ -70,6 +76,7 @@ const emptyEdit = (cat?: string): EditState => ({
   spec_deviceClass: '', spec_catalogNumber: '', spec_manufacturer: '',
   spec_series: '', spec_frameModel: '', spec_ratedCurrentA: '',
   spec_poles: '', spec_interruptingKA: '',
+  vendorId: '', vendorName: '',
   __origSpec: {},
 });
 
@@ -94,6 +101,10 @@ const CatalogManagerPanel: React.FC = () => {
   const [info, setInfo] = useState<string | null>(null);
   const [builderFor, setBuilderFor] = useState<ConfiguratorComponent | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const xlsRef = useRef<HTMLInputElement>(null);
+  const [vendors, setVendors] = useState<Vendor[]>([]);
+
+  useEffect(() => { vendorService.getAll().then(setVendors).catch(() => {}); }, []);
 
   const loadCounts = useCallback(async () => {
     try { setCounts((await configuratorService.componentCategoryCounts()).filter((c) => c.count > 0)); } catch { /* */ }
@@ -139,6 +150,8 @@ const CatalogManagerPanel: React.FC = () => {
       spec_ratedCurrentA: String((r as any).specifications?.ratedCurrentA ?? ''),
       spec_poles: String((r as any).specifications?.poles ?? ''),
       spec_interruptingKA: String((r as any).specifications?.interruptingKA ?? ''),
+      vendorId: (r as any).specifications?.vendorId ?? '',
+      vendorName: (r as any).specifications?.vendorName ?? '',
       __origSpec: (r as any).specifications ?? {},
     };
     BUCKETS.forEach((b) => { e[b] = String((r as any)[b] ?? '') === '0' ? '' : String((r as any)[b] ?? ''); });
@@ -170,7 +183,7 @@ const CatalogManagerPanel: React.FC = () => {
         poles: edit.spec_poles, interruptingKA: edit.spec_interruptingKA,
       };
       const hasAnySpec = Object.values(specFields).some((v) => v.trim() !== '');
-      if (isCbSave || hasAnySpec) {
+      if (isCbSave || hasAnySpec || edit.vendorId) {
         const specEdits: any = {};
         if (specFields.deviceClass.trim()) specEdits.deviceClass = specFields.deviceClass.trim();
         if (specFields.catalogNumber.trim()) specEdits.catalogNumber = specFields.catalogNumber.trim();
@@ -183,6 +196,7 @@ const CatalogManagerPanel: React.FC = () => {
         if (pol) specEdits.poles = /^[\d.]+$/.test(pol) ? Number(pol) : pol;
         const ika = specFields.interruptingKA.trim();
         if (ika) specEdits.interruptingKA = /^[\d.]+$/.test(ika) ? Number(ika) : ika;
+        if (edit.vendorId) { specEdits.vendorId = edit.vendorId; specEdits.vendorName = edit.vendorName; }
         payload.specifications = { ...(edit.__origSpec ?? {}), ...specEdits };
       }
       if (edit.id) await configuratorService.updateComponent(edit.id, payload);
@@ -240,6 +254,23 @@ const CatalogManagerPanel: React.FC = () => {
     }
   };
 
+  const importComponents = async (file: File) => {
+    setImporting(true);
+    setError(null);
+    try {
+      const out = await configuratorV2Service.importComponentsXlsx(file);
+      const msg = `Catalog imported — ${out.created} new, ${out.skipped} skipped${out.errors ? `, ${out.errors} errors` : ''}.`
+        + ` Total: ${out.total}.`;
+      setInfo(msg);
+      await Promise.all([search(), loadCounts()]);
+    } catch (e: any) {
+      setError(e?.response?.data?.error ?? 'Excel import failed');
+    } finally {
+      setImporting(false);
+      if (xlsRef.current) xlsRef.current.value = '';
+    }
+  };
+
   return (
     <Box sx={{ px: 3, pb: 4, pt: 2 }}>
       <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1.5 }} flexWrap="wrap" useFlexGap>
@@ -269,6 +300,26 @@ const CatalogManagerPanel: React.FC = () => {
           ref={fileRef} type="file" accept=".xlsm,.xlsx" hidden
           onChange={(e) => { const f = e.target.files?.[0]; if (f) importWb(f); }}
         />
+        <input
+          ref={xlsRef} type="file" accept=".xlsx" hidden
+          onChange={(e) => { const f = e.target.files?.[0]; if (f) importComponents(f); }}
+        />
+        <Button
+          startIcon={<FileDownloadRoundedIcon sx={{ fontSize: 16 }} />}
+          disabled={importing}
+          onClick={() => configuratorV2Service.exportCatalogXlsx().catch((e: any) => setError(e?.response?.data?.error ?? 'Export failed'))}
+          sx={{ color: C.text, textTransform: 'none', fontSize: 12.5, border: '1px solid ' + C.border, bgcolor: C.bg, '&:hover': { borderColor: C.blue } }}
+        >
+          Download Excel
+        </Button>
+        <Button
+          startIcon={<FileUploadRoundedIcon sx={{ fontSize: 16 }} />}
+          disabled={importing}
+          onClick={() => xlsRef.current?.click()}
+          sx={{ color: C.text, textTransform: 'none', fontSize: 12.5, border: '1px solid ' + C.border, bgcolor: C.bg, '&:hover': { borderColor: C.blue } }}
+        >
+          {importing ? 'Importing…' : 'Upload Excel'}
+        </Button>
         <Button
           disabled={importing}
           onClick={importLegacy}
@@ -437,7 +488,7 @@ const CatalogManagerPanel: React.FC = () => {
                       </Typography>
                     </Stack>
                     <Stack direction="row" alignItems="flex-start" spacing={0.5}>
-                      <Typography sx={{ color: '#8E9AAD', fontSize: 11.5, width: 110, flexShrink: 0, lineHeight: 1.4 }}>Manufacturer / Type</Typography>
+                      <Typography sx={{ color: '#8E9AAD', fontSize: 11.5, width: 110, flexShrink: 0, lineHeight: 1.4 }}>Manufacturer</Typography>
                       <Typography sx={{ color: '#E2E8F0', fontSize: 11.5, flex: 1, lineHeight: 1.4 }} noWrap
                         title={[spec.manufacturer, spec.subcategory && spec.subcategory !== spec.manufacturer ? spec.subcategory : null, spec.legacyType].filter(Boolean).join(', ') || '—'}>
                         {[spec.manufacturer, spec.subcategory && spec.subcategory !== spec.manufacturer ? spec.subcategory : null, spec.legacyType].filter(Boolean).join(', ') || '—'}
@@ -603,6 +654,18 @@ const CatalogManagerPanel: React.FC = () => {
                 </TextField>
                 <TextField size="small" label="Description" value={edit.description} onChange={(e) => setEdit({ ...edit, description: e.target.value })} sx={inputSx} fullWidth />
               </Stack>
+              <Autocomplete
+                options={vendors}
+                getOptionLabel={(v) => v.vendor_name}
+                isOptionEqualToValue={(a, b) => a.id === b.id}
+                freeSolo={false}
+                value={vendors.find((v) => v.id === edit.vendorId) ?? null}
+                onChange={(_e, v) => setEdit({ ...edit, vendorId: (v as Vendor)?.id ?? '', vendorName: (v as Vendor)?.vendor_name ?? '' })}
+                slotProps={{ paper: { sx: { bgcolor: '#0B0B0D', color: '#E2E8F0', border: '1px solid #1E2235' } } }}
+                renderInput={(params) => (
+                  <TextField {...params} size="small" label="Vendor (for RFQ / procurement)" sx={inputSx} />
+                )}
+              />
               <Typography sx={{ color: C.sub, fontSize: 10.5 }}>
                 Leave price empty → component shows RFQ $ until a quote is received.
               </Typography>
