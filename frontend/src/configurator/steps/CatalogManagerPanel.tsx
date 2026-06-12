@@ -27,6 +27,7 @@ import { configuratorService, ConfiguratorComponent } from '../../services/confi
 import configuratorV2Service from '../../services/configuratorV2Service';
 import PriceSourceDot from '../components/PriceSourceDot';
 import CbFilterPanel from '../components/CbFilterPanel';
+import CatalogNumberBuilderDialog from '../components/CatalogNumberBuilderDialog';
 
 const C = {
   bg: '#000000', surface: '#0B0B0D', border: '#1E2235', blue: '#00c8ff',
@@ -74,6 +75,7 @@ const CatalogManagerPanel: React.FC = () => {
   const [importing, setImporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
+  const [builderFor, setBuilderFor] = useState<ConfiguratorComponent | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const loadCounts = useCallback(async () => {
@@ -286,11 +288,10 @@ const CatalogManagerPanel: React.FC = () => {
               : ((r.description ?? '').slice(0, 60) || '—');
             // SKU display
             const skuFull = r.part_number ?? '';
-            const skuShort = skuFull.length > 14 ? skuFull.slice(0, 14) + '…' : skuFull || '—';
-            // Price status chip
-            const psLabel = priceStatus === 'PENDING_RFQ' ? 'RFQ' : priceStatus;
-            const psBorder = priceStatus === 'FIRM' ? C.green : priceStatus === 'ESTIMATED' ? C.amber : C.red;
-            const psColor  = priceStatus === 'FIRM' ? C.green : priceStatus === 'ESTIMATED' ? C.amber : C.red;
+            const skuShort = skuFull.length > 12 ? skuFull.slice(0, 12) + '…' : skuFull || '—';
+            // Status dot color + tooltip
+            const dotColor = priceStatus === 'FIRM' ? C.green : priceStatus === 'ESTIMATED' ? C.amber : C.red;
+            const dotTip   = priceStatus === 'FIRM' ? 'Firm price' : priceStatus === 'ESTIMATED' ? 'Estimated price' : 'No firm price — RFQ required';
             return (
               <Box
                 key={r.id}
@@ -301,7 +302,7 @@ const CatalogManagerPanel: React.FC = () => {
                   display: 'flex', flexDirection: 'column', gap: 0.75, minHeight: 150,
                 }}
               >
-                {/* ROW 1 — category chip + SKU chip + action icons */}
+                {/* ROW 1 — category chip + spacer + 3 action icons */}
                 <Stack direction="row" alignItems="center" spacing={0.75}>
                   <Chip
                     label={r.category}
@@ -309,29 +310,31 @@ const CatalogManagerPanel: React.FC = () => {
                     sx={{ bgcolor: 'rgba(0,200,255,0.10)', color: '#00c8ff', fontSize: 9.5, height: 18, maxWidth: 120, '& .MuiChip-label': { px: 1 } }}
                   />
                   <Box sx={{ flex: 1 }} />
-                  <Tooltip title={skuFull || 'No part number'}>
-                    <Chip
-                      label={'SKU: ' + skuShort}
-                      size="small"
-                      sx={{ bgcolor: 'transparent', border: '1px solid #1E2235', color: '#A9B6C9', fontSize: 9.5, height: 18, '& .MuiChip-label': { px: 1 } }}
-                    />
-                  </Tooltip>
                   <IconButton size="small" onClick={() => openEdit(r)} sx={{ color: C.sub, p: 0.4, '&:hover': { color: C.blue } }}><EditRoundedIcon sx={{ fontSize: 14 }} /></IconButton>
                   <IconButton size="small" onClick={() => openEdit(r, true)} sx={{ color: C.sub, p: 0.4, '&:hover': { color: C.blue } }}><ContentCopyRoundedIcon sx={{ fontSize: 13 }} /></IconButton>
                   <IconButton size="small" onClick={() => remove(r)} sx={{ color: C.sub, p: 0.4, '&:hover': { color: C.red } }}><DeleteOutlineRoundedIcon sx={{ fontSize: 14 }} /></IconButton>
                 </Stack>
 
-                {/* ROW 2 — device class title + price-status chip */}
-                <Stack direction="row" alignItems="center" spacing={1}>
+                {/* ROW 2 — device class title + SKU chip + status dot */}
+                <Stack direction="row" alignItems="center" spacing={0.75}>
                   <Typography sx={{ color: '#F0F6FF', fontSize: 17, fontWeight: 800, flex: 1, lineHeight: 1.15 }} noWrap title={deviceTitle}>
                     {deviceTitle}
                   </Typography>
-                  <Chip
-                    label={psLabel}
-                    size="small"
-                    variant="outlined"
-                    sx={{ borderColor: psBorder, color: psColor, fontSize: 9, height: 17, '& .MuiChip-label': { px: 0.75 } }}
-                  />
+                  <Tooltip title={skuFull || 'No part number'}>
+                    <Chip
+                      label={'SKU: ' + skuShort}
+                      size="small"
+                      sx={{ bgcolor: 'transparent', border: '1px solid #1E2235', color: '#A9B6C9', fontSize: 9.5, height: 18, flexShrink: 0, '& .MuiChip-label': { px: 1 } }}
+                    />
+                  </Tooltip>
+                  <Tooltip title={dotTip}>
+                    <Box
+                      sx={{
+                        width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
+                        bgcolor: dotColor, boxShadow: `0 0 6px ${dotColor}`,
+                      }}
+                    />
+                  </Tooltip>
                 </Stack>
 
                 {/* ROW 3-5 — labeled info rows */}
@@ -349,30 +352,36 @@ const CatalogManagerPanel: React.FC = () => {
                 {/* ROW 6 — footer: builder button (CB only) + price */}
                 <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mt: 'auto', pt: 0.5 }}>
                   {isCbCard ? (
-                    <Tooltip title="Part-number builder — coming soon">
-                      <span>
-                        <Button
-                          disabled
-                          size="small"
-                          sx={{
-                            bgcolor: 'rgba(0,200,255,0.25)', color: '#06151c',
-                            textTransform: 'none', fontWeight: 700, fontSize: 11.5,
-                            px: 1.5, borderRadius: '8px', minWidth: 0,
-                            '&.Mui-disabled': { bgcolor: 'rgba(0,200,255,0.18)', color: 'rgba(6,21,28,0.6)' },
-                          }}
-                        >
-                          Generate Catalog No.
-                        </Button>
-                      </span>
-                    </Tooltip>
+                    <Button
+                      size="small"
+                      onClick={() => setBuilderFor(r)}
+                      sx={{
+                        bgcolor: '#00c8ff', color: '#06151c',
+                        textTransform: 'none', fontWeight: 700, fontSize: 11.5,
+                        px: 1.5, borderRadius: '8px', minWidth: 0,
+                        '&:hover': { bgcolor: '#33d4ff' },
+                      }}
+                    >
+                      Generate Catalog No.
+                    </Button>
                   ) : (
                     <Box />
                   )}
                   <Stack direction="row" alignItems="center">
-                    <PriceSourceDot source={spec.priceSource} />
-                    <Typography sx={{ color: '#00c8ff', fontSize: 16, fontWeight: 800 }}>
-                      {Number(r.price) ? usd(Number(r.price)) : '—'}
-                    </Typography>
+                    {Number(r.price) > 0 ? (
+                      <>
+                        <PriceSourceDot source={spec.priceSource} />
+                        <Typography sx={{ color: '#00c8ff', fontSize: 16, fontWeight: 800 }}>
+                          {usd(Number(r.price))}
+                        </Typography>
+                      </>
+                    ) : (
+                      <Tooltip title="No quote received yet — raise an RFQ">
+                        <Typography sx={{ color: C.red, fontSize: 14, fontWeight: 800 }}>
+                          RFQ $
+                        </Typography>
+                      </Tooltip>
+                    )}
                   </Stack>
                 </Stack>
               </Box>
@@ -404,7 +413,15 @@ const CatalogManagerPanel: React.FC = () => {
                   <TableCell sx={{ ...cellSx, color: C.sub }}>{r.category}</TableCell>
                   <TableCell sx={cellSx}>{r.name}</TableCell>
                   <TableCell sx={{ ...cellSx, color: C.sub }}>{r.part_number ?? '—'}</TableCell>
-                  <TableCell sx={cellSx} align="right"><PriceSourceDot source={(r as any).specifications?.priceSource} />{Number(r.price) ? usd(Number(r.price)) : '—'}</TableCell>
+                  <TableCell sx={cellSx} align="right">
+                    {Number(r.price) > 0 ? (
+                      <><PriceSourceDot source={(r as any).specifications?.priceSource} />{usd(Number(r.price))}</>
+                    ) : (
+                      <Tooltip title="No quote received yet — raise an RFQ">
+                        <Typography component="span" sx={{ color: C.red, fontSize: 12, fontWeight: 800 }}>RFQ $</Typography>
+                      </Tooltip>
+                    )}
+                  </TableCell>
                   {BUCKETS.map((b) => (
                     <TableCell key={b} sx={{ ...cellSx, color: Number((r as any)[b]) ? C.text : '#2A3050' }} align="right">
                       {Number((r as any)[b]) || '·'}
@@ -433,6 +450,14 @@ const CatalogManagerPanel: React.FC = () => {
           )}
         </Box>
       )}
+
+      {/* Catalog Number Builder dialog */}
+      <CatalogNumberBuilderDialog
+        open={!!builderFor}
+        component={builderFor}
+        onClose={() => setBuilderFor(null)}
+        onSaved={() => { setInfo('Catalog number applied'); search(); }}
+      />
 
       {/* Add/Edit dialog */}
       <Dialog open={!!edit} onClose={() => setEdit(null)} maxWidth="sm" fullWidth
