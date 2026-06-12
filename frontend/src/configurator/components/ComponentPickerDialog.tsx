@@ -69,8 +69,10 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
       .catch(() => setCategories([]));
   }, [mode]);
 
-  // Active category — locked in swap mode
-  const activeCategory = mode === 'swap' ? (lockedCategory ?? '') : category;
+  // Active category — locked in swap mode, or in add mode when a
+  // lockedCategory is supplied (e.g. Section Editor adds CIRCUIT BREAKER).
+  const addLocked = mode === 'add' && !!lockedCategory;
+  const activeCategory = (mode === 'swap' || addLocked) ? (lockedCategory ?? '') : category;
 
   const search = useCallback(async (cat: string, qStr: string) => {
     setLoading(true);
@@ -79,8 +81,9 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
       if (cat) params.category = cat;
       if (qStr.trim()) params.q = qStr.trim();
       let rows = await configuratorService.listComponents(params);
-      // In add mode exclude engine-managed categories
-      if (mode === 'add') {
+      // In add mode exclude engine-managed categories — UNLESS a lockedCategory
+      // explicitly targets one (Section Editor adds breakers into a section).
+      if (mode === 'add' && !lockedCategory) {
         rows = rows.filter((r) => !EXCLUDED.has((r.category || '').toUpperCase()));
       }
       // Swap mode: sort cheapest first; treat 0/null price as Infinity (sort last)
@@ -115,8 +118,8 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
     setResults([]);
     setQtyMap({});
     setAddedNote(null);
-    if (mode === 'add') setCategory('');
-  }, [open, mode]);
+    if (mode === 'add') setCategory(lockedCategory ?? '');
+  }, [open, mode, lockedCategory]);
 
   const handlePick = async (c: ConfiguratorComponent) => {
     const qty = Math.max(1, Number(qtyMap[c.id]) || 1);
@@ -168,12 +171,14 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
             size="small"
             value={activeCategory}
             displayEmpty
-            disabled={mode === 'swap'}
+            disabled={mode === 'swap' || addLocked}
             onChange={(e) => handleCategoryChange(e.target.value)}
             sx={{ minWidth: 200, bgcolor: C.bg, color: C.text, fontSize: 12.5, '& fieldset': { borderColor: C.border } }}
           >
-            <MenuItem value="" sx={{ fontSize: 12.5 }}>All categories</MenuItem>
-            {mode === 'add'
+            {!addLocked && <MenuItem value="" sx={{ fontSize: 12.5 }}>All categories</MenuItem>}
+            {addLocked
+              ? <MenuItem value={lockedCategory!} sx={{ fontSize: 12.5 }}>{displayCase(lockedCategory!)}</MenuItem>
+              : mode === 'add'
               ? categories.map((c) => (
                   <MenuItem key={c.category} value={c.category} sx={{ fontSize: 12.5 }}>
                     {displayCase(c.category)} ({c.count})

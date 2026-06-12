@@ -268,6 +268,125 @@ router.delete('/lines/:lineId', wrap(async (req, res) => {
   res.json({ ok: true, waived: row.source === 'auto' ? req.body?.waiverReason : undefined });
 }));
 
+/* ── Sections (Section Editor — chip 2) ────────────────────────
+ * Per-switchboard section CRUD with immediate persistence so the BOM /
+ * quote / SLD recompute downstream. section_number is unique per
+ * (configuration_id, section_number); reorders swap numbers atomically.
+ *   POST   /switchboards/:id/sections   — append (or insert after N)
+ *   PATCH  /sections/:id                — name / role / frame / reorder
+ *   DELETE /sections/:id                — only when no section-scoped lines
+ */
+const SECTION_CAP = 10;
+
+router.post('/switchboards/:id/sections', wrap(async (req, res) => {
+  const board = await models.ConfiguratorSwitchboard.findByPk(req.params.id);
+  if (!board) return res.status(404).json({ error: 'not found' });
+  if (board.status === 'locked') return res.status(423).json({ error: 'switchboard locked — raise a change order' });
+
+  const existing = await models.ConfiguratorSystemSection.findAll({
+    where: { switchboard_id: board.id },
+    order: [['section_number', 'ASC']],
+  });
+  if (existing.length >= SECTION_CAP) {
+    return res.status(422).json({ error: `maximum ${SECTION_CAP} sections per switchboard` });
+  }
+
+  const afterRaw = req.body?.afterSectionNumber;
+  const after = afterRaw == null ? null : Number(afterRaw);
+  const role = String(req.body?.role ?? 'FEEDER');
+  const name = req.body?.name != null ? String(req.body.name) : null;
+
+  const created = await sequelize.transaction(async (t) => {
+    let newNumber;
+    if (after == null || !Number.isFinite(after)) {
+      newNumber = existing.length ? Math.max(...existing.map((s) => s.section_number)) + 1 : 1;
+    } else {
+      // Insert after `after`: shift sections >= after+1 up by one (descending
+      // to avoid transient unique collisions on section_number).
+      newNumber = after + 1;
+      const toShift = existing
+        .filter((s) => s.section_number >= newNumber)
+        .sort((a, b) => b.section_number - a.section_number);
+      for (const s of toShift) {
+        await s.update({ section_number: s.section_number + 1 }, { transaction: t });
+      }
+    }
+    return models.ConfiguratorSystemSection.create({
+      configuration_id: board.configuration_id,
+      switchboard_id: board.id,
+      section_number: newNumber,
+      name: name ?? `Section ${newNumber}`,
+      setup: { role },
+      electrical: {},
+      layout: {},
+      computed: {},
+      company_id: req.companyId ?? null,
+    }, { transaction: t });
+  });
+
+  res.status(201).json(created);
+}));
+
+router.patch('/sections/:id', wrap(async (req, res) => {
+  const row = await models.ConfiguratorSystemSection.findByPk(req.params.id);
+  if (!row) return res.status(404).json({ error: 'not found' });
+  const board = row.switchboard_id ? await models.ConfiguratorSwitchboard.findByPk(row.switchboard_id) : null;
+  if (board?.status === 'locked') return res.status(423).json({ error: 'switchboard locked — raise a change order' });
+
+  const body = req.body || {};
+
+  await sequelize.transaction(async (t) => {
+    // Reorder: swap section_number with the section currently holding the target.
+    if (body.section_number != null && Number(body.section_number) !== row.section_number) {
+      const target = Number(body.section_number);
+      const other = await models.ConfiguratorSystemSection.findOne({
+        where: { switchboard_id: row.switchboard_id, section_number: target },
+        transaction: t,
+      });
+      const from = row.section_number;
+      if (other) {
+        const parking = -Math.abs(Date.now() % 1000000);
+        await other.update({ section_number: parking }, { transaction: t });
+        await row.update({ section_number: target }, { transaction: t });
+        await other.update({ section_number: from }, { transaction: t });
+      } else {
+        await row.update({ section_number: target }, { transaction: t });
+      }
+    }
+
+    const patch = {};
+    if (body.name != null) patch.name = String(body.name);
+    if (body.role != null) patch.setup = { ...(row.setup || {}), role: String(body.role) };
+
+    // Frame: accept frame object, frameCode, or frame_id → store in layout.
+    if (body.frame !== undefined || body.frameCode !== undefined || body.frame_id !== undefined) {
+      const frame = body.frame ?? null;
+      const frameCode = body.frameCode ?? body.frame_id ?? frame?.frameCode ?? null;
+      patch.layout = { ...(row.layout || {}), frame, frameCode };
+    }
+    if (Object.keys(patch).length) await row.update(patch, { transaction: t });
+  });
+
+  const fresh = await models.ConfiguratorSystemSection.findByPk(row.id);
+  res.json(fresh);
+}));
+
+router.delete('/sections/:id', wrap(async (req, res) => {
+  const row = await models.ConfiguratorSystemSection.findByPk(req.params.id);
+  if (!row) return res.status(404).json({ error: 'not found' });
+  const board = row.switchboard_id ? await models.ConfiguratorSwitchboard.findByPk(row.switchboard_id) : null;
+  if (board?.status === 'locked') return res.status(423).json({ error: 'switchboard locked — raise a change order' });
+
+  const refCount = await models.ConfiguratorComponentLine.count({
+    where: { scope: 'section', section_id: row.id },
+  });
+  if (refCount > 0) {
+    return res.status(409).json({ error: 'Move or remove devices first' });
+  }
+  await row.destroy();
+  res.json({ ok: true });
+}));
+
 // Engineering standards (versioned)
 router.get('/engineering-standards/:tableKey', wrap(async (req, res) => {
   const row = await models.ConfiguratorEngineeringStandard.findOne({

@@ -27,6 +27,7 @@ export interface SectionRow {
   id: string;
   switchboard_id: string;
   section_number: number;
+  name?: string | null;
   setup?: Record<string, any> | null;
   electrical?: Record<string, any> | null;
   layout?: Record<string, any> | null;
@@ -406,6 +407,29 @@ export const configuratorV2Service = {
   }): Promise<ComponentLineRow> {
     const res = await api.patch<ComponentLineRow>(`${ROOT}/lines/${lineId}`, patch);
     return res.data;
+  },
+
+
+  /* ── Sections (Section Editor — chip 2) ── */
+  async createSection(switchboardId: string, body?: { afterSectionNumber?: number; role?: string; name?: string }): Promise<SectionRow> {
+    const res = await api.post<SectionRow>(`${ROOT}/switchboards/${switchboardId}/sections`, body ?? {});
+    return res.data;
+  },
+
+  async patchSection(sectionId: string, patch: {
+    name?: string;
+    role?: string;
+    frame?: Record<string, any> | null;
+    frameCode?: string | null;
+    frame_id?: string | null;
+    section_number?: number;
+  }): Promise<SectionRow> {
+    const res = await api.patch<SectionRow>(`${ROOT}/sections/${sectionId}`, patch);
+    return res.data;
+  },
+
+  async deleteSection(sectionId: string): Promise<void> {
+    await api.delete(`${ROOT}/sections/${sectionId}`);
   },
 
 

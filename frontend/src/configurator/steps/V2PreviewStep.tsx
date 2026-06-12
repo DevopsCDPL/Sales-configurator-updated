@@ -18,6 +18,7 @@ import QuotePanel from './QuotePanel';
 import DrawingsPanel from './DrawingsPanel';
 import ComponentsPanel from './ComponentsPanel';
 import DeviceListPanel from './DeviceListPanel';
+import SectionEditorPanel from './SectionEditorPanel';
 import { CIRCUIT_BREAKER_V2_DATA } from '../data/circuitBreakerV2Data';
 import type { CandidateDevice, LineupProposal, IntakeInput } from '../lib/lineup-proposal';
 import { generateSld, SldDevice } from '../lib/sld-generator';
@@ -457,6 +458,17 @@ const V2PreviewStep: React.FC = () => {
             />
           ) : boardView === 'sections' ? (
             <Box sx={{ pt: 1 }}>
+              <SectionEditorPanel
+                board={openBoard}
+                locked={openBoard.board.status === 'locked'}
+                onChanged={async () => {
+                  const full = await configuratorV2Service.getFull(openBoard.board.id);
+                  setOpenBoard(full);
+                  setSectionCounts((m) => ({ ...m, [full.board.id]: full.sections.length }));
+                  setSvg(sldFromFull(full)?.svg ?? null);
+                  setToast('Section design updated — BOM and quote will recompute');
+                }}
+              />
               <DeviceListPanel
                 lines={openBoard.lines}
                 intake={openBoard.board.intake as any}
