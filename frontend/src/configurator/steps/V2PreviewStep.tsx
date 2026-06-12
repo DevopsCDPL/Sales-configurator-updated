@@ -102,8 +102,15 @@ function sldFromFull(full: FullBoard): { svg: string } | null {
     frameModel: l.meta?.frameModel ?? l.name ?? undefined,
     sectionIndex: Number(l.meta?.sectionIndex) || 1,
     busSegment: l.meta?.role === 'MAIN' && l.meta?.designation === 'M2' ? 1 : 0,
+    poles: Number(l.meta?.poles) || undefined,
+    mounting: l.meta?.mounting ?? undefined,
+    interruptingKA: Number(l.meta?.interruptingKA) || null,
+    tripUnit: l.meta?.tripUnit ?? undefined,
+    loadDescription: l.meta?.loadDescription ?? undefined,
   }));
   const twoSeg = mains.length >= 2;
+  const intake: any = full.board.intake ?? {};
+  const afc = Number(intake?.utilityFaultKA);
   const { svg } = generateSld({
     title: full.board.name,
     configCode: 'Saved design',
@@ -112,6 +119,11 @@ function sldFromFull(full: FullBoard): { svg: string } | null {
     sccrKA: Number(bd.shortCircuitRating) || null,
     devices,
     busSegments: twoSeg ? 2 : 1,
+    boardName: full.board.name,
+    drawingNo: `SLD-${full.board.name}`,
+    serviceEntrance: !!full.board.service_entrance,
+    availableFaultKA: Number.isFinite(afc) && afc > 0 ? afc : null,
+    wires: Number(intake?.wires) || undefined,
   });
   return { svg };
 }
@@ -485,12 +497,33 @@ const V2PreviewStep: React.FC = () => {
             </Box>
           ) : boardView === 'sld' ? (
             <Box sx={{ px: 2, pb: 3, pt: 1 }}>
-              <Typography sx={{ color: '#CBD5E1', fontSize: 13.5, fontWeight: 600, mb: 1 }}>
-                One-Line Diagram (from saved design)
-              </Typography>
+              <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+                <Typography sx={{ color: '#CBD5E1', fontSize: 13.5, fontWeight: 600 }}>
+                  One-Line Diagram (from saved design) — submittal grade, ANSI/IEEE
+                </Typography>
+                {svg && (
+                  <Button
+                    size="small"
+                    onClick={() => {
+                      const blob = new Blob([svg], { type: 'image/svg+xml' });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `SLD-${openBoard.board.name.replace(/[^\w.-]+/g, '_')}.svg`;
+                      document.body.appendChild(a);
+                      a.click();
+                      document.body.removeChild(a);
+                      URL.revokeObjectURL(url);
+                    }}
+                    sx={{ color: C.blue, textTransform: 'none', fontSize: 11.5, border: '1px solid ' + C.border }}
+                  >
+                    Download SVG
+                  </Button>
+                )}
+              </Stack>
               {svg ? (
                 <Box
-                  sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', p: 2, overflowX: 'auto' }}
+                  sx={{ bgcolor: '#FFFFFF', borderRadius: '8px', p: 2, overflow: 'auto', maxHeight: '72vh', boxShadow: '0 0 0 1px ' + C.border }}
                   dangerouslySetInnerHTML={{ __html: svg }}
                 />
               ) : (
@@ -539,3 +572,4 @@ const V2PreviewStep: React.FC = () => {
 };
 
 export default V2PreviewStep;
+/* SLD: submittal-grade one-line wired (see sld-generator.ts). */
