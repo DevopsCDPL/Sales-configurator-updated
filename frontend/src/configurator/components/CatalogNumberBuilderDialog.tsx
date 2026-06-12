@@ -1,13 +1,15 @@
 /**
- * CatalogNumberBuilderDialog — Schneider Masterpact NT/NW catalog-number builder.
+ * CatalogNumberBuilderDialog — Schneider Part Number Decoder.
  * Uses the decoding engine from ../data/schneiderDecoderData.ts (do not modify that file).
  */
 import React, { useCallback, useEffect, useState } from 'react';
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Alert,
   Box,
   Button,
-  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -22,6 +24,9 @@ import {
 } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
+import SaveRoundedIcon from '@mui/icons-material/SaveRounded';
+import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
   DECODER_POSITIONS,
   DECODER_SPECIAL_POSITIONS,
@@ -33,10 +38,12 @@ import {
 } from '../data/schneiderDecoderData';
 import type { CodeOption } from '../data/schneiderDecoderData';
 import { configuratorService, ConfiguratorComponent } from '../../services/configuratorService';
+import configuratorV2Service from '../../services/configuratorV2Service';
 
 const C = {
   bg: '#000000', surface: '#0B0B0D', border: '#1E2235', blue: '#00c8ff',
   text: '#E2E8F0', sub: '#64748B', green: '#22C55E', amber: '#D97706', red: '#EF4444',
+  title: '#F0F6FF',
 };
 
 const inputSx = {
@@ -51,31 +58,81 @@ const inputSx = {
 
 const popperPaperSx = { bgcolor: C.surface, color: C.text, border: '1px solid ' + C.border };
 
+// Detail field definitions: label -> spec key
+const DETAIL_FIELDS: { label: string; key: string }[] = [
+  { label: 'Breaker Type',            key: 'deviceClass' },
+  { label: 'Manufacturer',            key: 'manufacturer' },
+  { label: 'Series / Product Family', key: 'series' },
+  { label: 'Frame / Model',           key: 'frameModel' },
+  { label: 'Rated Current (A)',       key: 'ratedCurrentA' },
+  { label: 'Breaking Capacity (kA)',  key: 'interruptingKA' },
+  { label: 'Number of Poles',         key: 'poles' },
+  { label: 'Rated Voltage',           key: 'voltageRating' },
+  { label: 'Trip Unit Type',          key: 'tripUnitType' },
+  { label: 'Protection Functions',    key: 'protectionFunctions' },
+  { label: 'Mounting Type',           key: 'mounting' },
+  { label: 'Application Type',        key: 'applicationType' },
+  { label: 'Dimensions',              key: 'dimensions' },
+];
+
+const NUMERIC_KEYS = new Set(['ratedCurrentA', 'interruptingKA', 'poles']);
+
+function coerceSpecValue(key: string, v: string): string | number | null {
+  const trimmed = v.trim();
+  if (trimmed === '') return null;
+  if (NUMERIC_KEYS.has(key)) {
+    const n = Number(trimmed);
+    if (Number.isFinite(n)) return n;
+  }
+  return v;
+}
+
 interface Props {
   open: boolean;
   component: ConfiguratorComponent | null;
+  switchboardId?: string | null;
   onClose: () => void;
   onSaved: () => void;
+  onAdded?: () => void;
 }
 
-export default function CatalogNumberBuilderDialog({ open, component, onClose, onSaved }: Props) {
+export default function CatalogNumberBuilderDialog({
+  open, component, switchboardId, onClose, onSaved, onAdded,
+}: Props) {
   const [std, setStd] = useState<string>('UL AC');
   const [selections, setSelections] = useState<Record<string, string>>({});
+  const [qty, setQty] = useState<number>(1);
+  const [details, setDetails] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
+  const [adding, setAdding] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [savedNote, setSavedNote] = useState(false);
 
-  // Reset state when dialog opens for a new component
+  const prefillDetails = useCallback((comp: ConfiguratorComponent | null) => {
+    if (!comp) { setDetails({}); return; }
+    const spec = (comp as any).specifications ?? {};
+    const d: Record<string, string> = {};
+    for (const f of DETAIL_FIELDS) {
+      const v = spec[f.key];
+      d[f.key] = v != null ? String(v) : '';
+    }
+    setDetails(d);
+  }, []);
+
   useEffect(() => {
-    if (open) {
+    if (open && component?.id) {
       setStd('UL AC');
       setSelections({});
+      setQty(1);
       setError(null);
       setSaving(false);
+      setAdding(false);
+      setSavedNote(false);
+      prefillDetails(component);
     }
-  }, [open, component?.id]);
+  }, [open, component?.id, prefillDetails]);
 
-  // When std changes, drop selections whose code is no longer valid for the new std
   const handleStdChange = useCallback((newStd: string) => {
     setStd(newStd);
     setSelections((prev) => {
@@ -91,7 +148,6 @@ export default function CatalogNumberBuilderDialog({ open, component, onClose, o
           next[def.key] = code;
         }
       }
-      // Keep special positions as-is (they are std-independent)
       for (const n of DECODER_SPECIAL_POSITIONS) {
         const k = String(n);
         if (prev[k]) next[k] = prev[k];
@@ -108,16 +164,13 @@ export default function CatalogNumberBuilderDialog({ open, component, onClose, o
   }, [std]);
 
   const generated = buildCatalogNumber(selections);
-  const charCount = generated.length;
 
-  // Completeness: every DECODER_POSITION whose options are non-empty for current std must be filled
   const complete = DECODER_POSITIONS.every((def) => {
     const opts = getOptions(def.key);
-    if (opts.length === 0) return true; // skip empty positions
+    if (opts.length === 0) return true;
     return !!selections[def.key];
   });
 
-  // Current special selections as an array of CodeOption (for the Autocomplete value)
   const specialValue: CodeOption[] = DECODER_SPECIAL_POSITIONS
     .map((n) => {
       const code = selections[String(n)];
@@ -130,38 +183,80 @@ export default function CatalogNumberBuilderDialog({ open, component, onClose, o
     const capped = value.slice(0, 7);
     setSelections((prev) => {
       const next = { ...prev };
-      // Clear all special slots first
-      for (const n of DECODER_SPECIAL_POSITIONS) {
-        delete next[String(n)];
-      }
-      // Set chosen codes into slots 19..25 in order
-      capped.forEach((opt, i) => {
-        next[String(DECODER_SPECIAL_POSITIONS[i])] = opt.code;
-      });
+      for (const n of DECODER_SPECIAL_POSITIONS) delete next[String(n)];
+      capped.forEach((opt, i) => { next[String(DECODER_SPECIAL_POSITIONS[i])] = opt.code; });
       return next;
     });
   };
 
   const handleCopy = () => {
+    if (!generated) return;
     navigator.clipboard.writeText(generated).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     });
   };
 
-  const handleApply = async () => {
+  const buildSpecEdits = () => {
+    if (!component) return {};
+    const origSpec = (component as any).specifications ?? {};
+    const edits: Record<string, string | number | null> = {};
+    for (const f of DETAIL_FIELDS) {
+      const origRaw = origSpec[f.key];
+      const origStr = origRaw != null ? String(origRaw) : '';
+      const current = details[f.key] ?? '';
+      if (current !== origStr) {
+        edits[f.key] = coerceSpecValue(f.key, current);
+      }
+    }
+    return edits;
+  };
+
+  const handleSaveCatalog = async () => {
     if (!component || !complete) return;
     setSaving(true);
     setError(null);
+    setSavedNote(false);
     try {
-      const spec = { ...((component as any).specifications ?? {}), catalogNumber: generated };
+      const specEdits = buildSpecEdits();
+      const spec = {
+        ...((component as any).specifications ?? {}),
+        ...specEdits,
+        catalogNumber: generated,
+      };
       await configuratorService.updateComponent(component.id, { specifications: spec } as any);
+      setSavedNote(true);
       onSaved();
-      onClose();
     } catch (e: any) {
       setError(e?.response?.data?.error ?? e?.message ?? 'Save failed');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleAddToConfig = async () => {
+    if (!component || !complete || !switchboardId) return;
+    setAdding(true);
+    setError(null);
+    try {
+      await configuratorV2Service.addLine(switchboardId, {
+        scope: 'board',
+        component_id: component.id,
+        category: component.category ?? 'CIRCUIT BREAKER',
+        part_number: component.part_number ?? null,
+        name: component.name ?? null,
+        quantity: Math.max(1, Number(qty) || 1),
+        unit_cost: Number(component.price) || 0,
+        price_status: ((component as any).price_status ?? 'PENDING_RFQ') as 'FIRM' | 'ESTIMATED' | 'PENDING_RFQ',
+        source: 'user',
+        meta: { catalogNumber: generated },
+      });
+      onAdded?.();
+      onClose();
+    } catch (e: any) {
+      setError(e?.response?.data?.error ?? e?.message ?? 'Add to config failed');
+    } finally {
+      setAdding(false);
     }
   };
 
@@ -176,67 +271,121 @@ export default function CatalogNumberBuilderDialog({ open, component, onClose, o
       }}
     >
       <DialogTitle sx={{ pb: 0.5 }}>
-        <Typography sx={{ color: '#F0F6FF', fontSize: 14, fontWeight: 800 }}>
-          Catalog Number Builder — Masterpact NT/NW
-        </Typography>
-        <Typography sx={{ color: C.sub, fontSize: 11.5, mt: 0.25 }}>
-          Schneider position-by-position part number (positions 1–25)
+        <Typography sx={{ color: C.title, fontSize: 14, fontWeight: 800 }}>
+          Schneider Part Number Decoder
         </Typography>
         {component && (
-          <Typography sx={{ color: C.sub, fontSize: 12, mt: 0.75 }} noWrap>
-            {component.name ?? ''}
+          <Typography sx={{ color: C.sub, fontSize: 11.5, mt: 0.25 }}>
+            Generate a catalog number for &quot;{component.name}&quot;, review full details, then save it to the catalog or add it to the configuration.
           </Typography>
         )}
       </DialogTitle>
 
       <Divider sx={{ borderColor: C.border, mt: 1 }} />
 
-      {/* Live preview bar — sticky */}
-      <Box
-        sx={{
-          position: 'sticky', top: 0, zIndex: 10,
-          bgcolor: C.surface, borderBottom: '1px solid ' + C.border,
-          px: 2, py: 1,
-          display: 'flex', alignItems: 'center', gap: 1,
-        }}
-      >
-        <Stack flex={1} spacing={0.25}>
-          <Typography
+      <DialogContent dividers sx={{ borderColor: C.border, pt: 2 }}>
+        <Stack direction="row" gap={1.5} alignItems="stretch" sx={{ mb: 2 }}>
+          <Box
             sx={{
-              fontFamily: 'monospace', fontSize: 16, fontWeight: 800,
-              color: C.blue, letterSpacing: 1, wordBreak: 'break-all',
+              flex: 1,
+              border: '1px solid rgba(0,200,255,0.45)',
+              borderRadius: '10px',
+              p: 1.25,
+              bgcolor: 'rgba(0,200,255,0.04)',
             }}
           >
-            {generated || '—'}
-          </Typography>
-          <Typography sx={{ color: C.sub, fontSize: 10 }}>
-            {charCount} character{charCount !== 1 ? 's' : ''}
-          </Typography>
-        </Stack>
-        <Tooltip title={copied ? 'Copied!' : 'Copy to clipboard'}>
-          <IconButton size="small" onClick={handleCopy} sx={{ color: copied ? C.green : C.sub, '&:hover': { color: C.blue } }}>
-            <ContentCopyRoundedIcon sx={{ fontSize: 16 }} />
-          </IconButton>
-        </Tooltip>
-      </Box>
+            <Typography sx={{ color: C.title, fontSize: 11, fontWeight: 800, mb: 0.75 }}>
+              Generated Catalog Number
+            </Typography>
+            <Box
+              sx={{
+                bgcolor: C.surface,
+                border: '1px solid ' + C.border,
+                borderRadius: '8px',
+                px: 1.25,
+                py: 0.9,
+                mb: 1,
+              }}
+            >
+              <Typography
+                sx={{
+                  fontFamily: 'monospace',
+                  fontSize: 15,
+                  fontWeight: 800,
+                  color: generated ? C.title : C.sub,
+                  letterSpacing: 3,
+                  wordBreak: 'break-all',
+                }}
+              >
+                {generated || '—'}
+              </Typography>
+            </Box>
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <Typography sx={{ color: C.sub, fontSize: 11 }}>Qty to add:</Typography>
+              <TextField
+                type="number"
+                size="small"
+                value={qty}
+                onChange={(e) => setQty(Math.max(1, Number(e.target.value) || 1))}
+                inputProps={{ min: 1 }}
+                sx={{
+                  width: 64,
+                  ...inputSx,
+                  '& input[type=number]': { MozAppearance: 'textfield' },
+                  '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
+                    WebkitAppearance: 'none',
+                    margin: 0,
+                  },
+                }}
+              />
+              <Box sx={{ flex: 1 }} />
+              <Typography sx={{ color: C.blue, fontSize: 11 }}>
+                {generated.length} chars
+              </Typography>
+              <Tooltip title={copied ? 'Copied!' : 'Copy to clipboard'}>
+                <span>
+                  <IconButton
+                    size="small"
+                    onClick={handleCopy}
+                    disabled={!generated}
+                    sx={{ color: copied ? C.green : C.sub, '&:hover': { color: C.blue } }}
+                  >
+                    <ContentCopyRoundedIcon sx={{ fontSize: 14 }} />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            </Stack>
+          </Box>
 
-      <DialogContent dividers sx={{ borderColor: C.border, pt: 2 }}>
-        {/* Standard selector */}
-        <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 2 }}>
-          <Typography sx={{ color: C.sub, fontSize: 12, flexShrink: 0 }}>Standard:</Typography>
-          <TextField
-            select
-            size="small"
-            value={std}
-            onChange={(e) => handleStdChange(e.target.value)}
-            sx={{ ...inputSx, minWidth: 160 }}
+          <Box
+            sx={{
+              flex: 1,
+              border: '1px solid ' + C.border,
+              borderRadius: '10px',
+              p: 1.25,
+            }}
           >
-            {DECODER_STANDARDS.map((s) => (
-              <MenuItem key={s} value={s} sx={{ fontSize: 12.5, color: C.text }}>
-                {s}
-              </MenuItem>
-            ))}
-          </TextField>
+            <Typography sx={{ color: C.title, fontSize: 11, fontWeight: 800, mb: 0.75 }}>
+              Standard
+            </Typography>
+            <TextField
+              select
+              size="small"
+              fullWidth
+              value={std}
+              onChange={(e) => handleStdChange(e.target.value)}
+              sx={inputSx}
+            >
+              {DECODER_STANDARDS.map((s) => (
+                <MenuItem key={s} value={s} sx={{ fontSize: 12.5, color: C.text }}>
+                  {s}
+                </MenuItem>
+              ))}
+            </TextField>
+            <Typography sx={{ color: C.sub, fontSize: 10.5, mt: 0.75 }}>
+              UL / ANSI / IEC and AC / DC determine which codes are available per position.
+            </Typography>
+          </Box>
         </Stack>
 
         {error && (
@@ -249,79 +398,186 @@ export default function CatalogNumberBuilderDialog({ open, component, onClose, o
           </Alert>
         )}
 
-        {/* Position grid — 2 columns */}
-        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1 }}>
-          {DECODER_POSITIONS.map((def) => {
-            const opts = getOptions(def.key);
-            if (opts.length === 0) return null;
-            const currentCode = selections[def.key] ?? null;
-            const currentOpt = opts.find((o) => o.code === currentCode) ?? null;
-            return (
-              <Autocomplete
-                key={def.key}
-                options={opts}
-                getOptionLabel={(o) => `${o.code} — ${o.label}`}
-                value={currentOpt}
-                onChange={(_e, v) => {
-                  setSelections((prev) => {
-                    const next = { ...prev };
-                    if (v) next[def.key] = v.code;
-                    else delete next[def.key];
-                    return next;
-                  });
-                }}
-                isOptionEqualToValue={(o, v) => o.code === v.code}
-                componentsProps={{ paper: { sx: popperPaperSx } }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    size="small"
-                    label={`${def.posLabel} · ${def.name}`}
-                    sx={inputSx}
-                  />
-                )}
-              />
-            );
-          })}
+        <Box
+          sx={{
+            border: '1px solid ' + C.border,
+            borderRadius: '10px',
+            p: 1.25,
+            mb: 2,
+          }}
+        >
+          <Typography sx={{ color: C.title, fontSize: 11, fontWeight: 800, mb: 1.25 }}>
+            Part Number Decoder — Position Selection
+          </Typography>
+
+          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1 }}>
+            {DECODER_POSITIONS.map((def) => {
+              const opts = getOptions(def.key);
+              if (opts.length === 0) return null;
+              const currentCode = selections[def.key] ?? null;
+              const currentOpt = opts.find((o) => o.code === currentCode) ?? null;
+              return (
+                <Autocomplete
+                  key={def.key}
+                  options={opts}
+                  getOptionLabel={(o) => `${o.code} — ${o.label}`}
+                  value={currentOpt}
+                  onChange={(_e, v) => {
+                    setSavedNote(false);
+                    setSelections((prev) => {
+                      const next = { ...prev };
+                      if (v) next[def.key] = v.code;
+                      else delete next[def.key];
+                      return next;
+                    });
+                  }}
+                  isOptionEqualToValue={(o, v) => o.code === v.code}
+                  componentsProps={{ paper: { sx: popperPaperSx } }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      size="small"
+                      label={`${def.posLabel} · ${def.name}`}
+                      sx={inputSx}
+                    />
+                  )}
+                />
+              );
+            })}
+          </Box>
+
+          <Box sx={{ mt: 1.5 }}>
+            <Autocomplete
+              multiple
+              options={POS19_25_SPECIAL}
+              getOptionLabel={(o) => `${o.code} — ${o.label}`}
+              value={specialValue}
+              onChange={handleSpecialChange}
+              isOptionEqualToValue={(o, v) => o.code === v.code}
+              componentsProps={{ paper: { sx: popperPaperSx } }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  size="small"
+                  label="Special options (Pos 19-25, optional)"
+                  sx={inputSx}
+                />
+              )}
+            />
+          </Box>
         </Box>
 
-        {/* Special positions 19-25 */}
-        <Box sx={{ mt: 1.5 }}>
-          <Autocomplete
-            multiple
-            options={POS19_25_SPECIAL}
-            getOptionLabel={(o) => `${o.code} — ${o.label}`}
-            value={specialValue}
-            onChange={handleSpecialChange}
-            isOptionEqualToValue={(o, v) => o.code === v.code}
-            componentsProps={{ paper: { sx: popperPaperSx } }}
-            renderInput={(params) => (
+        <Accordion
+          defaultExpanded={false}
+          disableGutters
+          elevation={0}
+          sx={{
+            bgcolor: 'transparent',
+            border: '1px solid ' + C.border,
+            borderRadius: '10px',
+            '&:before': { display: 'none' },
+          }}
+        >
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon sx={{ color: C.sub, fontSize: 18 }} />}
+            sx={{ minHeight: 40, '& .MuiAccordionSummary-content': { my: 0.75 } }}
+          >
+            <Typography sx={{ color: C.title, fontSize: 11, fontWeight: 800 }}>
+              Circuit Breaker Details
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails sx={{ pt: 0, pb: 1.5, px: 1.5 }}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1 }}>
+              {DETAIL_FIELDS.map((f) => (
+                <TextField
+                  key={f.key}
+                  size="small"
+                  label={f.label}
+                  value={details[f.key] ?? ''}
+                  onChange={(e) => {
+                    setSavedNote(false);
+                    setDetails((prev) => ({ ...prev, [f.key]: e.target.value }));
+                  }}
+                  sx={{ ...inputSx, '& .MuiInputLabel-root': { color: C.sub, fontSize: 11 } }}
+                />
+              ))}
               <TextField
-                {...params}
                 size="small"
-                label="Special options (Pos 19–25, optional)"
-                sx={inputSx}
+                label="Catalogue Number"
+                value={generated || '—'}
+                InputProps={{ readOnly: true }}
+                sx={{
+                  ...inputSx,
+                  '& .MuiInputLabel-root': { color: C.sub, fontSize: 11 },
+                  '& .MuiOutlinedInput-root': {
+                    bgcolor: C.surface, color: C.blue, fontSize: 12.5,
+                    '& fieldset': { borderColor: C.border },
+                    '&.Mui-focused fieldset': { borderColor: C.border },
+                  },
+                }}
               />
-            )}
-          />
-        </Box>
+            </Box>
+          </AccordionDetails>
+        </Accordion>
       </DialogContent>
 
-      <DialogActions sx={{ px: 2.5, py: 1.5, borderTop: '1px solid ' + C.border }}>
-        <Button onClick={onClose} sx={{ color: C.sub, textTransform: 'none' }}>Cancel</Button>
+      <DialogActions sx={{ px: 2.5, py: 1.5, borderTop: '1px solid ' + C.border, gap: 1 }}>
+        {savedNote && (
+          <Typography sx={{ color: C.green, fontSize: 11, mr: 'auto' }}>
+            Saved to catalog
+          </Typography>
+        )}
+        {!savedNote && <Box sx={{ flex: 1 }} />}
+
+        <Button onClick={onClose} sx={{ color: C.sub, textTransform: 'none' }}>
+          Cancel
+        </Button>
+
         <Tooltip title={complete ? '' : 'Select all positions first'}>
           <span>
             <Button
               disabled={!complete || saving}
-              onClick={handleApply}
-              variant="contained"
+              onClick={handleSaveCatalog}
+              variant="outlined"
+              startIcon={<SaveRoundedIcon sx={{ fontSize: 15 }} />}
               sx={{
-                bgcolor: C.blue, color: '#06151c', textTransform: 'none', fontWeight: 700,
+                borderColor: C.blue,
+                color: C.blue,
+                textTransform: 'none',
+                '&:hover': { bgcolor: 'rgba(0,200,255,0.08)', borderColor: C.blue },
+                '&.Mui-disabled': { borderColor: 'rgba(0,200,255,0.25)', color: 'rgba(0,200,255,0.4)' },
+              }}
+            >
+              {saving ? 'Saving...' : 'Save Catalog'}
+            </Button>
+          </span>
+        </Tooltip>
+
+        <Tooltip
+          title={
+            !switchboardId
+              ? "Open this builder from a board's Components step to add directly to a configuration"
+              : !complete
+              ? 'Select all positions first'
+              : ''
+          }
+        >
+          <span>
+            <Button
+              disabled={!complete || !switchboardId || adding}
+              onClick={handleAddToConfig}
+              variant="contained"
+              startIcon={<AddRoundedIcon sx={{ fontSize: 15 }} />}
+              sx={{
+                bgcolor: C.blue,
+                color: '#06151c',
+                textTransform: 'none',
+                fontWeight: 700,
                 '&:hover': { bgcolor: '#33d4ff' },
                 '&.Mui-disabled': { bgcolor: 'rgba(0,200,255,0.25)', color: 'rgba(6,21,28,0.5)' },
               }}
             >
-              {saving ? <CircularProgress size={14} sx={{ color: '#06151c' }} /> : 'Apply to component'}
+              {adding ? 'Adding...' : '+ Add to Config'}
             </Button>
           </span>
         </Tooltip>

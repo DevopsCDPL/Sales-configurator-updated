@@ -41,7 +41,7 @@ const BUCKET_SHORT: Record<string, string> = {
 
 const cellSx = { color: C.text, fontSize: 12, borderBottom: '1px solid ' + C.border, py: 0.55 };
 const headSx = { color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, py: 0.7, whiteSpace: 'nowrap' };
-const usd = (n: number) => n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 });
+const usd = (n: number) => Math.ceil(n).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
 const inputSx = {
   '& .MuiOutlinedInput-root': {
     bgcolor: C.surface, color: C.text, fontSize: 12.5,
@@ -359,7 +359,8 @@ const CatalogManagerPanel: React.FC = () => {
                         bgcolor: '#00c8ff', color: '#06151c',
                         textTransform: 'none', fontWeight: 700, fontSize: 11.5,
                         px: 1.5, borderRadius: '8px', minWidth: 0,
-                        '&:hover': { bgcolor: '#33d4ff' },
+                        border: '1px solid transparent', transition: 'all .15s',
+                        '&:hover': { bgcolor: 'transparent', color: '#00c8ff', border: '1px solid #00c8ff', boxShadow: '0 0 10px rgba(0,200,255,0.35)' },
                       }}
                     >
                       Generate Catalog No.
@@ -456,7 +457,7 @@ const CatalogManagerPanel: React.FC = () => {
         open={!!builderFor}
         component={builderFor}
         onClose={() => setBuilderFor(null)}
-        onSaved={() => { setInfo('Catalog number applied'); search(); }}
+        onSaved={() => { setInfo('Catalog number saved'); search(); }}
       />
 
       {/* Add/Edit dialog */}
