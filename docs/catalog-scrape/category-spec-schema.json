@@ -1,0 +1,494 @@
+{
+  "CIRCUIT BREAKER": {
+    "specFields": [
+      {"key": "manufacturer",         "label": "Manufacturer",              "unit": "",      "required": true},
+      {"key": "catalogNumber",        "label": "Catalog Number",            "unit": "",      "required": true},
+      {"key": "series",               "label": "Series / Frame Family",     "unit": "",      "required": true},
+      {"key": "frameModel",           "label": "Frame Model",               "unit": "",      "required": true},
+      {"key": "poles",                "label": "Number of Poles",           "unit": "",      "required": true},
+      {"key": "ratedCurrentA",        "label": "Rated Current",             "unit": "A",     "required": true},
+      {"key": "interruptingKA",       "label": "Interrupting Capacity",     "unit": "kA",    "required": true},
+      {"key": "voltageRating",        "label": "Voltage Rating",            "unit": "V",     "required": true},
+      {"key": "tripUnitType",         "label": "Trip Unit Type",            "unit": "",      "required": true},
+      {"key": "protectionFunctions",  "label": "Protection Functions",      "unit": "",      "required": false},
+      {"key": "mounting",             "label": "Mounting Style",            "unit": "",      "required": true},
+      {"key": "applicationType",      "label": "Application Type",          "unit": "",      "required": true},
+      {"key": "sccr",                 "label": "SCCR Contribution",         "unit": "kA",    "required": false},
+      {"key": "ulListing",            "label": "UL Listing (UL 489)",       "unit": "",      "required": true}
+    ],
+    "manufacturers": ["Eaton", "Square D / Schneider Electric", "Siemens", "ABB", "GE / Eaton"],
+    "sources": [
+      {"name": "AutomationDirect",    "baseUrl": "https://www.automationdirect.com", "priceVisible": true},
+      {"name": "Grainger",            "baseUrl": "https://www.grainger.com",         "priceVisible": true},
+      {"name": "Zoro",                "baseUrl": "https://www.zoro.com",             "priceVisible": true},
+      {"name": "Galco Industrial",    "baseUrl": "https://www.galco.com",            "priceVisible": true},
+      {"name": "Eaton (specs only)",  "baseUrl": "https://www.eaton.com",            "priceVisible": false}
+    ]
+  },
+
+  "CB ACCESSORIES": {
+    "specFields": [
+      {"key": "manufacturer",         "label": "Manufacturer",              "unit": "",      "required": true},
+      {"key": "catalogNumber",        "label": "Catalog Number",            "unit": "",      "required": true},
+      {"key": "accessoryType",        "label": "Accessory Type",            "unit": "",      "required": true},
+      {"key": "frameCompatibility",   "label": "Compatible Frame(s)",       "unit": "",      "required": true},
+      {"key": "voltageRating",        "label": "Coil / Rated Voltage",      "unit": "V",     "required": false},
+      {"key": "contactConfiguration", "label": "Contact Configuration",     "unit": "",      "required": false},
+      {"key": "wireRange",            "label": "Wire Range (lug kit)",      "unit": "AWG",   "required": false}
+    ],
+    "manufacturers": ["Eaton", "Square D / Schneider Electric", "Siemens", "ABB"],
+    "sources": [
+      {"name": "Grainger",            "baseUrl": "https://www.grainger.com",         "priceVisible": true},
+      {"name": "Zoro",                "baseUrl": "https://www.zoro.com",             "priceVisible": true},
+      {"name": "Galco Industrial",    "baseUrl": "https://www.galco.com",            "priceVisible": true}
+    ]
+  },
+
+  "ENCLOSURE": {
+    "specFields": [
+      {"key": "manufacturer",         "label": "Manufacturer",              "unit": "",      "required": true},
+      {"key": "catalogNumber",        "label": "Catalog Number",            "unit": "",      "required": true},
+      {"key": "series",               "label": "Series",                    "unit": "",      "required": false},
+      {"key": "nemaRating",           "label": "NEMA Rating",               "unit": "",      "required": true},
+      {"key": "material",             "label": "Material",                  "unit": "",      "required": true},
+      {"key": "finish",               "label": "Finish / Color",            "unit": "",      "required": false},
+      {"key": "widthIn",              "label": "Width",                     "unit": "in",    "required": true},
+      {"key": "heightIn",             "label": "Height",                    "unit": "in",    "required": true},
+      {"key": "depthIn",              "label": "Depth",                     "unit": "in",    "required": true},
+      {"key": "mounting",             "label": "Mounting Style",            "unit": "",      "required": true},
+      {"key": "ulListing",            "label": "UL Listing (UL 50/508A)",   "unit": "",      "required": true}
+    ],
+    "manufacturers": ["nVent Hoffman", "Saginaw Control & Engineering", "Rittal", "Wiegmann (nVent)", "Hammond"],
+    "sources": [
+      {"name": "Zoro",                "baseUrl": "https://www.zoro.com",             "priceVisible": true},
+      {"name": "Grainger",            "baseUrl": "https://www.grainger.com",         "priceVisible": true},
+      {"name": "RSP Supply",          "baseUrl": "https://rspsupply.com",            "priceVisible": true},
+      {"name": "Amazon",              "baseUrl": "https://www.amazon.com",           "priceVisible": true}
+    ]
+  },
+
+  "BUSSING": {
+    "specFields": [
+      {"key": "manufacturer",         "label": "Manufacturer / Supplier",   "unit": "",      "required": true},
+      {"key": "catalogNumber",        "label": "Catalog Number / Part",     "unit": "",      "required": false},
+      {"key": "material",             "label": "Material",                  "unit": "",      "required": true},
+      {"key": "wireType",             "label": "Conductor Type / Temper",   "unit": "",      "required": false},
+      {"key": "crossSectionIn",       "label": "Cross Section (W×T)",       "unit": "in",    "required": true},
+      {"key": "ratedCurrentA",        "label": "Rated Current (continuous)","unit": "A",     "required": true},
+      {"key": "busBarLengthFt",       "label": "Bar Length",                "unit": "ft",    "required": false},
+      {"key": "holePattern",          "label": "Hole Pattern / Spacing",    "unit": "in",    "required": false},
+      {"key": "ulRecognized",         "label": "UL Recognized",             "unit": "",      "required": false}
+    ],
+    "manufacturers": ["Storm Power Components", "nVent ERIFLEX", "Online Metals (distributor)", "Metals Depot (distributor)"],
+    "sources": [
+      {"name": "Online Metals",       "baseUrl": "https://www.onlinemetals.com",     "priceVisible": true},
+      {"name": "Metals Depot",        "baseUrl": "https://www.metalsdepot.com",      "priceVisible": true},
+      {"name": "Grainger",            "baseUrl": "https://www.grainger.com",         "priceVisible": true},
+      {"name": "Storm Power (RFQ)",   "baseUrl": "https://stormpowercomponents.com", "priceVisible": false}
+    ]
+  },
+
+  "CU": {
+    "specFields": [
+      {"key": "manufacturer",         "label": "Manufacturer / Supplier",   "unit": "",      "required": true},
+      {"key": "catalogNumber",        "label": "Catalog Number / Part",     "unit": "",      "required": false},
+      {"key": "material",             "label": "Alloy (C110 copper)",       "unit": "",      "required": true},
+      {"key": "awgSize",              "label": "AWG Size or Bar Dimensions","unit": "AWG",   "required": true},
+      {"key": "crossSectionMM2",      "label": "Cross Section",             "unit": "mm2",   "required": false},
+      {"key": "ratedCurrentA",        "label": "Rated Current (continuous)","unit": "A",     "required": false},
+      {"key": "lengthFt",             "label": "Length",                    "unit": "ft",    "required": false},
+      {"key": "finish",               "label": "Finish (bare / tin-plated)","unit": "",      "required": false},
+      {"key": "form",                 "label": "Form (bar / rod / strip)",  "unit": "",      "required": true}
+    ],
+    "manufacturers": ["Online Metals (distributor)", "Storm Power Components", "nVent ERICO (ground bars)"],
+    "sources": [
+      {"name": "Online Metals",       "baseUrl": "https://www.onlinemetals.com",     "priceVisible": true},
+      {"name": "Grainger",            "baseUrl": "https://www.grainger.com",         "priceVisible": true},
+      {"name": "Zoro",                "baseUrl": "https://www.zoro.com",             "priceVisible": true}
+    ]
+  },
+
+  "GLASTIC": {
+    "specFields": [
+      {"key": "manufacturer",         "label": "Manufacturer",              "unit": "",      "required": true},
+      {"key": "catalogNumber",        "label": "Catalog Number / Grade",    "unit": "",      "required": true},
+      {"key": "material",             "label": "Material (GPO-3)",          "unit": "",      "required": true},
+      {"key": "grade",                "label": "Laminate Grade",            "unit": "",      "required": true},
+      {"key": "thicknessIn",          "label": "Thickness",                 "unit": "in",    "required": true},
+      {"key": "widthIn",              "label": "Width",                     "unit": "in",    "required": false},
+      {"key": "lengthIn",             "label": "Length",                    "unit": "in",    "required": false},
+      {"key": "color",                "label": "Color",                     "unit": "",      "required": false},
+      {"key": "dielectricStrength",   "label": "Dielectric Strength",       "unit": "V/mil", "required": false},
+      {"key": "flameRating",          "label": "Flame Rating (UL 94)",      "unit": "",      "required": true},
+      {"key": "temperatureIndexC",    "label": "Temperature Index",         "unit": "°C",    "required": false},
+      {"key": "form",                 "label": "Form (sheet / rod / part)", "unit": "",      "required": true},
+      {"key": "ulRecognized",         "label": "UL Recognized",             "unit": "",      "required": false}
+    ],
+    "manufacturers": ["Rochling (Glastic)", "Curbell Plastics (distributor)", "Piedmont Plastics (distributor)", "FPI Industries", "Switcher Electric"],
+    "sources": [
+      {"name": "Curbell Plastics",    "baseUrl": "https://www.curbellplastics.com",  "priceVisible": true},
+      {"name": "Piedmont Plastics",   "baseUrl": "https://www.piedmontplastics.com", "priceVisible": true},
+      {"name": "McMaster-Carr",       "baseUrl": "https://www.mcmaster.com",         "priceVisible": true},
+      {"name": "Rochling (RFQ)",      "baseUrl": "https://www.rochling.com",         "priceVisible": false}
+    ]
+  },
+
+  "CAMLOCK": {
+    "specFields": [
+      {"key": "manufacturer",         "label": "Manufacturer",              "unit": "",      "required": true},
+      {"key": "catalogNumber",        "label": "Catalog Number",            "unit": "",      "required": true},
+      {"key": "series",               "label": "Series (e.g. Series 16)",   "unit": "",      "required": true},
+      {"key": "gender",               "label": "Gender (male / female)",    "unit": "",      "required": true},
+      {"key": "style",                "label": "Style (inline / panel)",    "unit": "",      "required": true},
+      {"key": "ratedCurrentA",        "label": "Amp Rating",                "unit": "A",     "required": true},
+      {"key": "wireRange",            "label": "Wire Range",                "unit": "AWG",   "required": true},
+      {"key": "voltageRating",        "label": "Voltage Rating",            "unit": "V",     "required": true},
+      {"key": "color",                "label": "Color / Phase",             "unit": "",      "required": true},
+      {"key": "material",             "label": "Body / Contact Material",   "unit": "",      "required": false},
+      {"key": "nemaRating",           "label": "NEMA Rating",               "unit": "",      "required": false},
+      {"key": "ulListing",            "label": "UL Listing (UL 1682)",      "unit": "",      "required": true},
+      {"key": "csaListing",           "label": "CSA Listed",                "unit": "",      "required": false}
+    ],
+    "manufacturers": ["Eaton Crouse-Hinds (Cam-Lok)", "Marinco", "Leviton", "Hubbell", "Ericson Manufacturing"],
+    "sources": [
+      {"name": "HomElectrical",       "baseUrl": "https://www.homelectrical.com",    "priceVisible": true},
+      {"name": "ATI Electrical",      "baseUrl": "https://atielectrical.com",        "priceVisible": true},
+      {"name": "Wire & Supply",       "baseUrl": "https://www.wireandsupply.com",    "priceVisible": true},
+      {"name": "Zoro",                "baseUrl": "https://www.zoro.com",             "priceVisible": true},
+      {"name": "Grainger",            "baseUrl": "https://www.grainger.com",         "priceVisible": true}
+    ]
+  },
+
+  "SPD": {
+    "specFields": [
+      {"key": "manufacturer",         "label": "Manufacturer",              "unit": "",      "required": true},
+      {"key": "catalogNumber",        "label": "Catalog Number",            "unit": "",      "required": true},
+      {"key": "series",               "label": "Series",                    "unit": "",      "required": false},
+      {"key": "spdType",              "label": "SPD Type (1 / 2 / 1+2)",   "unit": "",      "required": true},
+      {"key": "voltageRating",        "label": "Voltage System",            "unit": "V",     "required": true},
+      {"key": "maxContinuousVoltage", "label": "MCOV",                      "unit": "V",     "required": true},
+      {"key": "nominalDischargeKA",   "label": "Nominal Discharge Current (In)", "unit": "kA", "required": true},
+      {"key": "maxSurgeCurrentKA",    "label": "Max Surge Current (Imax)", "unit": "kA",   "required": true},
+      {"key": "protectionModes",      "label": "Protection Modes",          "unit": "",      "required": true},
+      {"key": "sccr",                 "label": "SCCR",                      "unit": "kA",    "required": true},
+      {"key": "mounting",             "label": "Mounting",                  "unit": "",      "required": true},
+      {"key": "nemaRating",           "label": "NEMA Rating",               "unit": "",      "required": false},
+      {"key": "indicatorType",        "label": "Status Indicator",          "unit": "",      "required": false},
+      {"key": "ulListing",            "label": "UL Listing (UL 1449 4th)", "unit": "",      "required": true}
+    ],
+    "manufacturers": ["Eaton", "Siemens", "Citel", "Hubbell", "ABB"],
+    "sources": [
+      {"name": "Grainger",            "baseUrl": "https://www.grainger.com",         "priceVisible": true},
+      {"name": "Zoro",                "baseUrl": "https://www.zoro.com",             "priceVisible": true},
+      {"name": "Newark",              "baseUrl": "https://www.newark.com",           "priceVisible": true},
+      {"name": "Eaton (specs only)",  "baseUrl": "https://www.eaton.com",            "priceVisible": false}
+    ]
+  },
+
+  "ATS": {
+    "specFields": [
+      {"key": "manufacturer",         "label": "Manufacturer",              "unit": "",      "required": true},
+      {"key": "catalogNumber",        "label": "Catalog Number",            "unit": "",      "required": true},
+      {"key": "series",               "label": "Series",                    "unit": "",      "required": true},
+      {"key": "ratedCurrentA",        "label": "Rated Current",             "unit": "A",     "required": true},
+      {"key": "poles",                "label": "Poles",                     "unit": "",      "required": true},
+      {"key": "voltageRating",        "label": "Voltage System",            "unit": "V",     "required": true},
+      {"key": "transferType",         "label": "Transfer Type",             "unit": "",      "required": true},
+      {"key": "controllerType",       "label": "Controller Type",           "unit": "",      "required": false},
+      {"key": "serviceEntrance",      "label": "Service Entrance Rated",    "unit": "",      "required": true},
+      {"key": "bypassIsolation",      "label": "Bypass / Isolation",        "unit": "",      "required": false},
+      {"key": "nemaRating",           "label": "NEMA Rating",               "unit": "",      "required": true},
+      {"key": "mounting",             "label": "Mounting (standalone/integral)", "unit": "", "required": true},
+      {"key": "transferTimeMs",       "label": "Transfer Time",             "unit": "ms",    "required": false},
+      {"key": "ulListing",            "label": "UL Listing (UL 1008)",      "unit": "",      "required": true}
+    ],
+    "manufacturers": ["ASCO Power Technologies", "Eaton", "Russelectric", "GE Zenith (ABB)", "Cummins PowerCommand"],
+    "sources": [
+      {"name": "Grainger",            "baseUrl": "https://www.grainger.com",         "priceVisible": true},
+      {"name": "Pioneer Critical Power", "baseUrl": "https://www.pioneercriticalpower.com", "priceVisible": true},
+      {"name": "Zoro",                "baseUrl": "https://www.zoro.com",             "priceVisible": true},
+      {"name": "ASCO (specs only)",   "baseUrl": "https://www.ascopower.com",        "priceVisible": false}
+    ]
+  },
+
+  "CONTROLS": {
+    "specFields": [
+      {"key": "manufacturer",         "label": "Manufacturer",              "unit": "",      "required": true},
+      {"key": "catalogNumber",        "label": "Catalog Number",            "unit": "",      "required": true},
+      {"key": "series",               "label": "Series",                    "unit": "",      "required": false},
+      {"key": "controlType",          "label": "Control Type",              "unit": "",      "required": true},
+      {"key": "operatorSize",         "label": "Operator Size",             "unit": "mm",    "required": true},
+      {"key": "mounting",             "label": "Mounting",                  "unit": "",      "required": true},
+      {"key": "poles",                "label": "Contact Configuration",     "unit": "",      "required": true},
+      {"key": "ratedCurrentA",        "label": "Contact Current Rating",    "unit": "A",     "required": true},
+      {"key": "voltageRating",        "label": "Voltage Rating",            "unit": "V",     "required": true},
+      {"key": "ipRating",             "label": "IP Rating",                 "unit": "",      "required": false},
+      {"key": "color",                "label": "Color",                     "unit": "",      "required": true},
+      {"key": "illuminated",          "label": "Illuminated",               "unit": "",      "required": false},
+      {"key": "ulListing",            "label": "UL Listing (UL 508)",       "unit": "",      "required": true}
+    ],
+    "manufacturers": ["Schneider Electric Harmony", "Eaton M22", "IDEC HW series", "Allen-Bradley 800T/800F", "AutomationDirect GCX"],
+    "sources": [
+      {"name": "AutomationDirect",    "baseUrl": "https://www.automationdirect.com", "priceVisible": true},
+      {"name": "Grainger",            "baseUrl": "https://www.grainger.com",         "priceVisible": true},
+      {"name": "Newark",              "baseUrl": "https://www.newark.com",           "priceVisible": true},
+      {"name": "RS Components",       "baseUrl": "https://www.rsdelivers.com",       "priceVisible": true}
+    ]
+  },
+
+  "CURRENT TRANSFORMER": {
+    "specFields": [
+      {"key": "manufacturer",         "label": "Manufacturer",              "unit": "",      "required": true},
+      {"key": "catalogNumber",        "label": "Catalog Number",            "unit": "",      "required": true},
+      {"key": "series",               "label": "Series / Model Family",     "unit": "",      "required": false},
+      {"key": "ctRatio",              "label": "CT Ratio (Primary:Secondary)", "unit": "",   "required": true},
+      {"key": "accuracyClass",        "label": "Accuracy Class",            "unit": "",      "required": true},
+      {"key": "burden",               "label": "Burden (B-class)",          "unit": "",      "required": true},
+      {"key": "style",                "label": "Window Type",               "unit": "",      "required": true},
+      {"key": "windowSizeIn",         "label": "Window / Aperture Size",    "unit": "in",    "required": true},
+      {"key": "ratedCurrentA",        "label": "Primary Rated Current",     "unit": "A",     "required": true},
+      {"key": "ratingFactor",         "label": "Rating Factor (RF)",        "unit": "",      "required": false},
+      {"key": "mounting",             "label": "Mounting Style",            "unit": "",      "required": true},
+      {"key": "ulListing",            "label": "UL Listed / IEEE C57.13",   "unit": "",      "required": true}
+    ],
+    "manufacturers": ["Flex-Core", "CR Magnetics", "Eaton", "Crompton (ABB)", "GE Grid Solutions"],
+    "sources": [
+      {"name": "Automation Systems Interconnect", "baseUrl": "https://www.asi-ez.com", "priceVisible": true},
+      {"name": "Galco Industrial",    "baseUrl": "https://www.galco.com",            "priceVisible": true},
+      {"name": "Newark",              "baseUrl": "https://www.newark.com",           "priceVisible": true},
+      {"name": "Grainger",            "baseUrl": "https://www.grainger.com",         "priceVisible": true},
+      {"name": "Flex-Core (specs only)", "baseUrl": "https://www.flex-core.com",    "priceVisible": false}
+    ]
+  },
+
+  "VOLTAGE TRANSFORMER": {
+    "specFields": [
+      {"key": "manufacturer",         "label": "Manufacturer",              "unit": "",      "required": true},
+      {"key": "catalogNumber",        "label": "Catalog Number",            "unit": "",      "required": true},
+      {"key": "series",               "label": "Series",                    "unit": "",      "required": false},
+      {"key": "transformerType",      "label": "Transformer Type (CPT/VT)", "unit": "",      "required": true},
+      {"key": "voltageRating",        "label": "Primary Voltage",           "unit": "V",     "required": true},
+      {"key": "secondaryVoltage",     "label": "Secondary Voltage",         "unit": "V",     "required": true},
+      {"key": "kvaRating",            "label": "kVA Rating",                "unit": "kVA",   "required": false},
+      {"key": "vaRating",             "label": "VA Rating",                 "unit": "VA",    "required": false},
+      {"key": "ptRatio",              "label": "PT Ratio (for VT)",         "unit": "",      "required": false},
+      {"key": "accuracyClass",        "label": "Accuracy Class (for VT)",   "unit": "",      "required": false},
+      {"key": "phases",               "label": "Phases",                    "unit": "",      "required": true},
+      {"key": "mounting",             "label": "Mounting",                  "unit": "",      "required": true},
+      {"key": "ulListing",            "label": "UL Listing (UL 506/1561)",  "unit": "",      "required": true}
+    ],
+    "manufacturers": ["Square D / Schneider (9070 series)", "Eaton", "Acme Electric / Hubbell", "Hammond Power Solutions", "Larson Electronics"],
+    "sources": [
+      {"name": "Grainger",            "baseUrl": "https://www.grainger.com",         "priceVisible": true},
+      {"name": "Zoro",                "baseUrl": "https://www.zoro.com",             "priceVisible": true},
+      {"name": "Larson Electronics",  "baseUrl": "https://www.larsonelectronics.com","priceVisible": true},
+      {"name": "AutomationDirect",    "baseUrl": "https://www.automationdirect.com", "priceVisible": true},
+      {"name": "Newark",              "baseUrl": "https://www.newark.com",           "priceVisible": true}
+    ]
+  },
+
+  "CT / VT / CPT": {
+    "specFields": [
+      {"key": "instrumentType",       "label": "Instrument Type (CT/VT/CPT)", "unit": "",   "required": true},
+      {"key": "manufacturer",         "label": "Manufacturer",              "unit": "",      "required": true},
+      {"key": "catalogNumber",        "label": "Catalog Number",            "unit": "",      "required": true},
+      {"key": "ctRatio",              "label": "CT Ratio",                  "unit": "",      "required": false},
+      {"key": "accuracyClass",        "label": "Accuracy Class",            "unit": "",      "required": false},
+      {"key": "burden",               "label": "Burden",                    "unit": "",      "required": false},
+      {"key": "style",                "label": "Window / Enclosure Type",   "unit": "",      "required": false},
+      {"key": "windowSizeIn",         "label": "Window Size",               "unit": "in",    "required": false},
+      {"key": "ratedCurrentA",        "label": "Primary Current Rating",    "unit": "A",     "required": false},
+      {"key": "voltageRating",        "label": "Primary Voltage",           "unit": "V",     "required": false},
+      {"key": "kvaRating",            "label": "kVA Rating (CPT)",          "unit": "kVA",   "required": false},
+      {"key": "transformerType",      "label": "Transformer Sub-type",      "unit": "",      "required": false},
+      {"key": "ulListing",            "label": "UL / IEEE Listing",         "unit": "",      "required": true}
+    ],
+    "manufacturers": ["Flex-Core", "CR Magnetics", "Eaton", "Square D / Schneider", "Hammond Power Solutions"],
+    "sources": [
+      {"name": "Grainger",            "baseUrl": "https://www.grainger.com",         "priceVisible": true},
+      {"name": "Newark",              "baseUrl": "https://www.newark.com",           "priceVisible": true},
+      {"name": "Zoro",                "baseUrl": "https://www.zoro.com",             "priceVisible": true}
+    ]
+  },
+
+  "POWER SUPPLY": {
+    "specFields": [
+      {"key": "manufacturer",         "label": "Manufacturer",              "unit": "",      "required": true},
+      {"key": "catalogNumber",        "label": "Catalog Number",            "unit": "",      "required": true},
+      {"key": "series",               "label": "Series",                    "unit": "",      "required": false},
+      {"key": "voltageRating",        "label": "Output Voltage",            "unit": "VDC",   "required": true},
+      {"key": "ratedCurrentA",        "label": "Output Current",            "unit": "A",     "required": true},
+      {"key": "outputPowerW",         "label": "Output Power",              "unit": "W",     "required": true},
+      {"key": "inputVoltageRange",    "label": "Input Voltage Range",       "unit": "VAC",   "required": true},
+      {"key": "inputPhases",          "label": "Input Phases",              "unit": "",      "required": true},
+      {"key": "mounting",             "label": "Mounting (DIN / panel)",    "unit": "",      "required": true},
+      {"key": "protectionFeatures",   "label": "Protection Features",       "unit": "",      "required": false},
+      {"key": "efficiency",           "label": "Efficiency (typical)",      "unit": "%",     "required": false},
+      {"key": "operatingTempC",       "label": "Operating Temp Range",      "unit": "°C",    "required": false},
+      {"key": "approvals",            "label": "Approvals (UL/cUL/CE)",     "unit": "",      "required": true}
+    ],
+    "manufacturers": ["Phoenix Contact (QUINT/STEP)", "PULS", "Sola/Hevi-Duty", "Siemens (SITOP)", "Allen-Bradley 1606-XLP", "AutomationDirect PSP"],
+    "sources": [
+      {"name": "AutomationDirect",    "baseUrl": "https://www.automationdirect.com", "priceVisible": true},
+      {"name": "Grainger",            "baseUrl": "https://www.grainger.com",         "priceVisible": true},
+      {"name": "Amazon",              "baseUrl": "https://www.amazon.com",           "priceVisible": true},
+      {"name": "Newark",              "baseUrl": "https://www.newark.com",           "priceVisible": true},
+      {"name": "RS Components",       "baseUrl": "https://www.rsdelivers.com",       "priceVisible": true}
+    ]
+  },
+
+  "LUGS": {
+    "specFields": [
+      {"key": "manufacturer",         "label": "Manufacturer",              "unit": "",      "required": true},
+      {"key": "catalogNumber",        "label": "Catalog Number",            "unit": "",      "required": true},
+      {"key": "lugType",              "label": "Lug / Connection Type",     "unit": "",      "required": true},
+      {"key": "connectionType",       "label": "Mechanical vs Compression", "unit": "",      "required": true},
+      {"key": "material",             "label": "Conductor Material Rating", "unit": "",      "required": true},
+      {"key": "wireRange",            "label": "Wire Range",                "unit": "AWG/kcmil", "required": true},
+      {"key": "numBarrels",           "label": "Number of Barrels / Taps",  "unit": "",      "required": false},
+      {"key": "holes",                "label": "Number of Mounting Holes",  "unit": "",      "required": true},
+      {"key": "holeDiameterIn",       "label": "Hole Diameter",             "unit": "in",    "required": false},
+      {"key": "holeSpacingIn",        "label": "Hole Spacing (C-C)",        "unit": "in",    "required": false},
+      {"key": "tongueThicknessIn",    "label": "Tongue Thickness",          "unit": "in",    "required": false},
+      {"key": "voltageRating",        "label": "Voltage Rating",            "unit": "V",     "required": true},
+      {"key": "ulListing",            "label": "UL Listing (UL 486A-486B)", "unit": "",      "required": true},
+      {"key": "csaListing",           "label": "CSA Listed",                "unit": "",      "required": false}
+    ],
+    "manufacturers": ["Burndy (Hubbell)", "Ilsco", "Penn-Union", "Panduit", "Thomas & Betts (ABB)", "nVent ERIFLEX"],
+    "sources": [
+      {"name": "AutomationDirect",    "baseUrl": "https://www.automationdirect.com", "priceVisible": true},
+      {"name": "Grainger",            "baseUrl": "https://www.grainger.com",         "priceVisible": true},
+      {"name": "Zoro",                "baseUrl": "https://www.zoro.com",             "priceVisible": true},
+      {"name": "Conversions Tech",    "baseUrl": "https://conversionstech.com",      "priceVisible": true}
+    ]
+  },
+
+  "TERMINALS": {
+    "specFields": [
+      {"key": "manufacturer",         "label": "Manufacturer",              "unit": "",      "required": true},
+      {"key": "catalogNumber",        "label": "Catalog Number",            "unit": "",      "required": true},
+      {"key": "series",               "label": "Series",                    "unit": "",      "required": true},
+      {"key": "connectionType",       "label": "Connection Type",           "unit": "",      "required": true},
+      {"key": "wireRange",            "label": "Wire Range",                "unit": "AWG",   "required": true},
+      {"key": "ratedCurrentA",        "label": "Current Rating",            "unit": "A",     "required": true},
+      {"key": "voltageRating",        "label": "Voltage Rating",            "unit": "V",     "required": true},
+      {"key": "mounting",             "label": "Mounting (DIN 35mm rail)",  "unit": "",      "required": true},
+      {"key": "color",                "label": "Body Color",                "unit": "",      "required": false},
+      {"key": "termWidth",            "label": "Terminal Pitch",            "unit": "mm",    "required": false},
+      {"key": "poles",                "label": "Pole Count",                "unit": "",      "required": false},
+      {"key": "ulListing",            "label": "UL Listing (UL 508/1059)",  "unit": "",      "required": true}
+    ],
+    "manufacturers": ["Phoenix Contact (PT/PTFIX/UK)", "Wago (281/282)", "ABB Entrelec (SNK)", "Marathon Special Products", "Weidmuller", "AutomationDirect DINterm"],
+    "sources": [
+      {"name": "AutomationDirect",    "baseUrl": "https://www.automationdirect.com", "priceVisible": true},
+      {"name": "Grainger",            "baseUrl": "https://www.grainger.com",         "priceVisible": true},
+      {"name": "Newark",              "baseUrl": "https://www.newark.com",           "priceVisible": true},
+      {"name": "RS Components",       "baseUrl": "https://www.rsdelivers.com",       "priceVisible": true}
+    ]
+  },
+
+  "WIRE CABLE": {
+    "specFields": [
+      {"key": "manufacturer",         "label": "Manufacturer",              "unit": "",      "required": true},
+      {"key": "catalogNumber",        "label": "Catalog Number / SKU",      "unit": "",      "required": true},
+      {"key": "wireType",             "label": "Wire Type (THHN/THWN-2)",   "unit": "",      "required": true},
+      {"key": "awgSize",              "label": "AWG Size or kcmil",         "unit": "AWG",   "required": true},
+      {"key": "material",             "label": "Conductor Material",        "unit": "",      "required": true},
+      {"key": "strandCount",          "label": "Strand Count",              "unit": "",      "required": false},
+      {"key": "voltageRating",        "label": "Voltage Rating",            "unit": "V",     "required": true},
+      {"key": "tempRating",           "label": "Temperature Rating",        "unit": "°C",    "required": true},
+      {"key": "color",                "label": "Insulation Color",          "unit": "",      "required": true},
+      {"key": "ulListing",            "label": "UL Listing (UL 83 / UL 44)","unit": "",      "required": true}
+    ],
+    "manufacturers": ["Southwire (SIMpull)", "Encore Wire", "General Cable / Prysmian", "Belden (control wire)"],
+    "sources": [
+      {"name": "Grainger",            "baseUrl": "https://www.grainger.com",         "priceVisible": true},
+      {"name": "Zoro",                "baseUrl": "https://www.zoro.com",             "priceVisible": true},
+      {"name": "Wire & Supply",       "baseUrl": "https://www.wireandsupply.com",    "priceVisible": true},
+      {"name": "Southwire Store",     "baseUrl": "https://www.southwire.com",        "priceVisible": true}
+    ]
+  },
+
+  "CONDUIT": {
+    "specFields": [
+      {"key": "manufacturer",         "label": "Manufacturer",              "unit": "",      "required": true},
+      {"key": "catalogNumber",        "label": "Catalog Number",            "unit": "",      "required": false},
+      {"key": "style",                "label": "Conduit Type",              "unit": "",      "required": true},
+      {"key": "tradeSizeIn",          "label": "Trade Size",                "unit": "in",    "required": true},
+      {"key": "material",             "label": "Material",                  "unit": "",      "required": true},
+      {"key": "lengthFt",             "label": "Length per Stick",          "unit": "ft",    "required": true},
+      {"key": "ulListing",            "label": "UL Listing",                "unit": "",      "required": true}
+    ],
+    "manufacturers": ["Allied Tube / Atkore (EMT/IMC)", "Wheatland Tube / Zekelman (EMT)", "Southwire (ENT/FMC)", "Carlon / ABB (PVC)"],
+    "sources": [
+      {"name": "Grainger",            "baseUrl": "https://www.grainger.com",         "priceVisible": true},
+      {"name": "Zoro",                "baseUrl": "https://www.zoro.com",             "priceVisible": true},
+      {"name": "AutomationDirect",    "baseUrl": "https://www.automationdirect.com", "priceVisible": true}
+    ]
+  },
+
+  "HARDWARE": {
+    "specFields": [
+      {"key": "manufacturer",         "label": "Manufacturer / Brand",      "unit": "",      "required": false},
+      {"key": "catalogNumber",        "label": "Part Number",               "unit": "",      "required": true},
+      {"key": "hardwareType",         "label": "Hardware Type",             "unit": "",      "required": true},
+      {"key": "material",             "label": "Material",                  "unit": "",      "required": true},
+      {"key": "threadSize",           "label": "Thread Size",               "unit": "",      "required": false},
+      {"key": "lengthIn",             "label": "Length",                    "unit": "in",    "required": false},
+      {"key": "finish",               "label": "Finish",                    "unit": "",      "required": false},
+      {"key": "quantityPkg",          "label": "Quantity per Package",      "unit": "ea",    "required": false}
+    ],
+    "manufacturers": ["Fastenal", "Grainger (generic)", "McMaster-Carr (generic)", "Panduit (cable management)"],
+    "sources": [
+      {"name": "McMaster-Carr",       "baseUrl": "https://www.mcmaster.com",         "priceVisible": true},
+      {"name": "Grainger",            "baseUrl": "https://www.grainger.com",         "priceVisible": true},
+      {"name": "Zoro",                "baseUrl": "https://www.zoro.com",             "priceVisible": true}
+    ]
+  },
+
+  "SWITCH": {
+    "specFields": [
+      {"key": "manufacturer",         "label": "Manufacturer",              "unit": "",      "required": true},
+      {"key": "catalogNumber",        "label": "Catalog Number",            "unit": "",      "required": true},
+      {"key": "series",               "label": "Series",                    "unit": "",      "required": false},
+      {"key": "style",                "label": "Switch Type",               "unit": "",      "required": true},
+      {"key": "ratedCurrentA",        "label": "Rated Current",             "unit": "A",     "required": true},
+      {"key": "poles",                "label": "Poles",                     "unit": "",      "required": true},
+      {"key": "voltageRating",        "label": "Voltage Rating",            "unit": "V",     "required": true},
+      {"key": "fusedOrNon",           "label": "Fusible / Non-Fusible",     "unit": "",      "required": true},
+      {"key": "fuseClass",            "label": "Fuse Class (if fusible)",   "unit": "",      "required": false},
+      {"key": "nemaRating",           "label": "NEMA Rating",               "unit": "",      "required": true},
+      {"key": "mounting",             "label": "Mounting",                  "unit": "",      "required": true},
+      {"key": "ulListing",            "label": "UL Listing (UL 98)",        "unit": "",      "required": true}
+    ],
+    "manufacturers": ["Eaton (DH/DG series)", "Square D / Schneider (QMB)", "Siemens (HNFC)", "ABB"],
+    "sources": [
+      {"name": "Grainger",            "baseUrl": "https://www.grainger.com",         "priceVisible": true},
+      {"name": "Zoro",                "baseUrl": "https://www.zoro.com",             "priceVisible": true},
+      {"name": "AutomationDirect",    "baseUrl": "https://www.automationdirect.com", "priceVisible": true}
+    ]
+  },
+
+  "LIGHT": {
+    "specFields": [
+      {"key": "manufacturer",         "label": "Manufacturer",              "unit": "",      "required": true},
+      {"key": "catalogNumber",        "label": "Catalog Number",            "unit": "",      "required": true},
+      {"key": "series",               "label": "Series",                    "unit": "",      "required": false},
+      {"key": "operatorSize",         "label": "Operator Size",             "unit": "mm",    "required": true},
+      {"key": "lightType",            "label": "Light Type (LED/incand)",   "unit": "",      "required": true},
+      {"key": "voltageRating",        "label": "Illumination Voltage",      "unit": "V",     "required": true},
+      {"key": "color",                "label": "Lens / Indicator Color",    "unit": "",      "required": true},
+      {"key": "style",                "label": "Lens Style",                "unit": "",      "required": false},
+      {"key": "ipRating",             "label": "IP Rating",                 "unit": "",      "required": false},
+      {"key": "mounting",             "label": "Mounting (panel cutout)",   "unit": "",      "required": true},
+      {"key": "ulListing",            "label": "UL Listing (UL 508)",       "unit": "",      "required": true}
+    ],
+    "manufacturers": ["Schneider Electric Harmony", "Eaton M22", "IDEC HW", "Allen-Bradley 800T", "AutomationDirect GCX"],
+    "sources": [
+      {"name": "AutomationDirect",    "baseUrl": "https://www.automationdirect.com", "priceVisible": true},
+      {"name": "Grainger",            "baseUrl": "https://www.grainger.com",         "priceVisible": true},
+      {"name": "Newark",              "baseUrl": "https://www.newark.com",           "priceVisible": true},
+      {"name": "RS Components",       "baseUrl": "https://www.rsdelivers.com",       "priceVisible": true}
+    ]
+  }
+}
