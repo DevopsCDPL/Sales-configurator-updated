@@ -25,11 +25,13 @@ import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 import SwapHorizRoundedIcon from '@mui/icons-material/SwapHorizRounded';
+import TuneRoundedIcon from '@mui/icons-material/TuneRounded';
 import { configuratorService, ConfiguratorComponent } from '../../services/configuratorService';
 import configuratorV2Service, { FullBoard, ComponentLineRow } from '../../services/configuratorV2Service';
 import PriceSourceDot from '../components/PriceSourceDot';
 import { displayCase, compactSku } from '../lib/displayCase';
 import ComponentPickerDialog from '../components/ComponentPickerDialog';
+import CatalogNumberBuilderDialog from '../components/CatalogNumberBuilderDialog';
 
 const C = {
   bg: '#000000', surface: '#0B0B0D', border: '#1E2235', blue: '#00c8ff',
@@ -61,6 +63,11 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
   const [pickerMode, setPickerMode] = useState<'swap' | 'add'>('add');
   const [pickerCategory, setPickerCategory] = useState<string | null>(null);
   const [swapLine, setSwapLine] = useState<ComponentLineRow | null>(null);
+  const [pickerPickOnly, setPickerPickOnly] = useState(false);
+
+  // Builder (Schneider Part Number Decoder) dialog state
+  const [builderOpen, setBuilderOpen] = useState(false);
+  const [builderComponent, setBuilderComponent] = useState<ConfiguratorComponent | null>(null);
 
   const sections = board.sections;
 
@@ -73,6 +80,7 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
   const openAddPicker = () => {
     setPickerMode('add');
     setPickerCategory(null);
+    setPickerPickOnly(false);
     setSwapLine(null);
     setPickerOpen(true);
   };
@@ -80,7 +88,16 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
   const openSwap = (line: ComponentLineRow) => {
     setPickerMode('swap');
     setPickerCategory(line.category ?? null);
+    setPickerPickOnly(false);
     setSwapLine(line);
+    setPickerOpen(true);
+  };
+
+  const openBuilderPicker = () => {
+    setPickerMode('add');
+    setPickerCategory('CIRCUIT BREAKER');
+    setPickerPickOnly(true);
+    setSwapLine(null);
     setPickerOpen(true);
   };
 
@@ -126,7 +143,12 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
   };
 
   const handlePick = async (c: ConfiguratorComponent, qty: number) => {
-    if (pickerMode === 'swap') {
+    if (pickerPickOnly) {
+      // pickOnly: close picker and open the builder dialog
+      setPickerOpen(false);
+      setBuilderComponent(c);
+      setBuilderOpen(true);
+    } else if (pickerMode === 'swap') {
       await doSwap(c);
     } else {
       await doAdd(c, qty);
@@ -249,6 +271,14 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
                   <Typography sx={{ color: '#CBD5E1', fontSize: 12.5, fontWeight: 700, flex: 1 }}>
                     Auto components — engine-selected from the design (rules editable in Standards)
                   </Typography>
+                  <Button
+                    size="small"
+                    startIcon={<TuneRoundedIcon sx={{ fontSize: 16 }} />}
+                    onClick={openBuilderPicker}
+                    sx={{ color: C.text, textTransform: 'none', fontSize: 12.5, border: '1px solid ' + C.border, bgcolor: C.bg, mr: 1, '&:hover': { borderColor: C.blue } }}
+                  >
+                    Build Schneider breaker
+                  </Button>
                   <Button
                     size="small"
                     startIcon={<AddRoundedIcon sx={{ fontSize: 14 }} />}
@@ -496,13 +526,24 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
         </Box>
       )}
 
-      {/* ── Shared picker dialog (swap + add) ── */}
+      {/* ── Shared picker dialog (swap + add + pickOnly) ── */}
       <ComponentPickerDialog
         open={pickerOpen}
         mode={pickerMode}
         lockedCategory={pickerCategory}
-        onClose={() => { setPickerOpen(false); setSwapLine(null); }}
+        pickOnly={pickerPickOnly}
+        onClose={() => { setPickerOpen(false); setSwapLine(null); setPickerPickOnly(false); }}
         onPick={handlePick}
+      />
+
+      {/* ── Schneider Part Number Decoder (builder) ── */}
+      <CatalogNumberBuilderDialog
+        open={builderOpen}
+        component={builderComponent}
+        switchboardId={switchboardId}
+        onClose={() => setBuilderOpen(false)}
+        onSaved={() => { /* catalog record updated; no line change needed */ }}
+        onAdded={() => { setBuilderOpen(false); refreshLines(); }}
       />
     </Box>
   );

@@ -44,10 +44,17 @@ export interface ComponentPickerDialogProps {
   lockedCategory?: string | null;
   onClose: () => void;
   onPick: (c: ConfiguratorComponent, qty: number) => void | Promise<void>;
+  /**
+   * pickOnly mode — when true the dialog behaves like swap (closes immediately
+   * after pick, no qty column) but calls onPick without performing any add/swap
+   * side-effect itself. Action button label is "Select". Default: undefined ->
+   * existing add/swap behaviour unchanged.
+   */
+  pickOnly?: boolean;
 }
 
 const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
-  open, mode, lockedCategory, onClose, onPick,
+  open, mode, lockedCategory, onClose, onPick, pickOnly,
 }) => {
   const [categories, setCategories] = useState<{ category: string; count: number }[]>([]);
   const [category, setCategory] = useState<string>('');
@@ -126,7 +133,9 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
     setBusyId(c.id);
     try {
       await onPick(c, qty);
-      if (mode === 'add') {
+      if (pickOnly) {
+        // pickOnly: caller takes over; dialog stays open until caller closes it
+      } else if (mode === 'add') {
         // Stay open; show transient confirmation note
         if (noteTimer.current) clearTimeout(noteTimer.current);
         setAddedNote(displayCase(c.name));
@@ -226,7 +235,7 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
                   <TableCell sx={{ ...headSx, bgcolor: C.bg }}>Part #</TableCell>
                   <TableCell sx={{ ...headSx, bgcolor: C.bg }}>Name</TableCell>
                   <TableCell sx={{ ...headSx, bgcolor: C.bg }} align="right">Price</TableCell>
-                  {mode === 'add' && (
+                  {mode === 'add' && !pickOnly && (
                     <TableCell sx={{ ...headSx, bgcolor: C.bg, width: 72 }}>Qty</TableCell>
                   )}
                   <TableCell sx={{ ...headSx, bgcolor: C.bg, width: 90 }} />
@@ -252,7 +261,7 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
                           </Typography>
                         )}
                       </TableCell>
-                      {mode === 'add' && (
+                      {mode === 'add' && !pickOnly && (
                         <TableCell sx={cellSx}>
                           <TextField
                             size="small"
@@ -264,7 +273,16 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
                         </TableCell>
                       )}
                       <TableCell sx={cellSx} align="right">
-                        {mode === 'swap' ? (
+                        {pickOnly ? (
+                          <Button
+                            size="small"
+                            disabled={busyId === r.id}
+                            onClick={() => handlePick(r)}
+                            sx={{ color: C.blue, textTransform: 'none', fontSize: 11, border: '1px solid ' + C.border }}
+                          >
+                            Select
+                          </Button>
+                        ) : mode === 'swap' ? (
                           <Button
                             size="small"
                             disabled={busyId === r.id}
