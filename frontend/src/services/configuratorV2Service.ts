@@ -643,6 +643,19 @@ export const configuratorV2Service = {
     return res.data;
   },
 
+  async enrichCatalog(rows: any[]): Promise<{
+    created: number; updated: number; matched: number;
+    offersAdded: number; errors: number; errorRows: string[];
+  }> {
+    const res = await api.post(`${ROOT}/catalog/enrich-json`, { rows });
+    return res.data;
+  },
+
+  async getEnrichTemplate(): Promise<any> {
+    const res = await api.get(`${ROOT}/catalog/enrich-template`);
+    return res.data;
+  },
+
   async downloadLabourTemplate(): Promise<void> {
     const res = await api.get(`${ROOT}/catalog/labour-template-xlsx`, { responseType: 'blob' });
     const url = URL.createObjectURL(new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));

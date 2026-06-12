@@ -33,6 +33,8 @@ import { vendorService } from '../../services/vendorService';
 import { Vendor } from '../../types';
 import FileDownloadRoundedIcon from '@mui/icons-material/FileDownloadRounded';
 import FileUploadRoundedIcon from '@mui/icons-material/FileUploadRounded';
+import StarRoundedIcon from '@mui/icons-material/StarRounded';
+import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded';
 
 const C = {
   bg: '#000000', surface: '#0B0B0D', border: '#1E2235', blue: '#00c8ff',
@@ -427,11 +429,32 @@ const CatalogManagerPanel: React.FC = () => {
                   <IconButton size="small" onClick={() => remove(r)} sx={{ color: C.sub, p: 0.4, '&:hover': { color: C.red } }}><DeleteOutlineRoundedIcon sx={{ fontSize: 14 }} /></IconButton>
                 </Stack>
 
-                {/* ROW 2 — device class title + SKU chip + status dot */}
+                {/* ROW 2 — thumbnail + device class title + productUrl + SKU chip + quality star + status dot */}
                 <Stack direction="row" alignItems="center" spacing={0.75}>
+                  {(r as any).image_url && (
+                    <Box
+                      component="img"
+                      src={(r as any).image_url}
+                      alt={r.name ?? ''}
+                      sx={{ width: 34, height: 34, objectFit: 'cover', borderRadius: '6px', border: '1px solid #1E2235', flexShrink: 0 }}
+                    />
+                  )}
                   <Typography sx={{ color: '#F0F6FF', fontSize: 17, fontWeight: 800, flex: 1, lineHeight: 1.15 }} noWrap title={r.name ?? deviceTitle}>
                     {deviceTitle}
                   </Typography>
+                  {spec.productUrl && (
+                    <Tooltip title="Open product page">
+                      <Box
+                        component="a"
+                        href={spec.productUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        sx={{ color: C.sub, display: 'flex', alignItems: 'center', '&:hover': { color: C.blue } }}
+                      >
+                        <OpenInNewRoundedIcon sx={{ fontSize: 12 }} />
+                      </Box>
+                    </Tooltip>
+                  )}
                   <Tooltip title={skuFull || 'No part number'}>
                     <Chip
                       label={'SKU: ' + (compactSku(skuFull) || '—')}
@@ -439,6 +462,14 @@ const CatalogManagerPanel: React.FC = () => {
                       sx={{ bgcolor: 'transparent', border: '1px solid #1E2235', color: '#A9B6C9', fontSize: 9.5, height: 18, flexShrink: 0, '& .MuiChip-label': { px: 1 } }}
                     />
                   </Tooltip>
+                  {spec.qualityRating != null && (
+                    <Tooltip title="Quality rating (web-derived)">
+                      <Stack direction="row" alignItems="center" spacing={0.2} sx={{ flexShrink: 0 }}>
+                        <StarRoundedIcon sx={{ fontSize: 10.5, color: C.amber }} />
+                        <Typography sx={{ fontSize: 10.5, color: C.amber, lineHeight: 1 }}>{spec.qualityRating}</Typography>
+                      </Stack>
+                    </Tooltip>
+                  )}
                   <Tooltip title={dotTip}>
                     <Box
                       sx={{
@@ -680,6 +711,29 @@ const CatalogManagerPanel: React.FC = () => {
                   </Box>
                 </>
               )}
+              {/* Vendor offers — read-only v1 */}
+              {(edit.__origSpec?.vendorOffers as any[] | undefined)?.length ? (
+                <Box>
+                  <Typography sx={{ color: C.sub, fontSize: 10.5, fontWeight: 700, mb: 0.5 }}>Vendor offers (web-sourced, read-only)</Typography>
+                  {(edit.__origSpec.vendorOffers as any[]).map((offer: any, idx: number) => (
+                    <Box key={idx} sx={{ fontSize: 11, color: C.sub, display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.3, flexWrap: 'wrap' }}>
+                      {offer.url ? (
+                        <Box component="a" href={offer.url} target="_blank" rel="noopener noreferrer"
+                          sx={{ color: C.blue, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
+                          {offer.vendor}
+                        </Box>
+                      ) : (
+                        <span>{offer.vendor}</span>
+                      )}
+                      <span style={{ color: '#2A3050' }}>—</span>
+                      <span>{offer.sku}</span>
+                      <span style={{ color: '#2A3050' }}>—</span>
+                      <span style={{ color: '#E2E8F0' }}>${typeof offer.price === 'number' ? offer.price.toFixed(2) : offer.price}</span>
+                      {offer.seenAt && <span style={{ color: '#2A3050' }}>— {offer.seenAt}</span>}
+                    </Box>
+                  ))}
+                </Box>
+              ) : null}
               <Typography sx={{ color: C.sub, fontSize: 11.5 }}>Labour hours per unit (drive the quote automatically)</Typography>
               <Stack direction="row" spacing={1}>
                 {BUCKETS.map((b) => (

@@ -1609,4 +1609,174 @@ router.get('/catalog/labour-template-xlsx', wrap(async (req, res) => {
   res.end();
 }));
 
+
+/* == Catalog Enrichment Pipeline =============================================
+ * POST /catalog/enrich-json   -- import scraper JSON array (safe merge)
+ * GET  /catalog/enrich-template -- sample row for reference                */
+const { mergeSpec, decidePrice } = require('../services/configurator/enrichMerge');
+
+router.get('/catalog/enrich-template', wrap(async (_req, res) => {
+  res.json({
+    matchPartNumber: 'LGS-0001',
+    matchName: null,
+    category: 'LUGS',
+    name: 'LUG, MECH, 2-HOLE, 300-800 KCMIL',
+    description: 'Mechanical lug, 2-hole, 300-800 KCMIL wire range',
+    manufacturer: 'Burndy',
+    manufacturerPartNumber: 'KA40U2N',
+    spec: { lugType: 'MECH', holes: 2, wireRange: '300-800 KCMIL' },
+    vendorOffers: [
+      { vendor: 'Platt', sku: 'PLT-KA40U2N', price: 17.47, currency: 'USD',
+        url: 'https://www.platt.com/platt-electric-supply/product/KA40U2N',
+        seenAt: '2026-06-13' },
+    ],
+    listPrice: 21.00,
+    qualityRating: 4,
+    popularity: 3,
+    imageUrl: 'https://cdn.burndy.com/images/KA40U2N.jpg',
+    productUrl: 'https://burndy.com/products/KA40U2N',
+    datasheetUrl: 'https://burndy.com/datasheets/KA40U2N.pdf',
+    model3dUrl: null,
+  });
+}));
+
+router.post('/catalog/enrich-json', wrap(async (req, res) => {
+  const rows = Array.isArray(req.body?.rows) ? req.body.rows : [];
+  if (!rows.length) return res.status(400).json({ error: 'body.rows must be a non-empty array' });
+
+  // Pre-load all existing components for deduplication and SKU generation
+  const allComponents = await models.ConfiguratorComponent.findAll({
+    attributes: ['id', 'part_number', 'name', 'category'],
+  });
+  const existingSkus = new Set(allComponents.map((c) => c.part_number).filter(Boolean));
+
+  // Build prefix -> maxN from existing part_numbers (reuse CATEGORY_PREFIX map)
+  const enrichPrefixCounter = new Map();
+  for (const pn of existingSkus) {
+    const m = /^([A-Z0-9]+)-(\d+)$/.exec(pn);
+    if (!m) continue;
+    const prefix = m[1];
+    const n = parseInt(m[2], 10);
+    if (!enrichPrefixCounter.has(prefix) || enrichPrefixCounter.get(prefix) < n) {
+      enrichPrefixCounter.set(prefix, n);
+    }
+  }
+  const enrichGenerateSku = (category) => {
+    const catUpper = (category || '').trim().toUpperCase();
+    let prefix = CATEGORY_PREFIX[catUpper];
+    if (!prefix) {
+      prefix = catUpper.replace(/[^A-Z0-9]/g, '').slice(0, 4) || 'CMP';
+    }
+    const n = (enrichPrefixCounter.get(prefix) ?? 0) + 1;
+    enrichPrefixCounter.set(prefix, n);
+    return `${prefix}-${String(n).padStart(4, '0')}`;
+  };
+
+  let created = 0, updated = 0, matched = 0, offersAdded = 0, errors = 0;
+  const errorRows = [];
+
+  for (const row of rows) {
+    try {
+      // 1. Match
+      let existing = null;
+
+      if (row.matchPartNumber) {
+        existing = await models.ConfiguratorComponent.findOne({
+          where: { part_number: row.matchPartNumber },
+        });
+      }
+
+      if (!existing) {
+        const nameKey = row.matchName || row.name;
+        if (nameKey && row.category) {
+          existing = await models.ConfiguratorComponent.findOne({
+            where: {
+              category: { [Op.iLike]: row.category },
+              name:     { [Op.iLike]: nameKey },
+            },
+          });
+        }
+      }
+
+      // 2. Create or merge
+      if (!existing) {
+        if (!row.name || !row.category) {
+          errors += 1;
+          if (errorRows.length < 10) errorRows.push(row.name || row.matchPartNumber || '(unknown)');
+          continue;
+        }
+
+        const newSku = enrichGenerateSku(row.category);
+        const newSpec = mergeSpec({}, row);
+        const priceResult = decidePrice('PENDING_RFQ', null, row);
+
+        await models.ConfiguratorComponent.create({
+          part_number:    newSku,
+          name:           row.name,
+          category:       (row.category || '').toUpperCase(),
+          description:    row.description || null,
+          price:          priceResult.price ?? 0,
+          mat_cost:       priceResult.price ?? 0,
+          price_status:   priceResult.price_status,
+          specifications: newSpec,
+          image_url:      row.imageUrl || null,
+          is_active:      true,
+          company_id:     req.companyId ?? null,
+        });
+
+        existingSkus.add(newSku);
+        created += 1;
+        if (Array.isArray(row.vendorOffers) && row.vendorOffers.length) {
+          offersAdded += row.vendorOffers.length;
+        }
+        continue;
+      }
+
+      // 3. Merge into existing
+      matched += 1;
+
+      const existingSpec = existing.specifications || {};
+      const prevOfferCount = Array.isArray(existingSpec.vendorOffers) ? existingSpec.vendorOffers.length : 0;
+
+      const mergedSpec = mergeSpec(existingSpec, row);
+
+      const newOfferCount = Array.isArray(mergedSpec.vendorOffers) ? mergedSpec.vendorOffers.length : 0;
+      offersAdded += Math.max(0, newOfferCount - prevOfferCount);
+
+      const priceResult = decidePrice(
+        existing.price_status ?? 'PENDING_RFQ',
+        existing.price != null ? Number(existing.price) : null,
+        row
+      );
+
+      const patch = { specifications: mergedSpec };
+
+      // description: existing wins if non-empty
+      if (!(existing.description && existing.description.trim())) {
+        if (row.description) patch.description = row.description;
+      }
+
+      // image_url: set only if currently empty
+      if (!existing.image_url && row.imageUrl) {
+        patch.image_url = row.imageUrl;
+      }
+
+      // price: update only if not FIRM
+      if (existing.price_status !== 'FIRM') {
+        patch.price        = priceResult.price ?? existing.price ?? 0;
+        patch.mat_cost     = patch.price;
+        patch.price_status = priceResult.price_status;
+      }
+
+      await existing.update(patch);
+      updated += 1;
+    } catch (e) {
+      errors += 1;
+      if (errorRows.length < 10) errorRows.push(row.name || row.matchPartNumber || '(unknown)');
+    }
+  }
+
+  res.json({ created, updated, matched, offersAdded, errors, errorRows });
+}));
+
 module.exports = router;

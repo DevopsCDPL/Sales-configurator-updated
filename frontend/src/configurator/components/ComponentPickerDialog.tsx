@@ -6,11 +6,12 @@
  */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle,
+  Box, Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle,
   MenuItem, Select, Stack, Table, TableBody, TableCell, TableHead, TableRow,
   TextField, Tooltip, Typography,
 } from '@mui/material';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
+import StarRoundedIcon from '@mui/icons-material/StarRounded';
 import { configuratorService, ConfiguratorComponent } from '../../services/configuratorService';
 import { displayCase, compactSku } from '../lib/displayCase';
 
@@ -65,6 +66,7 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
   const [busyId, setBusyId] = useState<string | null>(null);
   const [addedNote, setAddedNote] = useState<string | null>(null);
   const noteTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [ratingSort, setRatingSort] = useState<'price' | 'rating'>('price');
 
   // Load category counts (add mode only)
   useEffect(() => {
@@ -104,6 +106,7 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
         });
       }
       setResults(rows);
+      setRatingSort('price'); // reset to price on each new search
     } catch {
       setResults([]);
     } finally {
@@ -216,12 +219,45 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
           </Button>
         </Stack>
 
+        {/* Sort toggle (add mode, when any result has a rating) */}
+        {mode === 'add' && !pickOnly && results.some((r) => (r as any).specifications?.qualityRating != null) && (
+          <Stack direction="row" spacing={0.75} alignItems="center" sx={{ mb: 1 }}>
+            <Typography sx={{ color: C.sub, fontSize: 11 }}>Sort:</Typography>
+            {(['price', 'rating'] as const).map((s) => (
+              <Chip
+                key={s}
+                label={s === 'price' ? 'Price' : 'Rating'}
+                size="small"
+                onClick={() => setRatingSort(s)}
+                sx={{
+                  height: 20, fontSize: 11,
+                  bgcolor: ratingSort === s ? 'rgba(0,200,255,0.15)' : 'transparent',
+                  color: ratingSort === s ? C.blue : C.sub,
+                  border: '1px solid ' + (ratingSort === s ? C.blue : C.border),
+                  cursor: 'pointer',
+                  '& .MuiChip-label': { px: 1 },
+                }}
+              />
+            ))}
+          </Stack>
+        )}
         {/* Results */}
         {loading ? (
           <Stack alignItems="center" sx={{ py: 4 }}>
             <CircularProgress size={22} sx={{ color: C.blue }} />
           </Stack>
-        ) : !results.length ? (
+        ) : (() => {
+          const displayResults = mode === 'add' && !pickOnly && ratingSort === 'rating'
+            ? [...results].sort((a, b) => {
+                const ra = (a as any).specifications?.qualityRating ?? 0;
+                const rb = (b as any).specifications?.qualityRating ?? 0;
+                if (rb !== ra) return rb - ra;
+                const pa = Number(a.price) || Infinity;
+                const pb = Number(b.price) || Infinity;
+                return pa - pb;
+              })
+            : results;
+          return !displayResults.length ? (
           <Box sx={{ bgcolor: C.bg, border: '1px dashed ' + C.border, borderRadius: '10px', p: 3, textAlign: 'center' }}>
             <Typography sx={{ color: C.sub, fontSize: 12.5 }}>
               No catalog items match — adjust search or add it in Database → Components.
@@ -235,6 +271,7 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
                   <TableCell sx={{ ...headSx, bgcolor: C.bg }}>Part #</TableCell>
                   <TableCell sx={{ ...headSx, bgcolor: C.bg }}>Name</TableCell>
                   <TableCell sx={{ ...headSx, bgcolor: C.bg }} align="right">Price</TableCell>
+                  <TableCell sx={{ ...headSx, bgcolor: C.bg, width: 56 }} align="center">Rating</TableCell>
                   {mode === 'add' && !pickOnly && (
                     <TableCell sx={{ ...headSx, bgcolor: C.bg, width: 72 }}>Qty</TableCell>
                   )}
@@ -242,7 +279,7 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
                 </TableRow>
               </TableHead>
               <TableBody>
-                {results.map((r) => {
+                {displayResults.map((r) => {
                   const price = Number(r.price ?? (r as any).mat_cost ?? (r as any).material_cost) || 0;
                   return (
                     <TableRow key={r.id} hover>
@@ -260,6 +297,14 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
                             RFQ $
                           </Typography>
                         )}
+                      </TableCell>
+                      <TableCell sx={cellSx} align="center">
+                        {(r as any).specifications?.qualityRating != null ? (
+                          <Stack direction="row" alignItems="center" justifyContent="center" spacing={0.2}>
+                            <StarRoundedIcon sx={{ fontSize: 10, color: C.amber }} />
+                            <Typography sx={{ fontSize: 10.5, color: C.amber }}>{(r as any).specifications.qualityRating}</Typography>
+                          </Stack>
+                        ) : null}
                       </TableCell>
                       {mode === 'add' && !pickOnly && (
                         <TableCell sx={cellSx}>
@@ -309,7 +354,8 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
               </TableBody>
             </Table>
           </Box>
-        )}
+          );
+        })()}
       </DialogContent>
 
       <DialogActions>
