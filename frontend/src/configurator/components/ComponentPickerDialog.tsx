@@ -21,6 +21,7 @@ import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import StarRoundedIcon from '@mui/icons-material/StarRounded';
 import { configuratorService, ConfiguratorComponent } from '../../services/configuratorService';
 import { displayCase, compactSku } from '../lib/displayCase';
+import PriceSourceDot from './PriceSourceDot';
 import CbFilterPanel from './CbFilterPanel';
 
 const C = {
@@ -385,6 +386,7 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
                       </TableCell>
                       <TableCell sx={cellSx}>{displayCase(r.name)}</TableCell>
                       <TableCell sx={cellSx} align="right">
+                        <PriceSourceDot source={(r as any).specifications?.priceSource} />
                         {price > 0 ? (
                           usd(price)
                         ) : (

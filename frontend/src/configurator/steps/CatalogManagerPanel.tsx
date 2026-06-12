@@ -159,10 +159,16 @@ const CatalogManagerPanel: React.FC = () => {
   useEffect(() => { loadCounts(); }, [loadCounts]);
   useEffect(() => { search(); }, [category]); // eslint-disable-line react-hooks/exhaustive-deps
   // CIRCUIT BREAKER tab gets a cascading filter slot; others render all rows.
-  useEffect(() => { setFilteredRows(rows); }, [rows, category]);
+  const [sourceFilter, setSourceFilter] = useState<string>('all');
+  const sourceRows = React.useMemo(() => sourceFilter === 'all'
+    ? rows
+    : rows.filter((r) => sourceFilter === 'none'
+        ? !((r as any).specifications?.priceSource)
+        : (r as any).specifications?.priceSource === sourceFilter), [rows, sourceFilter]);
+  useEffect(() => { setFilteredRows(sourceRows); }, [sourceRows, category]);
   const isCb = (category || '').toUpperCase() === 'CIRCUIT BREAKER';
   const hasFilter = isCb || !!CATEGORY_FILTERS[category];
-  const gridRows = hasFilter ? filteredRows : rows;
+  const gridRows = hasFilter ? filteredRows : sourceRows;
 
   const openEdit = (r?: ConfiguratorComponent, duplicate = false) => {
     if (!r) { setEdit(emptyEdit(category || undefined)); return; }
@@ -377,6 +383,29 @@ const CatalogManagerPanel: React.FC = () => {
         })()}
       </Tabs>
 
+      <Stack direction="row" alignItems="center" spacing={0.75} sx={{ mb: 1 }}>
+        <Typography sx={{ color: C.sub, fontSize: 11 }}>Source:</Typography>
+        {([['all','All',''],['vendor-import','TPS','#00c8ff'],['rfq','RFQ firm','#22C55E'],['web','Web','#D97706'],['manual','Manual','#94A3B8'],['none','Unmarked','#475569']] as [string,string,string][]).map(([val,label,dot]) => (
+          <Chip
+            key={val}
+            size="small"
+            onClick={() => setSourceFilter(val)}
+            label={(
+              <Stack direction="row" alignItems="center" spacing={0.5}>
+                {dot ? <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: dot }} /> : null}
+                <span>{label}</span>
+              </Stack>
+            )}
+            sx={{
+              height: 20, fontSize: 10.5, cursor: 'pointer',
+              bgcolor: sourceFilter === val ? 'rgba(0,200,255,0.12)' : 'transparent',
+              border: '1px solid ' + (sourceFilter === val ? C.blue : C.border),
+              color: sourceFilter === val ? C.blue : C.sub,
+              '& .MuiChip-label': { px: 1 },
+            }}
+          />
+        ))}
+      </Stack>
       <Stack direction="row" justifyContent="flex-end" sx={{ mb: 1.5 }}>
         <Stack direction="row" spacing={0}>
           {([['cards', GridViewRoundedIcon], ['list', TableRowsRoundedIcon]] as const).map(([key, Icon]) => (
@@ -396,13 +425,13 @@ const CatalogManagerPanel: React.FC = () => {
       </Stack>
 
       {isCb && !loading && (
-        <CbFilterPanel items={rows} onFiltered={setFilteredRows} />
+        <CbFilterPanel items={sourceRows} onFiltered={setFilteredRows} />
       )}
       {!isCb && !loading && !!CATEGORY_FILTERS[category] && (
         <CategoryFilterPanel
           title={CATEGORY_FILTERS[category].title}
           fields={CATEGORY_FILTERS[category].fields}
-          items={rows}
+          items={sourceRows}
           onFiltered={setFilteredRows}
         />
       )}
@@ -563,11 +592,14 @@ const CatalogManagerPanel: React.FC = () => {
                         </Typography>
                       </>
                     ) : (
-                      <Tooltip title="No quote received yet — raise an RFQ">
-                        <Typography sx={{ color: C.red, fontSize: 14, fontWeight: 800 }}>
-                          RFQ $
-                        </Typography>
-                      </Tooltip>
+                      <>
+                        <PriceSourceDot source={spec.priceSource} />
+                        <Tooltip title="No quote received yet — raise an RFQ">
+                          <Typography sx={{ color: C.red, fontSize: 14, fontWeight: 800 }}>
+                            RFQ $
+                          </Typography>
+                        </Tooltip>
+                      </>
                     )}
                   </Stack>
                 </Stack>
@@ -606,9 +638,9 @@ const CatalogManagerPanel: React.FC = () => {
                     {Number(r.price) > 0 ? (
                       <><PriceSourceDot source={(r as any).specifications?.priceSource} />{usd(Number(r.price))}</>
                     ) : (
-                      <Tooltip title="No quote received yet — raise an RFQ">
+                      <><PriceSourceDot source={(r as any).specifications?.priceSource} /><Tooltip title="No quote received yet — raise an RFQ">
                         <Typography component="span" sx={{ color: C.red, fontSize: 12, fontWeight: 800 }}>RFQ $</Typography>
-                      </Tooltip>
+                      </Tooltip></>
                     )}
                   </TableCell>
                   {BUCKETS.map((b) => (
