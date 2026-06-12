@@ -224,7 +224,11 @@ export default function IntakeStep(props: IntakeStepProps) {
 
       {/* Feeder schedule */}
       <Box sx={{ ...card, mt: 2 }} onPaste={handlePaste}>
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
+        {pasteInfo && <Alert severity="info" sx={alertSx} onClose={() => setPasteInfo(null)}>{pasteInfo}</Alert>}
+
+        <Stack direction="row" spacing={2} alignItems="flex-start" sx={{ mt: 0.5 }}>
+        <Box sx={{ flex: 1, minWidth: 560 }}>
+        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
           <Typography sx={{ ...cardTitle, mb: 0 }}>Load &amp; Feeder Schedule</Typography>
           <Stack direction="row" spacing={1} alignItems="center">
             <Button size="small" startIcon={<AddRoundedIcon />} onClick={() => patch({ feeders: [...intake.feeders, newRow()] })}
@@ -241,10 +245,6 @@ export default function IntakeStep(props: IntakeStepProps) {
             </Button>
           </Stack>
         </Stack>
-        {pasteInfo && <Alert severity="info" sx={alertSx} onClose={() => setPasteInfo(null)}>{pasteInfo}</Alert>}
-
-        <Stack direction="row" spacing={2} alignItems="flex-start" sx={{ mt: 0.5 }}>
-        <Box sx={{ flex: 1, minWidth: 560 }}>
         <Table size="small" sx={{
           '& td, & th': { borderColor: C.border, color: C.text, fontSize: 12.5, py: 0.5 },
           '& td .MuiInputBase-root': {
@@ -335,9 +335,9 @@ export default function IntakeStep(props: IntakeStepProps) {
         <Box sx={{ width: 250, flexShrink: 0, alignSelf: 'flex-start' }}>
         <Tooltip title="Copy rows in Excel (description, type, unit, value, PF, continuous, poles, qty) and paste anywhere in this panel">
           <Chip icon={<ContentPasteRoundedIcon sx={{ fontSize: 14 }} />} label="Paste from Excel supported"
-            size="small" sx={{ mb: 1, width: '100%', bgcolor: 'transparent', border: `1px solid ${C.border}`, color: C.sub, fontSize: 11 }} />
+            size="small" sx={{ mb: 1, mt: 0.25, height: 28, width: '100%', bgcolor: 'transparent', border: `1px solid ${C.border}`, color: C.sub, fontSize: 11 }} />
         </Tooltip>
-        <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', p: 1.5, position: 'sticky', top: 148 }}>
+        <Box sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', p: 1.5, position: 'sticky', top: 148 }}>
           <Typography sx={{ color: C.sub, fontSize: 10.5, letterSpacing: 0.5, mb: 1 }}>LIVE LOAD SUMMARY</Typography>
           <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.25 }}>
             <Typography sx={{ color: C.sub, fontSize: 11.5 }}>Design current</Typography>
@@ -365,7 +365,7 @@ export default function IntakeStep(props: IntakeStepProps) {
                     <Typography sx={{ color: C.sub, fontSize: 10.5 }}>{t}</Typography>
                     <Typography sx={{ color: C.sub, fontSize: 10.5 }}>{Math.round(a)} A</Typography>
                   </Stack>
-                  <Box sx={{ height: 4, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+                  <Box sx={{ height: 4, bgcolor: '#000', borderRadius: 2 }}>
                     <Box sx={{ height: 4, width: `${summary.totalA ? Math.min(100, (a / summary.totalA) * 100) : 0}%`, bgcolor: '#00c8ff', borderRadius: 2, opacity: 0.85 }} />
                   </Box>
                 </Box>
