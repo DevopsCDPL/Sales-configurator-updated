@@ -38,6 +38,7 @@ const { buildProposalPdf } = require('../services/configurator/tpsProposalPdf');
 const { generateComponents } = require('../services/configurator/componentRules');
 const multer = require('multer');
 const wbUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20 * 1024 * 1024 } });
+const ExcelJS = require('exceljs');
 
 // Default ON in this private instance; set CONFIGURATOR_V2_SPINE=false to disable.
 const FLAG = () => String(process.env.CONFIGURATOR_V2_SPINE ?? 'true').toLowerCase() !== 'false';
@@ -880,6 +881,268 @@ router.post('/handoff/order-confirm', wrap(async (req, res) => {
 router.get('/handoff/events', wrap(async (req, res) => {
   const rows = await models.ConfiguratorHandoffEvent.findAll({ order: [['created_at', 'DESC']], limit: 200 });
   res.json(rows);
+}));
+
+/* -- Catalog Excel export (round-trip xlsx) --------------------------------
+ * GET  /catalog/export-xlsx              -- full component catalog as .xlsx
+ * POST /catalog/import-components-xlsx  -- re-import (skip existing SKUs)  */
+
+router.get('/catalog/export-xlsx', wrap(async (req, res) => {
+  const rows = await models.ConfiguratorComponent.findAll({
+    order: [['category', 'ASC'], ['part_number', 'ASC']],
+  });
+
+  const wb = new ExcelJS.Workbook();
+  const ws = wb.addWorksheet('Components');
+
+  ws.columns = [
+    { header: 'S.No',          key: 'sno',           width: 6  },
+    { header: 'SKU',           key: 'sku',            width: 20 },
+    { header: 'Name',          key: 'name',           width: 36 },
+    { header: 'Category',      key: 'category',       width: 22 },
+    { header: 'Description',   key: 'description',    width: 36 },
+    { header: 'Specification', key: 'specification',  width: 24 },
+    { header: 'Manufacturer',  key: 'manufacturer',   width: 22 },
+    { header: 'Vendor',        key: 'vendor',         width: 22 },
+    { header: 'Price',         key: 'price',          width: 12 },
+    { header: 'Price Status',  key: 'price_status',   width: 16 },
+    { header: 'Labour CU',     key: 'lbr_cu',         width: 11 },
+    { header: 'Labour ASM',    key: 'lbr_asm',        width: 11 },
+    { header: 'Labour CNT',    key: 'lbr_cnt',        width: 11 },
+    { header: 'Labour QC',     key: 'lbr_qc',         width: 11 },
+    { header: 'Labour TST',    key: 'lbr_tst',        width: 11 },
+    { header: 'Labour ENG',    key: 'lbr_eng',        width: 11 },
+    { header: 'Labour CAD',    key: 'lbr_cad',        width: 11 },
+  ];
+
+  // Bold + freeze header row
+  const hdrRow = ws.getRow(1);
+  hdrRow.font = { bold: true };
+  hdrRow.commit();
+  ws.views = [{ state: 'frozen', ySplit: 1 }];
+
+  rows.forEach((r, i) => {
+    const sp = r.specifications || {};
+    const spec = [
+      sp.ratedCurrentA && sp.ratedCurrentA + 'A',
+      sp.interruptingKA && sp.interruptingKA + 'kA',
+      sp.poles && sp.poles + 'P',
+    ].filter(Boolean).join(' / ') || sp.catalogNumber || '';
+
+    ws.addRow({
+      sno:           i + 1,
+      sku:           r.part_number || '',
+      name:          r.name || '',
+      category:      r.category || '',
+      description:   r.description || '',
+      specification: spec,
+      manufacturer:  sp.manufacturer || r.subcategory || '',
+      vendor:        sp.vendorName || '',
+      price:         Number(r.price) || 0,
+      price_status:  r.price_status || '',
+      lbr_cu:        Number(r.lbr_cu) || 0,
+      lbr_asm:       Number(r.lbr_asm) || 0,
+      lbr_cnt:       Number(r.lbr_cnt) || 0,
+      lbr_qc:        Number(r.lbr_qc) || 0,
+      lbr_tst:       Number(r.lbr_tst) || 0,
+      lbr_eng:       Number(r.lbr_eng) || 0,
+      lbr_cad:       Number(r.lbr_cad) || 0,
+    });
+  });
+
+  // _meta sheet with usage notes
+  const meta = wb.addWorksheet('_meta');
+  meta.addRow(['Notes']);
+  meta.addRow([
+    'Edit values and re-upload via Import. ' +
+    'Rows with an existing SKU are skipped; ' +
+    'rows with a blank SKU get a new SKU on import. ' +
+    'Do not change the SKU column for existing rows.',
+  ]);
+
+  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  res.setHeader('Content-Disposition', 'attachment; filename="component-catalog.xlsx"');
+  await wb.xlsx.write(res);
+  res.end();
+}));
+
+/* Category -> SKU prefix map used by the round-trip importer. */
+const CATEGORY_PREFIX = {
+  'CIRCUIT BREAKER':      'CBRK',
+  'CB ACCESSORIES':       'CBAC',
+  'ENCLOSURE':            'ENC',
+  'BUSSING':              'BUSS',
+  'CU':                   'CU',
+  'LUGS':                 'LGS',
+  'TERMINALS':            'TER',
+  'CONTROLS':             'CTRLS',
+  'WIRE CABLE':           'WRCBL',
+  'CONDUIT':              'CNDT',
+  'CURRENT TRANSFORMER':  'CRNTTRS',
+  'VOLTAGE TRANSFORMER':  'VLTGTRS',
+  'SPD':                  'SPD',
+  'ATS':                  'ATS',
+  'CAMLOCK':              'CAML',
+  'GLASTIC':              'GSTC',
+  'HARDWARE':             'HRDWR',
+  'LIGHT':                'LT',
+  'SWITCH':               'SWT',
+  'POWER SUPPLY':         'PRSPLY',
+  'STANDARD PRODUCT':     'STDPD',
+  'LABOR':                'LBR',
+  'UNKNOWN PARTS':        'UNK',
+};
+
+router.post('/catalog/import-components-xlsx', wbUpload.single('file'), wrap(async (req, res) => {
+  if (!req.file?.buffer) {
+    return res.status(400).json({ error: 'multipart file field "file" required (.xlsx)' });
+  }
+
+  const wb = new ExcelJS.Workbook();
+  await wb.xlsx.load(req.file.buffer);
+
+  // Pick "Components" sheet or first non-_meta sheet
+  const ws = wb.getWorksheet('Components') ||
+    wb.worksheets.find((s) => s.name !== '_meta') ||
+    wb.worksheets[0];
+  if (!ws) return res.status(422).json({ error: 'No worksheet found in uploaded file' });
+
+  // Map header names -> 1-based column indices (case-insensitive, trimmed)
+  const hdrRow = ws.getRow(1);
+  const colIdx = {};
+  hdrRow.eachCell((cell, colNumber) => {
+    const txt = String(cell.value ?? '').trim().toLowerCase();
+    colIdx[txt] = colNumber;
+  });
+
+  const get = (row, key) => {
+    const ci = colIdx[key.toLowerCase()];
+    if (!ci) return '';
+    const v = row.getCell(ci).value;
+    return v == null ? '' : String(v).trim();
+  };
+
+  if (!colIdx['name']) {
+    return res.status(422).json({ error: 'Unrecognized sheet -- export the catalog first to get the correct format' });
+  }
+
+  // Pre-load all existing components for deduplication and SKU generation
+  const allComponents = await models.ConfiguratorComponent.findAll({
+    attributes: ['part_number', 'name', 'category'],
+  });
+  const existingSkus = new Set(allComponents.map((c) => c.part_number).filter(Boolean));
+  const existingCatName = new Set(
+    allComponents.map((c) => `${(c.category || '').toUpperCase()}|${(c.name || '').toLowerCase()}`)
+  );
+
+  // Build prefix -> maxN from existing part_numbers
+  const prefixCounter = new Map();
+  for (const pn of existingSkus) {
+    const m = /^([A-Z0-9]+)-(\d+)$/.exec(pn);
+    if (!m) continue;
+    const prefix = m[1];
+    const n = parseInt(m[2], 10);
+    if (!prefixCounter.has(prefix) || prefixCounter.get(prefix) < n) {
+      prefixCounter.set(prefix, n);
+    }
+  }
+
+  const generateSku = (category) => {
+    const catUpper = (category || '').trim().toUpperCase();
+    let prefix = CATEGORY_PREFIX[catUpper];
+    if (!prefix) {
+      prefix = catUpper.replace(/[^A-Z0-9]/g, '').slice(0, 4) || 'CMP';
+    }
+    const n = (prefixCounter.get(prefix) ?? 0) + 1;
+    prefixCounter.set(prefix, n);
+    return `${prefix}-${String(n).padStart(4, '0')}`;
+  };
+
+  const VALID_STATUS = new Set(['FIRM', 'ESTIMATED', 'PENDING_RFQ']);
+
+  let created = 0, skipped = 0, errors = 0;
+  const errorRows = [];
+
+  // Collect data rows (eachRow is sync; awaits happen in the for loop below)
+  const dataRows = [];
+  ws.eachRow((row, rowNumber) => {
+    if (rowNumber > 1) dataRows.push(row);
+  });
+
+  for (const row of dataRows) {
+    const name = get(row, 'Name');
+    if (!name) continue; // blank line
+
+    const sku = get(row, 'SKU');
+    const category = (get(row, 'Category') || 'UNKNOWN PARTS').trim().toUpperCase();
+
+    // Dedupe: existing SKU -> skip
+    if (sku && existingSkus.has(sku)) { skipped += 1; continue; }
+    // Dedupe: blank SKU but same category+name -> skip
+    if (!sku && existingCatName.has(`${category}|${name.toLowerCase()}`)) { skipped += 1; continue; }
+
+    try {
+      const priceRaw = Number(get(row, 'Price')) || 0;
+      const priceStatusRaw = get(row, 'Price Status');
+      const price_status = VALID_STATUS.has(priceStatusRaw)
+        ? priceStatusRaw
+        : (priceRaw > 0 ? 'FIRM' : 'PENDING_RFQ');
+
+      // Build specifications object
+      const specs = { priceSource: 'manual' };
+      const mfr = get(row, 'Manufacturer');
+      if (mfr) specs.manufacturer = mfr;
+      const vendorVal = get(row, 'Vendor');
+      if (vendorVal) specs.vendorName = vendorVal;
+
+      // Parse Specification cell: "800A / 42kA / 3P" or free text
+      const specCell = get(row, 'Specification');
+      if (specCell) {
+        const mA  = /(\d+)\s*A\b/.exec(specCell);
+        const mKA = /(\d+)\s*kA/i.exec(specCell);
+        const mP  = /(\d+)\s*P\b/.exec(specCell);
+        if (mA || mKA || mP) {
+          if (mA)  specs.ratedCurrentA  = Number(mA[1]);
+          if (mKA) specs.interruptingKA = Number(mKA[1]);
+          if (mP)  specs.poles          = Number(mP[1]);
+        } else {
+          specs.specText = specCell;
+        }
+      }
+
+      const partNumber = sku || generateSku(category);
+
+      await models.ConfiguratorComponent.create({
+        part_number:    partNumber,
+        name,
+        category,
+        description:    get(row, 'Description') || null,
+        price:          priceRaw,
+        mat_cost:       priceRaw,
+        price_status,
+        specifications: specs,
+        lbr_cu:  Number(get(row, 'Labour CU'))  || 0,
+        lbr_asm: Number(get(row, 'Labour ASM')) || 0,
+        lbr_cnt: Number(get(row, 'Labour CNT')) || 0,
+        lbr_qc:  Number(get(row, 'Labour QC'))  || 0,
+        lbr_tst: Number(get(row, 'Labour TST')) || 0,
+        lbr_eng: Number(get(row, 'Labour ENG')) || 0,
+        lbr_cad: Number(get(row, 'Labour CAD')) || 0,
+        is_active:  true,
+        company_id: req.companyId ?? null,
+      });
+
+      existingSkus.add(partNumber);
+      existingCatName.add(`${category}|${name.toLowerCase()}`);
+      created += 1;
+    } catch (e) {
+      errors += 1;
+      if (errorRows.length < 10) errorRows.push(name);
+    }
+  }
+
+  const total = await models.ConfiguratorComponent.count();
+  res.json({ ok: true, created, skipped, errors, errorRows, total });
 }));
 
 module.exports = router;
