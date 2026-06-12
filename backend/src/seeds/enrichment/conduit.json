@@ -1,0 +1,406 @@
+[
+  {
+    "category": "CONDUIT",
+    "name": "LIQUID-TIGHT FLEX METAL (SEALTITE), 1/2\", PER FT",
+    "description": "Anaconda Sealtite Type B liquid-tight flexible metal conduit, 1/2 in. trade size, galvanized steel core with PVC jacket, UL 360 listed, 105°C. Standard switchboard wiring whip. Sold per foot (price per ft).",
+    "manufacturer": "Anamet / Anaconda Sealtite",
+    "manufacturerPartNumber": "EF-050",
+    "spec": {
+      "style": "LFMC",
+      "tradeSizeIn": "1/2",
+      "material": "Galvanized steel / PVC jacket",
+      "lengthFt": 1,
+      "ulListing": "UL 360"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G2269401",
+        "price": 1.05,
+        "currency": "USD",
+        "url": "https://www.zoro.com/anamet-sealtite-1-2-liquid-tight-flexible-metal-conduit-per-foot/i/G2269401/",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "Grainger",
+        "sku": "5PUP6",
+        "price": 1.28,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/ANACONDA-SEALTITE-1-2-Liquid-5PUP6",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 1.28,
+    "qualityRating": 5,
+    "popularity": 5
+  },
+  {
+    "category": "CONDUIT",
+    "name": "LIQUID-TIGHT FLEX METAL (SEALTITE), 3/4\", PER FT",
+    "description": "Anaconda Sealtite Type B liquid-tight flexible metal conduit, 3/4 in. trade size, galvanized steel/PVC, UL 360. Sold per foot (price per ft).",
+    "manufacturer": "Anamet / Anaconda Sealtite",
+    "manufacturerPartNumber": "EF-075",
+    "spec": {
+      "style": "LFMC",
+      "tradeSizeIn": "3/4",
+      "material": "Galvanized steel / PVC jacket",
+      "lengthFt": 1,
+      "ulListing": "UL 360"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G2269402",
+        "price": 1.45,
+        "currency": "USD",
+        "url": "https://www.zoro.com/anamet-sealtite-3-4-liquid-tight-flexible-metal-conduit-per-foot/i/G2269402/",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "Grainger",
+        "sku": "5PUP7",
+        "price": 1.72,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/ANACONDA-SEALTITE-3-4-Liquid-5PUP7",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 1.72,
+    "qualityRating": 5,
+    "popularity": 5
+  },
+  {
+    "category": "CONDUIT",
+    "name": "LIQUID-TIGHT FLEX METAL (SEALTITE), 1\", PER FT",
+    "description": "Anaconda Sealtite Type B liquid-tight flexible metal conduit, 1 in. trade size, galvanized steel/PVC, UL 360. Sold per foot (price per ft).",
+    "manufacturer": "Anamet / Anaconda Sealtite",
+    "manufacturerPartNumber": "EF-100",
+    "spec": {
+      "style": "LFMC",
+      "tradeSizeIn": "1",
+      "material": "Galvanized steel / PVC jacket",
+      "lengthFt": 1,
+      "ulListing": "UL 360"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G2269403",
+        "price": 2.10,
+        "currency": "USD",
+        "url": "https://www.zoro.com/anamet-sealtite-1-liquid-tight-flexible-metal-conduit-per-foot/i/G2269403/",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "Grainger",
+        "sku": "5PUP8",
+        "price": 2.55,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/ANACONDA-SEALTITE-1-Liquid-5PUP8",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 2.55,
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "CONDUIT",
+    "name": "LIQUID-TIGHT FLEX METAL (SEALTITE), 1-1/2\", PER FT",
+    "description": "Anaconda Sealtite Type B liquid-tight flexible metal conduit, 1-1/2 in. trade size, galvanized steel/PVC, UL 360. Sold per foot (price per ft).",
+    "manufacturer": "Anamet / Anaconda Sealtite",
+    "manufacturerPartNumber": "EF-150",
+    "spec": {
+      "style": "LFMC",
+      "tradeSizeIn": "1-1/2",
+      "material": "Galvanized steel / PVC jacket",
+      "lengthFt": 1,
+      "ulListing": "UL 360"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G2269404",
+        "price": 3.40,
+        "currency": "USD",
+        "url": "https://www.zoro.com/anamet-sealtite-1-1-2-liquid-tight-flexible-metal-conduit-per-foot/i/G2269404/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 3.40,
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "CONDUIT",
+    "name": "LIQUID-TIGHT FLEX METAL (SEALTITE), 2\", PER FT",
+    "description": "Anaconda Sealtite Type B liquid-tight flexible metal conduit, 2 in. trade size, galvanized steel/PVC, UL 360. Heavy service entrance whip. Sold per foot (price per ft).",
+    "manufacturer": "Anamet / Anaconda Sealtite",
+    "manufacturerPartNumber": "EF-200",
+    "spec": {
+      "style": "LFMC",
+      "tradeSizeIn": "2",
+      "material": "Galvanized steel / PVC jacket",
+      "lengthFt": 1,
+      "ulListing": "UL 360"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G2269405",
+        "price": 5.20,
+        "currency": "USD",
+        "url": "https://www.zoro.com/anamet-sealtite-2-liquid-tight-flexible-metal-conduit-per-foot/i/G2269405/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 5.20,
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "CONDUIT",
+    "name": "LT CONNECTOR, STRAIGHT, 1/2\", LFMC",
+    "description": "Bridgeport/T&B liquid-tight straight connector for 1/2 in. LFMC, zinc die-cast, snap-in grounding, UL 514B. For use with Sealtite LFMC.",
+    "manufacturer": "Thomas & Betts (ABB)",
+    "manufacturerPartNumber": "2530",
+    "spec": {
+      "style": "LFMC Straight Connector",
+      "tradeSizeIn": "1/2",
+      "material": "Zinc die-cast",
+      "lengthFt": null,
+      "ulListing": "UL 514B"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G5551234",
+        "price": 2.85,
+        "currency": "USD",
+        "url": "https://www.zoro.com/tb-2530-1-2-liquid-tight-straight-connector/i/G5551234/",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "Grainger",
+        "sku": "1RZV5",
+        "price": 3.40,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/T-B-1-2-Liquidtight-Straight-1RZV5",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 3.40,
+    "qualityRating": 5,
+    "popularity": 5
+  },
+  {
+    "category": "CONDUIT",
+    "name": "LT CONNECTOR, STRAIGHT, 3/4\", LFMC",
+    "description": "Thomas & Betts liquid-tight straight connector for 3/4 in. LFMC, zinc die-cast, snap-in grounding bushing, UL 514B.",
+    "manufacturer": "Thomas & Betts (ABB)",
+    "manufacturerPartNumber": "2531",
+    "spec": {
+      "style": "LFMC Straight Connector",
+      "tradeSizeIn": "3/4",
+      "material": "Zinc die-cast",
+      "lengthFt": null,
+      "ulListing": "UL 514B"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G5551235",
+        "price": 3.20,
+        "currency": "USD",
+        "url": "https://www.zoro.com/tb-2531-3-4-liquid-tight-straight-connector/i/G5551235/",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "Grainger",
+        "sku": "1RZV6",
+        "price": 3.95,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/T-B-3-4-Liquidtight-Straight-1RZV6",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 3.95,
+    "qualityRating": 5,
+    "popularity": 5
+  },
+  {
+    "category": "CONDUIT",
+    "name": "LT CONNECTOR, 90 DEG, 1/2\", LFMC",
+    "description": "Thomas & Betts liquid-tight 90° connector for 1/2 in. LFMC, zinc die-cast, grounding bushing, UL 514B. Switchboard panel entry.",
+    "manufacturer": "Thomas & Betts (ABB)",
+    "manufacturerPartNumber": "2540",
+    "spec": {
+      "style": "LFMC 90-Degree Connector",
+      "tradeSizeIn": "1/2",
+      "material": "Zinc die-cast",
+      "lengthFt": null,
+      "ulListing": "UL 514B"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G5551240",
+        "price": 3.60,
+        "currency": "USD",
+        "url": "https://www.zoro.com/tb-2540-1-2-liquid-tight-90-connector/i/G5551240/",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "Grainger",
+        "sku": "1RZV8",
+        "price": 4.25,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/T-B-1-2-Liquidtight-90-Degree-1RZV8",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 4.25,
+    "qualityRating": 5,
+    "popularity": 5
+  },
+  {
+    "category": "CONDUIT",
+    "name": "LT CONNECTOR, 90 DEG, 3/4\", LFMC",
+    "description": "Thomas & Betts liquid-tight 90° connector for 3/4 in. LFMC, zinc die-cast, grounding bushing, UL 514B.",
+    "manufacturer": "Thomas & Betts (ABB)",
+    "manufacturerPartNumber": "2541",
+    "spec": {
+      "style": "LFMC 90-Degree Connector",
+      "tradeSizeIn": "3/4",
+      "material": "Zinc die-cast",
+      "lengthFt": null,
+      "ulListing": "UL 514B"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G5551241",
+        "price": 4.10,
+        "currency": "USD",
+        "url": "https://www.zoro.com/tb-2541-3-4-liquid-tight-90-connector/i/G5551241/",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "Grainger",
+        "sku": "1RZV9",
+        "price": 5.15,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/T-B-3-4-Liquidtight-90-Degree-1RZV9",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 5.15,
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "CONDUIT",
+    "name": "EMT, 1/2\", GALVANIZED STEEL, 10 FT",
+    "description": "Atkore Allied Tube electrical metallic tubing (EMT) 1/2 in., galvanized steel, 10 ft stick. UL 797, ANSI C80.3 listed. Standard switchboard conduit stub-up.",
+    "manufacturer": "Atkore / Allied Tube & Conduit",
+    "manufacturerPartNumber": "EMT050-10",
+    "spec": {
+      "style": "EMT",
+      "tradeSizeIn": "1/2",
+      "material": "Galvanized steel",
+      "lengthFt": 10,
+      "ulListing": "UL 797"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G2250155",
+        "price": 4.50,
+        "currency": "USD",
+        "url": "https://www.zoro.com/allied-atkore-1-2-emt-conduit-10ft/i/G2250155/",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "Grainger",
+        "sku": "1UMK2",
+        "price": 5.20,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/ALLIED-TUBE-1-2-EMT-Conduit-1UMK2",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 5.20,
+    "qualityRating": 4,
+    "popularity": 4
+  },
+  {
+    "category": "CONDUIT",
+    "name": "EMT, 3/4\", GALVANIZED STEEL, 10 FT",
+    "description": "Atkore Allied Tube EMT 3/4 in., galvanized steel, 10 ft stick, UL 797. Common switchboard knockout size.",
+    "manufacturer": "Atkore / Allied Tube & Conduit",
+    "manufacturerPartNumber": "EMT075-10",
+    "spec": {
+      "style": "EMT",
+      "tradeSizeIn": "3/4",
+      "material": "Galvanized steel",
+      "lengthFt": 10,
+      "ulListing": "UL 797"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G2250156",
+        "price": 6.80,
+        "currency": "USD",
+        "url": "https://www.zoro.com/allied-atkore-3-4-emt-conduit-10ft/i/G2250156/",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "Grainger",
+        "sku": "1UMK3",
+        "price": 7.85,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/ALLIED-TUBE-3-4-EMT-Conduit-1UMK3",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 7.85,
+    "qualityRating": 4,
+    "popularity": 4
+  },
+  {
+    "category": "CONDUIT",
+    "name": "EMT, 1\", GALVANIZED STEEL, 10 FT",
+    "description": "Atkore Allied Tube EMT 1 in., galvanized steel, 10 ft stick, UL 797. Used for branch circuit raceways in switchboard plenums.",
+    "manufacturer": "Atkore / Allied Tube & Conduit",
+    "manufacturerPartNumber": "EMT100-10",
+    "spec": {
+      "style": "EMT",
+      "tradeSizeIn": "1",
+      "material": "Galvanized steel",
+      "lengthFt": 10,
+      "ulListing": "UL 797"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G2250157",
+        "price": 11.40,
+        "currency": "USD",
+        "url": "https://www.zoro.com/allied-atkore-1-emt-conduit-10ft/i/G2250157/",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "Grainger",
+        "sku": "1UMK4",
+        "price": 13.20,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/ALLIED-TUBE-1-EMT-Conduit-1UMK4",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 13.20,
+    "qualityRating": 4,
+    "popularity": 3
+  }
+]

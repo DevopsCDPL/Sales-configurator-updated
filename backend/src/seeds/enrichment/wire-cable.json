@@ -1,0 +1,647 @@
+[
+  {
+    "category": "WIRE CABLE",
+    "name": "THHN/THWN-2, #14 AWG, STRANDED, BLK",
+    "description": "Southwire SIMpull THHN/THWN-2 #14 AWG 7-strand copper, black, 600V, 90°C dry/75°C wet, UL 83/UL 1063. Sold by the foot (price per ft). Standard switchboard control wiring.",
+    "manufacturer": "Southwire",
+    "manufacturerPartNumber": "11585558",
+    "spec": {
+      "wireType": "THHN/THWN-2",
+      "awgSize": "#14 AWG",
+      "color": "Black",
+      "strandCount": "7-strand",
+      "insulation": "PVC/Nylon",
+      "voltage": "600V",
+      "tempRating": "90°C dry / 75°C wet",
+      "conductorMaterial": "Copper",
+      "ulListing": "UL 83, UL 1063"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Wire and Cable Your Way",
+        "sku": "THHN14STRBLK",
+        "price": 0.12,
+        "currency": "USD",
+        "url": "https://www.wireandcableyourway.com/14-awg-thhn-thwn-2-stranded-copper-building-wire-black.html",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "Zoro",
+        "sku": "G0283600",
+        "price": 0.14,
+        "currency": "USD",
+        "url": "https://www.zoro.com/encore-wire-14-awg-thhn-wire-stranded-black/i/G0283600/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 0.14,
+    "qualityRating": 5,
+    "popularity": 5
+  },
+  {
+    "category": "WIRE CABLE",
+    "name": "THHN/THWN-2, #14 AWG, STRANDED, WHT",
+    "description": "Southwire SIMpull THHN/THWN-2 #14 AWG 7-strand copper, white, 600V, 90°C dry/75°C wet, UL 83/UL 1063. Sold by the foot (price per ft).",
+    "manufacturer": "Southwire",
+    "manufacturerPartNumber": "11585577",
+    "spec": {
+      "wireType": "THHN/THWN-2",
+      "awgSize": "#14 AWG",
+      "color": "White",
+      "strandCount": "7-strand",
+      "insulation": "PVC/Nylon",
+      "voltage": "600V",
+      "tempRating": "90°C dry / 75°C wet",
+      "conductorMaterial": "Copper",
+      "ulListing": "UL 83, UL 1063"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Wire and Cable Your Way",
+        "sku": "THHN14STRWHT",
+        "price": 0.12,
+        "currency": "USD",
+        "url": "https://www.wireandcableyourway.com/14-awg-thhn-thwn-2-stranded-copper-building-wire-white.html",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 0.12,
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "WIRE CABLE",
+    "name": "THHN/THWN-2, #14 AWG, STRANDED, GRN",
+    "description": "Southwire SIMpull THHN/THWN-2 #14 AWG 7-strand copper, green (equipment ground), 600V, 90°C dry/75°C wet, UL 83. Sold by the foot (price per ft).",
+    "manufacturer": "Southwire",
+    "manufacturerPartNumber": "11585562",
+    "spec": {
+      "wireType": "THHN/THWN-2",
+      "awgSize": "#14 AWG",
+      "color": "Green",
+      "strandCount": "7-strand",
+      "insulation": "PVC/Nylon",
+      "voltage": "600V",
+      "tempRating": "90°C dry / 75°C wet",
+      "conductorMaterial": "Copper",
+      "ulListing": "UL 83, UL 1063"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Wire and Cable Your Way",
+        "sku": "THHN14STRGRN",
+        "price": 0.12,
+        "currency": "USD",
+        "url": "https://www.wireandcableyourway.com/14-awg-thhn-thwn-2-stranded-copper-building-wire-green.html",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 0.12,
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "WIRE CABLE",
+    "name": "THHN/THWN-2, #14 AWG, STRANDED, RED",
+    "description": "Southwire SIMpull THHN/THWN-2 #14 AWG 7-strand copper, red, 600V, 90°C dry/75°C wet, UL 83. Sold by the foot (price per ft).",
+    "manufacturer": "Southwire",
+    "manufacturerPartNumber": "11585565",
+    "spec": {
+      "wireType": "THHN/THWN-2",
+      "awgSize": "#14 AWG",
+      "color": "Red",
+      "strandCount": "7-strand",
+      "insulation": "PVC/Nylon",
+      "voltage": "600V",
+      "tempRating": "90°C dry / 75°C wet",
+      "conductorMaterial": "Copper",
+      "ulListing": "UL 83, UL 1063"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Wire and Cable Your Way",
+        "sku": "THHN14STRRED",
+        "price": 0.12,
+        "currency": "USD",
+        "url": "https://www.wireandcableyourway.com/14-awg-thhn-thwn-2-stranded-copper-building-wire-red.html",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 0.12,
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "WIRE CABLE",
+    "name": "THHN/THWN-2, #12 AWG, STRANDED, BLK",
+    "description": "Southwire SIMpull THHN/THWN-2 #12 AWG 7-strand copper, black, 600V, 90°C dry/75°C wet, UL 83. Sold by the foot (price per ft).",
+    "manufacturer": "Southwire",
+    "manufacturerPartNumber": "22967901",
+    "spec": {
+      "wireType": "THHN/THWN-2",
+      "awgSize": "#12 AWG",
+      "color": "Black",
+      "strandCount": "7-strand",
+      "insulation": "PVC/Nylon",
+      "voltage": "600V",
+      "tempRating": "90°C dry / 75°C wet",
+      "conductorMaterial": "Copper",
+      "ulListing": "UL 83, UL 1063"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Wire and Cable Your Way",
+        "sku": "THHN12STRBLK",
+        "price": 0.19,
+        "currency": "USD",
+        "url": "https://www.wireandcableyourway.com/12-awg-thhn-thwn-2-stranded-copper-building-wire-black.html",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "Zoro",
+        "sku": "G1634543",
+        "price": 0.22,
+        "currency": "USD",
+        "url": "https://www.zoro.com/southwire-12-awg-thhn-wire-stranded-black/i/G1634543/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 0.22,
+    "qualityRating": 5,
+    "popularity": 5
+  },
+  {
+    "category": "WIRE CABLE",
+    "name": "THHN/THWN-2, #12 AWG, STRANDED, WHT",
+    "description": "Southwire SIMpull THHN/THWN-2 #12 AWG 7-strand copper, white, 600V, 90°C dry/75°C wet. Sold by the foot (price per ft).",
+    "manufacturer": "Southwire",
+    "manufacturerPartNumber": "22967902",
+    "spec": {
+      "wireType": "THHN/THWN-2",
+      "awgSize": "#12 AWG",
+      "color": "White",
+      "strandCount": "7-strand",
+      "insulation": "PVC/Nylon",
+      "voltage": "600V",
+      "tempRating": "90°C dry / 75°C wet",
+      "conductorMaterial": "Copper",
+      "ulListing": "UL 83, UL 1063"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Wire and Cable Your Way",
+        "sku": "THHN12STRWHT",
+        "price": 0.19,
+        "currency": "USD",
+        "url": "https://www.wireandcableyourway.com/12-awg-thhn-thwn-2-stranded-copper-building-wire-white.html",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 0.19,
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "WIRE CABLE",
+    "name": "THHN/THWN-2, #12 AWG, STRANDED, GRN",
+    "description": "Southwire SIMpull THHN/THWN-2 #12 AWG 7-strand copper, green, 600V, 90°C dry/75°C wet. Equipment ground conductor. Sold by the foot (price per ft).",
+    "manufacturer": "Southwire",
+    "manufacturerPartNumber": "22967903",
+    "spec": {
+      "wireType": "THHN/THWN-2",
+      "awgSize": "#12 AWG",
+      "color": "Green",
+      "strandCount": "7-strand",
+      "insulation": "PVC/Nylon",
+      "voltage": "600V",
+      "tempRating": "90°C dry / 75°C wet",
+      "conductorMaterial": "Copper",
+      "ulListing": "UL 83, UL 1063"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Wire and Cable Your Way",
+        "sku": "THHN12STRGRN",
+        "price": 0.19,
+        "currency": "USD",
+        "url": "https://www.wireandcableyourway.com/12-awg-thhn-thwn-2-stranded-copper-building-wire-green.html",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 0.19,
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "WIRE CABLE",
+    "name": "THHN/THWN-2, #12 AWG, STRANDED, RED",
+    "description": "Southwire SIMpull THHN/THWN-2 #12 AWG 7-strand copper, red, 600V, 90°C dry/75°C wet. Sold by the foot (price per ft).",
+    "manufacturer": "Southwire",
+    "manufacturerPartNumber": "22967904",
+    "spec": {
+      "wireType": "THHN/THWN-2",
+      "awgSize": "#12 AWG",
+      "color": "Red",
+      "strandCount": "7-strand",
+      "insulation": "PVC/Nylon",
+      "voltage": "600V",
+      "tempRating": "90°C dry / 75°C wet",
+      "conductorMaterial": "Copper",
+      "ulListing": "UL 83, UL 1063"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Wire and Cable Your Way",
+        "sku": "THHN12STRRED",
+        "price": 0.19,
+        "currency": "USD",
+        "url": "https://www.wireandcableyourway.com/12-awg-thhn-thwn-2-stranded-copper-building-wire-red.html",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 0.19,
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "WIRE CABLE",
+    "name": "THHN/THWN-2, #10 AWG, STRANDED, WHT",
+    "description": "Encore Wire THHN/THWN-2 #10 AWG 7-strand copper, white, 600V, 90°C dry/75°C wet. Sold by the foot (price per ft).",
+    "manufacturer": "Encore Wire",
+    "manufacturerPartNumber": "EW10STRWHT",
+    "spec": {
+      "wireType": "THHN/THWN-2",
+      "awgSize": "#10 AWG",
+      "color": "White",
+      "strandCount": "7-strand",
+      "insulation": "PVC/Nylon",
+      "voltage": "600V",
+      "tempRating": "90°C dry / 75°C wet",
+      "conductorMaterial": "Copper",
+      "ulListing": "UL 83, UL 1063"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Wire and Cable Your Way",
+        "sku": "THHN10STRWHT",
+        "price": 0.30,
+        "currency": "USD",
+        "url": "https://www.wireandcableyourway.com/10-awg-thhn-thwn-2-stranded-copper-building-wire-white.html",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 0.30,
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "WIRE CABLE",
+    "name": "THHN/THWN-2, #10 AWG, STRANDED, GRN",
+    "description": "Encore Wire THHN/THWN-2 #10 AWG 7-strand copper, green, 600V, 90°C dry/75°C wet. Equipment ground conductor. Sold by the foot (price per ft).",
+    "manufacturer": "Encore Wire",
+    "manufacturerPartNumber": "EW10STRGRN",
+    "spec": {
+      "wireType": "THHN/THWN-2",
+      "awgSize": "#10 AWG",
+      "color": "Green",
+      "strandCount": "7-strand",
+      "insulation": "PVC/Nylon",
+      "voltage": "600V",
+      "tempRating": "90°C dry / 75°C wet",
+      "conductorMaterial": "Copper",
+      "ulListing": "UL 83, UL 1063"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Wire and Cable Your Way",
+        "sku": "THHN10STRGRN",
+        "price": 0.30,
+        "currency": "USD",
+        "url": "https://www.wireandcableyourway.com/10-awg-thhn-thwn-2-stranded-copper-building-wire-green.html",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 0.30,
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "WIRE CABLE",
+    "name": "THHN/THWN-2, #10 AWG, STRANDED, RED",
+    "description": "Encore Wire THHN/THWN-2 #10 AWG 7-strand copper, red, 600V, 90°C dry/75°C wet. Sold by the foot (price per ft).",
+    "manufacturer": "Encore Wire",
+    "manufacturerPartNumber": "EW10STRRED",
+    "spec": {
+      "wireType": "THHN/THWN-2",
+      "awgSize": "#10 AWG",
+      "color": "Red",
+      "strandCount": "7-strand",
+      "insulation": "PVC/Nylon",
+      "voltage": "600V",
+      "tempRating": "90°C dry / 75°C wet",
+      "conductorMaterial": "Copper",
+      "ulListing": "UL 83, UL 1063"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Wire and Cable Your Way",
+        "sku": "THHN10STRRED",
+        "price": 0.30,
+        "currency": "USD",
+        "url": "https://www.wireandcableyourway.com/10-awg-thhn-thwn-2-stranded-copper-building-wire-red.html",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 0.30,
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "WIRE CABLE",
+    "name": "SIS, #14 AWG, STRANDED, BLK",
+    "description": "Southwire SIS (Switchboard & Switchgear Wire) #14 AWG 19-strand copper, black, 600V, 90°C, flame-retardant cross-linked polyethylene insulation, UL 44. The actual NEC Article 408 / UL 891 switchboard wiring standard. Sold by the foot (price per ft).",
+    "manufacturer": "Southwire",
+    "manufacturerPartNumber": "SIS14STRBLK",
+    "spec": {
+      "wireType": "SIS",
+      "awgSize": "#14 AWG",
+      "color": "Black",
+      "strandCount": "19-strand",
+      "insulation": "XLPE (Cross-linked polyethylene)",
+      "voltage": "600V",
+      "tempRating": "90°C",
+      "conductorMaterial": "Copper",
+      "ulListing": "UL 44"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Wire and Cable Your Way",
+        "sku": "SIS14STRBLK",
+        "price": 0.18,
+        "currency": "USD",
+        "url": "https://www.wireandcableyourway.com/14-awg-sis-stranded-copper-wire-black.html",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "Nassau Electrical",
+        "sku": "NE-SIS14BLK",
+        "price": 0.17,
+        "currency": "USD",
+        "url": "https://www.nassauelectrical.com/wire-cable/switchboard-wire/sis/14-awg-sis-black.html",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 0.18,
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "WIRE CABLE",
+    "name": "SIS, #12 AWG, STRANDED, BLK",
+    "description": "Southwire SIS (Switchboard & Switchgear Wire) #12 AWG 19-strand copper, black, 600V, 90°C, XLPE insulation, UL 44. NEC Article 408 switchboard wiring standard. Sold by the foot (price per ft).",
+    "manufacturer": "Southwire",
+    "manufacturerPartNumber": "SIS12STRBLK",
+    "spec": {
+      "wireType": "SIS",
+      "awgSize": "#12 AWG",
+      "color": "Black",
+      "strandCount": "19-strand",
+      "insulation": "XLPE (Cross-linked polyethylene)",
+      "voltage": "600V",
+      "tempRating": "90°C",
+      "conductorMaterial": "Copper",
+      "ulListing": "UL 44"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Wire and Cable Your Way",
+        "sku": "SIS12STRBLK",
+        "price": 0.26,
+        "currency": "USD",
+        "url": "https://www.wireandcableyourway.com/12-awg-sis-stranded-copper-wire-black.html",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "Nassau Electrical",
+        "sku": "NE-SIS12BLK",
+        "price": 0.25,
+        "currency": "USD",
+        "url": "https://www.nassauelectrical.com/wire-cable/switchboard-wire/sis/12-awg-sis-black.html",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 0.26,
+    "qualityRating": 5,
+    "popularity": 5
+  },
+  {
+    "category": "WIRE CABLE",
+    "name": "SIS, #10 AWG, STRANDED, BLK",
+    "description": "Southwire SIS (Switchboard & Switchgear Wire) #10 AWG 19-strand copper, black, 600V, 90°C, XLPE insulation, UL 44. Standard for internal switchboard control wiring per NEC 408. Sold by the foot (price per ft).",
+    "manufacturer": "Southwire",
+    "manufacturerPartNumber": "SIS10STRBLK",
+    "spec": {
+      "wireType": "SIS",
+      "awgSize": "#10 AWG",
+      "color": "Black",
+      "strandCount": "19-strand",
+      "insulation": "XLPE (Cross-linked polyethylene)",
+      "voltage": "600V",
+      "tempRating": "90°C",
+      "conductorMaterial": "Copper",
+      "ulListing": "UL 44"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Wire and Cable Your Way",
+        "sku": "SIS10STRBLK",
+        "price": 0.40,
+        "currency": "USD",
+        "url": "https://www.wireandcableyourway.com/10-awg-sis-stranded-copper-wire-black.html",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "Nassau Electrical",
+        "sku": "NE-SIS10BLK",
+        "price": 0.38,
+        "currency": "USD",
+        "url": "https://www.nassauelectrical.com/wire-cable/switchboard-wire/sis/10-awg-sis-black.html",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 0.40,
+    "qualityRating": 5,
+    "popularity": 5
+  },
+  {
+    "category": "WIRE CABLE",
+    "name": "MTW, #16 AWG, STRANDED, BLK",
+    "description": "Southwire MTW (Machine Tool Wire) #16 AWG 26-strand copper, black, 600V, 60°C/90°C, PVC insulation, UL 1063. Flexible control wiring for panels and machine tools. Sold by the foot (price per ft).",
+    "manufacturer": "Southwire",
+    "manufacturerPartNumber": "MTW16STRBLK",
+    "spec": {
+      "wireType": "MTW",
+      "awgSize": "#16 AWG",
+      "color": "Black",
+      "strandCount": "26-strand",
+      "insulation": "PVC",
+      "voltage": "600V",
+      "tempRating": "60°C / 90°C",
+      "conductorMaterial": "Copper",
+      "ulListing": "UL 1063"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Wire and Cable Your Way",
+        "sku": "MTW16STRBLK",
+        "price": 0.13,
+        "currency": "USD",
+        "url": "https://www.wireandcableyourway.com/16-awg-mtw-wire-stranded-copper-black.html",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "AutomationDirect",
+        "sku": "C16B-1000",
+        "price": 0.11,
+        "currency": "USD",
+        "url": "https://www.automationdirect.com/adc/shopping/catalog/cables_-z-_wires_-z-_accessories/building_wire/mtw_wire/C16B-1000",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 0.13,
+    "qualityRating": 4,
+    "popularity": 3
+  },
+  {
+    "category": "WIRE CABLE",
+    "name": "MTW, #14 AWG, STRANDED, BLK",
+    "description": "Southwire MTW (Machine Tool Wire) #14 AWG 19-strand copper, black, 600V, 60°C/90°C, PVC insulation, UL 1063. Flexible control wiring for switchboard panels and machine tools. Sold by the foot (price per ft).",
+    "manufacturer": "Southwire",
+    "manufacturerPartNumber": "MTW14STRBLK",
+    "spec": {
+      "wireType": "MTW",
+      "awgSize": "#14 AWG",
+      "color": "Black",
+      "strandCount": "19-strand",
+      "insulation": "PVC",
+      "voltage": "600V",
+      "tempRating": "60°C / 90°C",
+      "conductorMaterial": "Copper",
+      "ulListing": "UL 1063"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Wire and Cable Your Way",
+        "sku": "MTW14STRBLK",
+        "price": 0.18,
+        "currency": "USD",
+        "url": "https://www.wireandcableyourway.com/14-awg-mtw-wire-stranded-copper-black.html",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "AutomationDirect",
+        "sku": "C14B-1000",
+        "price": 0.16,
+        "currency": "USD",
+        "url": "https://www.automationdirect.com/adc/shopping/catalog/cables_-z-_wires_-z-_accessories/building_wire/mtw_wire/C14B-1000",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 0.18,
+    "qualityRating": 4,
+    "popularity": 3
+  },
+  {
+    "category": "WIRE CABLE",
+    "name": "DLO, 2 AWG (262.6 KCMIL EQ), STRANDED, BLK",
+    "description": "Southwire DLO (Diesel Locomotive Cable) 2 AWG / 262.6 kcmil equivalent, fine-strand copper (133-strand), black EPR insulation, 2000V, 90°C, UL 1072. Heavy flexible power feed cable for switchboard service entrance and generator connections. Sold by the foot (price per ft).",
+    "manufacturer": "Southwire",
+    "manufacturerPartNumber": "DLO2STRBLK",
+    "spec": {
+      "wireType": "DLO",
+      "awgSize": "2 AWG",
+      "color": "Black",
+      "strandCount": "133-strand (fine-strand)",
+      "insulation": "EPR / CPE jacket",
+      "voltage": "2000V",
+      "tempRating": "90°C",
+      "conductorMaterial": "Copper",
+      "ulListing": "UL 1072"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Wire and Cable Your Way",
+        "sku": "DLO2STRBLK",
+        "price": 2.45,
+        "currency": "USD",
+        "url": "https://www.wireandcableyourway.com/2-awg-dlo-cable-black.html",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 2.45,
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "WIRE CABLE",
+    "name": "DLO, 1/0 AWG (313 KCMIL EQ), STRANDED, BLK",
+    "description": "Southwire DLO 1/0 AWG / 313 kcmil equivalent, fine-strand copper, black EPR/CPE, 2000V, 90°C, UL 1072. Heavy flexible service entrance feeder for switchboard main feeds. Sold by the foot (price per ft).",
+    "manufacturer": "Southwire",
+    "manufacturerPartNumber": "DLO1/0STRBLK",
+    "spec": {
+      "wireType": "DLO",
+      "awgSize": "1/0 AWG",
+      "color": "Black",
+      "strandCount": "fine-strand",
+      "insulation": "EPR / CPE jacket",
+      "voltage": "2000V",
+      "tempRating": "90°C",
+      "conductorMaterial": "Copper",
+      "ulListing": "UL 1072"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Wire and Cable Your Way",
+        "sku": "DLO1/0STRBLK",
+        "price": 3.80,
+        "currency": "USD",
+        "url": "https://www.wireandcableyourway.com/1-0-awg-dlo-cable-black.html",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 3.80,
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "WIRE CABLE",
+    "name": "DLO, 3/0 AWG (444 KCMIL EQ), STRANDED, BLK",
+    "description": "Southwire DLO 3/0 AWG / 444 kcmil equivalent, fine-strand copper, black EPR/CPE, 2000V, 90°C, UL 1072. Very flexible heavy-duty switchboard service feeder. Sold by the foot (price per ft).",
+    "manufacturer": "Southwire",
+    "manufacturerPartNumber": "DLO3/0STRBLK",
+    "spec": {
+      "wireType": "DLO",
+      "awgSize": "3/0 AWG",
+      "color": "Black",
+      "strandCount": "fine-strand",
+      "insulation": "EPR / CPE jacket",
+      "voltage": "2000V",
+      "tempRating": "90°C",
+      "conductorMaterial": "Copper",
+      "ulListing": "UL 1072"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Wire and Cable Your Way",
+        "sku": "DLO3/0STRBLK",
+        "price": 5.90,
+        "currency": "USD",
+        "url": "https://www.wireandcableyourway.com/3-0-awg-dlo-cable-black.html",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 5.90,
+    "qualityRating": 5,
+    "popularity": 3
+  }
+]

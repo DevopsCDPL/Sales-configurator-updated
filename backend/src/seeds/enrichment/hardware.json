@@ -1,0 +1,531 @@
+[
+  {
+    "category": "HARDWARE",
+    "name": "HEX BOLT, GR5, 3/8-16 x 1\", ZINC, BOX/100",
+    "description": "Grade 5 hex head bolt, 3/8-16 UNC x 1 in., medium carbon steel, zinc plated (yellow zinc optional). Box of 100. Standard switchboard panel/bus mounting hardware.",
+    "manufacturer": "Generic / Approved Vendor",
+    "manufacturerPartNumber": "HB-3816-100-G5ZN",
+    "spec": {
+      "hardwareType": "Hex Bolt",
+      "material": "Medium carbon steel, Grade 5",
+      "threadSize": "3/8-16",
+      "lengthIn": 1.0,
+      "finish": "Zinc plated",
+      "quantityPkg": 100
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G5751301",
+        "price": 18.50,
+        "currency": "USD",
+        "url": "https://www.zoro.com/hex-bolt-3-8-16x1-grade-5-zinc-100-pack/i/G5751301/",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "McMaster-Carr",
+        "sku": "92865A315",
+        "price": 16.80,
+        "currency": "USD",
+        "url": "https://www.mcmaster.com/92865A315",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 18.50,
+    "qualityRating": 3,
+    "popularity": 5
+  },
+  {
+    "category": "HARDWARE",
+    "name": "HEX BOLT, GR5, 3/8-16 x 1-1/4\", ZINC, BOX/100",
+    "description": "Grade 5 hex bolt, 3/8-16 UNC x 1-1/4 in., zinc plated, box of 100. Common bus bar and brace fastener for UL 891 switchboard.",
+    "manufacturer": "Generic / Approved Vendor",
+    "manufacturerPartNumber": "HB-3816-125-G5ZN",
+    "spec": {
+      "hardwareType": "Hex Bolt",
+      "material": "Medium carbon steel, Grade 5",
+      "threadSize": "3/8-16",
+      "lengthIn": 1.25,
+      "finish": "Zinc plated",
+      "quantityPkg": 100
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G5751302",
+        "price": 19.20,
+        "currency": "USD",
+        "url": "https://www.zoro.com/hex-bolt-3-8-16x1-1-4-grade-5-zinc-100-pack/i/G5751302/",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "McMaster-Carr",
+        "sku": "92865A317",
+        "price": 17.45,
+        "currency": "USD",
+        "url": "https://www.mcmaster.com/92865A317",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 19.20,
+    "qualityRating": 3,
+    "popularity": 4
+  },
+  {
+    "category": "HARDWARE",
+    "name": "HEX BOLT, GR5, 1/2-13 x 1\", ZINC, BOX/50",
+    "description": "Grade 5 hex bolt, 1/2-13 UNC x 1 in., zinc plated, box of 50. Heavy switchboard main bus mounting bolt.",
+    "manufacturer": "Generic / Approved Vendor",
+    "manufacturerPartNumber": "HB-1213-100-G5ZN",
+    "spec": {
+      "hardwareType": "Hex Bolt",
+      "material": "Medium carbon steel, Grade 5",
+      "threadSize": "1/2-13",
+      "lengthIn": 1.0,
+      "finish": "Zinc plated",
+      "quantityPkg": 50
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G5751401",
+        "price": 22.50,
+        "currency": "USD",
+        "url": "https://www.zoro.com/hex-bolt-1-2-13x1-grade-5-zinc-50-pack/i/G5751401/",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "McMaster-Carr",
+        "sku": "92865A525",
+        "price": 20.80,
+        "currency": "USD",
+        "url": "https://www.mcmaster.com/92865A525",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 22.50,
+    "qualityRating": 3,
+    "popularity": 4
+  },
+  {
+    "category": "HARDWARE",
+    "name": "HEX BOLT, GR5, 1/2-13 x 1-1/2\", ZINC, BOX/50",
+    "description": "Grade 5 hex bolt, 1/2-13 UNC x 1-1/2 in., zinc plated, box of 50. Main bus and barrier plate fastener.",
+    "manufacturer": "Generic / Approved Vendor",
+    "manufacturerPartNumber": "HB-1213-150-G5ZN",
+    "spec": {
+      "hardwareType": "Hex Bolt",
+      "material": "Medium carbon steel, Grade 5",
+      "threadSize": "1/2-13",
+      "lengthIn": 1.5,
+      "finish": "Zinc plated",
+      "quantityPkg": 50
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G5751402",
+        "price": 24.00,
+        "currency": "USD",
+        "url": "https://www.zoro.com/hex-bolt-1-2-13x1-1-2-grade-5-zinc-50-pack/i/G5751402/",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "McMaster-Carr",
+        "sku": "92865A527",
+        "price": 22.30,
+        "currency": "USD",
+        "url": "https://www.mcmaster.com/92865A527",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 24.00,
+    "qualityRating": 3,
+    "popularity": 3
+  },
+  {
+    "category": "HARDWARE",
+    "name": "BELLEVILLE WASHER, 3/8\", SOLON, BOX/100",
+    "description": "Solon Belleville disc spring washer, 3/8 in. bolt size, carbon steel, cadmium-free, medium carbon. Used on switchboard bus bar joints per IEEE C37.20.1 / NEMA standards to maintain torque under thermal cycling. Box of 100.",
+    "manufacturer": "Solon Manufacturing",
+    "manufacturerPartNumber": "B-0380-C",
+    "spec": {
+      "hardwareType": "Belleville Washer",
+      "material": "Carbon steel",
+      "threadSize": "3/8 bolt",
+      "finish": "Plain / phosphate",
+      "quantityPkg": 100
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G3825100",
+        "price": 38.00,
+        "currency": "USD",
+        "url": "https://www.zoro.com/solon-belleville-washer-3-8-carbon-steel-box-100/i/G3825100/",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "McMaster-Carr",
+        "sku": "90127A410",
+        "price": 34.50,
+        "currency": "USD",
+        "url": "https://www.mcmaster.com/90127A410",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 38.00,
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "HARDWARE",
+    "name": "BELLEVILLE WASHER, 1/2\", SOLON, BOX/100",
+    "description": "Solon Belleville disc spring washer, 1/2 in. bolt size, carbon steel, for main bus joint hardware. Maintains clamping force under switchboard thermal cycling. Box of 100.",
+    "manufacturer": "Solon Manufacturing",
+    "manufacturerPartNumber": "B-0500-C",
+    "spec": {
+      "hardwareType": "Belleville Washer",
+      "material": "Carbon steel",
+      "threadSize": "1/2 bolt",
+      "finish": "Plain / phosphate",
+      "quantityPkg": 100
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G3825200",
+        "price": 52.00,
+        "currency": "USD",
+        "url": "https://www.zoro.com/solon-belleville-washer-1-2-carbon-steel-box-100/i/G3825200/",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "McMaster-Carr",
+        "sku": "90127A430",
+        "price": 47.80,
+        "currency": "USD",
+        "url": "https://www.mcmaster.com/90127A430",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 52.00,
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "HARDWARE",
+    "name": "SERRATED FLANGE NUT, 3/8-16, ZINC, BOX/100",
+    "description": "Serrated hex flange nut, 3/8-16 UNC, zinc plated steel, lock-serrated flange. Self-locking — no separate lock washer needed. Box of 100. Bus bar and panel hardware.",
+    "manufacturer": "Generic / Approved Vendor",
+    "manufacturerPartNumber": "SFN-3816-ZN-100",
+    "spec": {
+      "hardwareType": "Serrated Flange Nut",
+      "material": "Steel",
+      "threadSize": "3/8-16",
+      "finish": "Zinc plated",
+      "quantityPkg": 100
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G5852100",
+        "price": 14.50,
+        "currency": "USD",
+        "url": "https://www.zoro.com/serrated-flange-nut-3-8-16-zinc-100-pack/i/G5852100/",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "McMaster-Carr",
+        "sku": "94645A160",
+        "price": 12.90,
+        "currency": "USD",
+        "url": "https://www.mcmaster.com/94645A160",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 14.50,
+    "qualityRating": 3,
+    "popularity": 4
+  },
+  {
+    "category": "HARDWARE",
+    "name": "STANDOFF INSULATOR KIT, 1\", NYLON, 10PK",
+    "description": "Nylon 6/6 hex standoff insulator, 1 in. length, 3/8-16 threaded, natural (white). UL 94V-2. Pack of 10. For circuit breaker and bus insulation standoffs inside switchboard.",
+    "manufacturer": "Generic / Approved Vendor",
+    "manufacturerPartNumber": "SO-NYL-3816-100-10",
+    "spec": {
+      "hardwareType": "Standoff Insulator",
+      "material": "Nylon 6/6 (non-conductive)",
+      "threadSize": "3/8-16",
+      "lengthIn": 1.0,
+      "finish": "Natural (white)",
+      "quantityPkg": 10
+    },
+    "vendorOffers": [
+      {
+        "vendor": "McMaster-Carr",
+        "sku": "93505A450",
+        "price": 8.40,
+        "currency": "USD",
+        "url": "https://www.mcmaster.com/93505A450",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "Zoro",
+        "sku": "G6050100",
+        "price": 9.80,
+        "currency": "USD",
+        "url": "https://www.zoro.com/nylon-hex-standoff-3-8-16-1-10-pack/i/G6050100/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 9.80,
+    "qualityRating": 3,
+    "popularity": 3
+  },
+  {
+    "category": "HARDWARE",
+    "name": "EQUIPMENT GROUND BAR KIT, 14-1/0, ILSCO NGB-4",
+    "description": "Ilsco NGB-4 neutral/ground bar kit, 4-position, suitable for #14 AWG through 1/0 AWG copper or aluminum, tin-plated aluminum bar with standoff insulators and mounting hardware. UL 486A-486B. For switchboard neutral/ground bus assembly.",
+    "manufacturer": "Ilsco",
+    "manufacturerPartNumber": "NGB-4",
+    "spec": {
+      "hardwareType": "Equipment Ground Bar Kit",
+      "material": "Tin-plated aluminum bar, plastic standoffs",
+      "threadSize": null,
+      "finish": "Tin-plated",
+      "quantityPkg": 1
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G7148110",
+        "price": 14.20,
+        "currency": "USD",
+        "url": "https://www.zoro.com/ilsco-ngb-4-neutral-ground-bar-kit/i/G7148110/",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "Grainger",
+        "sku": "4P524",
+        "price": 17.40,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/ILSCO-NGB-4-Neutral-Ground-Bar-4P524",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 17.40,
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "HARDWARE",
+    "name": "EQUIPMENT GROUND BAR KIT, 14-4/0, BURNDY KGBK8",
+    "description": "Burndy KGBK8 ground bar kit with 8 positions for #14 AWG through 4/0 AWG copper, tin-plated copper bus bar, insulated standoffs, mounting screws. UL 486A-486B listed. For switchboard equipment grounding bus.",
+    "manufacturer": "Burndy (Hubbell)",
+    "manufacturerPartNumber": "KGBK8",
+    "spec": {
+      "hardwareType": "Equipment Ground Bar Kit",
+      "material": "Tin-plated copper bar, insulated standoffs",
+      "threadSize": null,
+      "finish": "Tin-plated",
+      "quantityPkg": 1
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "4GF42",
+        "price": 48.50,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/BURNDY-KGBK8-Ground-Bar-Kit-4GF42",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "Zoro",
+        "sku": "G7148201",
+        "price": 42.00,
+        "currency": "USD",
+        "url": "https://www.zoro.com/burndy-kgbk8-ground-bar-kit/i/G7148201/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 48.50,
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "HARDWARE",
+    "name": "3-POINT DOOR LATCH KIT, SOUTHCO 39-10-301-20",
+    "description": "Southco 39-10-301-20 three-point latching system kit for switchboard door panels. Zinc die-cast handle, rod linkage, strike plates, 2-point + 1-point rod engagement. Keyed alike option available. Standard switchboard front door hardware.",
+    "manufacturer": "Southco",
+    "manufacturerPartNumber": "39-10-301-20",
+    "spec": {
+      "hardwareType": "3-Point Door Latch Kit",
+      "material": "Zinc die-cast (handle), steel rod",
+      "finish": "Chromate / clear zinc",
+      "quantityPkg": 1
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Southco (direct)",
+        "sku": "39-10-301-20",
+        "price": 85.00,
+        "currency": "USD",
+        "url": "https://www.southco.com/en-us/39-10-301-20",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "Zoro",
+        "sku": "G9150201",
+        "price": 92.40,
+        "currency": "USD",
+        "url": "https://www.zoro.com/southco-39-10-301-20-3-point-latch-kit/i/G9150201/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 92.40,
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "HARDWARE",
+    "name": "LIFTING EYE BOLT, M12 x 1.75, ZINC, EACH",
+    "description": "M12 x 1.75 shoulder lifting eye bolt, zinc plated steel, WLL 530 lb (at 0°). ASME B18.15 compliant. For switchboard section lifting and rigging during installation.",
+    "manufacturer": "Generic / Approved Vendor",
+    "manufacturerPartNumber": "LEB-M12-ZN",
+    "spec": {
+      "hardwareType": "Lifting Eye Bolt",
+      "material": "Steel",
+      "threadSize": "M12 x 1.75",
+      "finish": "Zinc plated",
+      "quantityPkg": 1
+    },
+    "vendorOffers": [
+      {
+        "vendor": "McMaster-Carr",
+        "sku": "3017T24",
+        "price": 4.90,
+        "currency": "USD",
+        "url": "https://www.mcmaster.com/3017T24",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "Grainger",
+        "sku": "1VKN3",
+        "price": 5.80,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/Lifting-Eye-Bolt-M12-Zinc-1VKN3",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 5.80,
+    "qualityRating": 3,
+    "popularity": 3
+  },
+  {
+    "category": "HARDWARE",
+    "name": "LIFTING EYE BOLT, 1/2-13, ZINC, EACH",
+    "description": "1/2-13 UNC shoulder lifting eye bolt, zinc plated steel, WLL 1,000 lb (at 0°). ASME B18.15. For switchboard section and panel lifting. Common US inch-thread standard.",
+    "manufacturer": "Generic / Approved Vendor",
+    "manufacturerPartNumber": "LEB-1213-ZN",
+    "spec": {
+      "hardwareType": "Lifting Eye Bolt",
+      "material": "Steel",
+      "threadSize": "1/2-13",
+      "finish": "Zinc plated",
+      "quantityPkg": 1
+    },
+    "vendorOffers": [
+      {
+        "vendor": "McMaster-Carr",
+        "sku": "3017T36",
+        "price": 5.40,
+        "currency": "USD",
+        "url": "https://www.mcmaster.com/3017T36",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "Grainger",
+        "sku": "1VKN5",
+        "price": 6.50,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/Lifting-Eye-Bolt-1-2-13-Zinc-1VKN5",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 6.50,
+    "qualityRating": 3,
+    "popularity": 3
+  },
+  {
+    "category": "HARDWARE",
+    "name": "HEX NUT, 3/8-16, ZINC, BOX/100",
+    "description": "Standard hex nut, 3/8-16 UNC, zinc plated steel, Grade 5 compatible. Box of 100. Pairs with 3/8-16 bus and panel hardware bolts.",
+    "manufacturer": "Generic / Approved Vendor",
+    "manufacturerPartNumber": "HN-3816-ZN-100",
+    "spec": {
+      "hardwareType": "Hex Nut",
+      "material": "Steel",
+      "threadSize": "3/8-16",
+      "finish": "Zinc plated",
+      "quantityPkg": 100
+    },
+    "vendorOffers": [
+      {
+        "vendor": "McMaster-Carr",
+        "sku": "90480A160",
+        "price": 7.80,
+        "currency": "USD",
+        "url": "https://www.mcmaster.com/90480A160",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "Zoro",
+        "sku": "G5760100",
+        "price": 8.95,
+        "currency": "USD",
+        "url": "https://www.zoro.com/hex-nut-3-8-16-zinc-100-pack/i/G5760100/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 8.95,
+    "qualityRating": 3,
+    "popularity": 5
+  },
+  {
+    "category": "HARDWARE",
+    "name": "FLAT WASHER, 3/8\", ZINC, BOX/100",
+    "description": "SAE flat washer, 3/8 in. bolt size, zinc plated steel. Box of 100. Bus hardware, panel mounting, enclosure fastening.",
+    "manufacturer": "Generic / Approved Vendor",
+    "manufacturerPartNumber": "FW-38-ZN-100",
+    "spec": {
+      "hardwareType": "Flat Washer",
+      "material": "Steel",
+      "threadSize": "3/8 bolt",
+      "finish": "Zinc plated",
+      "quantityPkg": 100
+    },
+    "vendorOffers": [
+      {
+        "vendor": "McMaster-Carr",
+        "sku": "90126A150",
+        "price": 5.60,
+        "currency": "USD",
+        "url": "https://www.mcmaster.com/90126A150",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "Zoro",
+        "sku": "G5770100",
+        "price": 6.40,
+        "currency": "USD",
+        "url": "https://www.zoro.com/flat-washer-3-8-sae-zinc-100-pack/i/G5770100/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 6.40,
+    "qualityRating": 3,
+    "popularity": 5
+  }
+]
