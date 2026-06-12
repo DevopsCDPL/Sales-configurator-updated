@@ -376,8 +376,14 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
                 <TableRow>
                   <TableCell sx={{ ...headSx, bgcolor: C.bg }}>Part #</TableCell>
                   <TableCell sx={{ ...headSx, bgcolor: C.bg }}>Name</TableCell>
+                  {isCbMode && (
+                    <TableCell sx={{ ...headSx, bgcolor: C.bg }}>Manufacturer</TableCell>
+                  )}
+                  {isCbMode && (
+                    <TableCell sx={{ ...headSx, bgcolor: C.bg }}>Rating</TableCell>
+                  )}
                   <TableCell sx={{ ...headSx, bgcolor: C.bg }} align="right">Price</TableCell>
-                  <TableCell sx={{ ...headSx, bgcolor: C.bg, width: 56 }} align="center">Rating</TableCell>
+                  <TableCell sx={{ ...headSx, bgcolor: C.bg, width: 56 }} align="center">&#9733;</TableCell>
                   {mode === 'add' && !pickOnly && (
                     <TableCell sx={{ ...headSx, bgcolor: C.bg, width: 72 }}>Qty</TableCell>
                   )}
@@ -387,16 +393,47 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
               <TableBody>
                 {displayRows.map((r) => {
                   const price = Number(r.price ?? (r as any).mat_cost ?? (r as any).material_cost) || 0;
+                  const sp: any = (r as any).specifications ?? {};
+                  const hasCatNum = !!sp.catalogNumber;
+                  const ratingParts: string[] = [];
+                  if (sp.ratedCurrentA != null) ratingParts.push(String(sp.ratedCurrentA) + 'A');
+                  if (sp.interruptingKA != null) ratingParts.push(String(sp.interruptingKA) + 'kA');
+                  if (sp.poles != null) ratingParts.push(String(sp.poles) + 'P');
+                  const ratingStr = ratingParts.length > 0 ? ratingParts.join(' / ') : '—';
+                  const mfgStr = sp.manufacturer ? displayCase(String(sp.manufacturer)) : '—';
                   return (
                     <TableRow key={r.id} hover>
                       <TableCell sx={cellSx}>
-                        <Tooltip title={r.part_number ?? ''}>
-                          <span>{compactSku(r.part_number) || '—'}</span>
-                        </Tooltip>
+                        <Stack direction="row" alignItems="center" spacing={0.5}>
+                          <Tooltip title={r.part_number ?? ''}>
+                            <span>{compactSku(r.part_number) || '—'}</span>
+                          </Tooltip>
+                          {hasCatNum && (
+                            <Tooltip title={'Cat# ' + sp.catalogNumber}>
+                              <Chip
+                                label="Cat#"
+                                size="small"
+                                sx={{
+                                  height: 16, fontSize: 9.5, fontWeight: 700,
+                                  bgcolor: 'rgba(34,197,94,0.12)',
+                                  color: C.green,
+                                  border: '1px solid rgba(34,197,94,0.35)',
+                                  '& .MuiChip-label': { px: 0.7 },
+                                }}
+                              />
+                            </Tooltip>
+                          )}
+                        </Stack>
                       </TableCell>
                       <TableCell sx={cellSx}>{displayCase(r.name)}</TableCell>
+                      {isCbMode && (
+                        <TableCell sx={{ ...cellSx, color: C.sub, fontSize: 11 }}>{mfgStr}</TableCell>
+                      )}
+                      {isCbMode && (
+                        <TableCell sx={{ ...cellSx, color: C.sub, fontSize: 11, whiteSpace: 'nowrap' }}>{ratingStr}</TableCell>
+                      )}
                       <TableCell sx={cellSx} align="right">
-                        <PriceSourceDot source={(r as any).specifications?.priceSource} />
+                        <PriceSourceDot source={sp.priceSource} />
                         {price > 0 ? (
                           usd(price)
                         ) : (
@@ -406,10 +443,10 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
                         )}
                       </TableCell>
                       <TableCell sx={cellSx} align="center">
-                        {(r as any).specifications?.qualityRating != null ? (
+                        {sp.qualityRating != null ? (
                           <Stack direction="row" alignItems="center" justifyContent="center" spacing={0.2}>
                             <StarRoundedIcon sx={{ fontSize: 10, color: C.amber }} />
-                            <Typography sx={{ fontSize: 10.5, color: C.amber }}>{(r as any).specifications.qualityRating}</Typography>
+                            <Typography sx={{ fontSize: 10.5, color: C.amber }}>{sp.qualityRating}</Typography>
                           </Stack>
                         ) : null}
                       </TableCell>

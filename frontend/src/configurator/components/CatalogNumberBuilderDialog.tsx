@@ -2,7 +2,7 @@
  * CatalogNumberBuilderDialog — Schneider Part Number Decoder.
  * Uses the decoding engine from ../data/schneiderDecoderData.ts (do not modify that file).
  */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Accordion,
   AccordionDetails,
@@ -10,6 +10,7 @@ import {
   Alert,
   Box,
   Button,
+  Chip,
   Dialog,
   DialogActions,
   DialogContent,
@@ -87,6 +88,82 @@ function coerceSpecValue(key: string, v: string): string | number | null {
   return v;
 }
 
+/** Pure helper: derive CB detail fields from currently selected position labels. */
+function deriveDetailsFromSelections(
+  selections: Record<string, string>,
+  getOpts: (key: string) => { code: string; label: string }[],
+): Partial<Record<string, string>> {
+  const label = (key: string): string =>
+    getOpts(key).find((o) => o.code === selections[key])?.label ?? '';
+
+  const d: Partial<Record<string, string>> = {};
+
+  if (Object.keys(selections).length === 0) return d;
+
+  // deviceClass — constant for Masterpact (ACB)
+  d.deviceClass = 'ACB';
+  d.mounting = 'Drawout';
+
+  // manufacturer from Pos 2 (Branding)
+  const brandLabel = label('2');
+  if (brandLabel) {
+    if (/Schneider Electric/i.test(brandLabel)) d.manufacturer = 'Schneider Electric';
+    else if (/Square D/i.test(brandLabel)) d.manufacturer = 'Square D';
+  }
+
+  // series / frameModel / poles from Pos 1 (Frame)
+  const frameLabel = label('1');
+  if (frameLabel) {
+    const frameMatch = frameLabel.match(/\b(NT|NW)\b/);
+    const frameType = frameMatch ? frameMatch[1] : null;
+    if (frameType) {
+      d.series = 'Masterpact ' + frameType;
+      d.frameModel = frameType;
+    } else {
+      d.series = 'Masterpact NT/NW';
+    }
+    const polesMatch = frameLabel.match(/(\d)(?:\/\d)?-Pole/i);
+    if (polesMatch) d.poles = polesMatch[1];
+  }
+
+  // ratedCurrentA from Pos 5 (Ampacity), fallback Pos 4 (Frame Rating)
+  const ampLabel = label('5');
+  if (ampLabel) {
+    const aMatch = ampLabel.match(/(\d[\d,]*)\s*A/);
+    if (aMatch) d.ratedCurrentA = aMatch[1].replace(/,/g, '');
+  }
+  if (!d.ratedCurrentA) {
+    const frameRatingLabel = label('4');
+    if (frameRatingLabel) {
+      const aMatch = frameRatingLabel.match(/(\d[\d,]*)\s*A/);
+      if (aMatch) d.ratedCurrentA = aMatch[1].replace(/,/g, '');
+    }
+  }
+
+  // interruptingKA from Pos 3 (Air Code) — prefer explicit "N kA" else first value from NT:/NW: list
+  const airLabel = label('3');
+  if (airLabel) {
+    const kaMatch = airLabel.match(/(\d+)\s*kA/i) ?? airLabel.match(/(?:NT|NW):(\d+)/i);
+    if (kaMatch) d.interruptingKA = kaMatch[1];
+  }
+
+  // voltageRating from Pos 3 or Pos 6
+  const termLabel = label('6');
+  const voltSearch = airLabel + ' ' + termLabel;
+  const voltMatch = voltSearch.match(/(\d{3,4})\s*V(?:ac|dc)?/i);
+  if (voltMatch) d.voltageRating = voltMatch[1] + 'V';
+
+  // tripUnitType and protectionFunctions from Pos 7_8
+  const tripLabel = label('7_8');
+  if (tripLabel) {
+    d.tripUnitType = tripLabel.trim();
+    const pfMatch = tripLabel.match(/\b(LSIG|LSIV|LSI|LI|LSO|LSG)\b/i);
+    if (pfMatch) d.protectionFunctions = pfMatch[1].toUpperCase();
+  }
+
+  return d;
+}
+
 interface Props {
   open: boolean;
   component: ConfiguratorComponent | null;
@@ -108,6 +185,8 @@ export default function CatalogNumberBuilderDialog({
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [savedNote, setSavedNote] = useState(false);
+  // Track which detail keys the user has manually edited — derived values won't clobber these.
+  const touchedRef = useRef<Set<string>>(new Set());
 
   const prefillDetails = useCallback((comp: ConfiguratorComponent | null) => {
     if (!comp) { setDetails({}); return; }
@@ -129,6 +208,7 @@ export default function CatalogNumberBuilderDialog({
       setSaving(false);
       setAdding(false);
       setSavedNote(false);
+      touchedRef.current = new Set();
       prefillDetails(component);
     }
   }, [open, component?.id, prefillDetails]);
@@ -163,6 +243,25 @@ export default function CatalogNumberBuilderDialog({
     return def ? def.getOptions(std) : [];
   }, [std]);
 
+  // Derive detail fields from selections and merge into details (untouched keys only).
+  useEffect(() => {
+    if (Object.keys(selections).length === 0) return;
+    const derived = deriveDetailsFromSelections(selections, getOptions);
+    setDetails((prev) => {
+      const next = { ...prev };
+      let changed = false;
+      for (const k of Object.keys(derived)) {
+        const val = derived[k as keyof typeof derived];
+        if (val && !touchedRef.current.has(k) && next[k] !== val) {
+          next[k] = val;
+          changed = true;
+        }
+      }
+      return changed ? next : prev;
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selections, std]);
+
   const generated = buildCatalogNumber(selections);
 
   const complete = DECODER_POSITIONS.every((def) => {
@@ -170,6 +269,15 @@ export default function CatalogNumberBuilderDialog({
     if (opts.length === 0) return true;
     return !!selections[def.key];
   });
+
+  // canSave: enabled when generated number is meaningful (>= 8 chars)
+  const canSave = generated.trim().length >= 8;
+
+  // Count positions with options but no selection (for partial-warning chip)
+  const partialCount = DECODER_POSITIONS.filter((def) => {
+    const opts = getOptions(def.key);
+    return opts.length > 0 && !selections[def.key];
+  }).length;
 
   const specialValue: CodeOption[] = DECODER_SPECIAL_POSITIONS
     .map((n) => {
@@ -213,7 +321,7 @@ export default function CatalogNumberBuilderDialog({
   };
 
   const handleSaveCatalog = async () => {
-    if (!component || !complete) return;
+    if (!component || !canSave) return;
     setSaving(true);
     setError(null);
     setSavedNote(false);
@@ -235,7 +343,7 @@ export default function CatalogNumberBuilderDialog({
   };
 
   const handleAddToConfig = async () => {
-    if (!component || !complete || !switchboardId) return;
+    if (!component || !canSave || !switchboardId) return;
     setAdding(true);
     setError(null);
     try {
@@ -420,7 +528,7 @@ export default function CatalogNumberBuilderDialog({
                 <Autocomplete
                   key={def.key}
                   options={opts}
-                  getOptionLabel={(o) => `${o.code} — ${o.label}`}
+                  getOptionLabel={(o) => o.code + ' — ' + o.label}
                   value={currentOpt}
                   onChange={(_e, v) => {
                     setSavedNote(false);
@@ -437,7 +545,7 @@ export default function CatalogNumberBuilderDialog({
                     <TextField
                       {...params}
                       size="small"
-                      label={`${def.posLabel} · ${def.name}`}
+                      label={def.posLabel + ' · ' + def.name}
                       sx={inputSx}
                     />
                   )}
@@ -450,7 +558,7 @@ export default function CatalogNumberBuilderDialog({
             <Autocomplete
               multiple
               options={POS19_25_SPECIAL}
-              getOptionLabel={(o) => `${o.code} — ${o.label}`}
+              getOptionLabel={(o) => o.code + ' — ' + o.label}
               value={specialValue}
               onChange={handleSpecialChange}
               isOptionEqualToValue={(o, v) => o.code === v.code}
@@ -496,6 +604,7 @@ export default function CatalogNumberBuilderDialog({
                   value={details[f.key] ?? ''}
                   onChange={(e) => {
                     setSavedNote(false);
+                    touchedRef.current.add(f.key);
                     setDetails((prev) => ({ ...prev, [f.key]: e.target.value }));
                   }}
                   sx={{ ...inputSx, '& .MuiInputLabel-root': { color: C.sub, fontSize: 11 } }}
@@ -527,16 +636,32 @@ export default function CatalogNumberBuilderDialog({
             Saved to catalog
           </Typography>
         )}
-        {!savedNote && <Box sx={{ flex: 1 }} />}
+        {!savedNote && (
+          <Box sx={{ display: 'flex', alignItems: 'center', flex: 1, gap: 1 }}>
+            {canSave && !complete && partialCount > 0 && (
+              <Chip
+                label={'Partial — ' + partialCount + ' position(s) unset'}
+                size="small"
+                sx={{
+                  height: 20, fontSize: 10.5,
+                  bgcolor: 'rgba(217,119,6,0.12)',
+                  color: C.amber,
+                  border: '1px solid rgba(217,119,6,0.35)',
+                  '& .MuiChip-label': { px: 1 },
+                }}
+              />
+            )}
+          </Box>
+        )}
 
         <Button onClick={onClose} sx={{ color: C.sub, textTransform: 'none' }}>
           Cancel
         </Button>
 
-        <Tooltip title={complete ? '' : 'Select all positions first'}>
+        <Tooltip title={canSave ? '' : 'Build at least 8 positions to enable save'}>
           <span>
             <Button
-              disabled={!complete || saving}
+              disabled={!canSave || saving}
               onClick={handleSaveCatalog}
               variant="outlined"
               startIcon={<SaveRoundedIcon sx={{ fontSize: 15 }} />}
@@ -557,14 +682,14 @@ export default function CatalogNumberBuilderDialog({
           title={
             !switchboardId
               ? "Open this builder from a board's Components step to add directly to a configuration"
-              : !complete
-              ? 'Select all positions first'
+              : !canSave
+              ? 'Build at least 8 positions to enable add'
               : ''
           }
         >
           <span>
             <Button
-              disabled={!complete || !switchboardId || adding}
+              disabled={!canSave || !switchboardId || adding}
               onClick={handleAddToConfig}
               variant="contained"
               startIcon={<AddRoundedIcon sx={{ fontSize: 15 }} />}
