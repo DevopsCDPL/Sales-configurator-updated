@@ -19,6 +19,7 @@ const {
   COLORS, TABLE, FOOTER_H, drawGlobalHeader, drawGlobalFooter,
   drawTableHeader, drawDataRow, drawSectionTitle, SIDE_MARGIN,
 } = require('../../utils/pdfTemplate');
+const { drawElevation } = require('./elevationPdf');
 
 const usd = (n) => `$ ${(Number(n) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const fmtDate = (d) => {
@@ -82,6 +83,8 @@ async function buildItem(board) {
 
   return {
     board, quote, unitPrice, qty,
+    _sections: sections,
+    _deviceLines: deviceLines,
     name: board.name,
     productLine: board.board_type === 'SWITCHBOARD_UL891' ? 'UL 891 Switchboard' : (board.board_type || 'Switchboard'),
     dims: widthIn ? `${heightIn}" x ${widthIn}" x ${depthIn}"` : '—',
@@ -333,12 +336,23 @@ async function buildProposalPdf(configurationId, { companyId = null, user = null
         }
       }
 
-      /* ── Elevation drawings placeholder ── */
+      /* ── §6 Elevation drawings (parametric pdfkit twin) ── */
       y = newPage();
       drawSectionTitle(doc, margin, y, sectionNo++, 'Elevation drawings (estimate only)');
-      y += 20;
-      doc.fontSize(8.5).font('Helvetica-Oblique').fillColor(COLORS.TEXT_MED)
-        .text('Elevation drawings will be issued with the engineering submittal package.', margin, y);
+      y += 14;
+      doc.fontSize(7.5).font('Helvetica-Oblique').fillColor(COLORS.TEXT_MED)
+        .text('Parametric estimate — subject to revision with engineering submittal.', margin, y, { width: cW });
+      y += 14;
+
+      // One elevation per board, stacked vertically
+      for (const it of items) {
+        // Need at least 180 pts for a useful elevation; move to new page if tight
+        y = ensure(y, 180);
+        const elvMaxH = Math.min(260, pageH - margin - FOOTER_H - y);
+        const region  = { x: margin, y, maxWidth: cW, maxHeight: elvMaxH };
+        const consumed = drawElevation(doc, region, it);
+        y += consumed + 18;
+      }
 
       /* ── Terms and Conditions ── */
       y = newPage();

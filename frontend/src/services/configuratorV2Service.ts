@@ -614,6 +614,13 @@ export const configuratorV2Service = {
     const res = await api.post(`${ROOT}/catalog/import-components-xlsx`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
     return res.data;
   },
+
+  async downloadLabourTemplate(): Promise<void> {
+    const res = await api.get(`${ROOT}/catalog/labour-template-xlsx`, { responseType: 'blob' });
+    const url = URL.createObjectURL(new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+    const a = document.createElement('a'); a.href = url; a.download = 'labour-hours-template.xlsx';
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  },
 };
 
 export default configuratorV2Service;

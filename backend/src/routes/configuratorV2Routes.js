@@ -1321,6 +1321,9 @@ router.post('/catalog/import-components-xlsx', wbUpload.single('file'), wrap(asy
     wb.worksheets[0];
   if (!ws) return res.status(422).json({ error: 'No worksheet found in uploaded file' });
 
+  // Labour-update mode: activated when workbook contains a 'Labour Hours' sheet
+  const labourUpdateMode = Boolean(wb.getWorksheet('Labour Hours'));
+
   // Map header names -> 1-based column indices (case-insensitive, trimmed)
   const hdrRow = ws.getRow(1);
   const colIdx = {};
@@ -1374,7 +1377,17 @@ router.post('/catalog/import-components-xlsx', wbUpload.single('file'), wrap(asy
 
   const VALID_STATUS = new Set(['FIRM', 'ESTIMATED', 'PENDING_RFQ']);
 
-  let created = 0, skipped = 0, errors = 0;
+  // Feature 3: preload vendor name map for resolution
+  const vendorMap = new Map();   // lowercase name -> { id, vendor_name }
+  try {
+    const allVendors = await models.Vendor.findAll({ attributes: ['id', 'vendor_name'] });
+    for (const v of allVendors) {
+      const key = String(v.vendor_name || '').toLowerCase().trim();
+      if (key) vendorMap.set(key, { id: v.id, vendor_name: v.vendor_name });
+    }
+  } catch { /* Vendor model unavailable — continue without resolution */ }
+
+  let created = 0, skipped = 0, errors = 0, vendorsResolved = 0, vendorsUnresolved = 0;
   const errorRows = [];
 
   // Collect data rows (eachRow is sync; awaits happen in the for loop below)
@@ -1390,8 +1403,26 @@ router.post('/catalog/import-components-xlsx', wbUpload.single('file'), wrap(asy
     const sku = get(row, 'SKU');
     const category = (get(row, 'Category') || 'UNKNOWN PARTS').trim().toUpperCase();
 
-    // Dedupe: existing SKU -> skip
-    if (sku && existingSkus.has(sku)) { skipped += 1; continue; }
+    // Dedupe: existing SKU — labour-update mode if sheet is 'Labour Hours'
+    if (sku && existingSkus.has(sku)) {
+      if (labourUpdateMode) {
+        try {
+          await models.ConfiguratorComponent.update({
+            lbr_cu:  Number(get(row, 'lbr_cu'))  || 0,
+            lbr_asm: Number(get(row, 'lbr_asm')) || 0,
+            lbr_cnt: Number(get(row, 'lbr_cnt')) || 0,
+            lbr_qc:  Number(get(row, 'lbr_qc'))  || 0,
+            lbr_tst: Number(get(row, 'lbr_tst')) || 0,
+            lbr_eng: Number(get(row, 'lbr_eng')) || 0,
+            lbr_cad: Number(get(row, 'lbr_cad')) || 0,
+          }, { where: { part_number: sku } });
+          skipped += 1;   // counts as 'processed not created'
+        } catch { errors += 1; }
+      } else {
+        skipped += 1;
+      }
+      continue;
+    }
     // Dedupe: blank SKU but same category+name -> skip
     if (!sku && existingCatName.has(`${category}|${name.toLowerCase()}`)) { skipped += 1; continue; }
 
@@ -1407,7 +1438,19 @@ router.post('/catalog/import-components-xlsx', wbUpload.single('file'), wrap(asy
       const mfr = get(row, 'Manufacturer');
       if (mfr) specs.manufacturer = mfr;
       const vendorVal = get(row, 'Vendor');
-      if (vendorVal) specs.vendorName = vendorVal;
+      if (vendorVal) {
+        const vKey = vendorVal.toLowerCase().trim();
+        const vMatch = vendorMap.get(vKey);
+        if (vMatch) {
+          specs.vendorId   = vMatch.id;
+          specs.vendorName = vMatch.vendor_name;   // canonical spelling
+          vendorsResolved += 1;
+        } else {
+          specs.vendorName = vendorVal;            // keep as typed
+          specs.vendorUnresolved = true;
+          vendorsUnresolved += 1;
+        }
+      }
 
       // Parse Specification cell: "800A / 42kA / 3P" or free text
       const specCell = get(row, 'Specification');
@@ -1456,7 +1499,67 @@ router.post('/catalog/import-components-xlsx', wbUpload.single('file'), wrap(asy
   }
 
   const total = await models.ConfiguratorComponent.count();
-  res.json({ ok: true, created, skipped, errors, errorRows, total });
+  res.json({ ok: true, created, skipped, errors, errorRows, total, vendorsResolved, vendorsUnresolved });
+}));
+
+/* ── Feature 2: Labour-hours blank template download ── */
+router.get('/catalog/labour-template-xlsx', wrap(async (req, res) => {
+  const rows = await models.ConfiguratorComponent.findAll({
+    order: [['category', 'ASC'], ['part_number', 'ASC']],
+    attributes: ['part_number', 'name', 'category', 'lbr_cu', 'lbr_asm', 'lbr_cnt', 'lbr_qc', 'lbr_tst', 'lbr_eng', 'lbr_cad'],
+  });
+
+  const wb = new ExcelJS.Workbook();
+
+  // Sheet 1 — Labour Hours (engineer fills blanks)
+  const ws = wb.addWorksheet('Labour Hours');
+  ws.columns = [
+    { header: 'part_number', key: 'part_number', width: 22 },
+    { header: 'name',        key: 'name',        width: 40 },
+    { header: 'category',    key: 'category',    width: 24 },
+    { header: 'lbr_cu',      key: 'lbr_cu',      width: 12 },
+    { header: 'lbr_asm',     key: 'lbr_asm',     width: 12 },
+    { header: 'lbr_cnt',     key: 'lbr_cnt',     width: 12 },
+    { header: 'lbr_qc',      key: 'lbr_qc',      width: 12 },
+    { header: 'lbr_tst',     key: 'lbr_tst',     width: 12 },
+    { header: 'lbr_eng',     key: 'lbr_eng',     width: 12 },
+    { header: 'lbr_cad',     key: 'lbr_cad',     width: 12 },
+  ];
+  const hdrRow = ws.getRow(1);
+  hdrRow.font = { bold: true };
+  hdrRow.commit();
+  ws.views = [{ state: 'frozen', ySplit: 1 }];
+
+  rows.forEach((r) => {
+    ws.addRow({
+      part_number: r.part_number || '',
+      name:        r.name || '',
+      category:    r.category || '',
+      lbr_cu:  Number(r.lbr_cu)  || 0,
+      lbr_asm: Number(r.lbr_asm) || 0,
+      lbr_cnt: Number(r.lbr_cnt) || 0,
+      lbr_qc:  Number(r.lbr_qc)  || 0,
+      lbr_tst: Number(r.lbr_tst) || 0,
+      lbr_eng: Number(r.lbr_eng) || 0,
+      lbr_cad: Number(r.lbr_cad) || 0,
+    });
+  });
+
+  // Sheet 2 — _meta instructions
+  const meta = wb.addWorksheet('_meta');
+  meta.addRow(['Instructions']);
+  meta.addRow([
+    'Fill hours per unit and import via Database → Components → Upload Excel — ' +
+    'labour columns are matched by header name. ' +
+    'Because this workbook contains a sheet named \'Labour Hours\', ' +
+    'the importer will UPDATE the 7 lbr_* columns on existing rows ' +
+    'instead of skipping them.',
+  ]);
+
+  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  res.setHeader('Content-Disposition', 'attachment; filename="labour-hours-template.xlsx"');
+  await wb.xlsx.write(res);
+  res.end();
 }));
 
 module.exports = router;

@@ -19,6 +19,7 @@ import {
 } from '@mui/material';
 import SaveRoundedIcon from '@mui/icons-material/SaveRounded';
 import UploadFileRoundedIcon from '@mui/icons-material/UploadFileRounded';
+import FileDownloadRoundedIcon from '@mui/icons-material/FileDownloadRounded';
 import configuratorV2Service, { StandardsTableRow } from '../../services/configuratorV2Service';
 
 const C = {
@@ -50,6 +51,7 @@ const StandardsPanel: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [importing, setImporting] = useState(false);
+  const [labourDl, setLabourDl] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const wbRef = useRef<HTMLInputElement>(null);
@@ -156,6 +158,20 @@ const StandardsPanel: React.FC = () => {
           ref={wbRef} type="file" accept=".xlsm,.xlsx" hidden
           onChange={(e) => { const f = e.target.files?.[0]; if (f) importWb(f); }}
         />
+        <Button
+          variant="outlined"
+          startIcon={<FileDownloadRoundedIcon sx={{ fontSize: 16 }} />}
+          disabled={labourDl}
+          onClick={async () => {
+            setLabourDl(true);
+            try { await configuratorV2Service.downloadLabourTemplate(); }
+            catch (e: any) { setError(e?.response?.data?.error ?? 'Download failed'); }
+            finally { setLabourDl(false); }
+          }}
+          sx={{ color: C.text, borderColor: C.border, bgcolor: C.bg, textTransform: 'none', fontSize: 12.5, '&:hover': { borderColor: C.blue } }}
+        >
+          {labourDl ? 'Downloading…' : 'Labour template'}
+        </Button>
         <Button
           startIcon={<UploadFileRoundedIcon sx={{ fontSize: 16 }} />}
           disabled={importing}
