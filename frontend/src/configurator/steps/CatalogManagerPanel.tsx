@@ -28,6 +28,7 @@ import configuratorV2Service from '../../services/configuratorV2Service';
 import PriceSourceDot from '../components/PriceSourceDot';
 import CbFilterPanel from '../components/CbFilterPanel';
 import CatalogNumberBuilderDialog from '../components/CatalogNumberBuilderDialog';
+import { displayCase, compactSku } from '../lib/displayCase';
 
 const C = {
   bg: '#000000', surface: '#0B0B0D', border: '#1E2235', blue: '#00c8ff',
@@ -73,9 +74,9 @@ const emptyEdit = (cat?: string): EditState => ({
 });
 
 const DEFAULT_CATEGORIES = [
-  'CIRCUIT BREAKER','ENCLOSURE','BUSSING','HARDWARE','LUGS','TERMINALS','CONTROLS',
+  'CIRCUIT BREAKER','CB ACCESSORIES','ENCLOSURE','BUSSING','HARDWARE','LUGS','TERMINALS','CONTROLS',
   'WIRE CABLE','CONDUIT','CT / VT / CPT','SPD','ATS','RELAY','SWITCH','CAMLOCK',
-  'GLASTIC','LIGHT','STANDARD PRODUCT',
+  'GLASTIC','LIGHT','STANDARD PRODUCT','UNKNOWN PARTS',
 ];
 
 const CatalogManagerPanel: React.FC = () => {
@@ -325,7 +326,7 @@ const CatalogManagerPanel: React.FC = () => {
             }
           });
           return merged.map((c) => (
-            <Tab key={c.category} label={`${c.category} (${c.count})`} value={c.category} />
+            <Tab key={c.category} label={`${displayCase(c.category)} (${c.count})`} value={c.category} />
           ));
         })()}
       </Tabs>
@@ -361,16 +362,9 @@ const CatalogManagerPanel: React.FC = () => {
             const priceStatus = (r as any).price_status ?? 'PENDING_RFQ';
             const isCbCard = (r.category ?? '').toUpperCase() === 'CIRCUIT BREAKER';
             // Derive device class title
-            const deviceTitle = spec.deviceClass
-              ? spec.deviceClass
-              : (r.name ?? '').split(/[\s,_\-]+/).slice(0, 2).join(' ') || (r.category ?? '—');
-            // Specification row value
-            const specValue = isCbCard
-              ? [spec.ratedCurrentA && spec.ratedCurrentA + 'A', spec.interruptingKA && spec.interruptingKA + 'kA', spec.poles && spec.poles + 'P'].filter(Boolean).join(' / ') || '—'
-              : ((r.description ?? '').slice(0, 60) || '—');
+            const deviceTitle = displayCase(spec.deviceClass && isCbCard ? String(spec.deviceClass) : (r.name ?? r.category ?? '—'));
             // SKU display
             const skuFull = r.part_number ?? '';
-            const skuShort = skuFull.length > 12 ? skuFull.slice(0, 12) + '…' : skuFull || '—';
             // Status dot color + tooltip
             const dotColor = priceStatus === 'FIRM' ? C.green : priceStatus === 'ESTIMATED' ? C.amber : C.red;
             const dotTip   = priceStatus === 'FIRM' ? 'Firm price' : priceStatus === 'ESTIMATED' ? 'Estimated price' : 'No firm price — RFQ required';
@@ -387,7 +381,7 @@ const CatalogManagerPanel: React.FC = () => {
                 {/* ROW 1 — category chip + spacer + 3 action icons */}
                 <Stack direction="row" alignItems="center" spacing={0.75}>
                   <Chip
-                    label={r.category}
+                    label={displayCase(r.category)}
                     size="small"
                     sx={{ bgcolor: 'rgba(0,200,255,0.10)', color: '#00c8ff', fontSize: 9.5, height: 18, maxWidth: 120, '& .MuiChip-label': { px: 1 } }}
                   />
@@ -399,12 +393,12 @@ const CatalogManagerPanel: React.FC = () => {
 
                 {/* ROW 2 — device class title + SKU chip + status dot */}
                 <Stack direction="row" alignItems="center" spacing={0.75}>
-                  <Typography sx={{ color: '#F0F6FF', fontSize: 17, fontWeight: 800, flex: 1, lineHeight: 1.15 }} noWrap title={deviceTitle}>
+                  <Typography sx={{ color: '#F0F6FF', fontSize: 17, fontWeight: 800, flex: 1, lineHeight: 1.15 }} noWrap title={r.name ?? deviceTitle}>
                     {deviceTitle}
                   </Typography>
                   <Tooltip title={skuFull || 'No part number'}>
                     <Chip
-                      label={'SKU: ' + skuShort}
+                      label={'SKU: ' + (compactSku(skuFull) || '—')}
                       size="small"
                       sx={{ bgcolor: 'transparent', border: '1px solid #1E2235', color: '#A9B6C9', fontSize: 9.5, height: 18, flexShrink: 0, '& .MuiChip-label': { px: 1 } }}
                     />
@@ -419,17 +413,44 @@ const CatalogManagerPanel: React.FC = () => {
                   </Tooltip>
                 </Stack>
 
-                {/* ROW 3-5 — labeled info rows */}
-                {([
-                  ['Catalog Number', spec.catalogNumber ?? '—'],
-                  ['Manufacturer',   [spec.manufacturer, spec.series, spec.frameModel].filter(Boolean).join(', ') || '—'],
-                  ['Specification',  specValue],
-                ] as [string, string][]).map(([label, value]) => (
-                  <Stack key={label} direction="row" alignItems="flex-start" spacing={0.5}>
-                    <Typography sx={{ color: '#8E9AAD', fontSize: 11.5, width: 110, flexShrink: 0, lineHeight: 1.4 }}>{label}</Typography>
-                    <Typography sx={{ color: '#E2E8F0', fontSize: 11.5, flex: 1, lineHeight: 1.4 }} noWrap title={value}>{value}</Typography>
-                  </Stack>
-                ))}
+                {/* ROW 3-5 — labeled info rows (per category) */}
+                {isCbCard ? (
+                  ([
+                    ['Catalog Number', spec.catalogNumber ?? '—'],
+                    ['Manufacturer',   [spec.manufacturer, spec.series, spec.frameModel].filter(Boolean).join(', ') || '—'],
+                    ['Specification',  [spec.ratedCurrentA && spec.ratedCurrentA + 'A', spec.interruptingKA && spec.interruptingKA + 'kA', spec.poles && spec.poles + 'P'].filter(Boolean).join(' / ') || '—'],
+                  ] as [string, string][]).map(([label, value]) => (
+                    <Stack key={label} direction="row" alignItems="flex-start" spacing={0.5}>
+                      <Typography sx={{ color: '#8E9AAD', fontSize: 11.5, width: 110, flexShrink: 0, lineHeight: 1.4 }}>{label}</Typography>
+                      <Typography sx={{ color: '#E2E8F0', fontSize: 11.5, flex: 1, lineHeight: 1.4 }} noWrap title={value}>{value}</Typography>
+                    </Stack>
+                  ))
+                ) : (
+                  <>
+                    <Stack direction="row" alignItems="flex-start" spacing={0.5}>
+                      <Typography sx={{ color: '#8E9AAD', fontSize: 11.5, width: 110, flexShrink: 0, lineHeight: 1.4 }}>Description</Typography>
+                      <Typography
+                        sx={{ color: '#E2E8F0', fontSize: 11.5, flex: 1, lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
+                        title={(r.description ?? r.name) ?? '—'}
+                      >
+                        {(r.description ?? r.name) ?? '—'}
+                      </Typography>
+                    </Stack>
+                    <Stack direction="row" alignItems="flex-start" spacing={0.5}>
+                      <Typography sx={{ color: '#8E9AAD', fontSize: 11.5, width: 110, flexShrink: 0, lineHeight: 1.4 }}>Manufacturer / Type</Typography>
+                      <Typography sx={{ color: '#E2E8F0', fontSize: 11.5, flex: 1, lineHeight: 1.4 }} noWrap
+                        title={[spec.manufacturer, spec.subcategory && spec.subcategory !== spec.manufacturer ? spec.subcategory : null, spec.legacyType].filter(Boolean).join(', ') || '—'}>
+                        {[spec.manufacturer, spec.subcategory && spec.subcategory !== spec.manufacturer ? spec.subcategory : null, spec.legacyType].filter(Boolean).join(', ') || '—'}
+                      </Typography>
+                    </Stack>
+                    <Stack direction="row" alignItems="flex-start" spacing={0.5}>
+                      <Typography sx={{ color: '#8E9AAD', fontSize: 11.5, width: 110, flexShrink: 0, lineHeight: 1.4 }}>Labour total (hr)</Typography>
+                      <Typography sx={{ color: '#E2E8F0', fontSize: 11.5, flex: 1, lineHeight: 1.4 }} noWrap>
+                        {(() => { const t = ['lbr_cu','lbr_asm','lbr_cnt','lbr_qc','lbr_tst','lbr_eng','lbr_cad'].reduce((a, k) => a + (Number((r as any)[k]) || 0), 0); return t > 0 ? t.toFixed(2) : '—'; })()}
+                      </Typography>
+                    </Stack>
+                  </>
+                )}
 
                 {/* ROW 6 — footer: builder button (CB only) + price */}
                 <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mt: 'auto', pt: 0.5 }}>
@@ -481,21 +502,23 @@ const CatalogManagerPanel: React.FC = () => {
           <Table size="small" sx={{ minWidth: 900 }}>
             <TableHead>
               <TableRow>
-                <TableCell sx={headSx}>CATEGORY</TableCell>
-                <TableCell sx={headSx}>NAME</TableCell>
-                <TableCell sx={headSx}>PART #</TableCell>
-                <TableCell sx={headSx} align="right">PRICE</TableCell>
+                <TableCell sx={headSx}>Category</TableCell>
+                <TableCell sx={headSx}>Name</TableCell>
+                <TableCell sx={headSx}>Part #</TableCell>
+                <TableCell sx={headSx} align="right">Price</TableCell>
                 {BUCKETS.map((b) => <TableCell key={b} sx={headSx} align="right">{BUCKET_SHORT[b]}</TableCell>)}
-                <TableCell sx={headSx}>STATUS</TableCell>
+                <TableCell sx={headSx}>Status</TableCell>
                 <TableCell sx={headSx} />
               </TableRow>
             </TableHead>
             <TableBody>
               {gridRows.map((r) => (
                 <TableRow key={r.id} hover>
-                  <TableCell sx={{ ...cellSx, color: C.sub }}>{r.category}</TableCell>
-                  <TableCell sx={cellSx}>{r.name}</TableCell>
-                  <TableCell sx={{ ...cellSx, color: C.sub }}>{r.part_number ?? '—'}</TableCell>
+                  <TableCell sx={{ ...cellSx, color: C.sub }}>{displayCase(r.category)}</TableCell>
+                  <TableCell sx={cellSx}>{displayCase(r.name)}</TableCell>
+                  <TableCell sx={{ ...cellSx, color: C.sub }}>
+                    <Tooltip title={r.part_number ?? ''}><span>{compactSku(r.part_number) || '—'}</span></Tooltip>
+                  </TableCell>
                   <TableCell sx={cellSx} align="right">
                     {Number(r.price) > 0 ? (
                       <><PriceSourceDot source={(r as any).specifications?.priceSource} />{usd(Number(r.price))}</>

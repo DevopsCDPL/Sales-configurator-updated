@@ -21,6 +21,7 @@ import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material
 import { configuratorService, ConfiguratorComponent } from '../../services/configuratorService';
 import configuratorV2Service, { FullBoard, ComponentLineRow } from '../../services/configuratorV2Service';
 import PriceSourceDot from '../components/PriceSourceDot';
+import { displayCase, compactSku } from '../lib/displayCase';
 
 const C = {
   bg: '#000000', surface: '#0B0B0D', border: '#1E2235', blue: '#00c8ff',
@@ -247,12 +248,12 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7, width: 240 }}>COMPONENT</TableCell>
-                <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7 }}>CATALOG ITEM</TableCell>
-                <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7, width: 110 }}>QTY BASIS</TableCell>
-                <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7, width: 70 }}>QTY</TableCell>
-                <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7, width: 100 }} align="right">UNIT PRICE</TableCell>
-                <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7, width: 56 }} align="center">STATUS</TableCell>
+                <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7, width: 240 }}>Component</TableCell>
+                <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7 }}>Catalog item</TableCell>
+                <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7, width: 110 }}>Qty basis</TableCell>
+                <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7, width: 70 }}>Qty</TableCell>
+                <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7, width: 100 }} align="right">Unit price</TableCell>
+                <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7, width: 56 }} align="center">Status</TableCell>
                 <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7, width: 90 }} />
               </TableRow>
             </TableHead>
@@ -260,8 +261,8 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
               {ruleGroups.map(([group, rows]) => (
                 <React.Fragment key={group}>
                   <TableRow>
-                    <TableCell colSpan={7} sx={{ color: '#A9B6C9', fontSize: 10.5, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', borderBottom: '1px solid ' + C.border, bgcolor: 'rgba(0,200,255,0.04)', py: 0.6 }}>
-                      {group}
+                    <TableCell colSpan={7} sx={{ color: '#A9B6C9', fontSize: 10.5, fontWeight: 700, letterSpacing: 0.5, borderBottom: '1px solid ' + C.border, bgcolor: 'rgba(0,200,255,0.04)', py: 0.6 }}>
+                      {displayCase(group)}
                     </TableCell>
                   </TableRow>
                   {rows.map((l) => {
@@ -276,7 +277,7 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
                         <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.55 }}>
                           {l.meta?.placeholder ? (
                             <Box>
-                              <Chip label="NO CATALOG MATCH" size="small"
+                              <Chip label="No catalog match" size="small"
                                 sx={{ bgcolor: 'rgba(217,119,6,0.12)', color: '#FCD34D', fontSize: 9.5, height: 18 }} />
                               <Typography sx={{ color: C.sub, fontSize: 10.5, fontStyle: 'italic', mt: 0.2 }}>
                                 add to catalog or swap
@@ -284,7 +285,7 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
                             </Box>
                           ) : (
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                              <Typography sx={{ color: C.text, fontSize: 12 }}>{l.name}</Typography>
+                              <Typography sx={{ color: C.text, fontSize: 12 }}>{displayCase(l.name)}</Typography>
                               {l.meta?.swapped && (
                                 <Chip label="swapped" size="small" sx={{ bgcolor: 'transparent', border: '1px solid ' + C.amber, color: C.amber, fontSize: 8.5, height: 15 }} />
                               )}
@@ -342,7 +343,7 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
       <Dialog open={!!swapLine} onClose={() => setSwapLine(null)} maxWidth="sm" fullWidth
         PaperProps={{ sx: { bgcolor: C.surface, border: '1px solid ' + C.border, backgroundImage: 'none' } }}>
         <DialogTitle sx={{ color: C.text, fontSize: 14, fontWeight: 700 }}>
-          Swap — {swapLine?.meta?.ruleDescription ?? swapLine?.name} ({swapLine?.category})
+          Swap — {displayCase(swapLine?.meta?.ruleDescription ?? swapLine?.name)} ({displayCase(swapLine?.category)})
         </DialogTitle>
         <DialogContent>
           {!swapCands.length ? (
@@ -376,22 +377,24 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell sx={headSx}>CATEGORY</TableCell>
-                <TableCell sx={headSx}>PART #</TableCell>
-                <TableCell sx={headSx}>NAME</TableCell>
-                <TableCell sx={headSx}>WHERE</TableCell>
-                <TableCell sx={headSx} align="right">QTY</TableCell>
-                <TableCell sx={headSx} align="right">UNIT COST</TableCell>
-                <TableCell sx={headSx}>PRICE</TableCell>
+                <TableCell sx={headSx}>Category</TableCell>
+                <TableCell sx={headSx}>Part #</TableCell>
+                <TableCell sx={headSx}>Name</TableCell>
+                <TableCell sx={headSx}>Where</TableCell>
+                <TableCell sx={headSx} align="right">Qty</TableCell>
+                <TableCell sx={headSx} align="right">Unit cost</TableCell>
+                <TableCell sx={headSx}>Price</TableCell>
                 <TableCell sx={headSx} />
               </TableRow>
             </TableHead>
             <TableBody>
               {userLines.map((l) => (
                 <TableRow key={l.id}>
-                  <TableCell sx={{ ...cellSx, color: C.sub }}>{l.category}</TableCell>
-                  <TableCell sx={cellSx}>{l.part_number ?? '—'}</TableCell>
-                  <TableCell sx={cellSx}>{l.name}</TableCell>
+                  <TableCell sx={{ ...cellSx, color: C.sub }}>{displayCase(l.category)}</TableCell>
+                  <TableCell sx={cellSx}>
+                    <Tooltip title={l.part_number ?? ''}><span>{compactSku(l.part_number) || '—'}</span></Tooltip>
+                  </TableCell>
+                  <TableCell sx={cellSx}>{displayCase(l.name)}</TableCell>
                   <TableCell sx={{ ...cellSx, color: C.sub }}>{sectionLabel(l)}</TableCell>
                   <TableCell sx={cellSx} align="right">{l.quantity}</TableCell>
                   <TableCell sx={cellSx} align="right">{l.unit_cost ? usd(Number(l.unit_cost)) : '—'}</TableCell>
@@ -423,7 +426,7 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
           <MenuItem value="" sx={{ fontSize: 12.5 }}>All categories</MenuItem>
           {categories.map((c) => (
             <MenuItem key={c.category} value={c.category} sx={{ fontSize: 12.5 }}>
-              {c.category} ({c.count})
+              {displayCase(c.category)} ({c.count})
             </MenuItem>
           ))}
         </Select>
@@ -454,12 +457,12 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell sx={headSx}>CATEGORY</TableCell>
-                <TableCell sx={headSx}>PART #</TableCell>
-                <TableCell sx={headSx}>NAME</TableCell>
-                <TableCell sx={headSx} align="right">PRICE</TableCell>
-                <TableCell sx={headSx}>QTY</TableCell>
-                <TableCell sx={headSx}>SCOPE</TableCell>
+                <TableCell sx={headSx}>Category</TableCell>
+                <TableCell sx={headSx}>Part #</TableCell>
+                <TableCell sx={headSx}>Name</TableCell>
+                <TableCell sx={headSx} align="right">Price</TableCell>
+                <TableCell sx={headSx}>Qty</TableCell>
+                <TableCell sx={headSx}>Scope</TableCell>
                 <TableCell sx={headSx} />
               </TableRow>
             </TableHead>
@@ -468,9 +471,11 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
                 const price = Number(r.price ?? r.mat_cost ?? r.material_cost) || 0;
                 return (
                   <TableRow key={r.id}>
-                    <TableCell sx={{ ...cellSx, color: C.sub }}>{r.category}</TableCell>
-                    <TableCell sx={cellSx}>{r.part_number ?? '—'}</TableCell>
-                    <TableCell sx={cellSx}>{r.name}</TableCell>
+                    <TableCell sx={{ ...cellSx, color: C.sub }}>{displayCase(r.category)}</TableCell>
+                    <TableCell sx={cellSx}>
+                      <Tooltip title={r.part_number ?? ''}><span>{compactSku(r.part_number) || '—'}</span></Tooltip>
+                    </TableCell>
+                    <TableCell sx={cellSx}>{displayCase(r.name)}</TableCell>
                     <TableCell sx={cellSx} align="right">
                       {price > 0 ? usd(price) : <Chip label="RFQ" size="small" sx={{ bgcolor: 'transparent', border: '1px solid ' + C.amber, color: C.amber, fontSize: 9.5, height: 18 }} />}
                     </TableCell>
