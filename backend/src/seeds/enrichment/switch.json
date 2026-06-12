@@ -1,0 +1,512 @@
+[
+  {
+    "category": "SWITCH",
+    "name": "SELECTOR SWITCH, 22MM, 2-POS, MAINTAINED, 1NO, METAL, BLACK, SCHNEIDER XB4BG21",
+    "description": "Schneider Electric Harmony XB4 22mm metal selector switch, 2-position maintained, 1NO contact, black key-operated operator (key 455), IP66, 600V, UL 508 listed",
+    "manufacturer": "Schneider Electric",
+    "manufacturerPartNumber": "XB4BG21",
+    "spec": {
+      "series": "Harmony XB4",
+      "style": "Selector switch, 22mm panel cutout",
+      "ratedCurrentA": 6,
+      "poles": "1NO",
+      "voltageRating": "600V AC",
+      "fusedOrNon": "Non-fusible",
+      "nemaRating": "NEMA 4, 4X, 13",
+      "mounting": "22mm panel cutout",
+      "ipRating": "IP66",
+      "color": "Black",
+      "operatorSize": "22",
+      "positions": 2,
+      "action": "Maintained",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "2HMJ9",
+        "price": 42.50,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/SCHNEIDER-ELECTRIC-Selector-Switch-2HMJ9",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 42.50,
+    "qualityRating": 5,
+    "popularity": 5,
+    "productUrl": "https://www.se.com/us/en/product/XB4BG21/key-switch-selector-harmony-xb4-metal-black-22mm-key-455-2-positionsstay-put1-no",
+    "imageUrl": "https://download.schneider-electric.com/files?p_Doc_Ref=XB4BG21_360_Right&p_File_Type=rendition_1500_jpg"
+  },
+  {
+    "category": "SWITCH",
+    "name": "SELECTOR SWITCH, 22MM, 3-POS, MAINTAINED, 1NO+1NC, METAL, BLACK, SCHNEIDER XB4BG33",
+    "description": "Schneider Electric Harmony XB4 22mm metal selector switch, 3-position maintained (left-center-right), 1NO+1NC, black operator, IP66, 600V, UL 508 — Hand/Off/Auto in switchboards",
+    "manufacturer": "Schneider Electric",
+    "manufacturerPartNumber": "XB4BG33",
+    "spec": {
+      "series": "Harmony XB4",
+      "style": "Selector switch, 22mm panel cutout",
+      "ratedCurrentA": 6,
+      "poles": "1NO/1NC",
+      "voltageRating": "600V AC",
+      "fusedOrNon": "Non-fusible",
+      "nemaRating": "NEMA 4, 4X, 13",
+      "mounting": "22mm panel cutout",
+      "ipRating": "IP66",
+      "color": "Black",
+      "operatorSize": "22",
+      "positions": 3,
+      "action": "Maintained",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "2HML5",
+        "price": 51.20,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/SCHNEIDER-ELECTRIC-Selector-Switch-2HML5",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 51.20,
+    "qualityRating": 5,
+    "popularity": 5,
+    "productUrl": "https://www.se.com/us/en/product/XB4BG33/"
+  },
+  {
+    "category": "SWITCH",
+    "name": "SELECTOR SWITCH, 22MM, 2-POS, MAINTAINED, 1NO, PLASTIC, BLACK, SCHNEIDER XB5AG21",
+    "description": "Schneider Electric Harmony XB5 22mm plastic selector switch, 2-position maintained, 1NO, black operator, IP65, 600V, UL 508 — economy version of XB4 series",
+    "manufacturer": "Schneider Electric",
+    "manufacturerPartNumber": "XB5AG21",
+    "spec": {
+      "series": "Harmony XB5",
+      "style": "Selector switch, 22mm panel cutout",
+      "ratedCurrentA": 6,
+      "poles": "1NO",
+      "voltageRating": "600V AC",
+      "fusedOrNon": "Non-fusible",
+      "nemaRating": "NEMA 4, 4X",
+      "mounting": "22mm panel cutout",
+      "ipRating": "IP65",
+      "color": "Black",
+      "operatorSize": "22",
+      "positions": 2,
+      "action": "Maintained",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "2HMK7",
+        "price": 32.80,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/SCHNEIDER-ELECTRIC-Selector-Switch-2HMK7",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 32.80,
+    "qualityRating": 5,
+    "popularity": 4,
+    "productUrl": "https://www.se.com/us/en/product/XB5AG21/key-switch-selector-harmony-xb5-plastic-black-22mm-key-455-2-positions-stay-put-1-no",
+    "imageUrl": "https://download.schneider-electric.com/files?p_Doc_Ref=XB5AG21_360_Bottom&p_File_Type=rendition_1500_jpg"
+  },
+  {
+    "category": "SWITCH",
+    "name": "SELECTOR SWITCH, 22MM, 3-POS, MAINTAINED, 1NO+1NC, PLASTIC, BLACK, SCHNEIDER XB5AG33",
+    "description": "Schneider Electric Harmony XB5 22mm plastic selector switch, 3-position maintained, 1NO+1NC, black operator, IP65, 600V, UL 508",
+    "manufacturer": "Schneider Electric",
+    "manufacturerPartNumber": "XB5AG33",
+    "spec": {
+      "series": "Harmony XB5",
+      "style": "Selector switch, 22mm panel cutout",
+      "ratedCurrentA": 6,
+      "poles": "1NO/1NC",
+      "voltageRating": "600V AC",
+      "fusedOrNon": "Non-fusible",
+      "nemaRating": "NEMA 4, 4X",
+      "mounting": "22mm panel cutout",
+      "ipRating": "IP65",
+      "color": "Black",
+      "operatorSize": "22",
+      "positions": 3,
+      "action": "Maintained",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "2HMK9",
+        "price": 39.50,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/SCHNEIDER-ELECTRIC-Selector-Switch-2HMK9",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 39.50,
+    "qualityRating": 5,
+    "popularity": 4,
+    "productUrl": "https://www.se.com/us/en/product/XB5AG33/"
+  },
+  {
+    "category": "SWITCH",
+    "name": "SELECTOR SWITCH, 22MM, 2-POS, MAINTAINED, 1NO, BLACK, EATON M22-WS",
+    "description": "Eaton M22 RMQ-Titan 22mm selector switch operator, 2-position maintained, black, IP69K, 600V, UL 508 — requires separate M22-K10 contact block",
+    "manufacturer": "Eaton",
+    "manufacturerPartNumber": "M22-WS",
+    "spec": {
+      "series": "M22 RMQ-Titan",
+      "style": "Selector switch operator, 22mm",
+      "ratedCurrentA": 10,
+      "poles": "1NO (with contact block)",
+      "voltageRating": "600V AC",
+      "fusedOrNon": "Non-fusible",
+      "nemaRating": "NEMA 4, 4X, 12",
+      "mounting": "22mm panel cutout",
+      "ipRating": "IP69K",
+      "color": "Black",
+      "operatorSize": "22",
+      "positions": 2,
+      "action": "Maintained",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "1EYK2",
+        "price": 28.15,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/EATON-Selector-Switch-Operator-1EYK2",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 28.15,
+    "qualityRating": 5,
+    "popularity": 4,
+    "productUrl": "https://www.eaton.com/us/en-us/catalog/switches-and-disconnects/m22-selector-switches.html"
+  },
+  {
+    "category": "SWITCH",
+    "name": "SELECTOR SWITCH, 22MM, 3-POS, MAINTAINED, 1NO+1NC, BLACK, EATON M22-WS3",
+    "description": "Eaton M22 RMQ-Titan 22mm 3-position maintained selector switch operator, black, IP69K, 600V, UL 508 — Hand/Off/Auto service",
+    "manufacturer": "Eaton",
+    "manufacturerPartNumber": "M22-WS3",
+    "spec": {
+      "series": "M22 RMQ-Titan",
+      "style": "Selector switch operator, 22mm",
+      "ratedCurrentA": 10,
+      "poles": "1NO/1NC (with contact block)",
+      "voltageRating": "600V AC",
+      "fusedOrNon": "Non-fusible",
+      "nemaRating": "NEMA 4, 4X, 12",
+      "mounting": "22mm panel cutout",
+      "ipRating": "IP69K",
+      "color": "Black",
+      "operatorSize": "22",
+      "positions": 3,
+      "action": "Maintained",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "1EYK6",
+        "price": 33.80,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/EATON-Selector-Switch-Operator-1EYK6",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 33.80,
+    "qualityRating": 5,
+    "popularity": 4,
+    "productUrl": "https://www.eaton.com/us/en-us/catalog/switches-and-disconnects/m22-selector-switches.html"
+  },
+  {
+    "category": "SWITCH",
+    "name": "SELECTOR SWITCH, 22MM, 2-POS, MAINTAINED, 1NO, BLACK, IDEC LW1L-A2T10Q",
+    "description": "IDEC LW series 22mm 2-position maintained selector switch, 1NO, black operator, IP65, 600V, UL 508 — common in utility and switchboard applications",
+    "manufacturer": "IDEC",
+    "manufacturerPartNumber": "LW1L-A2T10Q",
+    "spec": {
+      "series": "LW",
+      "style": "Selector switch, 22mm panel cutout",
+      "ratedCurrentA": 10,
+      "poles": "1NO",
+      "voltageRating": "600V AC",
+      "fusedOrNon": "Non-fusible",
+      "nemaRating": "NEMA 4, 4X",
+      "mounting": "22mm panel cutout",
+      "ipRating": "IP65",
+      "color": "Black",
+      "operatorSize": "22",
+      "positions": 2,
+      "action": "Maintained",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Newark",
+        "sku": "75K1523",
+        "price": 34.50,
+        "currency": "USD",
+        "url": "https://www.newark.com/idec/lw1l-a2t10q/selector-switch/dp/75K1523",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 34.50,
+    "qualityRating": 5,
+    "popularity": 4,
+    "productUrl": "https://www.idec.com/usa/en/selector-switches"
+  },
+  {
+    "category": "SWITCH",
+    "name": "SELECTOR SWITCH, 22MM, 2-POS, MAINTAINED, 1NO, BLACK, AUTOMATIONDIRECT GCX2100",
+    "description": "AutomationDirect GCX 22mm 2-position maintained selector switch, 1NO, black operator, IP65, 600V, UL 508 — value-tier choice for switchboard selector applications",
+    "manufacturer": "AutomationDirect",
+    "manufacturerPartNumber": "GCX2100",
+    "spec": {
+      "series": "GCX",
+      "style": "Selector switch, 22mm panel cutout",
+      "ratedCurrentA": 10,
+      "poles": "1NO",
+      "voltageRating": "600V AC",
+      "fusedOrNon": "Non-fusible",
+      "nemaRating": "NEMA 4, 4X",
+      "mounting": "22mm panel cutout",
+      "ipRating": "IP65",
+      "color": "Black",
+      "operatorSize": "22",
+      "positions": 2,
+      "action": "Maintained",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "AutomationDirect",
+        "sku": "GCX2100",
+        "price": 13.00,
+        "currency": "USD",
+        "url": "https://www.automationdirect.com/adc/Shopping/Catalog/Pushbuttons,_Switches_-z-_Indicators/Selector_Switches/22mm_GCX_Selector_Switches/GCX2100",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 13.00,
+    "qualityRating": 4,
+    "popularity": 4,
+    "productUrl": "https://www.automationdirect.com/adc/Shopping/Catalog/Pushbuttons,_Switches_-z-_Indicators/Selector_Switches/22mm_GCX_Selector_Switches/GCX2100"
+  },
+  {
+    "category": "SWITCH",
+    "name": "SELECTOR SWITCH, 22MM, 3-POS, MAINTAINED, 2NO, BLACK, AUTOMATIONDIRECT GCX3100",
+    "description": "AutomationDirect GCX 22mm 3-position maintained selector switch, 2NO, black operator, IP65, 600V, UL 508",
+    "manufacturer": "AutomationDirect",
+    "manufacturerPartNumber": "GCX3100",
+    "spec": {
+      "series": "GCX",
+      "style": "Selector switch, 22mm panel cutout",
+      "ratedCurrentA": 10,
+      "poles": "2NO",
+      "voltageRating": "600V AC",
+      "fusedOrNon": "Non-fusible",
+      "nemaRating": "NEMA 4, 4X",
+      "mounting": "22mm panel cutout",
+      "ipRating": "IP65",
+      "color": "Black",
+      "operatorSize": "22",
+      "positions": 3,
+      "action": "Maintained",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "AutomationDirect",
+        "sku": "GCX3100",
+        "price": 16.50,
+        "currency": "USD",
+        "url": "https://www.automationdirect.com/adc/Shopping/Catalog/Pushbuttons,_Switches_-z-_Indicators/Selector_Switches/22mm_GCX_Selector_Switches/GCX3100",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 16.50,
+    "qualityRating": 4,
+    "popularity": 3,
+    "productUrl": "https://www.automationdirect.com/adc/Shopping/Catalog/Pushbuttons,_Switches_-z-_Indicators/Selector_Switches/22mm_GCX_Selector_Switches/GCX3100"
+  },
+  {
+    "category": "SWITCH",
+    "name": "CB CONTROL SWITCH, SERIES 24, 10A, 120VAC, SPRING-RETURN, ELECTROSWITCH 24101RES",
+    "description": "Electroswitch Series 24 circuit breaker control switch (CBCS), spring-return-to-neutral, CLOSE-NEUTRAL-TRIP, 10A, 120V AC, NEMA 1 panel mount — standard utility switchboard breaker control device",
+    "manufacturer": "Electroswitch",
+    "manufacturerPartNumber": "24101RES",
+    "spec": {
+      "series": "Series 24",
+      "style": "Circuit breaker control switch (CBCS)",
+      "ratedCurrentA": 10,
+      "poles": "Multi-contact CLOSE/TRIP arrangement",
+      "voltageRating": "120V AC",
+      "fusedOrNon": "Non-fusible",
+      "nemaRating": "NEMA 1",
+      "mounting": "Panel mount, 2.25in square cutout",
+      "color": "Black",
+      "action": "Spring-return to neutral",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [],
+    "qualityRating": 5,
+    "popularity": 4,
+    "productUrl": "https://www.electroswitch.com/products/series-24-circuit-breaker-control-switches"
+  },
+  {
+    "category": "SWITCH",
+    "name": "CB CONTROL SWITCH, SERIES 24, 10A, 125VDC, SPRING-RETURN, ELECTROSWITCH 24101SES",
+    "description": "Electroswitch Series 24 CBCS, 10A, 125V DC battery, spring-return neutral, CLOSE-NEUTRAL-TRIP — for DC battery-backed breaker control schemes in utility switchboards",
+    "manufacturer": "Electroswitch",
+    "manufacturerPartNumber": "24101SES",
+    "spec": {
+      "series": "Series 24",
+      "style": "Circuit breaker control switch (CBCS)",
+      "ratedCurrentA": 10,
+      "poles": "Multi-contact",
+      "voltageRating": "125V DC",
+      "fusedOrNon": "Non-fusible",
+      "nemaRating": "NEMA 1",
+      "mounting": "Panel mount",
+      "color": "Black",
+      "action": "Spring-return to neutral",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [],
+    "qualityRating": 5,
+    "popularity": 3,
+    "productUrl": "https://www.electroswitch.com/products/series-24-circuit-breaker-control-switches"
+  },
+  {
+    "category": "SWITCH",
+    "name": "CB CONTROL SWITCH, SERIES 24, MAINTAINED, 10A, 120VAC, ELECTROSWITCH 24201RES",
+    "description": "Electroswitch Series 24 CBCS maintained-contact version, 10A, 120V AC, NEMA 1 panel mount — for breaker transfer and feeder control requiring held contact",
+    "manufacturer": "Electroswitch",
+    "manufacturerPartNumber": "24201RES",
+    "spec": {
+      "series": "Series 24",
+      "style": "Circuit breaker control switch (CBCS), maintained",
+      "ratedCurrentA": 10,
+      "poles": "Multi-contact",
+      "voltageRating": "120V AC",
+      "fusedOrNon": "Non-fusible",
+      "nemaRating": "NEMA 1",
+      "mounting": "Panel mount",
+      "color": "Black",
+      "action": "Maintained",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [],
+    "qualityRating": 5,
+    "popularity": 3,
+    "productUrl": "https://www.electroswitch.com/products/series-24-circuit-breaker-control-switches"
+  },
+  {
+    "category": "SWITCH",
+    "name": "SELECTOR SWITCH, 22MM, 2-POS, MAINTAINED, 1NO, BLACK, SIEMENS 3SU1050-5BC01-0AA0",
+    "description": "Siemens SIRIUS ACT 22mm 2-position maintained selector switch operator, black, IP66/IP67, 600V, compatible with 3SU1 contact blocks, UL 508",
+    "manufacturer": "Siemens",
+    "manufacturerPartNumber": "3SU1050-5BC01-0AA0",
+    "spec": {
+      "series": "SIRIUS ACT 3SU1",
+      "style": "Selector switch operator, 22mm",
+      "ratedCurrentA": 6,
+      "poles": "1NO (with contact block)",
+      "voltageRating": "600V AC",
+      "fusedOrNon": "Non-fusible",
+      "nemaRating": "NEMA 4, 4X",
+      "mounting": "22mm panel cutout",
+      "ipRating": "IP66/IP67",
+      "color": "Black",
+      "operatorSize": "22",
+      "positions": 2,
+      "action": "Maintained",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "5JKN7",
+        "price": 35.40,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/SIEMENS-Selector-Switch-Operator-5JKN7",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 35.40,
+    "qualityRating": 5,
+    "popularity": 3,
+    "productUrl": "https://mall.industry.siemens.com/mall/en/us/Catalog/Product/3SU1050-5BC01-0AA0"
+  },
+  {
+    "category": "SWITCH",
+    "name": "CONTACT BLOCK, 1NO, SNAP-IN, 600V, 6A, SCHNEIDER ZB4BZ101",
+    "description": "Schneider Electric Harmony ZB4BZ101 contact block, 1NO, 600V, 6A, snap-in mount to ZB4/XB4/ZB5/XB5 22mm operators — required add-on for modular selector switch assemblies",
+    "manufacturer": "Schneider Electric",
+    "manufacturerPartNumber": "ZB4BZ101",
+    "spec": {
+      "series": "Harmony ZB4/XB4",
+      "style": "Contact block, snap-in",
+      "ratedCurrentA": 6,
+      "poles": "1NO",
+      "voltageRating": "600V AC",
+      "fusedOrNon": "Non-fusible",
+      "nemaRating": "Compatible with IP66",
+      "mounting": "Snap-in to 22mm operator body",
+      "color": "Gray",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "2HM34",
+        "price": 8.90,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/SCHNEIDER-ELECTRIC-Contact-Block-2HM34",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 8.90,
+    "qualityRating": 5,
+    "popularity": 5,
+    "productUrl": "https://www.se.com/us/en/product/ZB4BZ101/"
+  },
+  {
+    "category": "SWITCH",
+    "name": "CONTACT BLOCK, 1NC, SNAP-IN, 600V, 6A, SCHNEIDER ZB4BZ102",
+    "description": "Schneider Electric Harmony ZB4BZ102 contact block, 1NC, 600V, 6A, snap-in mount to ZB4/XB4 22mm operators",
+    "manufacturer": "Schneider Electric",
+    "manufacturerPartNumber": "ZB4BZ102",
+    "spec": {
+      "series": "Harmony ZB4/XB4",
+      "style": "Contact block, snap-in",
+      "ratedCurrentA": 6,
+      "poles": "1NC",
+      "voltageRating": "600V AC",
+      "fusedOrNon": "Non-fusible",
+      "nemaRating": "Compatible with IP66",
+      "mounting": "Snap-in to 22mm operator body",
+      "color": "Gray",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "2HM35",
+        "price": 8.90,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/SCHNEIDER-ELECTRIC-Contact-Block-2HM35",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 8.90,
+    "qualityRating": 5,
+    "popularity": 5,
+    "productUrl": "https://www.se.com/us/en/product/ZB4BZ102/"
+  }
+]

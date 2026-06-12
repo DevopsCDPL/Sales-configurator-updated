@@ -1,0 +1,476 @@
+[
+  {
+    "category": "ENCLOSURE",
+    "name": "HOFFMAN A-36H30W12LP NEMA 12 WALL MOUNT 36X30X12 STEEL",
+    "description": "nVent Hoffman A-series NEMA 12 wall-mount enclosure, 36H x 30W x 12D in., 14-gauge steel, ANSI 61 gray powder coat, continuous hinge door, padlockable latch, sub-panel included, UL 50/508A listed.",
+    "manufacturer": "nVent Hoffman",
+    "manufacturerPartNumber": "A-36H30W12LP",
+    "spec": {
+      "series": "A-Series CSD",
+      "nemaRating": "NEMA 12",
+      "material": "14-gauge steel",
+      "finish": "ANSI 61 gray powder coat",
+      "widthIn": 30,
+      "heightIn": 36,
+      "depthIn": 12,
+      "mounting": "Wall-mount",
+      "subpanel": "Included",
+      "ulListing": "UL 50, UL 508A"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "A-36H30W12LP",
+        "url": "https://www.grainger.com/search?searchQuery=Hoffman+A-36H30W12LP",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "Zoro",
+        "sku": "A-36H30W12LP",
+        "url": "https://www.zoro.com/search?q=Hoffman+A-36H30W12LP",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.nvent.com/en-us/brands/hoffman/products",
+    "qualityRating": 5,
+    "popularity": 5
+  },
+  {
+    "category": "ENCLOSURE",
+    "name": "HOFFMAN A-48H36W16LP NEMA 12 WALL MOUNT 48X36X16 STEEL",
+    "description": "nVent Hoffman A-series NEMA 12 wall-mount enclosure, 48H x 36W x 16D in., 14-gauge steel, ANSI 61 gray powder coat, sub-panel included, UL 50/508A listed. Common for medium switchboard sections.",
+    "manufacturer": "nVent Hoffman",
+    "manufacturerPartNumber": "A-48H36W16LP",
+    "spec": {
+      "series": "A-Series CSD",
+      "nemaRating": "NEMA 12",
+      "material": "14-gauge steel",
+      "finish": "ANSI 61 gray powder coat",
+      "widthIn": 36,
+      "heightIn": 48,
+      "depthIn": 16,
+      "mounting": "Wall-mount",
+      "subpanel": "Included",
+      "ulListing": "UL 50, UL 508A"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "A-48H36W16LP",
+        "url": "https://www.grainger.com/search?searchQuery=Hoffman+A-48H36W16LP",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.nvent.com/en-us/brands/hoffman/products",
+    "qualityRating": 5,
+    "popularity": 5
+  },
+  {
+    "category": "ENCLOSURE",
+    "name": "HOFFMAN CSDFSS48P36P FREESTANDING ENCLOSURE 72X48X36 NEMA 12 STEEL",
+    "description": "nVent Hoffman CSD Comline freestanding enclosure, 72H x 48W x 36D in., 12-gauge steel, NEMA 12, two-door front access, sub-panel included, ANSI 61 gray, UL 508A. Typical for UL 891 switchboard main section.",
+    "manufacturer": "nVent Hoffman",
+    "manufacturerPartNumber": "CSDFSS48P36P",
+    "spec": {
+      "series": "CSD Comline Freestanding",
+      "nemaRating": "NEMA 12",
+      "material": "12-gauge steel",
+      "finish": "ANSI 61 gray powder coat",
+      "widthIn": 48,
+      "heightIn": 72,
+      "depthIn": 36,
+      "mounting": "Floor-mount freestanding",
+      "subpanel": "Included",
+      "ulListing": "UL 50, UL 508A"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "CSDFSS48P36P",
+        "url": "https://www.grainger.com/search?searchQuery=Hoffman+CSDFSS48P36P",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.nvent.com/en-us/brands/hoffman/products",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "ENCLOSURE",
+    "name": "HOFFMAN A-36H30W12SS NEMA 4X WALL MOUNT 36X30X12 STAINLESS STEEL",
+    "description": "nVent Hoffman A-series NEMA 4X wall-mount enclosure, 36H x 30W x 12D in., 304 stainless steel, brushed finish, padlockable, gasket door, UL 50 / 508A listed. For wet/washdown environments.",
+    "manufacturer": "nVent Hoffman",
+    "manufacturerPartNumber": "A-36H30W12SS",
+    "spec": {
+      "series": "A-Series Stainless",
+      "nemaRating": "NEMA 4X",
+      "material": "304 stainless steel",
+      "finish": "Brushed #4",
+      "widthIn": 30,
+      "heightIn": 36,
+      "depthIn": 12,
+      "mounting": "Wall-mount",
+      "subpanel": "Optional",
+      "ulListing": "UL 50, UL 508A"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "A-36H30W12SS",
+        "url": "https://www.grainger.com/search?searchQuery=Hoffman+A-36H30W12SS",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.nvent.com/en-us/brands/hoffman/products",
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "ENCLOSURE",
+    "name": "SAGINAW SCE-36P2410 NEMA 12 WALL MOUNT 36X24X10 STEEL",
+    "description": "Saginaw Control & Engineering SCE series NEMA 12 wall-mount enclosure, 36H x 24W x 10D in., 14-gauge steel, ANSI 61 gray, sub-panel included, UL 50/508A listed.",
+    "manufacturer": "Saginaw Control & Engineering",
+    "manufacturerPartNumber": "SCE-36P2410",
+    "spec": {
+      "series": "SCE",
+      "nemaRating": "NEMA 12",
+      "material": "14-gauge steel",
+      "finish": "ANSI 61 gray powder coat",
+      "widthIn": 24,
+      "heightIn": 36,
+      "depthIn": 10,
+      "mounting": "Wall-mount",
+      "subpanel": "Included",
+      "ulListing": "UL 50, UL 508A"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "SCE-36P2410",
+        "url": "https://www.grainger.com/search?searchQuery=Saginaw+SCE-36P2410",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "Zoro",
+        "sku": "SCE-36P2410",
+        "url": "https://www.zoro.com/search?q=Saginaw+SCE-36P2410",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.saginawcontrol.com/product-category/enclosures/",
+    "qualityRating": 4,
+    "popularity": 4
+  },
+  {
+    "category": "ENCLOSURE",
+    "name": "SAGINAW SCE-48P3616 NEMA 12 WALL MOUNT 48X36X16 STEEL",
+    "description": "Saginaw Control & Engineering SCE series NEMA 12 wall-mount enclosure, 48H x 36W x 16D in., 14-gauge steel, ANSI 61 gray powder coat, sub-panel included, UL 50/508A.",
+    "manufacturer": "Saginaw Control & Engineering",
+    "manufacturerPartNumber": "SCE-48P3616",
+    "spec": {
+      "series": "SCE",
+      "nemaRating": "NEMA 12",
+      "material": "14-gauge steel",
+      "finish": "ANSI 61 gray powder coat",
+      "widthIn": 36,
+      "heightIn": 48,
+      "depthIn": 16,
+      "mounting": "Wall-mount",
+      "subpanel": "Included",
+      "ulListing": "UL 50, UL 508A"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "SCE-48P3616",
+        "url": "https://www.grainger.com/search?searchQuery=Saginaw+SCE-48P3616",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.saginawcontrol.com/product-category/enclosures/",
+    "qualityRating": 4,
+    "popularity": 4
+  },
+  {
+    "category": "ENCLOSURE",
+    "name": "SAGINAW SCE-60XEL4018SR NEMA 1 FREESTANDING 60X40X18 STEEL",
+    "description": "Saginaw Control & Engineering SCE XEL series NEMA 1 freestanding enclosure, 60H x 40W x 18D in., 12-gauge steel, gray powder coat, sub-panel, single door, UL 50/508A.",
+    "manufacturer": "Saginaw Control & Engineering",
+    "manufacturerPartNumber": "SCE-60XEL4018SR",
+    "spec": {
+      "series": "SCE XEL Freestanding",
+      "nemaRating": "NEMA 1",
+      "material": "12-gauge steel",
+      "finish": "ANSI 61 gray powder coat",
+      "widthIn": 40,
+      "heightIn": 60,
+      "depthIn": 18,
+      "mounting": "Floor-mount freestanding",
+      "subpanel": "Included",
+      "ulListing": "UL 50, UL 508A"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Saginaw Control & Engineering",
+        "sku": "SCE-60XEL4018SR",
+        "url": "https://www.saginawcontrol.com/product-category/enclosures/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.saginawcontrol.com/product-category/enclosures/",
+    "qualityRating": 4,
+    "popularity": 3
+  },
+  {
+    "category": "ENCLOSURE",
+    "name": "RITTAL TS 8 BAYING ENCLOSURE 71X24X24 NEMA 12 STEEL",
+    "description": "Rittal TS 8 series baying enclosure, 71H x 24W x 24D in. (1800x600x600 mm), 16-gauge steel, RAL 7035 gray, removable gland plates top/bottom, 100mm mounting rail spacing, UL 508A, NEMA 12. Ideal for switchboard lineup baying.",
+    "manufacturer": "Rittal",
+    "manufacturerPartNumber": "TS8685500",
+    "spec": {
+      "series": "TS 8",
+      "nemaRating": "NEMA 12",
+      "material": "16-gauge steel",
+      "finish": "RAL 7035 gray powder coat",
+      "widthIn": 23.6,
+      "heightIn": 70.9,
+      "depthIn": 23.6,
+      "mounting": "Floor-mount freestanding (bayable)",
+      "subpanel": "Optional",
+      "ulListing": "UL 50, UL 508A"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Rittal",
+        "sku": "TS8685500",
+        "url": "https://www.rittal.com/us_en/products/enclosures-housings.html",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.rittal.com/us_en/products/enclosures-housings.html",
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "ENCLOSURE",
+    "name": "RITTAL TS 8 BAYING ENCLOSURE 71X24X32 NEMA 12 STEEL",
+    "description": "Rittal TS 8 series baying enclosure, 71H x 24W x 32D in. (1800x600x800 mm), 16-gauge steel, RAL 7035 gray, removable gland plates, UL 508A, NEMA 12. Deeper variant for larger switchboard sections.",
+    "manufacturer": "Rittal",
+    "manufacturerPartNumber": "TS8686500",
+    "spec": {
+      "series": "TS 8",
+      "nemaRating": "NEMA 12",
+      "material": "16-gauge steel",
+      "finish": "RAL 7035 gray powder coat",
+      "widthIn": 23.6,
+      "heightIn": 70.9,
+      "depthIn": 31.5,
+      "mounting": "Floor-mount freestanding (bayable)",
+      "subpanel": "Optional",
+      "ulListing": "UL 50, UL 508A"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Rittal",
+        "sku": "TS8686500",
+        "url": "https://www.rittal.com/us_en/products/enclosures-housings.html",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.rittal.com/us_en/products/enclosures-housings.html",
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "ENCLOSURE",
+    "name": "HOFFMAN CSD COMLINE FREESTANDING 72X36X24 NEMA 12 STEEL",
+    "description": "nVent Hoffman CSD Comline single-door freestanding enclosure, 72H x 36W x 24D in., 12-gauge steel, NEMA 12, ANSI 61 gray, UL 508A. Standard size for single-section switchboard.",
+    "manufacturer": "nVent Hoffman",
+    "manufacturerPartNumber": "CSDFSS36P24P",
+    "spec": {
+      "series": "CSD Comline Freestanding",
+      "nemaRating": "NEMA 12",
+      "material": "12-gauge steel",
+      "finish": "ANSI 61 gray powder coat",
+      "widthIn": 36,
+      "heightIn": 72,
+      "depthIn": 24,
+      "mounting": "Floor-mount freestanding",
+      "subpanel": "Included",
+      "ulListing": "UL 50, UL 508A"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "CSDFSS36P24P",
+        "url": "https://www.grainger.com/search?searchQuery=Hoffman+CSDFSS36P24P",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.nvent.com/en-us/brands/hoffman/products",
+    "qualityRating": 5,
+    "popularity": 5
+  },
+  {
+    "category": "ENCLOSURE",
+    "name": "HOFFMAN A-24H2410LP NEMA 12 WALL MOUNT 24X24X10 STEEL",
+    "description": "nVent Hoffman A-series NEMA 12 wall-mount enclosure, 24H x 24W x 10D in., 14-gauge steel, ANSI 61 gray, sub-panel included. Common for small panel sections and MCC buckets.",
+    "manufacturer": "nVent Hoffman",
+    "manufacturerPartNumber": "A-24H2410LP",
+    "spec": {
+      "series": "A-Series CSD",
+      "nemaRating": "NEMA 12",
+      "material": "14-gauge steel",
+      "finish": "ANSI 61 gray powder coat",
+      "widthIn": 24,
+      "heightIn": 24,
+      "depthIn": 10,
+      "mounting": "Wall-mount",
+      "subpanel": "Included",
+      "ulListing": "UL 50, UL 508A"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "A-24H2410LP",
+        "url": "https://www.grainger.com/search?searchQuery=Hoffman+A-24H2410LP",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "Zoro",
+        "sku": "A-24H2410LP",
+        "url": "https://www.zoro.com/search?q=Hoffman+A-24H2410LP",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.nvent.com/en-us/brands/hoffman/products",
+    "qualityRating": 5,
+    "popularity": 5
+  },
+  {
+    "category": "ENCLOSURE",
+    "name": "SAGINAW SCE-24P2410 NEMA 12 WALL MOUNT 24X24X10 STEEL",
+    "description": "Saginaw Control & Engineering SCE series NEMA 12 wall-mount enclosure, 24H x 24W x 10D in., 14-gauge steel, ANSI 61 gray, sub-panel, padlockable, UL 50/508A.",
+    "manufacturer": "Saginaw Control & Engineering",
+    "manufacturerPartNumber": "SCE-24P2410",
+    "spec": {
+      "series": "SCE",
+      "nemaRating": "NEMA 12",
+      "material": "14-gauge steel",
+      "finish": "ANSI 61 gray powder coat",
+      "widthIn": 24,
+      "heightIn": 24,
+      "depthIn": 10,
+      "mounting": "Wall-mount",
+      "subpanel": "Included",
+      "ulListing": "UL 50, UL 508A"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "SCE-24P2410",
+        "url": "https://www.grainger.com/search?searchQuery=Saginaw+SCE-24P2410",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.saginawcontrol.com/product-category/enclosures/",
+    "qualityRating": 4,
+    "popularity": 4
+  },
+  {
+    "category": "ENCLOSURE",
+    "name": "HOFFMAN CSD COMLINE FREESTANDING 90X60X24 NEMA 12 STEEL",
+    "description": "nVent Hoffman CSD Comline double-door freestanding enclosure, 90H x 60W x 24D in., 12-gauge steel, NEMA 12, ANSI 61 gray, UL 508A. Oversized section for main switchboard or large ATS.",
+    "manufacturer": "nVent Hoffman",
+    "manufacturerPartNumber": "CSDFSS60P24P",
+    "spec": {
+      "series": "CSD Comline Freestanding",
+      "nemaRating": "NEMA 12",
+      "material": "12-gauge steel",
+      "finish": "ANSI 61 gray powder coat",
+      "widthIn": 60,
+      "heightIn": 90,
+      "depthIn": 24,
+      "mounting": "Floor-mount freestanding",
+      "subpanel": "Included",
+      "ulListing": "UL 50, UL 508A"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "CSDFSS60P24P",
+        "url": "https://www.grainger.com/search?searchQuery=Hoffman+CSDFSS60P24P",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.nvent.com/en-us/brands/hoffman/products",
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "ENCLOSURE",
+    "name": "HOFFMAN A-36H2412LP NEMA 1 WALL MOUNT 36X24X12 STEEL",
+    "description": "nVent Hoffman A-series NEMA 1 wall-mount enclosure, 36H x 24W x 12D in., 14-gauge steel, ANSI 61 gray, sub-panel included. UL 50/508A listed. Budget option for dry indoor locations.",
+    "manufacturer": "nVent Hoffman",
+    "manufacturerPartNumber": "A-36H2412LP",
+    "spec": {
+      "series": "A-Series",
+      "nemaRating": "NEMA 1",
+      "material": "14-gauge steel",
+      "finish": "ANSI 61 gray powder coat",
+      "widthIn": 24,
+      "heightIn": 36,
+      "depthIn": 12,
+      "mounting": "Wall-mount",
+      "subpanel": "Included",
+      "ulListing": "UL 50, UL 508A"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "A-36H2412LP",
+        "url": "https://www.grainger.com/search?searchQuery=Hoffman+A-36H2412LP",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "Zoro",
+        "sku": "A-36H2412LP",
+        "url": "https://www.zoro.com/search?q=Hoffman+A-36H2412LP",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.nvent.com/en-us/brands/hoffman/products",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "ENCLOSURE",
+    "name": "RITTAL AX COMPACT ENCLOSURE 12X10X6 NEMA 4X ALUMINUM",
+    "description": "Rittal AX series compact NEMA 4X enclosure, 12H x 10W x 6D in. (300x250x150mm), aluminum die-cast with polyester coating, IP66/IP67, UL 50 listed. For small outdoor controls or junction boxes.",
+    "manufacturer": "Rittal",
+    "manufacturerPartNumber": "AX1025000",
+    "spec": {
+      "series": "AX Compact",
+      "nemaRating": "NEMA 4X",
+      "material": "Aluminum die-cast",
+      "finish": "Polyester powder coat gray",
+      "widthIn": 9.8,
+      "heightIn": 11.8,
+      "depthIn": 5.9,
+      "mounting": "Wall-mount",
+      "subpanel": "Optional",
+      "ulListing": "UL 50"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Rittal",
+        "sku": "AX1025000",
+        "url": "https://www.rittal.com/us_en/products/enclosures-housings.html",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.rittal.com/us_en/products/enclosures-housings.html",
+    "qualityRating": 5,
+    "popularity": 3
+  }
+]

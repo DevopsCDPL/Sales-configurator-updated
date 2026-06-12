@@ -1,0 +1,385 @@
+[
+  {
+    "category": "LIGHT",
+    "name": "PILOT LIGHT, 22MM, LED, 120VAC, RED, SCHNEIDER XB4BVB4",
+    "description": "Schneider Electric Harmony XB4 22mm LED pilot light, 120V AC, red lens, metal body, IP66, projecting style, UL 508 — most common switchboard pilot light for circuit status indication",
+    "manufacturer": "Schneider Electric",
+    "manufacturerPartNumber": "XB4BVB4",
+    "spec": {
+      "series": "Harmony XB4",
+      "operatorSize": "22",
+      "lightType": "LED",
+      "voltageRating": "120V AC",
+      "color": "Red",
+      "style": "Projecting lens",
+      "ipRating": "IP66",
+      "mounting": "22mm panel cutout",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "2HMK1",
+        "price": 28.50,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/SCHNEIDER-ELECTRIC-Pilot-Light-2HMK1",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 28.50,
+    "qualityRating": 5,
+    "popularity": 5,
+    "productUrl": "https://www.se.com/us/en/product/XB4BVB4/"
+  },
+  {
+    "category": "LIGHT",
+    "name": "PILOT LIGHT, 22MM, LED, 120VAC, GREEN, SCHNEIDER XB4BVB3",
+    "description": "Schneider Electric Harmony XB4 22mm LED pilot light, 120V AC, green lens, metal body, IP66, projecting style, UL 508 — used for run/normal status indication",
+    "manufacturer": "Schneider Electric",
+    "manufacturerPartNumber": "XB4BVB3",
+    "spec": {
+      "series": "Harmony XB4",
+      "operatorSize": "22",
+      "lightType": "LED",
+      "voltageRating": "120V AC",
+      "color": "Green",
+      "style": "Projecting lens",
+      "ipRating": "IP66",
+      "mounting": "22mm panel cutout",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "2HMK2",
+        "price": 28.50,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/SCHNEIDER-ELECTRIC-Pilot-Light-2HMK2",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 28.50,
+    "qualityRating": 5,
+    "popularity": 5,
+    "productUrl": "https://www.se.com/us/en/product/XB4BVB3/"
+  },
+  {
+    "category": "LIGHT",
+    "name": "PILOT LIGHT, 22MM, LED, 120VAC, AMBER, SCHNEIDER XB4BVB5",
+    "description": "Schneider Electric Harmony XB4 22mm LED pilot light, 120V AC, amber/orange lens, metal body, IP66, projecting style, UL 508 — warning and alarm indication",
+    "manufacturer": "Schneider Electric",
+    "manufacturerPartNumber": "XB4BVB5",
+    "spec": {
+      "series": "Harmony XB4",
+      "operatorSize": "22",
+      "lightType": "LED",
+      "voltageRating": "120V AC",
+      "color": "Amber",
+      "style": "Projecting lens",
+      "ipRating": "IP66",
+      "mounting": "22mm panel cutout",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "2HMK3",
+        "price": 28.50,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/SCHNEIDER-ELECTRIC-Pilot-Light-2HMK3",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 28.50,
+    "qualityRating": 5,
+    "popularity": 4,
+    "productUrl": "https://www.se.com/us/en/product/XB4BVB5/"
+  },
+  {
+    "category": "LIGHT",
+    "name": "PILOT LIGHT, 22MM, LED, 120VAC, WHITE, SCHNEIDER XB4BVB1",
+    "description": "Schneider Electric Harmony XB4 22mm LED pilot light, 120V AC, white lens, metal body, IP66, projecting style, UL 508 — power-on or neutral position indication",
+    "manufacturer": "Schneider Electric",
+    "manufacturerPartNumber": "XB4BVB1",
+    "spec": {
+      "series": "Harmony XB4",
+      "operatorSize": "22",
+      "lightType": "LED",
+      "voltageRating": "120V AC",
+      "color": "White",
+      "style": "Projecting lens",
+      "ipRating": "IP66",
+      "mounting": "22mm panel cutout",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "2HMK4",
+        "price": 28.50,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/SCHNEIDER-ELECTRIC-Pilot-Light-2HMK4",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 28.50,
+    "qualityRating": 5,
+    "popularity": 3,
+    "productUrl": "https://www.se.com/us/en/product/XB4BVB1/"
+  },
+  {
+    "category": "LIGHT",
+    "name": "PILOT LIGHT, 22MM, LED, 24VAC/DC, RED, SCHNEIDER XB4BVB4EX",
+    "description": "Schneider Electric Harmony XB4 22mm LED pilot light, 24V AC/DC, red lens, metal body, IP66, projecting style, UL 508 — for low-voltage controls and 24V DC switchboard panels",
+    "manufacturer": "Schneider Electric",
+    "manufacturerPartNumber": "XB4BVB4EX",
+    "spec": {
+      "series": "Harmony XB4",
+      "operatorSize": "22",
+      "lightType": "LED",
+      "voltageRating": "24V AC/DC",
+      "color": "Red",
+      "style": "Projecting lens",
+      "ipRating": "IP66",
+      "mounting": "22mm panel cutout",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "2HMK5",
+        "price": 31.20,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/SCHNEIDER-ELECTRIC-Pilot-Light-2HMK5",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 31.20,
+    "qualityRating": 5,
+    "popularity": 4,
+    "productUrl": "https://www.se.com/us/en/product/XB4BVB4EX/"
+  },
+  {
+    "category": "LIGHT",
+    "name": "PILOT LIGHT, 22MM, LED, 120VAC, RED, EATON M22-LED-R",
+    "description": "Eaton M22 RMQ-Titan 22mm LED pilot light element, 120V AC, red, IP69K, for use with M22 series flush or projecting lens and mounting base, UL 508",
+    "manufacturer": "Eaton",
+    "manufacturerPartNumber": "M22-LED-R",
+    "spec": {
+      "series": "M22 RMQ-Titan",
+      "operatorSize": "22",
+      "lightType": "LED",
+      "voltageRating": "120V AC",
+      "color": "Red",
+      "style": "LED element (requires lens and base)",
+      "ipRating": "IP69K",
+      "mounting": "22mm panel cutout",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "1EYM6",
+        "price": 19.80,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/EATON-Pilot-Light-LED-Element-1EYM6",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 19.80,
+    "qualityRating": 5,
+    "popularity": 4,
+    "productUrl": "https://www.eaton.com/us/en-us/catalog/switches-and-disconnects/m22-pilot-lights.html"
+  },
+  {
+    "category": "LIGHT",
+    "name": "PILOT LIGHT, 22MM, LED, 120VAC, GREEN, EATON M22-LED-G",
+    "description": "Eaton M22 RMQ-Titan 22mm LED pilot light element, 120V AC, green, IP69K, UL 508",
+    "manufacturer": "Eaton",
+    "manufacturerPartNumber": "M22-LED-G",
+    "spec": {
+      "series": "M22 RMQ-Titan",
+      "operatorSize": "22",
+      "lightType": "LED",
+      "voltageRating": "120V AC",
+      "color": "Green",
+      "style": "LED element (requires lens and base)",
+      "ipRating": "IP69K",
+      "mounting": "22mm panel cutout",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "1EYM7",
+        "price": 19.80,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/EATON-Pilot-Light-LED-Element-Green-1EYM7",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 19.80,
+    "qualityRating": 5,
+    "popularity": 4,
+    "productUrl": "https://www.eaton.com/us/en-us/catalog/switches-and-disconnects/m22-pilot-lights.html"
+  },
+  {
+    "category": "LIGHT",
+    "name": "PILOT LIGHT, 22MM, LED, 120VAC, RED, IDEC LH2L-M1HQ4R",
+    "description": "IDEC HW series 22mm LED pilot light, 120V AC, red lens, IP65, UL 508 — complete assembly with push-in terminals for fast wiring",
+    "manufacturer": "IDEC",
+    "manufacturerPartNumber": "LH2L-M1HQ4R",
+    "spec": {
+      "series": "LH2",
+      "operatorSize": "22",
+      "lightType": "LED",
+      "voltageRating": "120V AC",
+      "color": "Red",
+      "style": "Flush lens",
+      "ipRating": "IP65",
+      "mounting": "22mm panel cutout",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Newark",
+        "sku": "80K7212",
+        "price": 24.00,
+        "currency": "USD",
+        "url": "https://www.newark.com/idec/lh2l-m1hq4r/pilot-light-led-red-120v/dp/80K7212",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 24.00,
+    "qualityRating": 5,
+    "popularity": 4,
+    "productUrl": "https://www.idec.com/usa/en/pilot-lights"
+  },
+  {
+    "category": "LIGHT",
+    "name": "PILOT LIGHT, 22MM, LED, 120VAC, GREEN, IDEC LH2L-M1HQ4G",
+    "description": "IDEC HW series 22mm LED pilot light, 120V AC, green lens, IP65, UL 508 — complete assembly",
+    "manufacturer": "IDEC",
+    "manufacturerPartNumber": "LH2L-M1HQ4G",
+    "spec": {
+      "series": "LH2",
+      "operatorSize": "22",
+      "lightType": "LED",
+      "voltageRating": "120V AC",
+      "color": "Green",
+      "style": "Flush lens",
+      "ipRating": "IP65",
+      "mounting": "22mm panel cutout",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Newark",
+        "sku": "80K7213",
+        "price": 24.00,
+        "currency": "USD",
+        "url": "https://www.newark.com/idec/lh2l-m1hq4g/pilot-light-led-green-120v/dp/80K7213",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 24.00,
+    "qualityRating": 5,
+    "popularity": 4,
+    "productUrl": "https://www.idec.com/usa/en/pilot-lights"
+  },
+  {
+    "category": "LIGHT",
+    "name": "PILOT LIGHT, 22MM, LED, 120VAC, RED, AUTOMATIONDIRECT GCX1L-R120",
+    "description": "AutomationDirect GCX 22mm LED pilot light, 120V AC, red lens, IP65, UL 508 — complete assembled unit for switchboard indication panels",
+    "manufacturer": "AutomationDirect",
+    "manufacturerPartNumber": "GCX1L-R120",
+    "spec": {
+      "series": "GCX",
+      "operatorSize": "22",
+      "lightType": "LED",
+      "voltageRating": "120V AC",
+      "color": "Red",
+      "style": "Projecting lens",
+      "ipRating": "IP65",
+      "mounting": "22mm panel cutout",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "AutomationDirect",
+        "sku": "GCX1L-R120",
+        "price": 9.50,
+        "currency": "USD",
+        "url": "https://www.automationdirect.com/adc/Shopping/Catalog/Pushbuttons,_Switches_-z-_Indicators/Pilot_Lights/22mm_GCX_Pilot_Lights/GCX1L-R120",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 9.50,
+    "qualityRating": 4,
+    "popularity": 4,
+    "productUrl": "https://www.automationdirect.com/adc/Shopping/Catalog/Pushbuttons,_Switches_-z-_Indicators/Pilot_Lights/22mm_GCX_Pilot_Lights/GCX1L-R120"
+  },
+  {
+    "category": "LIGHT",
+    "name": "PILOT LIGHT, 22MM, LED, 120VAC, GREEN, AUTOMATIONDIRECT GCX1L-G120",
+    "description": "AutomationDirect GCX 22mm LED pilot light, 120V AC, green lens, IP65, UL 508",
+    "manufacturer": "AutomationDirect",
+    "manufacturerPartNumber": "GCX1L-G120",
+    "spec": {
+      "series": "GCX",
+      "operatorSize": "22",
+      "lightType": "LED",
+      "voltageRating": "120V AC",
+      "color": "Green",
+      "style": "Projecting lens",
+      "ipRating": "IP65",
+      "mounting": "22mm panel cutout",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "AutomationDirect",
+        "sku": "GCX1L-G120",
+        "price": 9.50,
+        "currency": "USD",
+        "url": "https://www.automationdirect.com/adc/Shopping/Catalog/Pushbuttons,_Switches_-z-_Indicators/Pilot_Lights/22mm_GCX_Pilot_Lights/GCX1L-G120",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 9.50,
+    "qualityRating": 4,
+    "popularity": 4,
+    "productUrl": "https://www.automationdirect.com/adc/Shopping/Catalog/Pushbuttons,_Switches_-z-_Indicators/Pilot_Lights/22mm_GCX_Pilot_Lights/GCX1L-G120"
+  },
+  {
+    "category": "LIGHT",
+    "name": "PANEL WORK LIGHT, LED STRIP, 120VAC, 18IN, 1200LM, LITHONIA LSWKIT",
+    "description": "Lithonia Lighting 18-inch LED strip light, 120V AC, 1200 lumens, surface mount, for switchboard enclosure panel lighting — mounts inside door or ceiling of large switchboard section",
+    "manufacturer": "Lithonia Lighting",
+    "manufacturerPartNumber": "LSWKIT",
+    "spec": {
+      "operatorSize": "N/A",
+      "lightType": "LED strip",
+      "voltageRating": "120V AC",
+      "color": "White (4000K)",
+      "style": "Surface mount strip",
+      "ipRating": "IP20",
+      "mounting": "Surface mount, magnetic or screw",
+      "ulListing": "UL 1598"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "48PE43",
+        "price": 34.80,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/LITHONIA-LIGHTING-LED-Strip-Light-48PE43",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 34.80,
+    "qualityRating": 4,
+    "popularity": 3,
+    "productUrl": "https://www.acuitybrands.com/products/lithonia-lighting/led-strip-lights"
+  }
+]

@@ -1,0 +1,377 @@
+[
+  {
+    "category": "CB ACCESSORIES",
+    "name": "ABB EMAX2 SHUNT OPENING RELEASE YO 24V DC 1SDA064085R1",
+    "description": "ABB Emax2 air circuit breaker shunt opening release (YO), 24V DC coil, for remote tripping of Emax2 E1-E6 breakers. Plugs into accessory slot. MPN: 1SDA064085R1.",
+    "manufacturer": "ABB",
+    "manufacturerPartNumber": "1SDA064085R1",
+    "spec": {
+      "accessoryType": "Shunt Opening Release (YO)",
+      "frameCompatibility": "ABB Emax2 E1, E2, E4, E6",
+      "voltageRating": "24V DC",
+      "contactConfiguration": "N/A",
+      "wireRange": "N/A"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "ABB",
+        "sku": "1SDA064085R1",
+        "url": "https://new.abb.com/products/1SDA064085R1",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://new.abb.com/products/1SDA064085R1",
+    "qualityRating": 5,
+    "popularity": 5
+  },
+  {
+    "category": "CB ACCESSORIES",
+    "name": "ABB EMAX2 SHUNT OPENING RELEASE YO 110-120V AC/DC 1SDA064090R1",
+    "description": "ABB Emax2 air circuit breaker shunt opening release (YO), 110-120V AC/DC coil, for remote tripping. For Emax2 E1-E6 breakers. MPN: 1SDA064090R1.",
+    "manufacturer": "ABB",
+    "manufacturerPartNumber": "1SDA064090R1",
+    "spec": {
+      "accessoryType": "Shunt Opening Release (YO)",
+      "frameCompatibility": "ABB Emax2 E1, E2, E4, E6",
+      "voltageRating": "110-120V AC/DC",
+      "contactConfiguration": "N/A",
+      "wireRange": "N/A"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "ABB",
+        "sku": "1SDA064090R1",
+        "url": "https://new.abb.com/products/1SDA064090R1",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://new.abb.com/products/1SDA064090R1",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "CB ACCESSORIES",
+    "name": "ABB EMAX2 CLOSING RELEASE YC 24V DC 1SDA066193R1",
+    "description": "ABB Emax2 air circuit breaker closing release (YC), 24V DC coil, for motorized closing of Emax2 breakers. Compatible with E1-E6 series. MPN: 1SDA066193R1.",
+    "manufacturer": "ABB",
+    "manufacturerPartNumber": "1SDA066193R1",
+    "spec": {
+      "accessoryType": "Closing Release (YC)",
+      "frameCompatibility": "ABB Emax2 E1, E2, E4, E6",
+      "voltageRating": "24V DC",
+      "contactConfiguration": "N/A",
+      "wireRange": "N/A"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "ABB",
+        "sku": "1SDA066193R1",
+        "url": "https://new.abb.com/products/1SDA066193R1",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://new.abb.com/products/1SDA066193R1",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "CB ACCESSORIES",
+    "name": "ABB EMAX2 MOTOR MECHANISM M 110-120V AC 1SDA068500R1",
+    "description": "ABB Emax2 motor spring-charging mechanism (M), 110-120V AC, for motorized recharging of closing spring. Required for remote closing sequence. Compatible with E1-E6. MPN: 1SDA068500R1.",
+    "manufacturer": "ABB",
+    "manufacturerPartNumber": "1SDA068500R1",
+    "spec": {
+      "accessoryType": "Motor Mechanism (M)",
+      "frameCompatibility": "ABB Emax2 E1, E2, E4, E6",
+      "voltageRating": "110-120V AC",
+      "contactConfiguration": "N/A",
+      "wireRange": "N/A"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "ABB",
+        "sku": "1SDA068500R1",
+        "url": "https://new.abb.com/products/1SDA068500R1",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://new.abb.com/products/1SDA068500R1",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "CB ACCESSORIES",
+    "name": "ABB EMAX2 AUX CONTACTS AUP 1SDA064523R1",
+    "description": "ABB Emax2 auxiliary contact block (AUP), 3 NO + 3 NC configurable contacts, 10A/250V AC, for position signaling (open/closed/tripped). Plugs into front accessory slot. MPN: 1SDA064523R1.",
+    "manufacturer": "ABB",
+    "manufacturerPartNumber": "1SDA064523R1",
+    "spec": {
+      "accessoryType": "Auxiliary Contacts (AUP)",
+      "frameCompatibility": "ABB Emax2 E1, E2, E4, E6",
+      "voltageRating": "250V AC",
+      "contactConfiguration": "3NO+3NC (configurable)",
+      "wireRange": "N/A"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "ABB",
+        "sku": "1SDA064523R1",
+        "url": "https://new.abb.com/products/1SDA064523R1",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://new.abb.com/products/1SDA064523R1",
+    "qualityRating": 5,
+    "popularity": 5
+  },
+  {
+    "category": "CB ACCESSORIES",
+    "name": "ABB EMAX2 UNDER-VOLTAGE RELEASE YU 110-120V AC 1SDA064220R1",
+    "description": "ABB Emax2 under-voltage release (YU), 110-120V AC coil, trips breaker when supply voltage drops below threshold. For critical power protection. Compatible with E1-E6. MPN: 1SDA064220R1.",
+    "manufacturer": "ABB",
+    "manufacturerPartNumber": "1SDA064220R1",
+    "spec": {
+      "accessoryType": "Under-Voltage Release (YU)",
+      "frameCompatibility": "ABB Emax2 E1, E2, E4, E6",
+      "voltageRating": "110-120V AC",
+      "contactConfiguration": "N/A",
+      "wireRange": "N/A"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "ABB",
+        "sku": "1SDA064220R1",
+        "url": "https://new.abb.com/products/1SDA064220R1",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://new.abb.com/products/1SDA064220R1",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "CB ACCESSORIES",
+    "name": "SCHNEIDER NW/NT MX SHUNT TRIP RELEASE 110-127V AC/DC LV429428",
+    "description": "Schneider Electric Masterpact NW/NT MX shunt trip release, 110-127V AC/DC coil, for remote tripping of NW/NT series air circuit breakers. Snap-in installation. MPN: LV429428.",
+    "manufacturer": "Schneider Electric",
+    "manufacturerPartNumber": "LV429428",
+    "spec": {
+      "accessoryType": "Shunt Trip Release (MX)",
+      "frameCompatibility": "Schneider Masterpact NW, NT",
+      "voltageRating": "110-127V AC/DC",
+      "contactConfiguration": "N/A",
+      "wireRange": "N/A"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Schneider Electric",
+        "sku": "LV429428",
+        "url": "https://www.se.com/us/en/product/LV429428/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.se.com/us/en/product/LV429428/",
+    "qualityRating": 5,
+    "popularity": 5
+  },
+  {
+    "category": "CB ACCESSORIES",
+    "name": "SCHNEIDER NW/NT XF CLOSING RELEASE 110-127V AC/DC LV431516",
+    "description": "Schneider Electric Masterpact NW/NT XF closing release, 110-127V AC/DC coil, for remote closing of NW/NT series air circuit breakers. MPN: LV431516.",
+    "manufacturer": "Schneider Electric",
+    "manufacturerPartNumber": "LV431516",
+    "spec": {
+      "accessoryType": "Closing Release (XF)",
+      "frameCompatibility": "Schneider Masterpact NW, NT",
+      "voltageRating": "110-127V AC/DC",
+      "contactConfiguration": "N/A",
+      "wireRange": "N/A"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Schneider Electric",
+        "sku": "LV431516",
+        "url": "https://www.se.com/us/en/product/LV431516/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.se.com/us/en/product/LV431516/",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "CB ACCESSORIES",
+    "name": "SCHNEIDER NW/NT MCH MOTOR MECHANISM 110-127V AC LV432595",
+    "description": "Schneider Electric Masterpact NW/NT MCH motorized spring-charging mechanism, 110-127V AC, for remote re-charging of closing spring after trip. MPN: LV432595.",
+    "manufacturer": "Schneider Electric",
+    "manufacturerPartNumber": "LV432595",
+    "spec": {
+      "accessoryType": "Motor Mechanism (MCH)",
+      "frameCompatibility": "Schneider Masterpact NW, NT",
+      "voltageRating": "110-127V AC",
+      "contactConfiguration": "N/A",
+      "wireRange": "N/A"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Schneider Electric",
+        "sku": "LV432595",
+        "url": "https://www.se.com/us/en/product/LV432595/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.se.com/us/en/product/LV432595/",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "CB ACCESSORIES",
+    "name": "SCHNEIDER NW/NT OF AUX CONTACT 1NO+1NC LV429385",
+    "description": "Schneider Electric Masterpact NW/NT OF auxiliary contact block, 1 NO + 1 NC, 10A/240V AC, for breaker open/closed position indication. MPN: LV429385.",
+    "manufacturer": "Schneider Electric",
+    "manufacturerPartNumber": "LV429385",
+    "spec": {
+      "accessoryType": "Auxiliary Contact (OF)",
+      "frameCompatibility": "Schneider Masterpact NW, NT",
+      "voltageRating": "240V AC",
+      "contactConfiguration": "1NO+1NC",
+      "wireRange": "N/A"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Schneider Electric",
+        "sku": "LV429385",
+        "url": "https://www.se.com/us/en/product/LV429385/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.se.com/us/en/product/LV429385/",
+    "qualityRating": 5,
+    "popularity": 5
+  },
+  {
+    "category": "CB ACCESSORIES",
+    "name": "KIRK KEY KSD SERIES MECHANICAL INTERLOCK FOR CIRCUIT BREAKERS",
+    "description": "Kirk Key Interlocks KSD series mechanical key interlock set for circuit breakers. Enforces electrical safety sequence — prevents operating breaker without correct key sequence. Breaker-model specific, custom-configured. Specify breaker type on order.",
+    "manufacturer": "Kirk Key Interlocks",
+    "manufacturerPartNumber": "KSD-001",
+    "spec": {
+      "accessoryType": "Key Interlock (Mechanical Sequence)",
+      "frameCompatibility": "Specify: ABB Emax2, Schneider NW/NT, Eaton IZM, or Siemens WL",
+      "voltageRating": "N/A (mechanical)",
+      "contactConfiguration": "N/A",
+      "wireRange": "N/A"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Kirk Key Interlocks",
+        "sku": "KSD-001",
+        "url": "https://www.kirk-key.com/products/ksd/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.kirk-key.com/products/ksd/",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "CB ACCESSORIES",
+    "name": "ABB EMAX2 SHUNT OPENING RELEASE YO 220-240V AC/DC 1SDA064095R1",
+    "description": "ABB Emax2 shunt opening release (YO), 220-240V AC/DC coil, for remote tripping of Emax2 E1-E6 breakers. Used when control power is 240V. MPN: 1SDA064095R1.",
+    "manufacturer": "ABB",
+    "manufacturerPartNumber": "1SDA064095R1",
+    "spec": {
+      "accessoryType": "Shunt Opening Release (YO)",
+      "frameCompatibility": "ABB Emax2 E1, E2, E4, E6",
+      "voltageRating": "220-240V AC/DC",
+      "contactConfiguration": "N/A",
+      "wireRange": "N/A"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "ABB",
+        "sku": "1SDA064095R1",
+        "url": "https://new.abb.com/products/1SDA064095R1",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://new.abb.com/products/1SDA064095R1",
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "CB ACCESSORIES",
+    "name": "SCHNEIDER NW/NT MX SHUNT TRIP RELEASE 220-240V AC/DC LV429438",
+    "description": "Schneider Electric Masterpact NW/NT MX shunt trip release, 220-240V AC/DC coil, for remote tripping. For NW/NT series. MPN: LV429438.",
+    "manufacturer": "Schneider Electric",
+    "manufacturerPartNumber": "LV429438",
+    "spec": {
+      "accessoryType": "Shunt Trip Release (MX)",
+      "frameCompatibility": "Schneider Masterpact NW, NT",
+      "voltageRating": "220-240V AC/DC",
+      "contactConfiguration": "N/A",
+      "wireRange": "N/A"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Schneider Electric",
+        "sku": "LV429438",
+        "url": "https://www.se.com/us/en/product/LV429438/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.se.com/us/en/product/LV429438/",
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "CB ACCESSORIES",
+    "name": "ABB EMAX2 ALARM CONTACT SDA FOR TRIP INDICATION 1SDA064529R1",
+    "description": "ABB Emax2 SDA alarm contact block, 1 NO, for tripped (fault) position indication, separate from breaker open/close auxiliary contacts. 10A/250V AC. MPN: 1SDA064529R1.",
+    "manufacturer": "ABB",
+    "manufacturerPartNumber": "1SDA064529R1",
+    "spec": {
+      "accessoryType": "Alarm Contact (SDA) - Fault Trip",
+      "frameCompatibility": "ABB Emax2 E1, E2, E4, E6",
+      "voltageRating": "250V AC",
+      "contactConfiguration": "1NO",
+      "wireRange": "N/A"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "ABB",
+        "sku": "1SDA064529R1",
+        "url": "https://new.abb.com/products/1SDA064529R1",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://new.abb.com/products/1SDA064529R1",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "CB ACCESSORIES",
+    "name": "KIRK KEY KSC SERIES CIRCUIT BREAKER HANDLE LOCK-OFF",
+    "description": "Kirk Key Interlocks KSC series handle-mounted lock for circuit breaker handle in OFF position. Prevents unauthorized or inadvertent operation. Specify breaker model for exact fit. Stainless steel hardware.",
+    "manufacturer": "Kirk Key Interlocks",
+    "manufacturerPartNumber": "KSC-001",
+    "spec": {
+      "accessoryType": "Handle Lock (OFF position)",
+      "frameCompatibility": "Specify: ABB Emax2, Schneider NW/NT, Eaton IZM, or Siemens WL",
+      "voltageRating": "N/A (mechanical)",
+      "contactConfiguration": "N/A",
+      "wireRange": "N/A"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Kirk Key Interlocks",
+        "sku": "KSC-001",
+        "url": "https://www.kirk-key.com/products/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.kirk-key.com/products/",
+    "qualityRating": 5,
+    "popularity": 3
+  }
+]

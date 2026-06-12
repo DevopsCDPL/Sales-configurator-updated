@@ -1,0 +1,497 @@
+[
+  {
+    "category": "ATS",
+    "name": "ASCO 300 SERIES ATS 100A 3P 208V OPEN TRANSITION NEMA 1",
+    "description": "ASCO Series 300 automatic transfer switch, 100A, 3-pole, 208Y/120V, open transition, mechanically interlocked, UL 1008 listed, NEMA 1 enclosure, basic controller with time delays.",
+    "manufacturer": "ASCO Power Technologies",
+    "manufacturerPartNumber": "ATS300H100N3S",
+    "spec": {
+      "series": "Series 300",
+      "ratedCurrentA": 100,
+      "poles": "3P",
+      "voltageRating": "208Y/120V",
+      "transferType": "Open transition",
+      "controllerType": "Basic programmable",
+      "serviceEntrance": "No",
+      "bypassIsolation": "No",
+      "mechanicalInterlockType": "Mechanically interlocked",
+      "nemaRating": "NEMA 1",
+      "mounting": "Standalone",
+      "transferTimeMs": 400,
+      "ulListing": "UL 1008"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "ASCO / Schneider Electric",
+        "sku": "ATS300H100N3S",
+        "url": "https://www.se.com/us/en/brands/ascopower/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.se.com/us/en/brands/ascopower/",
+    "qualityRating": 5,
+    "popularity": 5
+  },
+  {
+    "category": "ATS",
+    "name": "ASCO 300 SERIES ATS 200A 3P 480V OPEN TRANSITION NEMA 1",
+    "description": "ASCO Series 300 automatic transfer switch, 200A, 3-pole, 480Y/277V, open transition, mechanically interlocked, UL 1008 listed, NEMA 1 enclosure.",
+    "manufacturer": "ASCO Power Technologies",
+    "manufacturerPartNumber": "ATS300H200N3X",
+    "spec": {
+      "series": "Series 300",
+      "ratedCurrentA": 200,
+      "poles": "3P",
+      "voltageRating": "480Y/277V",
+      "transferType": "Open transition",
+      "controllerType": "Basic programmable",
+      "serviceEntrance": "No",
+      "bypassIsolation": "No",
+      "mechanicalInterlockType": "Mechanically interlocked",
+      "nemaRating": "NEMA 1",
+      "mounting": "Standalone",
+      "transferTimeMs": 400,
+      "ulListing": "UL 1008"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "ASCO / Schneider Electric",
+        "sku": "ATS300H200N3X",
+        "url": "https://www.se.com/us/en/brands/ascopower/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.se.com/us/en/brands/ascopower/",
+    "qualityRating": 5,
+    "popularity": 5
+  },
+  {
+    "category": "ATS",
+    "name": "ASCO 300 SERIES ATS 400A 3P 480V OPEN TRANSITION NEMA 1",
+    "description": "ASCO Series 300 automatic transfer switch, 400A, 3-pole, 480Y/277V, open transition, mechanically interlocked, UL 1008 listed, NEMA 1 enclosure, programmable controller.",
+    "manufacturer": "ASCO Power Technologies",
+    "manufacturerPartNumber": "ATS300H400N3X",
+    "spec": {
+      "series": "Series 300",
+      "ratedCurrentA": 400,
+      "poles": "3P",
+      "voltageRating": "480Y/277V",
+      "transferType": "Open transition",
+      "controllerType": "Basic programmable",
+      "serviceEntrance": "No",
+      "bypassIsolation": "No",
+      "mechanicalInterlockType": "Mechanically interlocked",
+      "nemaRating": "NEMA 1",
+      "mounting": "Standalone",
+      "transferTimeMs": 400,
+      "ulListing": "UL 1008"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "ASCO / Schneider Electric",
+        "sku": "ATS300H400N3X",
+        "url": "https://www.se.com/us/en/brands/ascopower/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.se.com/us/en/brands/ascopower/",
+    "qualityRating": 5,
+    "popularity": 5
+  },
+  {
+    "category": "ATS",
+    "name": "ASCO 300 SERIES ATS 600A 3P 480V OPEN TRANSITION NEMA 1",
+    "description": "ASCO Series 300 automatic transfer switch, 600A, 3-pole, 480Y/277V, open transition, mechanically interlocked, UL 1008 listed, NEMA 1 enclosure.",
+    "manufacturer": "ASCO Power Technologies",
+    "manufacturerPartNumber": "ATS300H600N3X",
+    "spec": {
+      "series": "Series 300",
+      "ratedCurrentA": 600,
+      "poles": "3P",
+      "voltageRating": "480Y/277V",
+      "transferType": "Open transition",
+      "controllerType": "Basic programmable",
+      "serviceEntrance": "No",
+      "bypassIsolation": "No",
+      "mechanicalInterlockType": "Mechanically interlocked",
+      "nemaRating": "NEMA 1",
+      "mounting": "Standalone",
+      "transferTimeMs": 400,
+      "ulListing": "UL 1008"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "ASCO / Schneider Electric",
+        "sku": "ATS300H600N3X",
+        "url": "https://www.se.com/us/en/brands/ascopower/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.se.com/us/en/brands/ascopower/",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "ATS",
+    "name": "ASCO 7000 SERIES POWER TRANSFER SWITCH 800A 3P 480V CLOSED TRANSITION",
+    "description": "ASCO Series 7000 power transfer switch, 800A, 3-pole, 480Y/277V, closed transition (make-before-break), bypass/isolation, UL 1008 listed, NEMA 1 enclosure, Micropanel controller with Modbus.",
+    "manufacturer": "ASCO Power Technologies",
+    "manufacturerPartNumber": "ATSS7BKSC080N3X",
+    "spec": {
+      "series": "Series 7000",
+      "ratedCurrentA": 800,
+      "poles": "3P",
+      "voltageRating": "480Y/277V",
+      "transferType": "Closed transition",
+      "controllerType": "Micropanel with Modbus",
+      "serviceEntrance": "No",
+      "bypassIsolation": "Yes",
+      "mechanicalInterlockType": "Motorized",
+      "nemaRating": "NEMA 1",
+      "mounting": "Standalone",
+      "transferTimeMs": 100,
+      "ulListing": "UL 1008"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "ASCO / Schneider Electric",
+        "sku": "ATSS7BKSC080N3X",
+        "url": "https://www.se.com/us/en/brands/ascopower/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.se.com/us/en/brands/ascopower/",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "ATS",
+    "name": "ASCO 7000 SERIES POWER TRANSFER SWITCH 1200A 3P 480V CLOSED TRANSITION",
+    "description": "ASCO Series 7000 power transfer switch, 1200A, 3-pole, 480Y/277V, closed transition, bypass/isolation, Micropanel controller with Modbus/BACnet, UL 1008 listed.",
+    "manufacturer": "ASCO Power Technologies",
+    "manufacturerPartNumber": "ATSS7BKSC120N3X",
+    "spec": {
+      "series": "Series 7000",
+      "ratedCurrentA": 1200,
+      "poles": "3P",
+      "voltageRating": "480Y/277V",
+      "transferType": "Closed transition",
+      "controllerType": "Micropanel with Modbus/BACnet",
+      "serviceEntrance": "No",
+      "bypassIsolation": "Yes",
+      "mechanicalInterlockType": "Motorized",
+      "nemaRating": "NEMA 1",
+      "mounting": "Standalone",
+      "transferTimeMs": 100,
+      "ulListing": "UL 1008"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "ASCO / Schneider Electric",
+        "sku": "ATSS7BKSC120N3X",
+        "url": "https://www.se.com/us/en/brands/ascopower/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.se.com/us/en/brands/ascopower/",
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "ATS",
+    "name": "EATON ATC-600 CONTACTOR ATS 100A 3P 480V OPEN TRANSITION NEMA 1",
+    "description": "Eaton ATC-600 contactor-based automatic transfer switch, 100A, 3-pole, 480Y/277V, open transition, mechanically interlocked contactors, UL 1008 listed, NEMA 1 enclosure, integral time delays.",
+    "manufacturer": "Eaton",
+    "manufacturerPartNumber": "ATC600A100KC3",
+    "spec": {
+      "series": "ATC-600",
+      "ratedCurrentA": 100,
+      "poles": "3P",
+      "voltageRating": "480Y/277V",
+      "transferType": "Open transition",
+      "controllerType": "ATC-600 microprocessor",
+      "serviceEntrance": "No",
+      "bypassIsolation": "No",
+      "mechanicalInterlockType": "Mechanically interlocked contactors",
+      "nemaRating": "NEMA 1",
+      "mounting": "Standalone",
+      "transferTimeMs": 300,
+      "ulListing": "UL 1008"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Eaton",
+        "sku": "ATC600A100KC3",
+        "url": "https://www.eaton.com/us/en-us/catalog/automated-transfer-switches.html",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.eaton.com/us/en-us/catalog/automated-transfer-switches.html",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "ATS",
+    "name": "EATON ATC-600 CONTACTOR ATS 200A 3P 480V OPEN TRANSITION NEMA 1",
+    "description": "Eaton ATC-600 contactor-based automatic transfer switch, 200A, 3-pole, 480Y/277V, open transition, mechanically interlocked contactors, UL 1008 listed, NEMA 1 enclosure.",
+    "manufacturer": "Eaton",
+    "manufacturerPartNumber": "ATC600A200KC3",
+    "spec": {
+      "series": "ATC-600",
+      "ratedCurrentA": 200,
+      "poles": "3P",
+      "voltageRating": "480Y/277V",
+      "transferType": "Open transition",
+      "controllerType": "ATC-600 microprocessor",
+      "serviceEntrance": "No",
+      "bypassIsolation": "No",
+      "mechanicalInterlockType": "Mechanically interlocked contactors",
+      "nemaRating": "NEMA 1",
+      "mounting": "Standalone",
+      "transferTimeMs": 300,
+      "ulListing": "UL 1008"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Eaton",
+        "sku": "ATC600A200KC3",
+        "url": "https://www.eaton.com/us/en-us/catalog/automated-transfer-switches.html",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.eaton.com/us/en-us/catalog/automated-transfer-switches.html",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "ATS",
+    "name": "EATON ATC-600 CONTACTOR ATS 400A 3P 480V OPEN TRANSITION NEMA 1",
+    "description": "Eaton ATC-600 contactor-based automatic transfer switch, 400A, 3-pole, 480Y/277V, open transition, mechanically interlocked contactors, UL 1008 listed, NEMA 1 enclosure.",
+    "manufacturer": "Eaton",
+    "manufacturerPartNumber": "ATC600A400KC3",
+    "spec": {
+      "series": "ATC-600",
+      "ratedCurrentA": 400,
+      "poles": "3P",
+      "voltageRating": "480Y/277V",
+      "transferType": "Open transition",
+      "controllerType": "ATC-600 microprocessor",
+      "serviceEntrance": "No",
+      "bypassIsolation": "No",
+      "mechanicalInterlockType": "Mechanically interlocked contactors",
+      "nemaRating": "NEMA 1",
+      "mounting": "Standalone",
+      "transferTimeMs": 300,
+      "ulListing": "UL 1008"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Eaton",
+        "sku": "ATC600A400KC3",
+        "url": "https://www.eaton.com/us/en-us/catalog/automated-transfer-switches.html",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.eaton.com/us/en-us/catalog/automated-transfer-switches.html",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "ATS",
+    "name": "GE ZENITH ZTS 200A 3P 480V OPEN TRANSITION NEMA 1",
+    "description": "GE Zenith ZTS series automatic transfer switch, 200A, 3-pole, 480Y/277V, open transition, mechanically interlocked, NEMA 1 enclosure, UL 1008 listed. Service entrance rated variant available.",
+    "manufacturer": "GE Zenith (ABB)",
+    "manufacturerPartNumber": "ZTSBS2E200KXX",
+    "spec": {
+      "series": "ZTS",
+      "ratedCurrentA": 200,
+      "poles": "3P",
+      "voltageRating": "480Y/277V",
+      "transferType": "Open transition",
+      "controllerType": "Basic",
+      "serviceEntrance": "No",
+      "bypassIsolation": "No",
+      "mechanicalInterlockType": "Mechanically interlocked",
+      "nemaRating": "NEMA 1",
+      "mounting": "Standalone",
+      "transferTimeMs": 400,
+      "ulListing": "UL 1008"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "GE Zenith / ABB",
+        "sku": "ZTSBS2E200KXX",
+        "url": "https://new.abb.com/low-voltage/products/transfer-switching-equipment",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://new.abb.com/low-voltage/products/transfer-switching-equipment",
+    "qualityRating": 4,
+    "popularity": 4
+  },
+  {
+    "category": "ATS",
+    "name": "GE ZENITH ZTG 400A 4P 480V CLOSED TRANSITION NEMA 1",
+    "description": "GE Zenith ZTG series closed transition automatic transfer switch, 400A, 4-pole (switched neutral), 480Y/277V, closed transition, NEMA 1 enclosure, UL 1008 listed.",
+    "manufacturer": "GE Zenith (ABB)",
+    "manufacturerPartNumber": "ZTGBS4E400KXX",
+    "spec": {
+      "series": "ZTG",
+      "ratedCurrentA": 400,
+      "poles": "4P",
+      "voltageRating": "480Y/277V",
+      "transferType": "Closed transition",
+      "controllerType": "Programmable",
+      "serviceEntrance": "No",
+      "bypassIsolation": "No",
+      "mechanicalInterlockType": "Motorized",
+      "nemaRating": "NEMA 1",
+      "mounting": "Standalone",
+      "transferTimeMs": 100,
+      "ulListing": "UL 1008"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "GE Zenith / ABB",
+        "sku": "ZTGBS4E400KXX",
+        "url": "https://new.abb.com/low-voltage/products/transfer-switching-equipment",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://new.abb.com/low-voltage/products/transfer-switching-equipment",
+    "qualityRating": 4,
+    "popularity": 3
+  },
+  {
+    "category": "ATS",
+    "name": "ABB TRUONE OTM-C 100A 4P 480V CONTACTOR ATS",
+    "description": "ABB TruONE / OTM-C series automatic transfer switch, 100A, 4-pole, 480V, contactor-based open transition, mechanically interlocked, UL 1008 listed.",
+    "manufacturer": "ABB",
+    "manufacturerPartNumber": "OTM-C100-4-X-BT",
+    "spec": {
+      "series": "TruONE OTM-C",
+      "ratedCurrentA": 100,
+      "poles": "4P",
+      "voltageRating": "480V",
+      "transferType": "Open transition",
+      "controllerType": "Basic",
+      "serviceEntrance": "No",
+      "bypassIsolation": "No",
+      "mechanicalInterlockType": "Mechanically interlocked contactors",
+      "nemaRating": "NEMA 1",
+      "mounting": "Standalone",
+      "transferTimeMs": 300,
+      "ulListing": "UL 1008"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "ABB",
+        "sku": "OTM-C100-4-X-BT",
+        "url": "https://new.abb.com/low-voltage/products/transfer-switching-equipment/automatic-transfer-switches",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://new.abb.com/low-voltage/products/transfer-switching-equipment/automatic-transfer-switches",
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "ATS",
+    "name": "ABB TRUONE OTM-C 200A 4P 480V CONTACTOR ATS",
+    "description": "ABB TruONE / OTM-C series automatic transfer switch, 200A, 4-pole, 480V, contactor-based open transition, mechanically interlocked, UL 1008 listed.",
+    "manufacturer": "ABB",
+    "manufacturerPartNumber": "OTM-C200-4-X-BT",
+    "spec": {
+      "series": "TruONE OTM-C",
+      "ratedCurrentA": 200,
+      "poles": "4P",
+      "voltageRating": "480V",
+      "transferType": "Open transition",
+      "controllerType": "Basic",
+      "serviceEntrance": "No",
+      "bypassIsolation": "No",
+      "mechanicalInterlockType": "Mechanically interlocked contactors",
+      "nemaRating": "NEMA 1",
+      "mounting": "Standalone",
+      "transferTimeMs": 300,
+      "ulListing": "UL 1008"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "ABB",
+        "sku": "OTM-C200-4-X-BT",
+        "url": "https://new.abb.com/low-voltage/products/transfer-switching-equipment/automatic-transfer-switches",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://new.abb.com/low-voltage/products/transfer-switching-equipment/automatic-transfer-switches",
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "ATS",
+    "name": "ASCO 300 SERIES ATS 200A 3P 208V SERVICE ENTRANCE RATED NEMA 3R",
+    "description": "ASCO Series 300 automatic transfer switch, 200A, 3-pole, 208Y/120V, open transition, service entrance rated (UL 891 / NEC 230.83), NEMA 3R enclosure, outdoor weatherproof, UL 1008.",
+    "manufacturer": "ASCO Power Technologies",
+    "manufacturerPartNumber": "ATS300H200S3S",
+    "spec": {
+      "series": "Series 300",
+      "ratedCurrentA": 200,
+      "poles": "3P",
+      "voltageRating": "208Y/120V",
+      "transferType": "Open transition",
+      "controllerType": "Basic programmable",
+      "serviceEntrance": "Yes",
+      "bypassIsolation": "No",
+      "mechanicalInterlockType": "Mechanically interlocked",
+      "nemaRating": "NEMA 3R",
+      "mounting": "Standalone",
+      "transferTimeMs": 400,
+      "ulListing": "UL 1008, Service Entrance"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "ASCO / Schneider Electric",
+        "sku": "ATS300H200S3S",
+        "url": "https://www.se.com/us/en/brands/ascopower/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.se.com/us/en/brands/ascopower/",
+    "qualityRating": 5,
+    "popularity": 5
+  },
+  {
+    "category": "ATS",
+    "name": "EATON ATC-600 CONTACTOR ATS 600A 3P 480V OPEN TRANSITION NEMA 1",
+    "description": "Eaton ATC-600 contactor-based automatic transfer switch, 600A, 3-pole, 480Y/277V, open transition, mechanically interlocked contactors, UL 1008 listed, NEMA 1 enclosure.",
+    "manufacturer": "Eaton",
+    "manufacturerPartNumber": "ATC600A600KC3",
+    "spec": {
+      "series": "ATC-600",
+      "ratedCurrentA": 600,
+      "poles": "3P",
+      "voltageRating": "480Y/277V",
+      "transferType": "Open transition",
+      "controllerType": "ATC-600 microprocessor",
+      "serviceEntrance": "No",
+      "bypassIsolation": "No",
+      "mechanicalInterlockType": "Mechanically interlocked contactors",
+      "nemaRating": "NEMA 1",
+      "mounting": "Standalone",
+      "transferTimeMs": 300,
+      "ulListing": "UL 1008"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Eaton",
+        "sku": "ATC600A600KC3",
+        "url": "https://www.eaton.com/us/en-us/catalog/automated-transfer-switches.html",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.eaton.com/us/en-us/catalog/automated-transfer-switches.html",
+    "qualityRating": 5,
+    "popularity": 3
+  }
+]

@@ -1,0 +1,421 @@
+[
+  {
+    "category": "BUSSING",
+    "name": "COPPER BUS BAR C110 1/4X2 SOFT-DRAWN TIN-PLATED 10FT",
+    "description": "C110 electrolytic tough pitch copper bus bar, 1/4 in. x 2 in. cross-section, soft-drawn temper, tin-plated finish, 10 ft standard length. Rated ~400A continuous (free air). Standard switchboard distribution bus stock.",
+    "manufacturer": "Online Metals / Metals Depot",
+    "manufacturerPartNumber": "CU-C110-0.25X2.0-TP-10",
+    "spec": {
+      "material": "Copper C110",
+      "wireType": "Soft-drawn, tin-plated",
+      "crossSectionIn": "0.25x2.0",
+      "ratedCurrentA": 400,
+      "busBarLengthFt": 10,
+      "holePattern": "Customer specified",
+      "ulRecognized": "UL 891 compatible"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Online Metals",
+        "sku": "CU-C110-025X200-TP",
+        "url": "https://www.onlinemetals.com/en/buy/copper/flat-bar",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "Metals Depot",
+        "sku": "C110FLB14X2",
+        "url": "https://www.metalsdepot.com/copper/copper-flat-bar",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.onlinemetals.com/en/buy/copper/flat-bar",
+    "qualityRating": 4,
+    "popularity": 5
+  },
+  {
+    "category": "BUSSING",
+    "name": "COPPER BUS BAR C110 1/4X3 SOFT-DRAWN TIN-PLATED 10FT",
+    "description": "C110 copper bus bar, 1/4 in. x 3 in. cross-section, soft-drawn, tin-plated, 10 ft length. Rated ~600A continuous (free air). Standard neutral/ground bus stock.",
+    "manufacturer": "Online Metals / Metals Depot",
+    "manufacturerPartNumber": "CU-C110-0.25X3.0-TP-10",
+    "spec": {
+      "material": "Copper C110",
+      "wireType": "Soft-drawn, tin-plated",
+      "crossSectionIn": "0.25x3.0",
+      "ratedCurrentA": 600,
+      "busBarLengthFt": 10,
+      "holePattern": "Customer specified",
+      "ulRecognized": "UL 891 compatible"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Online Metals",
+        "sku": "CU-C110-025X300-TP",
+        "url": "https://www.onlinemetals.com/en/buy/copper/flat-bar",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "Metals Depot",
+        "sku": "C110FLB14X3",
+        "url": "https://www.metalsdepot.com/copper/copper-flat-bar",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.onlinemetals.com/en/buy/copper/flat-bar",
+    "qualityRating": 4,
+    "popularity": 5
+  },
+  {
+    "category": "BUSSING",
+    "name": "COPPER BUS BAR C110 3/8X4 SOFT-DRAWN TIN-PLATED 10FT",
+    "description": "C110 copper bus bar, 3/8 in. x 4 in. cross-section, soft-drawn, tin-plated, 10 ft length. Rated ~1200A continuous (free air). Main bus bar for 1200A switchboard section.",
+    "manufacturer": "Online Metals / Metals Depot",
+    "manufacturerPartNumber": "CU-C110-0.375X4.0-TP-10",
+    "spec": {
+      "material": "Copper C110",
+      "wireType": "Soft-drawn, tin-plated",
+      "crossSectionIn": "0.375x4.0",
+      "ratedCurrentA": 1200,
+      "busBarLengthFt": 10,
+      "holePattern": "Customer specified",
+      "ulRecognized": "UL 891 compatible"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Online Metals",
+        "sku": "CU-C110-0375X400-TP",
+        "url": "https://www.onlinemetals.com/en/buy/copper/flat-bar",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "Metals Depot",
+        "sku": "C110FLB38X4",
+        "url": "https://www.metalsdepot.com/copper/copper-flat-bar",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.onlinemetals.com/en/buy/copper/flat-bar",
+    "qualityRating": 4,
+    "popularity": 4
+  },
+  {
+    "category": "BUSSING",
+    "name": "COPPER BUS BAR C110 1/2X5 SOFT-DRAWN TIN-PLATED 10FT",
+    "description": "C110 copper bus bar, 1/2 in. x 5 in. cross-section, soft-drawn, tin-plated, 10 ft length. Rated ~2000A continuous (free air). Main bus for 2000A switchboard section.",
+    "manufacturer": "Online Metals / Metals Depot",
+    "manufacturerPartNumber": "CU-C110-0.5X5.0-TP-10",
+    "spec": {
+      "material": "Copper C110",
+      "wireType": "Soft-drawn, tin-plated",
+      "crossSectionIn": "0.5x5.0",
+      "ratedCurrentA": 2000,
+      "busBarLengthFt": 10,
+      "holePattern": "Customer specified",
+      "ulRecognized": "UL 891 compatible"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Online Metals",
+        "sku": "CU-C110-050X500-TP",
+        "url": "https://www.onlinemetals.com/en/buy/copper/flat-bar",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.onlinemetals.com/en/buy/copper/flat-bar",
+    "qualityRating": 4,
+    "popularity": 3
+  },
+  {
+    "category": "BUSSING",
+    "name": "NVENT ERIFLEX FLEXIBAR 125A 18MM X 3MM TINNED COPPER FLEXIBLE BUS",
+    "description": "nVent Eriflex Flexibar flexible bus bar laminate, 125A, 18mm x 3mm cross-section, tinned stranded copper, 1m nominal length. For flexible connections to breaker terminals and bus transitions.",
+    "manufacturer": "nVent ERIFLEX",
+    "manufacturerPartNumber": "504106",
+    "spec": {
+      "material": "Copper C110, tin-plated",
+      "wireType": "Stranded laminate, flexible",
+      "crossSectionIn": "0.71x0.12",
+      "ratedCurrentA": 125,
+      "busBarLengthFt": 3.3,
+      "ulRecognized": "UL recognized component"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "nVent ERIFLEX",
+        "sku": "504106",
+        "url": "https://www.nvent.com/en-us/brands/eriflex",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.nvent.com/en-us/brands/eriflex",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "BUSSING",
+    "name": "NVENT ERIFLEX FLEXIBAR 250A 25MM X 5MM TINNED COPPER FLEXIBLE BUS",
+    "description": "nVent Eriflex Flexibar flexible bus bar laminate, 250A, 25mm x 5mm cross-section, tinned stranded copper, 1m nominal length. Standard flexible connection for 250A breaker bus.",
+    "manufacturer": "nVent ERIFLEX",
+    "manufacturerPartNumber": "504107",
+    "spec": {
+      "material": "Copper C110, tin-plated",
+      "wireType": "Stranded laminate, flexible",
+      "crossSectionIn": "0.98x0.20",
+      "ratedCurrentA": 250,
+      "busBarLengthFt": 3.3,
+      "ulRecognized": "UL recognized component"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "nVent ERIFLEX",
+        "sku": "504107",
+        "url": "https://www.nvent.com/en-us/brands/eriflex",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.nvent.com/en-us/brands/eriflex",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "BUSSING",
+    "name": "NVNET ERIFLEX FLEXIBAR 400A 32MM X 5MM TINNED COPPER FLEXIBLE BUS",
+    "description": "nVent Eriflex Flexibar flexible bus bar laminate, 400A, 32mm x 5mm cross-section, tinned stranded copper, 1m nominal length. For 400A bus transitions and flexible tap connections.",
+    "manufacturer": "nVent ERIFLEX",
+    "manufacturerPartNumber": "504108",
+    "spec": {
+      "material": "Copper C110, tin-plated",
+      "wireType": "Stranded laminate, flexible",
+      "crossSectionIn": "1.26x0.20",
+      "ratedCurrentA": 400,
+      "busBarLengthFt": 3.3,
+      "ulRecognized": "UL recognized component"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "nVent ERIFLEX",
+        "sku": "504108",
+        "url": "https://www.nvent.com/en-us/brands/eriflex",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.nvent.com/en-us/brands/eriflex",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "BUSSING",
+    "name": "STORM POWER CUSTOM COPPER BUS BAR 1/4X2 PUNCHED TIN-PLATED",
+    "description": "Storm Power Components custom-fabricated copper bus bar, 1/4 in. x 2 in., C110 soft-drawn tin-plated, punched per drawing with standard 1.0 in. bolt hole pattern. UL 891 switchboard bus. RFQ pricing.",
+    "manufacturer": "Storm Power Components",
+    "manufacturerPartNumber": "SPC-CB-025X200-TP-P",
+    "spec": {
+      "material": "Copper C110",
+      "wireType": "Soft-drawn, tin-plated, punched",
+      "crossSectionIn": "0.25x2.0",
+      "ratedCurrentA": 400,
+      "holePattern": "1.0 in. centers standard",
+      "ulRecognized": "UL 891 switchboard bus"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Storm Power Components",
+        "sku": "SPC-CB-025X200-TP-P",
+        "url": "https://stormpowercomponents.com/bus-bars/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://stormpowercomponents.com/bus-bars/",
+    "qualityRating": 4,
+    "popularity": 4
+  },
+  {
+    "category": "BUSSING",
+    "name": "STORM POWER CUSTOM COPPER BUS BAR 3/8X4 PUNCHED TIN-PLATED",
+    "description": "Storm Power Components custom-fabricated copper bus bar, 3/8 in. x 4 in., C110 soft-drawn tin-plated, punched per drawing. For 1200A main bus in UL 891 switchboard applications. RFQ pricing.",
+    "manufacturer": "Storm Power Components",
+    "manufacturerPartNumber": "SPC-CB-0375X400-TP-P",
+    "spec": {
+      "material": "Copper C110",
+      "wireType": "Soft-drawn, tin-plated, punched",
+      "crossSectionIn": "0.375x4.0",
+      "ratedCurrentA": 1200,
+      "holePattern": "1.5 in. centers standard",
+      "ulRecognized": "UL 891 switchboard bus"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Storm Power Components",
+        "sku": "SPC-CB-0375X400-TP-P",
+        "url": "https://stormpowercomponents.com/bus-bars/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://stormpowercomponents.com/bus-bars/",
+    "qualityRating": 4,
+    "popularity": 3
+  },
+  {
+    "category": "BUSSING",
+    "name": "MERSEN COPPER BUS BAR SPLICE PLATE 400A 1/4X2 2-HOLE",
+    "description": "Mersen (formerly Ferraz Shawmut) bus bar splice plate, 400A, 1/4 in. x 2 in. copper, 2-hole, tin-plated. Used to mechanically and electrically join bus bar sections at switchboard section boundaries.",
+    "manufacturer": "Mersen",
+    "manufacturerPartNumber": "BSPL-400-2H",
+    "spec": {
+      "material": "Copper C110, tin-plated",
+      "wireType": "Hard-drawn",
+      "crossSectionIn": "0.25x2.0",
+      "ratedCurrentA": 400,
+      "holePattern": "2-hole, 1.0 in. centers",
+      "ulRecognized": "Yes"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Mersen",
+        "sku": "BSPL-400-2H",
+        "url": "https://ep-us.mersen.com/products/bus-bars",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://ep-us.mersen.com/products/bus-bars",
+    "qualityRating": 4,
+    "popularity": 4
+  },
+  {
+    "category": "BUSSING",
+    "name": "SOLON BELLEVILLE WASHER KIT BUS BAR HARDWARE 1/2 IN BOLT",
+    "description": "Solon Manufacturing Belleville spring washer (disc spring) kit for bus bar bolted connections, 1/2 in. bolt size, stainless steel. Maintains proper clamping force across thermal cycles in copper bus joints. Pack of 50.",
+    "manufacturer": "Solon Manufacturing",
+    "manufacturerPartNumber": "BWK-050-SS-50",
+    "spec": {
+      "material": "Stainless steel 302/304",
+      "wireType": "N/A",
+      "crossSectionIn": "N/A",
+      "ratedCurrentA": 0,
+      "holePattern": "1/2 in. bolt hole",
+      "ulRecognized": "No"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Solon Manufacturing / McMaster-Carr",
+        "sku": "BWK-050-SS-50",
+        "url": "https://www.mcmaster.com/belleville-washers",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.solon.com/belleville",
+    "qualityRating": 4,
+    "popularity": 3
+  },
+  {
+    "category": "BUSSING",
+    "name": "3M RAYCHEM HEAT-SHRINK BUS INSULATION TUBING 3IN ID BLACK",
+    "description": "3M / Raychem heat-shrink tubing for bus bar insulation, 3 in. ID (pre-shrink), 2:1 shrink ratio, black, rated 600V, operating to 125°C. Used for insulating bus bar ends and transition sections in switchboards.",
+    "manufacturer": "3M / Raychem",
+    "manufacturerPartNumber": "EPS300-3.000-48-BK",
+    "spec": {
+      "material": "Polyolefin, 600V rated",
+      "wireType": "N/A",
+      "crossSectionIn": "3.0 ID",
+      "ratedCurrentA": 0,
+      "busBarLengthFt": 4,
+      "ulRecognized": "UL 224 VW-1"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "EPS300-3.000-48-BK",
+        "url": "https://www.grainger.com/search?searchQuery=Raychem+heat+shrink+bus+insulation+3+inch",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.3m.com/3M/en_US/p/d/cbgnaw011311/",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "BUSSING",
+    "name": "NVNET ERIFLEX FLEXIBAR 800A 50MM X 10MM TINNED COPPER FLEXIBLE BUS",
+    "description": "nVent Eriflex Flexibar flexible bus bar laminate, 800A, 50mm x 10mm cross-section, tinned stranded copper, 1m nominal length. For 800A switchboard main bus flexible drops and transitions.",
+    "manufacturer": "nVent ERIFLEX",
+    "manufacturerPartNumber": "504115",
+    "spec": {
+      "material": "Copper C110, tin-plated",
+      "wireType": "Stranded laminate, flexible",
+      "crossSectionIn": "1.97x0.39",
+      "ratedCurrentA": 800,
+      "busBarLengthFt": 3.3,
+      "ulRecognized": "UL recognized component"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "nVent ERIFLEX",
+        "sku": "504115",
+        "url": "https://www.nvent.com/en-us/brands/eriflex",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.nvent.com/en-us/brands/eriflex",
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "BUSSING",
+    "name": "COPPER BUS BAR C110 1/4X4 SOFT-DRAWN TIN-PLATED 10FT",
+    "description": "C110 copper bus bar, 1/4 in. x 4 in. cross-section, soft-drawn, tin-plated, 10 ft length. Rated ~800A continuous. Common main bus stock for 800A switchboard sections.",
+    "manufacturer": "Online Metals / Metals Depot",
+    "manufacturerPartNumber": "CU-C110-0.25X4.0-TP-10",
+    "spec": {
+      "material": "Copper C110",
+      "wireType": "Soft-drawn, tin-plated",
+      "crossSectionIn": "0.25x4.0",
+      "ratedCurrentA": 800,
+      "busBarLengthFt": 10,
+      "holePattern": "Customer specified",
+      "ulRecognized": "UL 891 compatible"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Online Metals",
+        "sku": "CU-C110-025X400-TP",
+        "url": "https://www.onlinemetals.com/en/buy/copper/flat-bar",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "Metals Depot",
+        "sku": "C110FLB14X4",
+        "url": "https://www.metalsdepot.com/copper/copper-flat-bar",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.onlinemetals.com/en/buy/copper/flat-bar",
+    "qualityRating": 4,
+    "popularity": 4
+  },
+  {
+    "category": "BUSSING",
+    "name": "MERSEN BUS SUPPORT CLEAT GPO-3 GLASS POLYESTER 2IN BUS",
+    "description": "Mersen (formerly Ferraz Shawmut) bus bar support cleat, GPO-3 glass-reinforced polyester, for 2 in. wide x 1/4 in. thick bus bars. Provides phase isolation and structural support. Rated 600V, UL recognized.",
+    "manufacturer": "Mersen",
+    "manufacturerPartNumber": "BSUP-GPO3-200",
+    "spec": {
+      "material": "GPO-3 glass polyester",
+      "wireType": "N/A",
+      "crossSectionIn": "2.0 width",
+      "ratedCurrentA": 0,
+      "holePattern": "Mounting holes per drawing",
+      "ulRecognized": "UL recognized"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Mersen",
+        "sku": "BSUP-GPO3-200",
+        "url": "https://ep-us.mersen.com/products/bus-bars",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://ep-us.mersen.com/products/bus-bars",
+    "qualityRating": 4,
+    "popularity": 4
+  }
+]

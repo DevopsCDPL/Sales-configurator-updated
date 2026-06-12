@@ -1,0 +1,899 @@
+[
+  {
+    "category": "TERMINALS",
+    "name": "TERMINAL BLOCK, FEED-THROUGH, 12AWG, 20A, 600V, GRAY, DIN 35, PHOENIX UK 5-P",
+    "description": "Phoenix Contact UK 5-P single-level feed-through terminal block, screw clamp, 28-12 AWG, 20A, 600V, gray, 5mm pitch, DIN 35mm rail, UL 508 / UL 1059 listed",
+    "manufacturer": "Phoenix Contact",
+    "manufacturerPartNumber": "3044170",
+    "spec": {
+      "series": "UK",
+      "connectionType": "Screw clamp",
+      "wireRange": "28-12 AWG",
+      "ratedCurrentA": 20,
+      "voltageRating": "600V",
+      "mounting": "DIN 35mm rail (TS35)",
+      "color": "Gray",
+      "termWidth": "5",
+      "poles": "1-pole",
+      "ulListing": "UL 508 / UL 1059"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Newark",
+        "sku": "55AE1614",
+        "price": 1.85,
+        "currency": "USD",
+        "url": "https://www.newark.com/phoenix-contact/3044170/terminal-block-feedthrough-screw/dp/55AE1614",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "AutomationDirect",
+        "sku": "KNT-T1225",
+        "price": 0.72,
+        "currency": "USD",
+        "url": "https://www.automationdirect.com/adc/Shopping/Catalog/Terminal_Blocks/DIN_Rail_Terminal_Blocks/Feed-Through_Terminal_Blocks_(Screw_Connection)/KNT-T1225",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 1.85,
+    "qualityRating": 5,
+    "popularity": 5,
+    "productUrl": "https://www.phoenixcontact.com/en-us/products/feed-through-terminal-block-uk-5-3044170"
+  },
+  {
+    "category": "TERMINALS",
+    "name": "TERMINAL BLOCK, FEED-THROUGH, 10AWG, 32A, 600V, GRAY, DIN 35, PHOENIX UK 10-P",
+    "description": "Phoenix Contact UK 10-P single-level feed-through terminal block, screw clamp, 24-10 AWG, 32A, 600V, gray, 6mm pitch, DIN 35mm rail, UL 508 / UL 1059",
+    "manufacturer": "Phoenix Contact",
+    "manufacturerPartNumber": "3044197",
+    "spec": {
+      "series": "UK",
+      "connectionType": "Screw clamp",
+      "wireRange": "24-10 AWG",
+      "ratedCurrentA": 32,
+      "voltageRating": "600V",
+      "mounting": "DIN 35mm rail (TS35)",
+      "color": "Gray",
+      "termWidth": "6",
+      "poles": "1-pole",
+      "ulListing": "UL 508 / UL 1059"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Newark",
+        "sku": "55AE1616",
+        "price": 2.45,
+        "currency": "USD",
+        "url": "https://www.newark.com/phoenix-contact/3044197/terminal-block-feedthrough-screw/dp/55AE1616",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 2.45,
+    "qualityRating": 5,
+    "popularity": 4,
+    "productUrl": "https://www.phoenixcontact.com/en-us/products/feed-through-terminal-block-uk-10-3044197"
+  },
+  {
+    "category": "TERMINALS",
+    "name": "TERMINAL BLOCK, GROUND/PE, 12AWG, 20A, GREEN-YELLOW, DIN 35, PHOENIX UK 5-HESI",
+    "description": "Phoenix Contact UK 5-HESI protective earth (PE) terminal block, screw clamp, 28-12 AWG, 20A, green-yellow, 5mm pitch, DIN 35mm rail — connects PE to rail",
+    "manufacturer": "Phoenix Contact",
+    "manufacturerPartNumber": "3044423",
+    "spec": {
+      "series": "UK",
+      "connectionType": "Screw clamp",
+      "wireRange": "28-12 AWG",
+      "ratedCurrentA": 20,
+      "voltageRating": "600V",
+      "mounting": "DIN 35mm rail (TS35)",
+      "color": "Green-yellow",
+      "termWidth": "5",
+      "poles": "1-pole",
+      "ulListing": "UL 508 / UL 1059"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Newark",
+        "sku": "55AE1628",
+        "price": 2.15,
+        "currency": "USD",
+        "url": "https://www.newark.com/phoenix-contact/3044423/terminal-block-ground-pe/dp/55AE1628",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 2.15,
+    "qualityRating": 5,
+    "popularity": 5,
+    "productUrl": "https://www.phoenixcontact.com/en-us/products/protective-earth-terminal-block-uk-5-hesi-3044423"
+  },
+  {
+    "category": "TERMINALS",
+    "name": "TERMINAL BLOCK, FEED-THROUGH, 12AWG, 20A, BLUE (NEUTRAL), DIN 35, PHOENIX UK 5-P BU",
+    "description": "Phoenix Contact UK 5-P blue feed-through terminal block for neutral conductors, screw clamp, 28-12 AWG, 20A, 600V, blue, 5mm pitch, DIN 35mm rail",
+    "manufacturer": "Phoenix Contact",
+    "manufacturerPartNumber": "3044215",
+    "spec": {
+      "series": "UK",
+      "connectionType": "Screw clamp",
+      "wireRange": "28-12 AWG",
+      "ratedCurrentA": 20,
+      "voltageRating": "600V",
+      "mounting": "DIN 35mm rail (TS35)",
+      "color": "Blue",
+      "termWidth": "5",
+      "poles": "1-pole",
+      "ulListing": "UL 508 / UL 1059"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Newark",
+        "sku": "55AE1618",
+        "price": 1.95,
+        "currency": "USD",
+        "url": "https://www.newark.com/phoenix-contact/3044215/terminal-block-blue-neutral/dp/55AE1618",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 1.95,
+    "qualityRating": 5,
+    "popularity": 4,
+    "productUrl": "https://www.phoenixcontact.com/en-us/products/feed-through-terminal-block-uk-5-p-bu-3044215"
+  },
+  {
+    "category": "TERMINALS",
+    "name": "TERMINAL BLOCK, FUSED, 6.3A FUSE, 14AWG, 600V, GRAY, DIN 35, PHOENIX UK 5-DOUBLE",
+    "description": "Phoenix Contact UK 5-DOUBLE fused feed-through terminal block, screw clamp, 5×20mm fuse max 6.3A, 28-14 AWG, 600V, gray, 10mm pitch, DIN 35mm rail",
+    "manufacturer": "Phoenix Contact",
+    "manufacturerPartNumber": "0709925",
+    "spec": {
+      "series": "UK",
+      "connectionType": "Screw clamp, fused",
+      "wireRange": "28-14 AWG",
+      "ratedCurrentA": 6.3,
+      "voltageRating": "600V",
+      "mounting": "DIN 35mm rail (TS35)",
+      "color": "Gray",
+      "termWidth": "10",
+      "poles": "1-pole",
+      "ulListing": "UL 508 / UL 1059"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Newark",
+        "sku": "17N8283",
+        "price": 8.20,
+        "currency": "USD",
+        "url": "https://www.newark.com/phoenix-contact/0709925/terminal-block-fused/dp/17N8283",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 8.20,
+    "qualityRating": 5,
+    "popularity": 3,
+    "productUrl": "https://www.phoenixcontact.com/en-us/products/fused-terminal-block-uk-5-double-0709925"
+  },
+  {
+    "category": "TERMINALS",
+    "name": "TERMINAL BLOCK, PUSH-IN, 12AWG, 17.5A, 400V, GRAY, DIN 35, WAGO 2273-204",
+    "description": "Wago 2273-204 push-in terminal block, 4-conductor, 28-12 AWG, 17.5A, 400V, gray, 6.2mm pitch, DIN 35mm rail, CAGE CLAMP spring connection",
+    "manufacturer": "Wago",
+    "manufacturerPartNumber": "2273-204",
+    "spec": {
+      "series": "2273",
+      "connectionType": "Push-in spring clamp (CAGE CLAMP)",
+      "wireRange": "28-12 AWG",
+      "ratedCurrentA": 17.5,
+      "voltageRating": "400V",
+      "mounting": "DIN 35mm rail (TS35)",
+      "color": "Gray",
+      "termWidth": "6.2",
+      "poles": "4-pole",
+      "ulListing": "UL 1059"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "56NY68",
+        "price": 3.95,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/WAGO-Terminal-Block-56NY68",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 3.95,
+    "qualityRating": 5,
+    "popularity": 4,
+    "productUrl": "https://www.wago.com/us/terminal-blocks/2273-204"
+  },
+  {
+    "category": "TERMINALS",
+    "name": "TERMINAL BLOCK, FEED-THROUGH, 12AWG, 15A, 600V, GRAY, DIN 35, ABB ENTRELEC SNK 4-P",
+    "description": "ABB Entrelec SNK 4-P screw clamp feed-through terminal block, 22-12 AWG, 15A, 600V, gray, 6.2mm pitch, DIN 35mm rail, UL 508 listed",
+    "manufacturer": "ABB Entrelec",
+    "manufacturerPartNumber": "1SNA115124R0300",
+    "spec": {
+      "series": "SNK",
+      "connectionType": "Screw clamp",
+      "wireRange": "22-12 AWG",
+      "ratedCurrentA": 15,
+      "voltageRating": "600V",
+      "mounting": "DIN 35mm rail (TS35)",
+      "color": "Gray",
+      "termWidth": "6.2",
+      "poles": "1-pole",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Newark",
+        "sku": "88K7434",
+        "price": 1.55,
+        "currency": "USD",
+        "url": "https://www.newark.com/abb-entrelec/1sna115124r0300/terminal-block/dp/88K7434",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 1.55,
+    "qualityRating": 5,
+    "popularity": 4,
+    "productUrl": "https://new.abb.com/products/1SNA115124R0300"
+  },
+  {
+    "category": "TERMINALS",
+    "name": "TERMINAL BLOCK, FEED-THROUGH, 12AWG, 15A, 600V, GRAY, DIN 35, DINKLE DK4N-J",
+    "description": "Dinkle DK4N-J screw clamp feed-through terminal block, 22-12 AWG, 15A, 600V, gray, 6mm pitch, DIN 35mm rail, UL 508 / CSA listed",
+    "manufacturer": "Dinkle",
+    "manufacturerPartNumber": "DK4N-J",
+    "spec": {
+      "series": "DK4N",
+      "connectionType": "Screw clamp",
+      "wireRange": "22-12 AWG",
+      "ratedCurrentA": 15,
+      "voltageRating": "600V",
+      "mounting": "DIN 35mm rail (TS35)",
+      "color": "Gray",
+      "termWidth": "6",
+      "poles": "1-pole",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "AutomationDirect",
+        "sku": "DK4N-J",
+        "price": 0.55,
+        "currency": "USD",
+        "url": "https://www.automationdirect.com/adc/Shopping/Catalog/Terminal_Blocks/DIN_Rail_Terminal_Blocks/Feed-Through_Terminal_Blocks_(Screw_Connection)/DK4N-J",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 0.55,
+    "qualityRating": 4,
+    "popularity": 4,
+    "productUrl": "https://www.dinkle.com/en/product/DK4N-J"
+  },
+  {
+    "category": "TERMINALS",
+    "name": "TERMINAL BLOCK, GROUND/PE, 12AWG, 15A, GRN-YEL, DIN 35, DINKLE DK4N-PE",
+    "description": "Dinkle DK4N-PE protective earth terminal block, screw clamp, 22-12 AWG, 15A, green-yellow, 6mm pitch, DIN 35mm rail, grounding to rail",
+    "manufacturer": "Dinkle",
+    "manufacturerPartNumber": "DK4N-PE",
+    "spec": {
+      "series": "DK4N",
+      "connectionType": "Screw clamp",
+      "wireRange": "22-12 AWG",
+      "ratedCurrentA": 15,
+      "voltageRating": "600V",
+      "mounting": "DIN 35mm rail (TS35)",
+      "color": "Green-yellow",
+      "termWidth": "6",
+      "poles": "1-pole",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "AutomationDirect",
+        "sku": "DK4N-PE",
+        "price": 0.65,
+        "currency": "USD",
+        "url": "https://www.automationdirect.com/adc/Shopping/Catalog/Terminal_Blocks/DIN_Rail_Terminal_Blocks/Ground_Terminal_Blocks/DK4N-PE",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 0.65,
+    "qualityRating": 4,
+    "popularity": 4,
+    "productUrl": "https://www.dinkle.com/en/product/DK4N-PE"
+  },
+  {
+    "category": "TERMINALS",
+    "name": "TERMINAL BLOCK, FEED-THROUGH, 10AWG, 30A, 600V, GRAY, DIN 35, AUTOMATIONDIRECT KNT-T1425",
+    "description": "AutomationDirect Konnect-It KNT-T1425 screw clamp feed-through terminal, 22-10 AWG, 30A, 600V, gray, 8mm pitch, DIN 35mm rail, UL 508",
+    "manufacturer": "AutomationDirect",
+    "manufacturerPartNumber": "KNT-T1425",
+    "spec": {
+      "series": "Konnect-It",
+      "connectionType": "Screw clamp",
+      "wireRange": "22-10 AWG",
+      "ratedCurrentA": 30,
+      "voltageRating": "600V",
+      "mounting": "DIN 35mm rail (TS35)",
+      "color": "Gray",
+      "termWidth": "8",
+      "poles": "1-pole",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "AutomationDirect",
+        "sku": "KNT-T1425",
+        "price": 0.65,
+        "currency": "USD",
+        "url": "https://www.automationdirect.com/adc/Shopping/Catalog/Terminal_Blocks/DIN_Rail_Terminal_Blocks/Feed-Through_Terminal_Blocks_(Screw_Connection)/KNT-T1425",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 0.65,
+    "qualityRating": 4,
+    "popularity": 4,
+    "productUrl": "https://www.automationdirect.com/adc/Shopping/Catalog/Terminal_Blocks/DIN_Rail_Terminal_Blocks/Feed-Through_Terminal_Blocks_(Screw_Connection)/KNT-T1425"
+  },
+  {
+    "category": "TERMINALS",
+    "name": "TERMINAL BLOCK, FEED-THROUGH, 8AWG, 76A, 600V, GRAY, DIN 35, AUTOMATIONDIRECT KNT-T1825",
+    "description": "AutomationDirect Konnect-It KNT-T1825 screw clamp power terminal, 14-8 AWG, 76A, 600V, gray, 12mm pitch, DIN 35mm rail, for heavier power circuits",
+    "manufacturer": "AutomationDirect",
+    "manufacturerPartNumber": "KNT-T1825",
+    "spec": {
+      "series": "Konnect-It",
+      "connectionType": "Screw clamp",
+      "wireRange": "14-8 AWG",
+      "ratedCurrentA": 76,
+      "voltageRating": "600V",
+      "mounting": "DIN 35mm rail (TS35)",
+      "color": "Gray",
+      "termWidth": "12",
+      "poles": "1-pole",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "AutomationDirect",
+        "sku": "KNT-T1825",
+        "price": 1.20,
+        "currency": "USD",
+        "url": "https://www.automationdirect.com/adc/Shopping/Catalog/Terminal_Blocks/DIN_Rail_Terminal_Blocks/Feed-Through_Terminal_Blocks_(Screw_Connection)/KNT-T1825",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 1.20,
+    "qualityRating": 4,
+    "popularity": 3,
+    "productUrl": "https://www.automationdirect.com/adc/Shopping/Catalog/Terminal_Blocks/DIN_Rail_Terminal_Blocks/Feed-Through_Terminal_Blocks_(Screw_Connection)/KNT-T1825"
+  },
+  {
+    "category": "TERMINALS",
+    "name": "TERMINAL BLOCK, FEED-THROUGH, 12AWG, 20A, 600V, GRAY, DIN 35, WEIDMULLER WDU 2.5",
+    "description": "Weidmuller WDU 2.5 screw clamp feed-through terminal block, 28-12 AWG (2.5mm²), 24A, 800V, gray, 5mm pitch, DIN 35mm rail",
+    "manufacturer": "Weidmuller",
+    "manufacturerPartNumber": "1020500000",
+    "spec": {
+      "series": "WDU",
+      "connectionType": "Screw clamp",
+      "wireRange": "28-12 AWG",
+      "ratedCurrentA": 24,
+      "voltageRating": "800V",
+      "mounting": "DIN 35mm rail (TS35)",
+      "color": "Gray",
+      "termWidth": "5",
+      "poles": "1-pole",
+      "ulListing": "UL 508 / UL 1059"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Newark",
+        "sku": "14T8836",
+        "price": 1.90,
+        "currency": "USD",
+        "url": "https://www.newark.com/weidmuller/1020500000/terminal-block-screw/dp/14T8836",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 1.90,
+    "qualityRating": 5,
+    "popularity": 3,
+    "productUrl": "https://www.weidmuller.com/en/products/1020500000"
+  },
+  {
+    "category": "TERMINALS",
+    "name": "TERMINAL BLOCK, GROUND PTU, PUSH-IN/SCREW, 12AWG, GREEN-YELLOW, DIN 35, PHOENIX PTU 2.5-TWIN-PE",
+    "description": "Phoenix Contact PTU 2.5-TWIN-PE dual-connection protective conductor terminal block; push-in on panel side, screw on field side; 26-12 AWG, green-yellow, DIN 35mm rail, cULus recognized",
+    "manufacturer": "Phoenix Contact",
+    "manufacturerPartNumber": "3209517",
+    "spec": {
+      "series": "PTU",
+      "connectionType": "Push-in (panel) / Screw clamp (field)",
+      "wireRange": "26-12 AWG",
+      "ratedCurrentA": 20,
+      "voltageRating": "600V",
+      "mounting": "DIN 35mm rail (TS35), NS35/7.5, NS35/15",
+      "color": "Green-yellow",
+      "termWidth": "5",
+      "poles": "1-pole",
+      "ulListing": "cULus Recognized E60425"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Newark",
+        "sku": "58AC3893",
+        "price": 3.10,
+        "currency": "USD",
+        "url": "https://www.newark.com/phoenix-contact/3209517/terminal-block-din-rail-4mm-grey/dp/58AC3893",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 3.10,
+    "qualityRating": 5,
+    "popularity": 3,
+    "productUrl": "https://www.phoenixcontact.com/en-us/products/ground-terminal-block-ptu-25-twin-pe-3209517"
+  },
+  {
+    "category": "TERMINALS",
+    "name": "TERMINAL BLOCK, CT SHORTING, 10A, 600V, MARATHON SPECIAL PRODUCTS 1501SC",
+    "description": "Marathon Special Products 1501SC CT shorting terminal block, screw clamp, shorting bar standard, 600V, 10A, used to short current transformer secondaries during CT installation/removal",
+    "manufacturer": "Marathon Special Products",
+    "manufacturerPartNumber": "1501SC",
+    "spec": {
+      "series": "1500",
+      "connectionType": "Screw clamp with shorting bar",
+      "wireRange": "14-10 AWG",
+      "ratedCurrentA": 10,
+      "voltageRating": "600V",
+      "mounting": "Panel / DIN 35mm rail",
+      "color": "Gray",
+      "termWidth": "10",
+      "poles": "1-pole",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "5B419",
+        "price": 12.50,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/MARATHON-ELECTRIC-Terminal-Block-5B419",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 12.50,
+    "qualityRating": 4,
+    "popularity": 3,
+    "productUrl": "https://www.marathonsp.com/products/terminal-blocks/ct-shorting"
+  },
+  {
+    "category": "TERMINALS",
+    "name": "TERMINAL BLOCK, CT SHORTING, 10A, 600V, FLEX-CORE TBS-4",
+    "description": "Flex-Core TBS-4 current transformer shorting terminal block, 4 terminals, screw type, 600V, shorting jumper for safe CT secondary disconnect; UL listed",
+    "manufacturer": "Flex-Core",
+    "manufacturerPartNumber": "TBS-4",
+    "spec": {
+      "series": "TBS",
+      "connectionType": "Screw clamp with shorting jumper",
+      "wireRange": "14-12 AWG",
+      "ratedCurrentA": 10,
+      "voltageRating": "600V",
+      "mounting": "Panel mount",
+      "color": "Gray",
+      "termWidth": "N/A",
+      "poles": "4-pole",
+      "ulListing": "UL Listed"
+    },
+    "vendorOffers": [],
+    "qualityRating": 5,
+    "popularity": 3,
+    "productUrl": "https://www.flex-core.com/products/accessories/shorting-blocks/"
+  },
+  {
+    "category": "TERMINALS",
+    "name": "TERMINAL BLOCK, FEED-THROUGH, 4AWG, 110A, 600V, GRAY, DIN 35, PHOENIX UK 35-P",
+    "description": "Phoenix Contact UK 35-P heavy power feed-through terminal block, screw clamp, 10-4 AWG, 110A, 600V, gray, 15mm pitch, DIN 35mm rail — for main control circuit feeds",
+    "manufacturer": "Phoenix Contact",
+    "manufacturerPartNumber": "3044488",
+    "spec": {
+      "series": "UK",
+      "connectionType": "Screw clamp",
+      "wireRange": "10-4 AWG",
+      "ratedCurrentA": 110,
+      "voltageRating": "600V",
+      "mounting": "DIN 35mm rail (TS35)",
+      "color": "Gray",
+      "termWidth": "15",
+      "poles": "1-pole",
+      "ulListing": "UL 508 / UL 1059"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Newark",
+        "sku": "82K0139",
+        "price": 8.95,
+        "currency": "USD",
+        "url": "https://www.newark.com/phoenix-contact/3044488/terminal-block-heavy-power/dp/82K0139",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 8.95,
+    "qualityRating": 5,
+    "popularity": 3,
+    "productUrl": "https://www.phoenixcontact.com/en-us/products/feed-through-terminal-block-uk-35-3044488"
+  },
+  {
+    "category": "TERMINALS",
+    "name": "TERMINAL BLOCK, DISCONNECT, KNIFE, 12AWG, 20A, 600V, GRAY, DIN 35, PHOENIX UK 5-MTK-P",
+    "description": "Phoenix Contact UK 5-MTK-P knife-disconnect terminal block, screw clamp, 28-12 AWG, 20A, 600V, gray, 5mm pitch, DIN 35mm rail — allows circuit disconnect with knife switch blade",
+    "manufacturer": "Phoenix Contact",
+    "manufacturerPartNumber": "3044305",
+    "spec": {
+      "series": "UK",
+      "connectionType": "Screw clamp with knife disconnect",
+      "wireRange": "28-12 AWG",
+      "ratedCurrentA": 20,
+      "voltageRating": "600V",
+      "mounting": "DIN 35mm rail (TS35)",
+      "color": "Gray",
+      "termWidth": "5",
+      "poles": "1-pole",
+      "ulListing": "UL 508 / UL 1059"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Newark",
+        "sku": "39K9148",
+        "price": 4.85,
+        "currency": "USD",
+        "url": "https://www.newark.com/phoenix-contact/3044305/terminal-block-knife-disconnect/dp/39K9148",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 4.85,
+    "qualityRating": 5,
+    "popularity": 3,
+    "productUrl": "https://www.phoenixcontact.com/en-us/products/disconnect-terminal-block-uk-5-mtk-p-3044305"
+  },
+  {
+    "category": "TERMINALS",
+    "name": "TERMINAL BLOCK, END STOP/CLAMP, DIN 35 RAIL, PHOENIX E/UK",
+    "description": "Phoenix Contact E/UK end stop/bracket for UK terminal series on DIN 35mm rail — secures terminal blocks at ends of row",
+    "manufacturer": "Phoenix Contact",
+    "manufacturerPartNumber": "3044163",
+    "spec": {
+      "series": "UK",
+      "connectionType": "Mechanical end bracket",
+      "wireRange": "N/A",
+      "ratedCurrentA": 0,
+      "voltageRating": "N/A",
+      "mounting": "DIN 35mm rail (TS35)",
+      "color": "Gray",
+      "termWidth": "5",
+      "poles": "0",
+      "ulListing": "N/A"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Newark",
+        "sku": "17N7822",
+        "price": 0.35,
+        "currency": "USD",
+        "url": "https://www.newark.com/phoenix-contact/3044163/end-stop/dp/17N7822",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 0.35,
+    "qualityRating": 5,
+    "popularity": 5,
+    "productUrl": "https://www.phoenixcontact.com/en-us/products/end-bracket-e-uk-3044163"
+  },
+  {
+    "category": "TERMINALS",
+    "name": "TERMINAL BLOCK, FEED-THROUGH, 12AWG, 16A, 600V, GRAY, DIN 35, WAGO 280-806",
+    "description": "Wago 280-806 single-conductor terminal block, screw connection, 28-12 AWG, 16A, 600V, gray, 6.2mm pitch, DIN 35mm rail",
+    "manufacturer": "Wago",
+    "manufacturerPartNumber": "280-806",
+    "spec": {
+      "series": "280",
+      "connectionType": "Screw clamp",
+      "wireRange": "28-12 AWG",
+      "ratedCurrentA": 16,
+      "voltageRating": "600V",
+      "mounting": "DIN 35mm rail (TS35)",
+      "color": "Gray",
+      "termWidth": "6.2",
+      "poles": "1-pole",
+      "ulListing": "UL 508 / UL 1059"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "5X853",
+        "price": 2.10,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/WAGO-Terminal-Block-5X853",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 2.10,
+    "qualityRating": 5,
+    "popularity": 4,
+    "productUrl": "https://www.wago.com/us/terminal-blocks/280-806"
+  },
+  {
+    "category": "TERMINALS",
+    "name": "DIN RAIL, 35MM TS35 STEEL PERFORATED, 1 METER, PHOENIX NS 35/7.5 PERF",
+    "description": "Phoenix Contact NS 35/7.5 PERF perforated steel DIN 35mm mounting rail, 1-meter length, for mounting terminal blocks and DIN-rail components inside switchboard",
+    "manufacturer": "Phoenix Contact",
+    "manufacturerPartNumber": "0801733",
+    "spec": {
+      "series": "NS 35",
+      "connectionType": "Mounting rail",
+      "wireRange": "N/A",
+      "ratedCurrentA": 0,
+      "voltageRating": "N/A",
+      "mounting": "Panel screw mount",
+      "color": "Galvanized steel",
+      "termWidth": "35mm wide",
+      "poles": "0",
+      "ulListing": "N/A"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Newark",
+        "sku": "34F4879",
+        "price": 4.95,
+        "currency": "USD",
+        "url": "https://www.newark.com/phoenix-contact/0801733/din-rail-35mm-1m/dp/34F4879",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "AutomationDirect",
+        "sku": "DIN-EN35S",
+        "price": 3.50,
+        "currency": "USD",
+        "url": "https://www.automationdirect.com/adc/Shopping/Catalog/Terminal_Blocks/DIN_Rail_Terminal_Blocks/DIN_Rails/DIN-EN35S",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 4.95,
+    "qualityRating": 5,
+    "popularity": 5,
+    "productUrl": "https://www.phoenixcontact.com/en-us/products/din-rail-ns-35-75-perf-2000mm-0801733"
+  },
+  {
+    "category": "TERMINALS",
+    "name": "TERMINAL BLOCK, GROUND/PE, 12AWG, 16A, 600V, GRN-YEL, DIN 35, WAGO 280-107",
+    "description": "Wago 280-107 PE grounding terminal block, screw connection, 28-12 AWG, 16A, green-yellow, 6.2mm pitch, DIN 35mm rail — PE to rail connection",
+    "manufacturer": "Wago",
+    "manufacturerPartNumber": "280-107",
+    "spec": {
+      "series": "280",
+      "connectionType": "Screw clamp",
+      "wireRange": "28-12 AWG",
+      "ratedCurrentA": 16,
+      "voltageRating": "600V",
+      "mounting": "DIN 35mm rail (TS35)",
+      "color": "Green-yellow",
+      "termWidth": "6.2",
+      "poles": "1-pole",
+      "ulListing": "UL 508 / UL 1059"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "5X864",
+        "price": 2.35,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/WAGO-Terminal-Block-Ground-5X864",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 2.35,
+    "qualityRating": 5,
+    "popularity": 4,
+    "productUrl": "https://www.wago.com/us/terminal-blocks/280-107"
+  },
+  {
+    "category": "TERMINALS",
+    "name": "TERMINAL BLOCK, FEED-THROUGH, 12AWG, 20A, 600V, GRAY, DIN 35, MARATHON 141PBMSA",
+    "description": "Marathon Special Products 141PBMSA screw clamp feed-through terminal block, 22-12 AWG, 20A, 600V, gray, 6mm pitch, DIN 35mm rail, UL 508 listed — traditional US switchboard house choice",
+    "manufacturer": "Marathon Special Products",
+    "manufacturerPartNumber": "141PBMSA",
+    "spec": {
+      "series": "141",
+      "connectionType": "Screw clamp",
+      "wireRange": "22-12 AWG",
+      "ratedCurrentA": 20,
+      "voltageRating": "600V",
+      "mounting": "DIN 35mm rail (TS35)",
+      "color": "Gray",
+      "termWidth": "6",
+      "poles": "1-pole",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "4PCX5",
+        "price": 2.20,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/MARATHON-ELECTRIC-Terminal-Block-4PCX5",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 2.20,
+    "qualityRating": 4,
+    "popularity": 3,
+    "productUrl": "https://www.marathonsp.com/products/terminal-blocks"
+  },
+  {
+    "category": "TERMINALS",
+    "name": "TERMINAL BLOCK, CT SHORTING, 4-POLE, 600V, GE MODEL 12SB",
+    "description": "GE 12SB CT shorting block, 4-pole screw-terminal, 600V AC, used to short-circuit current transformer secondary wiring during maintenance — required per NFPA 70 for all switchboard CT circuits",
+    "manufacturer": "GE",
+    "manufacturerPartNumber": "12SB",
+    "spec": {
+      "series": "12SB",
+      "connectionType": "Screw clamp with shorting bar",
+      "wireRange": "14-10 AWG",
+      "ratedCurrentA": 10,
+      "voltageRating": "600V",
+      "mounting": "Panel mount",
+      "color": "Gray",
+      "termWidth": "N/A",
+      "poles": "4-pole",
+      "ulListing": "UL Listed"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "1ELK2",
+        "price": 18.50,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/GE-CT-Shorting-Block-1ELK2",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 18.50,
+    "qualityRating": 5,
+    "popularity": 3,
+    "productUrl": "https://store.gegrids.com/products/ct-shorting-blocks"
+  },
+  {
+    "category": "TERMINALS",
+    "name": "TERMINAL BLOCK, FEED-THROUGH, 14AWG, 20A, 600V, GRAY, DIN 35, PHOENIX PT 1.5",
+    "description": "Phoenix Contact PT 1.5 compact spring-clamp push-in terminal block, 24-14 AWG, 17.5A, 400V, gray, 3.5mm pitch, DIN 35mm rail — for instrument/signal wiring up to 14 AWG",
+    "manufacturer": "Phoenix Contact",
+    "manufacturerPartNumber": "3209574",
+    "spec": {
+      "series": "PT",
+      "connectionType": "Push-in spring clamp (COMBICON)",
+      "wireRange": "24-14 AWG",
+      "ratedCurrentA": 17.5,
+      "voltageRating": "400V",
+      "mounting": "DIN 35mm rail (TS35)",
+      "color": "Gray",
+      "termWidth": "3.5",
+      "poles": "1-pole",
+      "ulListing": "UL 508 / UL 1059"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Newark",
+        "sku": "88R7041",
+        "price": 1.45,
+        "currency": "USD",
+        "url": "https://www.newark.com/phoenix-contact/3209574/terminal-block-push-in/dp/88R7041",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 1.45,
+    "qualityRating": 5,
+    "popularity": 4,
+    "productUrl": "https://www.phoenixcontact.com/en-us/products/terminal-block-pt-15-3209574"
+  },
+  {
+    "category": "TERMINALS",
+    "name": "TERMINAL BLOCK, FEED-THROUGH, 10AWG, 32A, 600V, GRAY, DIN 35, PHOENIX PT 4",
+    "description": "Phoenix Contact PT 4 push-in spring-clamp terminal block, 28-10 AWG, 32A, 600V, gray, 5.2mm pitch, DIN 35mm rail — tool-free wiring with solid or ferrule conductors",
+    "manufacturer": "Phoenix Contact",
+    "manufacturerPartNumber": "3213042",
+    "spec": {
+      "series": "PT",
+      "connectionType": "Push-in spring clamp",
+      "wireRange": "28-10 AWG",
+      "ratedCurrentA": 32,
+      "voltageRating": "600V",
+      "mounting": "DIN 35mm rail (TS35)",
+      "color": "Gray",
+      "termWidth": "5.2",
+      "poles": "1-pole",
+      "ulListing": "UL 508 / UL 1059"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Newark",
+        "sku": "88R7059",
+        "price": 2.25,
+        "currency": "USD",
+        "url": "https://www.newark.com/phoenix-contact/3213042/terminal-block-push-in/dp/88R7059",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 2.25,
+    "qualityRating": 5,
+    "popularity": 4,
+    "productUrl": "https://www.phoenixcontact.com/en-us/products/terminal-block-pt-4-3213042"
+  },
+  {
+    "category": "TERMINALS",
+    "name": "TERMINAL BLOCK, GROUND, 10AWG, 41A, GRN-YEL, DIN 35, PHOENIX PT 4-PE",
+    "description": "Phoenix Contact PT 4-PE push-in spring-clamp PE terminal block, 28-10 AWG, 41A, green-yellow, 5.2mm pitch, DIN 35mm rail, connects PE wire to mounting rail",
+    "manufacturer": "Phoenix Contact",
+    "manufacturerPartNumber": "3213068",
+    "spec": {
+      "series": "PT",
+      "connectionType": "Push-in spring clamp",
+      "wireRange": "28-10 AWG",
+      "ratedCurrentA": 41,
+      "voltageRating": "800V",
+      "mounting": "DIN 35mm rail (TS35)",
+      "color": "Green-yellow",
+      "termWidth": "5.2",
+      "poles": "1-pole",
+      "ulListing": "UL 508 / UL 1059"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Newark",
+        "sku": "88R7061",
+        "price": 2.65,
+        "currency": "USD",
+        "url": "https://www.newark.com/phoenix-contact/3213068/terminal-block-ground-pe/dp/88R7061",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 2.65,
+    "qualityRating": 5,
+    "popularity": 4,
+    "productUrl": "https://www.phoenixcontact.com/en-us/products/protective-earth-terminal-block-pt-4-pe-3213068"
+  },
+  {
+    "category": "TERMINALS",
+    "name": "TERMINAL BLOCK, FEED-THROUGH, 14AWG, 16A, 600V, GRAY, DIN 35, AUTOMATIONDIRECT KNT-T1225",
+    "description": "AutomationDirect Konnect-It KNT-T1225 screw clamp feed-through terminal, 22-14 AWG, 16A, 600V, gray, 5mm pitch, DIN 35mm rail, low-cost value option for switchboard control wiring",
+    "manufacturer": "AutomationDirect",
+    "manufacturerPartNumber": "KNT-T1225",
+    "spec": {
+      "series": "Konnect-It",
+      "connectionType": "Screw clamp",
+      "wireRange": "22-14 AWG",
+      "ratedCurrentA": 16,
+      "voltageRating": "600V",
+      "mounting": "DIN 35mm rail (TS35)",
+      "color": "Gray",
+      "termWidth": "5",
+      "poles": "1-pole",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "AutomationDirect",
+        "sku": "KNT-T1225",
+        "price": 0.50,
+        "currency": "USD",
+        "url": "https://www.automationdirect.com/adc/Shopping/Catalog/Terminal_Blocks/DIN_Rail_Terminal_Blocks/Feed-Through_Terminal_Blocks_(Screw_Connection)/KNT-T1225",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 0.50,
+    "qualityRating": 4,
+    "popularity": 4,
+    "productUrl": "https://www.automationdirect.com/adc/Shopping/Catalog/Terminal_Blocks/DIN_Rail_Terminal_Blocks/Feed-Through_Terminal_Blocks_(Screw_Connection)/KNT-T1225"
+  }
+]

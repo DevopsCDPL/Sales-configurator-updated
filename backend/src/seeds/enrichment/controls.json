@@ -1,0 +1,628 @@
+[
+  {
+    "category": "CONTROLS",
+    "name": "GEN CONTROLLER, DSE7310 MKII, AUTO START/STOP, MODEM, DEEP SEA DSE7310MKII",
+    "description": "Deep Sea Electronics DSE7310 MKII automatic generator controller, auto start/stop, AMF/ATS logic, LCD display, Modbus RTU, USB, 2 CAN, J1939 engine support, UL Listed — most common DSE model for utility switchboard standby-gen metering and control",
+    "manufacturer": "Deep Sea Electronics",
+    "manufacturerPartNumber": "DSE7310MKII",
+    "spec": {
+      "series": "DSE7000",
+      "controlType": "Automatic generator controller",
+      "operatorSize": "N/A",
+      "mounting": "Panel cutout (DIN rail optional)",
+      "poles": "Multiple digital/analog I/O",
+      "ratedCurrentA": 1,
+      "voltageRating": "8-35V DC supply",
+      "ipRating": "IP65 (front face)",
+      "color": "Black",
+      "illuminated": "Yes - LCD backlit",
+      "ulListing": "UL Listed, cULus"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Galco Industrial",
+        "sku": "DSE7310MKII",
+        "price": 595.00,
+        "currency": "USD",
+        "url": "https://www.galco.com/buy/Deep-Sea-Electronics/DSE7310MKII",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 595.00,
+    "qualityRating": 5,
+    "popularity": 5,
+    "productUrl": "https://www.deepsea.com/products/genset-controllers/dse7310-mkii/"
+  },
+  {
+    "category": "CONTROLS",
+    "name": "GEN CONTROLLER, DSE7320 MKII, AUTO START/MAINS FAILURE, DEEP SEA DSE7320MKII",
+    "description": "Deep Sea Electronics DSE7320 MKII automatic generator controller with mains (utility) failure detection and AMF, LCD display, Modbus RTU, J1939, UL Listed — used where switchboard monitors both utility and generator bus",
+    "manufacturer": "Deep Sea Electronics",
+    "manufacturerPartNumber": "DSE7320MKII",
+    "spec": {
+      "series": "DSE7000",
+      "controlType": "Automatic generator controller with mains failure detection",
+      "operatorSize": "N/A",
+      "mounting": "Panel cutout",
+      "poles": "Multiple digital/analog I/O",
+      "ratedCurrentA": 1,
+      "voltageRating": "8-35V DC supply",
+      "ipRating": "IP65 (front face)",
+      "color": "Black",
+      "illuminated": "Yes - LCD backlit",
+      "ulListing": "UL Listed, cULus"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Galco Industrial",
+        "sku": "DSE7320MKII",
+        "price": 680.00,
+        "currency": "USD",
+        "url": "https://www.galco.com/buy/Deep-Sea-Electronics/DSE7320MKII",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 680.00,
+    "qualityRating": 5,
+    "popularity": 4,
+    "productUrl": "https://www.deepsea.com/products/genset-controllers/dse7320-mkii/"
+  },
+  {
+    "category": "CONTROLS",
+    "name": "CAPACITIVE TRIP DEVICE, 120/240VAC, 250VDC OUTPUT, UTILITY RELAY CTD-120/240",
+    "description": "Utility Relay Company CTD-120/240 capacitive trip device (CTD), charges from 120 or 240V AC control power, delivers 250V DC stored-energy trip pulse to shunt trip coil — powers breaker trip on loss of AC; mounts on DIN rail inside switchboard",
+    "manufacturer": "Utility Relay Company",
+    "manufacturerPartNumber": "CTD-120/240",
+    "spec": {
+      "series": "CTD",
+      "controlType": "Capacitive trip device (stored energy)",
+      "operatorSize": "N/A",
+      "mounting": "DIN rail",
+      "poles": "1 trip output",
+      "ratedCurrentA": 5,
+      "voltageRating": "120/240V AC input, 250V DC output",
+      "ipRating": "IP20",
+      "color": "Gray",
+      "illuminated": "Yes - status LED",
+      "ulListing": "UL Listed"
+    },
+    "vendorOffers": [],
+    "qualityRating": 5,
+    "popularity": 4,
+    "productUrl": "https://www.utilityrelay.com/products/capacitive-trip-devices"
+  },
+  {
+    "category": "CONTROLS",
+    "name": "CAPACITIVE TRIP DEVICE, 120VAC, 250VDC OUTPUT, ACUPOWER ACP-CTD-120",
+    "description": "AcuPower ACP-CTD-120 capacitive trip device, 120V AC input, 250V DC trip output, DIN rail mount — alternative to Utility Relay CTD for switchboard shunt-trip applications with loss of control power",
+    "manufacturer": "AcuPower",
+    "manufacturerPartNumber": "ACP-CTD-120",
+    "spec": {
+      "series": "ACP-CTD",
+      "controlType": "Capacitive trip device",
+      "operatorSize": "N/A",
+      "mounting": "DIN rail",
+      "poles": "1 trip output",
+      "ratedCurrentA": 5,
+      "voltageRating": "120V AC input, 250V DC output",
+      "ipRating": "IP20",
+      "color": "Gray",
+      "illuminated": "Yes - LED",
+      "ulListing": "UL Listed"
+    },
+    "vendorOffers": [],
+    "qualityRating": 4,
+    "popularity": 3,
+    "productUrl": "https://www.acupowerltd.com/products/capacitive-trip-devices"
+  },
+  {
+    "category": "CONTROLS",
+    "name": "EKIP INTERFACE MODULE, ABB EKIP COM HMI, FOR EMAX2 BREAKERS",
+    "description": "ABB Ekip Hi interface module (COM HMI) for SACE Emax2 air circuit breakers — provides front-panel display and communication interface; mounts in breaker control unit slot for IEC 61850, Modbus, Profibus access from switchboard panel",
+    "manufacturer": "ABB",
+    "manufacturerPartNumber": "1SDA073527R1",
+    "spec": {
+      "series": "Ekip",
+      "controlType": "Breaker interface/communications module",
+      "operatorSize": "N/A",
+      "mounting": "Internal breaker slot",
+      "poles": "N/A",
+      "ratedCurrentA": 0,
+      "voltageRating": "24V DC (from breaker)",
+      "ipRating": "IP20",
+      "color": "Black",
+      "illuminated": "Yes - display",
+      "ulListing": "UL Listed"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Newark",
+        "sku": "88R6422",
+        "price": 385.00,
+        "currency": "USD",
+        "url": "https://www.newark.com/abb/1sda073527r1/ekip-interface-module/dp/88R6422",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 385.00,
+    "qualityRating": 5,
+    "popularity": 3,
+    "productUrl": "https://new.abb.com/products/1SDA073527R1"
+  },
+  {
+    "category": "CONTROLS",
+    "name": "IFE ETHERNET INTERFACE MODULE, SCHNEIDER LV434001",
+    "description": "Schneider Electric IFE Ethernet interface for MasterPact MTZ/NT/NW and PowerPact H/J/L/P breakers — provides Modbus TCP, SNMP access over Ethernet for switchboard ERMS/arc flash reduction; part of Schneider ERMS kit",
+    "manufacturer": "Schneider Electric",
+    "manufacturerPartNumber": "LV434001",
+    "spec": {
+      "series": "MasterPact/PowerPact IFE",
+      "controlType": "Ethernet interface module for power circuit breaker",
+      "operatorSize": "N/A",
+      "mounting": "Clips to breaker front face",
+      "poles": "N/A",
+      "ratedCurrentA": 0,
+      "voltageRating": "24V DC",
+      "ipRating": "IP20",
+      "color": "Black",
+      "illuminated": "Yes - link/activity LEDs",
+      "ulListing": "UL Listed"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "56MY14",
+        "price": 520.00,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/SCHNEIDER-ELECTRIC-Ethernet-Interface-56MY14",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 520.00,
+    "qualityRating": 5,
+    "popularity": 4,
+    "productUrl": "https://www.se.com/us/en/product/LV434001/"
+  },
+  {
+    "category": "CONTROLS",
+    "name": "IO MODULE, DIGITAL I/O FOR MASTERPACT/POWERPACT, SCHNEIDER LV434063",
+    "description": "Schneider Electric IO module LV434063 for MasterPact MTZ / PowerPact breakers — 4 digital inputs + 4 relay outputs for external signaling, ERMS zone selective interlocking, and remote trip/close integration in UL 891 switchboards",
+    "manufacturer": "Schneider Electric",
+    "manufacturerPartNumber": "LV434063",
+    "spec": {
+      "series": "MasterPact/PowerPact IO",
+      "controlType": "Digital I/O module for power circuit breaker",
+      "operatorSize": "N/A",
+      "mounting": "Clips to breaker",
+      "poles": "4DI + 4DO",
+      "ratedCurrentA": 2,
+      "voltageRating": "24V DC",
+      "ipRating": "IP20",
+      "color": "Black",
+      "illuminated": "Yes",
+      "ulListing": "UL Listed"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "56MY15",
+        "price": 310.00,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/SCHNEIDER-ELECTRIC-IO-Module-56MY15",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 310.00,
+    "qualityRating": 5,
+    "popularity": 3,
+    "productUrl": "https://www.se.com/us/en/product/LV434063/"
+  },
+  {
+    "category": "CONTROLS",
+    "name": "MODBUS GATEWAY, SERIAL RS-485 TO ETHERNET, MOXA MGATE MB3170",
+    "description": "Moxa MGate MB3170 1-port serial-to-Ethernet Modbus gateway, RS-232/422/485, converts Modbus RTU/ASCII to Modbus TCP — used in switchboards to bring meter and controller data to network without replacing field devices",
+    "manufacturer": "Moxa",
+    "manufacturerPartNumber": "MB3170",
+    "spec": {
+      "series": "MGate MB3000",
+      "controlType": "Modbus gateway (serial to Ethernet)",
+      "operatorSize": "N/A",
+      "mounting": "DIN rail",
+      "poles": "1 serial port",
+      "ratedCurrentA": 0.5,
+      "voltageRating": "12-48V DC or 24V AC",
+      "ipRating": "IP30",
+      "color": "Gray",
+      "illuminated": "Yes - status LEDs",
+      "ulListing": "UL Listed, cUL"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Newark",
+        "sku": "73M0451",
+        "price": 385.00,
+        "currency": "USD",
+        "url": "https://www.newark.com/moxa/mb3170/modbus-gateway/dp/73M0451",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 385.00,
+    "qualityRating": 4,
+    "popularity": 4,
+    "productUrl": "https://www.moxa.com/en/products/industrial-edge-connectivity/protocol-gateways/modbus-gateways/mgate-mb3000-series"
+  },
+  {
+    "category": "CONTROLS",
+    "name": "MODBUS GATEWAY, RS-485 4-PORT TO ETHERNET, MOXA MGATE MB3280",
+    "description": "Moxa MGate MB3280 4-port Modbus RTU/ASCII to Modbus TCP gateway, RS-485, DIN rail — aggregates up to 4 Modbus serial buses (meters, controllers) to one Ethernet port in large switchboard sections",
+    "manufacturer": "Moxa",
+    "manufacturerPartNumber": "MB3280",
+    "spec": {
+      "series": "MGate MB3000",
+      "controlType": "Modbus gateway, 4-port serial to Ethernet",
+      "operatorSize": "N/A",
+      "mounting": "DIN rail",
+      "poles": "4 serial ports",
+      "ratedCurrentA": 0.5,
+      "voltageRating": "12-48V DC or 24V AC",
+      "ipRating": "IP30",
+      "color": "Gray",
+      "illuminated": "Yes - status LEDs",
+      "ulListing": "UL Listed, cUL"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Newark",
+        "sku": "73M0455",
+        "price": 520.00,
+        "currency": "USD",
+        "url": "https://www.newark.com/moxa/mb3280/modbus-gateway/dp/73M0455",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 520.00,
+    "qualityRating": 4,
+    "popularity": 3,
+    "productUrl": "https://www.moxa.com/en/products/industrial-edge-connectivity/protocol-gateways/modbus-gateways/mgate-mb3000-series"
+  },
+  {
+    "category": "CONTROLS",
+    "name": "PUSHBUTTON, 22MM, MOMENTARY, 1NO, GREEN, SCHNEIDER XB4BA31",
+    "description": "Schneider Electric Harmony XB4 22mm flush-head momentary pushbutton operator, green, 1NO contact block, metal body, IP66, 600V, UL 508 — START button in generator and motor switchboard panels",
+    "manufacturer": "Schneider Electric",
+    "manufacturerPartNumber": "XB4BA31",
+    "spec": {
+      "series": "Harmony XB4",
+      "controlType": "Pushbutton, momentary",
+      "operatorSize": "22",
+      "mounting": "22mm panel cutout",
+      "poles": "1NO",
+      "ratedCurrentA": 6,
+      "voltageRating": "600V AC",
+      "ipRating": "IP66",
+      "color": "Green",
+      "illuminated": "No",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "2HMH1",
+        "price": 22.80,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/SCHNEIDER-ELECTRIC-Pushbutton-2HMH1",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 22.80,
+    "qualityRating": 5,
+    "popularity": 5,
+    "productUrl": "https://www.se.com/us/en/product/XB4BA31/"
+  },
+  {
+    "category": "CONTROLS",
+    "name": "PUSHBUTTON, 22MM, MOMENTARY, 1NC, RED, SCHNEIDER XB4BA42",
+    "description": "Schneider Electric Harmony XB4 22mm flush-head momentary pushbutton, red, 1NC contact block, metal body, IP66, 600V, UL 508 — STOP button in generator and motor switchboard panels",
+    "manufacturer": "Schneider Electric",
+    "manufacturerPartNumber": "XB4BA42",
+    "spec": {
+      "series": "Harmony XB4",
+      "controlType": "Pushbutton, momentary",
+      "operatorSize": "22",
+      "mounting": "22mm panel cutout",
+      "poles": "1NC",
+      "ratedCurrentA": 6,
+      "voltageRating": "600V AC",
+      "ipRating": "IP66",
+      "color": "Red",
+      "illuminated": "No",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "2HMH4",
+        "price": 22.80,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/SCHNEIDER-ELECTRIC-Pushbutton-2HMH4",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 22.80,
+    "qualityRating": 5,
+    "popularity": 5,
+    "productUrl": "https://www.se.com/us/en/product/XB4BA42/"
+  },
+  {
+    "category": "CONTROLS",
+    "name": "PUSHBUTTON, 22MM, MOMENTARY, 1NO, GREEN, AUTOMATIONDIRECT GCX1A-G",
+    "description": "AutomationDirect GCX 22mm flush momentary pushbutton, green, 1NO, IP65, 600V, UL 508 — value-tier START/RESET for switchboard control panels",
+    "manufacturer": "AutomationDirect",
+    "manufacturerPartNumber": "GCX1A-G",
+    "spec": {
+      "series": "GCX",
+      "controlType": "Pushbutton, momentary",
+      "operatorSize": "22",
+      "mounting": "22mm panel cutout",
+      "poles": "1NO",
+      "ratedCurrentA": 10,
+      "voltageRating": "600V AC",
+      "ipRating": "IP65",
+      "color": "Green",
+      "illuminated": "No",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "AutomationDirect",
+        "sku": "GCX1A-G",
+        "price": 8.50,
+        "currency": "USD",
+        "url": "https://www.automationdirect.com/adc/Shopping/Catalog/Pushbuttons,_Switches_-z-_Indicators/Pushbuttons/22mm_GCX_Pushbuttons/GCX1A-G",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 8.50,
+    "qualityRating": 4,
+    "popularity": 4,
+    "productUrl": "https://www.automationdirect.com/adc/Shopping/Catalog/Pushbuttons,_Switches_-z-_Indicators/Pushbuttons/22mm_GCX_Pushbuttons/GCX1A-G"
+  },
+  {
+    "category": "CONTROLS",
+    "name": "PUSHBUTTON, 22MM, MOMENTARY E-STOP, 1NC, RED MUSHROOM, SCHNEIDER XB4BS8445",
+    "description": "Schneider Electric Harmony XB4 22mm mushroom-head E-stop pushbutton, twist-to-release, red, 1NC, metal body, IP65, 600V, UL 508 — emergency stop for generator/motor control panels",
+    "manufacturer": "Schneider Electric",
+    "manufacturerPartNumber": "XB4BS8445",
+    "spec": {
+      "series": "Harmony XB4",
+      "controlType": "E-stop pushbutton, twist-to-release",
+      "operatorSize": "22",
+      "mounting": "22mm panel cutout",
+      "poles": "1NC",
+      "ratedCurrentA": 6,
+      "voltageRating": "600V AC",
+      "ipRating": "IP65",
+      "color": "Red mushroom",
+      "illuminated": "No",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "2HMG1",
+        "price": 45.60,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/SCHNEIDER-ELECTRIC-E-Stop-2HMG1",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 45.60,
+    "qualityRating": 5,
+    "popularity": 4,
+    "productUrl": "https://www.se.com/us/en/product/XB4BS8445/"
+  },
+  {
+    "category": "CONTROLS",
+    "name": "GROUND FAULT RELAY, TRIP RELAY, 120VAC, DIN RAIL, ABB TERRA 50 GFTD",
+    "description": "ABB TERRA 50 ground fault trip relay, 120V AC supply, trip output relay, DIN rail, adjustable pickup 0.03–30A — used with switchboard ground fault sensing CT for breaker trip in switchboards per NEC 230.95",
+    "manufacturer": "ABB",
+    "manufacturerPartNumber": "TERRA50GFTD",
+    "spec": {
+      "series": "TERRA 50",
+      "controlType": "Ground fault trip relay",
+      "operatorSize": "N/A",
+      "mounting": "DIN rail",
+      "poles": "1 trip relay output",
+      "ratedCurrentA": 5,
+      "voltageRating": "120V AC",
+      "ipRating": "IP20",
+      "color": "Gray",
+      "illuminated": "Yes - fault LED",
+      "ulListing": "UL Listed"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Newark",
+        "sku": "66K8021",
+        "price": 245.00,
+        "currency": "USD",
+        "url": "https://www.newark.com/abb/terra50gftd/ground-fault-trip-relay/dp/66K8021",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 245.00,
+    "qualityRating": 5,
+    "popularity": 3,
+    "productUrl": "https://new.abb.com/products/TERRA50GFTD"
+  },
+  {
+    "category": "CONTROLS",
+    "name": "RELAY, DPDT, 120VAC COIL, 10A, DIN RAIL, IDEC RH2B-UAC120V",
+    "description": "IDEC RH2B-UAC120V general purpose relay, DPDT, 120V AC coil, 10A contacts, screw terminals, DIN rail via PF083A socket — standard control relay for switchboard interlock and indication circuits",
+    "manufacturer": "IDEC",
+    "manufacturerPartNumber": "RH2B-UAC120V",
+    "spec": {
+      "series": "RH2B",
+      "controlType": "General purpose relay, DPDT",
+      "operatorSize": "N/A",
+      "mounting": "Plug-in socket (PF083A)",
+      "poles": "DPDT (2NO/2NC)",
+      "ratedCurrentA": 10,
+      "voltageRating": "120V AC coil, 250V AC contacts",
+      "ipRating": "IP20",
+      "color": "Gray",
+      "illuminated": "No",
+      "ulListing": "UL Listed"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "AutomationDirect",
+        "sku": "RH2B-UAC120V",
+        "price": 8.00,
+        "currency": "USD",
+        "url": "https://www.automationdirect.com/adc/Shopping/Catalog/Relays_-z-_Timers/IDEC_Relays/RH2B-UAC120V",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 8.00,
+    "qualityRating": 5,
+    "popularity": 5,
+    "productUrl": "https://www.idec.com/en/products/relay-rh2b"
+  },
+  {
+    "category": "CONTROLS",
+    "name": "RELAY SOCKET, 8-PIN, DIN RAIL, IDEC PF083A",
+    "description": "IDEC PF083A relay socket for RH2B/SH2B series DPDT relays, 8-pin, DIN rail mount, screw terminals — required with RH2B relays in switchboard control panels",
+    "manufacturer": "IDEC",
+    "manufacturerPartNumber": "PF083A",
+    "spec": {
+      "series": "PF",
+      "controlType": "Relay socket",
+      "operatorSize": "N/A",
+      "mounting": "DIN rail",
+      "poles": "8-pin",
+      "ratedCurrentA": 10,
+      "voltageRating": "250V AC",
+      "ipRating": "IP20",
+      "color": "Gray",
+      "illuminated": "No",
+      "ulListing": "UL Listed"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "AutomationDirect",
+        "sku": "PF083A",
+        "price": 3.50,
+        "currency": "USD",
+        "url": "https://www.automationdirect.com/adc/Shopping/Catalog/Relays_-z-_Timers/IDEC_Relays/PF083A",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 3.50,
+    "qualityRating": 5,
+    "popularity": 5,
+    "productUrl": "https://www.idec.com/en/products/relay-socket-pf083a"
+  },
+  {
+    "category": "CONTROLS",
+    "name": "ANNUNCIATOR / ALARM MODULE, 8-POINT, 120VAC, EATON D64MR1",
+    "description": "Eaton D64MR1 8-point annunciator relay module, 120V AC, individual window per alarm, manual/automatic reset — provides audible/visual alarm for critical switchboard conditions: loss of voltage, ground fault, overcurrent",
+    "manufacturer": "Eaton",
+    "manufacturerPartNumber": "D64MR1",
+    "spec": {
+      "series": "D64M",
+      "controlType": "Annunciator alarm module",
+      "operatorSize": "N/A",
+      "mounting": "Panel mount",
+      "poles": "8 alarm inputs",
+      "ratedCurrentA": 2,
+      "voltageRating": "120V AC",
+      "ipRating": "NEMA 1",
+      "color": "Black",
+      "illuminated": "Yes - window annunciator",
+      "ulListing": "UL Listed"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "4HT32",
+        "price": 420.00,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/EATON-Annunciator-Module-4HT32",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 420.00,
+    "qualityRating": 5,
+    "popularity": 3,
+    "productUrl": "https://www.eaton.com/us/en-us/catalog/control-panel-components/d64m-annunciator.html"
+  },
+  {
+    "category": "CONTROLS",
+    "name": "HOUR METER, PANEL MOUNT, 120VAC, 6-DIGIT, REDINGTON 875-0000",
+    "description": "Redington 875 6-digit elapsed time meter (hour meter), 120V AC, panel mount, UL listed — records generator run-hours for maintenance tracking in switchboards",
+    "manufacturer": "Redington",
+    "manufacturerPartNumber": "875-0000",
+    "spec": {
+      "series": "875",
+      "controlType": "Hour meter / elapsed time meter",
+      "operatorSize": "N/A",
+      "mounting": "Panel cutout (1.78in × 0.87in)",
+      "poles": "N/A",
+      "ratedCurrentA": 0.1,
+      "voltageRating": "120V AC",
+      "ipRating": "IP20",
+      "color": "Black",
+      "illuminated": "No",
+      "ulListing": "UL Listed"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "2EFY9",
+        "price": 35.80,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/REDINGTON-Hour-Meter-2EFY9",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 35.80,
+    "qualityRating": 4,
+    "popularity": 3,
+    "productUrl": "https://www.redington.com/products/875"
+  },
+  {
+    "category": "CONTROLS",
+    "name": "TERMINAL STRIP FOR CONTROL, 24-BLOCK, SCREW, 600V, AUTOMATIONDIRECT TS-2400",
+    "description": "AutomationDirect TS-2400 24-block DIN rail terminal strip, screw clamp, 14-12 AWG, 600V, 20A, gray — prewired terminal strip for switchboard external control wiring connections",
+    "manufacturer": "AutomationDirect",
+    "manufacturerPartNumber": "TS-2400",
+    "spec": {
+      "series": "TS",
+      "controlType": "Terminal strip (pre-assembled)",
+      "operatorSize": "N/A",
+      "mounting": "DIN rail (35mm) / panel",
+      "poles": "24-position",
+      "ratedCurrentA": 20,
+      "voltageRating": "600V AC",
+      "ipRating": "IP20",
+      "color": "Gray",
+      "illuminated": "No",
+      "ulListing": "UL 508"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "AutomationDirect",
+        "sku": "TS-2400",
+        "price": 22.00,
+        "currency": "USD",
+        "url": "https://www.automationdirect.com/adc/Shopping/Catalog/Terminal_Blocks/Pre-Assembled_Terminal_Strips/TS-2400",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 22.00,
+    "qualityRating": 4,
+    "popularity": 4,
+    "productUrl": "https://www.automationdirect.com/adc/Shopping/Catalog/Terminal_Blocks/Pre-Assembled_Terminal_Strips/TS-2400"
+  }
+]
