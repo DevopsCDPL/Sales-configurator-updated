@@ -1,0 +1,579 @@
+[
+  {
+    "category": "CAMLOCK",
+    "name": "CAMLOCK, 400A, INLINE, FEMALE, BLK, 2/0-4/0 AWG, ERICSON 400FBK",
+    "description": "Ericson Series 16 400A female inline camlock connector, black, 2/0-4/0 AWG, 480/600V, cUL/UL Listed, CSA, NEMA 4",
+    "manufacturer": "Ericson Manufacturing",
+    "manufacturerPartNumber": "400FBK",
+    "spec": {
+      "series": "Series 16",
+      "gender": "Female",
+      "style": "Inline",
+      "ratedCurrentA": 400,
+      "wireRange": "2/0-4/0 AWG",
+      "voltageRating": "600V AC / 250V DC",
+      "color": "Black",
+      "material": "Neoprene body; silver-plated copper contact",
+      "nemaRating": "NEMA 4",
+      "ulListing": "UL 1682",
+      "csaListing": "CSA US"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "HomElectrical",
+        "sku": "ERC-400FBK",
+        "price": 42.71,
+        "currency": "USD",
+        "url": "https://www.homelectrical.com/electrical-connectors/ericson-erc-400fbk.1.html",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "imageUrl": "https://www.homelectrical.com/sites/default/files/styles/image_500x500/public/images/product/unsorted2/ERC-400FBK.jpg",
+    "productUrl": "https://www.homelectrical.com/electrical-connectors/ericson-erc-400fbk.1.html",
+    "qualityRating": 4,
+    "popularity": 5
+  },
+  {
+    "category": "CAMLOCK",
+    "name": "CAMLOCK, 400A, INLINE, MALE, BLK, 2/0-4/0 AWG, ERICSON 400MBK",
+    "description": "Ericson Series 16 400A male inline camlock connector, black, 2/0-4/0 AWG, 480/600V, cUL/UL Listed, CSA, NEMA 4",
+    "manufacturer": "Ericson Manufacturing",
+    "manufacturerPartNumber": "400MBK",
+    "spec": {
+      "series": "Series 16",
+      "gender": "Male",
+      "style": "Inline",
+      "ratedCurrentA": 400,
+      "wireRange": "2/0-4/0 AWG",
+      "voltageRating": "600V AC / 250V DC",
+      "color": "Black",
+      "material": "Neoprene body; silver-plated copper contact",
+      "nemaRating": "NEMA 4",
+      "ulListing": "UL 1682",
+      "csaListing": "CSA US"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "HomElectrical",
+        "sku": "ERC-400MBK",
+        "price": 42.71,
+        "currency": "USD",
+        "url": "https://www.homelectrical.com/electrical-connectors/ericson-erc-400mbk.1.html",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "imageUrl": "https://www.homelectrical.com/sites/default/files/styles/image_500x500/public/images/product/unsorted2/ERC-400MBK.jpg",
+    "productUrl": "https://www.homelectrical.com/electrical-connectors/ericson-erc-400mbk.1.html",
+    "qualityRating": 4,
+    "popularity": 5
+  },
+  {
+    "category": "CAMLOCK",
+    "name": "CAMLOCK, 400A, INLINE, FEMALE, GRN, 2/0-4/0 AWG, ERICSON 400FGN",
+    "description": "Ericson Series 16 400A female inline camlock connector, green (ground), 2/0-4/0 AWG, 480/600V, cUL/UL Listed, CSA",
+    "manufacturer": "Ericson Manufacturing",
+    "manufacturerPartNumber": "400FGN",
+    "spec": {
+      "series": "Series 16",
+      "gender": "Female",
+      "style": "Inline",
+      "ratedCurrentA": 400,
+      "wireRange": "2/0-4/0 AWG",
+      "voltageRating": "600V AC",
+      "color": "Green",
+      "material": "Neoprene body; silver-plated copper contact",
+      "nemaRating": "NEMA 4",
+      "ulListing": "UL 1682",
+      "csaListing": "CSA US"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "HomElectrical",
+        "sku": "ERC-400FGN",
+        "price": 42.71,
+        "currency": "USD",
+        "url": "https://www.homelectrical.com/electrical-connectors/ericson-erc-400fgn.1.html",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "imageUrl": "https://www.homelectrical.com/sites/default/files/styles/image_500x500/public/images/product/unsorted2/ERC-400FGN.jpg",
+    "productUrl": "https://www.homelectrical.com/electrical-connectors/ericson-erc-400fgn.1.html",
+    "qualityRating": 4,
+    "popularity": 5
+  },
+  {
+    "category": "CAMLOCK",
+    "name": "CAMLOCK, 400A, INLINE, FEMALE, BLU, 2/0-4/0 AWG, ERICSON 400FB",
+    "description": "Ericson Series 16 400A female inline camlock connector, blue (neutral/C-phase), 2/0-4/0 AWG, 480/600V, cUL/UL Listed, CSA",
+    "manufacturer": "Ericson Manufacturing",
+    "manufacturerPartNumber": "400FB",
+    "spec": {
+      "series": "Series 16",
+      "gender": "Female",
+      "style": "Inline",
+      "ratedCurrentA": 400,
+      "wireRange": "2/0-4/0 AWG",
+      "voltageRating": "600V AC",
+      "color": "Blue",
+      "material": "Neoprene body; silver-plated copper contact",
+      "nemaRating": "NEMA 4",
+      "ulListing": "UL 1682",
+      "csaListing": "CSA US"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "HomElectrical",
+        "sku": "ERC-400FB",
+        "price": 42.71,
+        "currency": "USD",
+        "url": "https://www.homelectrical.com/electrical-connectors/ericson-erc-400fb.1.html",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "imageUrl": "https://www.homelectrical.com/sites/default/files/styles/image_500x500/public/images/product/unsorted2/ERC-400FB.jpg",
+    "productUrl": "https://www.homelectrical.com/electrical-connectors/ericson-erc-400fb.1.html",
+    "qualityRating": 4,
+    "popularity": 5
+  },
+  {
+    "category": "CAMLOCK",
+    "name": "CAMLOCK, 400A, INLINE, FEMALE, RED, 2/0-4/0 AWG, ERICSON 400FR",
+    "description": "Ericson Series 16 400A female inline camlock connector, red (B-phase), 2/0-4/0 AWG, 480/600V, cUL/UL Listed, CSA",
+    "manufacturer": "Ericson Manufacturing",
+    "manufacturerPartNumber": "400FR",
+    "spec": {
+      "series": "Series 16",
+      "gender": "Female",
+      "style": "Inline",
+      "ratedCurrentA": 400,
+      "wireRange": "2/0-4/0 AWG",
+      "voltageRating": "600V AC",
+      "color": "Red",
+      "material": "Neoprene body; silver-plated copper contact",
+      "nemaRating": "NEMA 4",
+      "ulListing": "UL 1682",
+      "csaListing": "CSA US"
+    },
+    "productUrl": "https://www.ericson.com/camlock-16-series-400a-inline-connector-female-red-2-0-4-0-awg400fr.html",
+    "qualityRating": 4,
+    "popularity": 5
+  },
+  {
+    "category": "CAMLOCK",
+    "name": "CAMLOCK, 400A, INLINE, FEMALE, WHT, 2/0-4/0 AWG, ERICSON 400FW",
+    "description": "Ericson Series 16 400A female inline camlock connector, white (neutral), 2/0-4/0 AWG, 480/600V, cUL/UL Listed, CSA",
+    "manufacturer": "Ericson Manufacturing",
+    "manufacturerPartNumber": "400FW",
+    "spec": {
+      "series": "Series 16",
+      "gender": "Female",
+      "style": "Inline",
+      "ratedCurrentA": 400,
+      "wireRange": "2/0-4/0 AWG",
+      "voltageRating": "600V AC",
+      "color": "White",
+      "material": "Neoprene body; silver-plated copper contact",
+      "nemaRating": "NEMA 4",
+      "ulListing": "UL 1682",
+      "csaListing": "CSA US"
+    },
+    "productUrl": "https://www.homelectrical.com/electrical-connectors/ericson-erc-400fw.1.html",
+    "qualityRating": 4,
+    "popularity": 4
+  },
+  {
+    "category": "CAMLOCK",
+    "name": "CAMLOCK, 400A, PANEL-MOUNT, MALE RECEPT, BLK, 2/0-4/0 AWG, ERICSON 400MRBK",
+    "description": "Ericson Series 16 400A male panel-mount receptacle, black, 2/0-4/0 AWG, 1/2 in threaded stud, 1-1/8 in length, for service entrance panels",
+    "manufacturer": "Ericson Manufacturing",
+    "manufacturerPartNumber": "400MRBK",
+    "spec": {
+      "series": "Series 16",
+      "gender": "Male",
+      "style": "Panel",
+      "ratedCurrentA": 400,
+      "wireRange": "2/0-4/0 AWG",
+      "voltageRating": "600V AC",
+      "color": "Black",
+      "material": "Thermoplastic body; silver-plated copper contact",
+      "nemaRating": "NEMA 3R",
+      "ulListing": "UL 1682",
+      "csaListing": "RoHS Compliant"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "HomElectrical",
+        "sku": "ERC-400MRBK",
+        "price": 45.17,
+        "currency": "USD",
+        "url": "https://www.homelectrical.com/electrical-connectors/ericson-erc-400mrbk.1.html",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "imageUrl": "https://www.homelectrical.com/sites/default/files/styles/image_500x500/public/images/product/unsorted2/ERC-400MRBK.jpg",
+    "productUrl": "https://www.homelectrical.com/electrical-connectors/ericson-erc-400mrbk.1.html",
+    "qualityRating": 4,
+    "popularity": 5
+  },
+  {
+    "category": "CAMLOCK",
+    "name": "CAMLOCK, 400A, PANEL-MOUNT, MALE RECEPT, WHT, 2/0-4/0 AWG, ERICSON 400MRW",
+    "description": "Ericson Series 16 400A male panel-mount receptacle, white (neutral), 2/0-4/0 AWG, 1/2 in threaded stud, for service entrance panels",
+    "manufacturer": "Ericson Manufacturing",
+    "manufacturerPartNumber": "400MRW",
+    "spec": {
+      "series": "Series 16",
+      "gender": "Male",
+      "style": "Panel",
+      "ratedCurrentA": 400,
+      "wireRange": "2/0-4/0 AWG",
+      "voltageRating": "600V AC",
+      "color": "White",
+      "material": "Thermoplastic body; silver-plated copper contact",
+      "nemaRating": "NEMA 3R",
+      "ulListing": "UL 1682"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "HomElectrical",
+        "sku": "ERC-400MRW",
+        "price": 45.17,
+        "currency": "USD",
+        "url": "https://www.homelectrical.com/electrical-connectors/ericson-erc-400mrw.1.html",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "imageUrl": "https://www.homelectrical.com/sites/default/files/styles/image_500x500/public/images/product/unsorted2/ERC-400MRW.jpg",
+    "productUrl": "https://www.homelectrical.com/electrical-connectors/ericson-erc-400mrw.1.html",
+    "qualityRating": 4,
+    "popularity": 5
+  },
+  {
+    "category": "CAMLOCK",
+    "name": "CAMLOCK, 400A, PANEL-MOUNT, MALE RECEPT, RED, 2/0-4/0 AWG, ERICSON 400MRR",
+    "description": "Ericson Series 16 400A male panel-mount receptacle, red (B-phase), 2/0-4/0 AWG, 1/2 in threaded stud, for service entrance panels",
+    "manufacturer": "Ericson Manufacturing",
+    "manufacturerPartNumber": "400MRR",
+    "spec": {
+      "series": "Series 16",
+      "gender": "Male",
+      "style": "Panel",
+      "ratedCurrentA": 400,
+      "wireRange": "2/0-4/0 AWG",
+      "voltageRating": "600V AC",
+      "color": "Red",
+      "material": "Thermoplastic body; silver-plated copper contact",
+      "nemaRating": "NEMA 3R",
+      "ulListing": "UL 1682"
+    },
+    "productUrl": "https://www.ericson.com/en/product/products-portable-power-cam-type/",
+    "qualityRating": 4,
+    "popularity": 5
+  },
+  {
+    "category": "CAMLOCK",
+    "name": "CAMLOCK, 400A, PANEL-MOUNT, MALE RECEPT, GRN, 2/0-4/0 AWG, ERICSON 400MRGRN",
+    "description": "Ericson Series 16 400A male panel-mount receptacle, green (ground), 2/0-4/0 AWG, for service entrance panels",
+    "manufacturer": "Ericson Manufacturing",
+    "manufacturerPartNumber": "400MRGRN",
+    "spec": {
+      "series": "Series 16",
+      "gender": "Male",
+      "style": "Panel",
+      "ratedCurrentA": 400,
+      "wireRange": "2/0-4/0 AWG",
+      "voltageRating": "600V AC",
+      "color": "Green",
+      "material": "Thermoplastic body; silver-plated copper contact",
+      "nemaRating": "NEMA 3R",
+      "ulListing": "UL 1682"
+    },
+    "productUrl": "https://www.ericson.com/en/product/products-portable-power-cam-type/",
+    "qualityRating": 4,
+    "popularity": 4
+  },
+  {
+    "category": "CAMLOCK",
+    "name": "CAMLOCK, 400A, INLINE, MALE, BLK, 2/0-4/0 AWG, LEVITON 16R21-1E",
+    "description": "Leviton Series 16 400A male panel receptacle, 90-degree mount, black, double set screw termination, 2/0-4/0 AWG, 600V, UL 1691 compliant, NEMA 3R when mated, 35kA SCCR",
+    "manufacturer": "Leviton",
+    "manufacturerPartNumber": "16R21-1E",
+    "spec": {
+      "series": "Series 16",
+      "gender": "Male",
+      "style": "Panel",
+      "ratedCurrentA": 400,
+      "wireRange": "2/0-4/0 AWG",
+      "voltageRating": "600V AC",
+      "color": "Black",
+      "material": "UV-stabilized TPV body",
+      "nemaRating": "NEMA 3R (mated)",
+      "ulListing": "UL 1691",
+      "csaListing": "Yes"
+    },
+    "productUrl": "https://leviton.com/products/16r21-1e",
+    "qualityRating": 5,
+    "popularity": 5
+  },
+  {
+    "category": "CAMLOCK",
+    "name": "CAMLOCK, 400A, INLINE, MALE RECEPT, BLK, TAPER, 300A, LEVITON 16R21-UE",
+    "description": "Leviton Series 16 male receptacle, black taper nose, 300A, inline, 600V, UL 1682 listed",
+    "manufacturer": "Leviton",
+    "manufacturerPartNumber": "16R21-UE",
+    "spec": {
+      "series": "Series 16",
+      "gender": "Male",
+      "style": "Inline",
+      "ratedCurrentA": 300,
+      "wireRange": "#6 to 4/0 AWG",
+      "voltageRating": "600V AC / 250V DC",
+      "color": "Black",
+      "material": "UV-stabilized TPV body",
+      "nemaRating": "NEMA 3R (mated)",
+      "ulListing": "UL 1682",
+      "csaListing": "Yes"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G4057208",
+        "price": 35.42,
+        "currency": "USD",
+        "url": "https://www.zoro.com/leviton-male-connector-blk-taper-nose-300acdc-16r21-ue/i/G4057208/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.zoro.com/leviton-male-connector-blk-taper-nose-300acdc-16r21-ue/i/G4057208/",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "CAMLOCK",
+    "name": "CAMLOCK, 400A, PANEL-MOUNT, MALE RECEPT, BLK, SHLD, LEVITON 16R31-XE",
+    "description": "Leviton Series 16 400A male receptacle, black, 3/4 in shield, taper nose, panel mount, 600V",
+    "manufacturer": "Leviton",
+    "manufacturerPartNumber": "16R31-XE",
+    "spec": {
+      "series": "Series 16",
+      "gender": "Male",
+      "style": "Panel",
+      "ratedCurrentA": 400,
+      "wireRange": "2/0-4/0 AWG",
+      "voltageRating": "600V AC",
+      "color": "Black",
+      "material": "UV-stabilized TPV body",
+      "nemaRating": "NEMA 3R (mated)",
+      "ulListing": "UL 1682"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G4077088",
+        "price": 52.88,
+        "currency": "USD",
+        "url": "https://www.zoro.com/leviton-electrical-connector-assembly-16-srs-ml-rec-tpr-075in-shld-400a-blk-16r31-xe/i/G4077088/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.zoro.com/leviton-electrical-connector-assembly-16-srs-ml-rec-tpr-075in-shld-400a-blk-16r31-xe/i/G4077088/",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "CAMLOCK",
+    "name": "CAMLOCK, 400A, PANEL-MOUNT, MALE RECEPT, GRN, SHLD, LEVITON 16R32-XG",
+    "description": "Leviton Series 16 400A male receptacle, green (ground), 3/4 in shield, 600V, panel mount",
+    "manufacturer": "Leviton",
+    "manufacturerPartNumber": "16R32-XG",
+    "spec": {
+      "series": "Series 16",
+      "gender": "Male",
+      "style": "Panel",
+      "ratedCurrentA": 400,
+      "wireRange": "2/0-4/0 AWG",
+      "voltageRating": "600V AC",
+      "color": "Green",
+      "material": "UV-stabilized TPV body",
+      "nemaRating": "NEMA 3R (mated)",
+      "ulListing": "UL 1682"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G4051985",
+        "price": 52.88,
+        "currency": "USD",
+        "url": "https://www.zoro.com/leviton-electrical-connector-assembly-16-srs-rec-tpr-075in-shld-600v-400a-grn-16r32-xg/i/G4051985/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.zoro.com/leviton-electrical-connector-assembly-16-srs-rec-tpr-075in-shld-600v-400a-grn-16r32-xg/i/G4051985/",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "CAMLOCK",
+    "name": "CAMLOCK, 400A, PANEL-MOUNT, MALE RECEPT, YEL, LEVITON 16R25-1UY",
+    "description": "Leviton Series 16 400A male panel receptacle, yellow, 600V, panel mount",
+    "manufacturer": "Leviton",
+    "manufacturerPartNumber": "16R25-1UY",
+    "spec": {
+      "series": "Series 16",
+      "gender": "Male",
+      "style": "Panel",
+      "ratedCurrentA": 400,
+      "wireRange": "2/0-4/0 AWG",
+      "voltageRating": "600V AC",
+      "color": "Yellow",
+      "material": "UV-stabilized TPV body",
+      "nemaRating": "NEMA 3R (mated)",
+      "ulListing": "UL 1682"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G5716996",
+        "price": 45.12,
+        "currency": "USD",
+        "url": "https://www.zoro.com/leviton-male-panel-rec-16-ser-16r25-1uy/i/G5716996/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.zoro.com/leviton-male-panel-rec-16-ser-16r25-1uy/i/G5716996/",
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "CAMLOCK",
+    "name": "CAMLOCK, 400A, INLINE, MALE, ORG, DSS, LEVITON 16D24-UO",
+    "description": "Leviton Series 16 400A male plug, orange, double set screw termination, 2/0 AWG, 600V, inline, UL 1682",
+    "manufacturer": "Leviton",
+    "manufacturerPartNumber": "16D24-UO",
+    "spec": {
+      "series": "Series 16",
+      "gender": "Male",
+      "style": "Inline",
+      "ratedCurrentA": 400,
+      "wireRange": "2/0-4/0 AWG",
+      "voltageRating": "600V AC",
+      "color": "Orange",
+      "material": "UV-stabilized TPV body",
+      "nemaRating": "NEMA 3R (mated)",
+      "ulListing": "UL 1682"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G5717538",
+        "price": 44.95,
+        "currency": "USD",
+        "url": "https://www.zoro.com/leviton-electrical-connector-assembly-16-series-male-plug-2-2-0-org-bul-16d22-buo/i/G5717538/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.zoro.com/leviton-electrical-connector-assembly-16-series-male-plug-2-2-0-org-bul-16d22-buo/i/G5717538/",
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "CAMLOCK",
+    "name": "CAMLOCK, 400A, INLINE, MALE RECEPT, BLK, LEVITON 16R21-UR",
+    "description": "Leviton Series 16 male receptacle, black, 400A, 600V, inline, UL 1682 listed",
+    "manufacturer": "Leviton",
+    "manufacturerPartNumber": "16R21-UR",
+    "spec": {
+      "series": "Series 16",
+      "gender": "Male",
+      "style": "Inline",
+      "ratedCurrentA": 400,
+      "wireRange": "2/0-4/0 AWG",
+      "voltageRating": "600V AC",
+      "color": "Black",
+      "material": "UV-stabilized TPV body",
+      "nemaRating": "NEMA 3R (mated)",
+      "ulListing": "UL 1682"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G315867036",
+        "price": 38.75,
+        "currency": "USD",
+        "url": "https://www.zoro.com/leviton-male-receptacle-16r21-ur/i/G315867036/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.zoro.com/leviton-male-receptacle-16r21-ur/i/G315867036/",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "CAMLOCK",
+    "name": "CAMLOCK, 400A, INLINE, FEMALE, BLU, 2/0-4/0 AWG, ERICSON 400FB-MGNT",
+    "description": "Ericson Series 16 400A male inline green connector, for 3-phase switchboard service entrance power distribution systems",
+    "manufacturer": "Ericson Manufacturing",
+    "manufacturerPartNumber": "400MGN",
+    "spec": {
+      "series": "Series 16",
+      "gender": "Male",
+      "style": "Inline",
+      "ratedCurrentA": 400,
+      "wireRange": "2/0-4/0 AWG",
+      "voltageRating": "600V AC",
+      "color": "Green",
+      "material": "Neoprene body; silver-plated copper contact",
+      "nemaRating": "NEMA 4",
+      "ulListing": "UL 1682",
+      "csaListing": "CSA US"
+    },
+    "productUrl": "https://products.ericson.com/en/product/products-portable-power-cam-type/camlock-16-series-400a-inline-connector-male-green-20-40-awg--400MGN",
+    "qualityRating": 4,
+    "popularity": 4
+  },
+  {
+    "category": "CAMLOCK",
+    "name": "CAMLOCK, 400A, INLINE, FEMALE, BRN, 2/0-4/0 AWG, ERICSON 400FBR",
+    "description": "Ericson Series 16 400A female inline camlock connector, brown (A-phase), 2/0-4/0 AWG, 480/600V, cUL/UL Listed, CSA",
+    "manufacturer": "Ericson Manufacturing",
+    "manufacturerPartNumber": "400FBR",
+    "spec": {
+      "series": "Series 16",
+      "gender": "Female",
+      "style": "Inline",
+      "ratedCurrentA": 400,
+      "wireRange": "2/0-4/0 AWG",
+      "voltageRating": "600V AC",
+      "color": "Brown",
+      "material": "Neoprene body; silver-plated copper contact",
+      "nemaRating": "NEMA 4",
+      "ulListing": "UL 1682",
+      "csaListing": "CSA US"
+    },
+    "productUrl": "https://www.ericson.com/en/catalog/node/products-portable-power-cam-type",
+    "qualityRating": 4,
+    "popularity": 3
+  },
+  {
+    "category": "CAMLOCK",
+    "name": "CAMLOCK, 400A, PANEL-MOUNT, RECEPT 45-DEG, ALL COLORS, LEVITON 16-SERIES PANEL",
+    "description": "Leviton Series 16 400A panel mount 45-degree angled camlock connectors for panels or enclosures, available in all phase colors, double set screw 2/0-4/0 AWG",
+    "manufacturer": "Leviton",
+    "manufacturerPartNumber": "16-SERIES-PANEL-45",
+    "spec": {
+      "series": "Series 16",
+      "gender": "Male",
+      "style": "Panel",
+      "ratedCurrentA": 400,
+      "wireRange": "2/0-4/0 AWG",
+      "voltageRating": "600V AC",
+      "color": "Multiple (BLK/RED/BLU/WHT/GRN/ORG)",
+      "material": "UV-stabilized TPV body",
+      "nemaRating": "NEMA 3R (mated)",
+      "ulListing": "UL 1691"
+    },
+    "productUrl": "https://temporarypowersupply.com/product/leviton-series-16-400a-panel-mount-45-angled-camlock-connectors-for-panels-or-enclosures/",
+    "qualityRating": 5,
+    "popularity": 4
+  }
+]

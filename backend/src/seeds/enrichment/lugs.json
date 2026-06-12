@@ -1,0 +1,896 @@
+[
+  {
+    "category": "LUGS",
+    "name": "LUG, COMPRESSION, 2-HOLE, 6 AWG, COPPER, BURNDY YA6CL2TC38",
+    "description": "Burndy HYLUG compression lug, 2-hole, standard barrel, copper, 6 AWG, 3/8 in stud, blue color code, UL 486A-486B listed, AL9CU dual rated",
+    "manufacturer": "Burndy (Hubbell)",
+    "manufacturerPartNumber": "YA6CL2TC38",
+    "spec": {
+      "lugType": "Compression",
+      "connectionType": "Compression",
+      "material": "Copper",
+      "wireRange": "#6 AWG",
+      "numBarrels": "Single",
+      "holes": 2,
+      "holeDiameterIn": 0.44,
+      "holeSpacingIn": 1.0,
+      "voltageRating": "600V",
+      "ulListing": "UL 486A-486B",
+      "csaListing": "CSA C22.2 No. 65"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G4649522",
+        "price": 8.59,
+        "currency": "USD",
+        "url": "https://www.zoro.com/burndy-two-hole-lug-compression-connector-6-awg-ya6cl2tc38/i/G4649522/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "imageUrl": "https://www.zoro.com/static/cms/product/large/G4649522.jpg",
+    "productUrl": "https://www.zoro.com/burndy-two-hole-lug-compression-connector-6-awg-ya6cl2tc38/i/G4649522/",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "LUGS",
+    "name": "LUG, COMPRESSION, 1-HOLE, 6 AWG, COPPER, BURNDY YA6CL4BOX",
+    "description": "Burndy HYLUG compression lug, 1-hole, standard barrel, copper, 6 AWG, 3/8 in stud, blue color code, UL 486A-486B listed",
+    "manufacturer": "Burndy (Hubbell)",
+    "manufacturerPartNumber": "YA6CL4BOX",
+    "spec": {
+      "lugType": "Compression",
+      "connectionType": "Compression",
+      "material": "Copper",
+      "wireRange": "#6 AWG",
+      "numBarrels": "Single",
+      "holes": 1,
+      "holeDiameterIn": 0.44,
+      "voltageRating": "600V",
+      "ulListing": "UL 486A-486B",
+      "csaListing": "CSA C22.2 No. 65"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G4689727",
+        "price": 4.49,
+        "currency": "USD",
+        "url": "https://www.zoro.com/burndy-one-hole-compression-lug-6-awg-max-38-in-stud-standard-barrel-copper-blue-ya6cl4box/i/G4689727/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.zoro.com/burndy-one-hole-compression-lug-6-awg-max-38-in-stud-standard-barrel-copper-blue-ya6cl4box/i/G4689727/",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "LUGS",
+    "name": "LUG, COMPRESSION, 1-HOLE, 4 AWG, COPPER, BURNDY YA4CLBOX",
+    "description": "Burndy HYLUG one-hole compression lug, copper, 4 AWG, standard barrel, UL 486A-486B listed",
+    "manufacturer": "Burndy (Hubbell)",
+    "manufacturerPartNumber": "YA4CLBOX",
+    "spec": {
+      "lugType": "Compression",
+      "connectionType": "Compression",
+      "material": "Copper",
+      "wireRange": "#4 AWG",
+      "numBarrels": "Single",
+      "holes": 1,
+      "voltageRating": "600V",
+      "ulListing": "UL 486A-486B",
+      "csaListing": "CSA C22.2 No. 65"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G4667677",
+        "price": 4.66,
+        "currency": "USD",
+        "url": "https://www.zoro.com/burndy-one-hole-lug-compression-connector-4-awg-ya4clbox/i/G4667677/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.zoro.com/burndy-one-hole-lug-compression-connector-4-awg-ya4clbox/i/G4667677/",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "LUGS",
+    "name": "LUG, COMPRESSION, 2-HOLE, 4 AWG, COPPER, BURNDY YA4CL2TC38",
+    "description": "Burndy HYLUG two-hole compression lug, copper, 4 AWG, 3/8 in stud, standard barrel, gray color code, UL 486A-486B listed",
+    "manufacturer": "Burndy (Hubbell)",
+    "manufacturerPartNumber": "YA4CL2TC38",
+    "spec": {
+      "lugType": "Compression",
+      "connectionType": "Compression",
+      "material": "Copper",
+      "wireRange": "#4 AWG",
+      "numBarrels": "Single",
+      "holes": 2,
+      "holeDiameterIn": 0.44,
+      "holeSpacingIn": 1.0,
+      "voltageRating": "600V",
+      "ulListing": "UL 486A-486B",
+      "csaListing": "CSA C22.2 No. 65"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G4684827",
+        "price": 10.15,
+        "currency": "USD",
+        "url": "https://www.zoro.com/burndy-two-hole-lug-compression-connector-4-awg-ya4cl2tc38/i/G4684827/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.zoro.com/burndy-two-hole-lug-compression-connector-4-awg-ya4cl2tc38/i/G4684827/",
+    "qualityRating": 5,
+    "popularity": 5
+  },
+  {
+    "category": "LUGS",
+    "name": "LUG, COMPRESSION, 2-HOLE, 2 AWG, COPPER, BURNDY YA2CL2TC38",
+    "description": "Burndy HYLUG two-hole compression lug, copper, 2 AWG, 3/8 in stud, short barrel, brown color code, UL 486A-486B listed",
+    "manufacturer": "Burndy (Hubbell)",
+    "manufacturerPartNumber": "YA2CL2TC38",
+    "spec": {
+      "lugType": "Compression",
+      "connectionType": "Compression",
+      "material": "Copper",
+      "wireRange": "#2 AWG",
+      "numBarrels": "Single",
+      "holes": 2,
+      "holeDiameterIn": 0.44,
+      "holeSpacingIn": 1.0,
+      "voltageRating": "600V",
+      "ulListing": "UL 486A-486B",
+      "csaListing": "CSA C22.2 No. 65"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G0671922",
+        "price": 12.34,
+        "currency": "USD",
+        "url": "https://www.zoro.com/burndy-2-hole-compr-lug-std-brl-2-awg-38-bolt-1-center-insp-hole-brown-rohs-ya2cl2tc38/i/G0671922/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.zoro.com/burndy-2-hole-compr-lug-std-brl-2-awg-38-bolt-1-center-insp-hole-brown-rohs-ya2cl2tc38/i/G0671922/",
+    "qualityRating": 5,
+    "popularity": 5
+  },
+  {
+    "category": "LUGS",
+    "name": "LUG, COMPRESSION, 1-HOLE, 2 AWG, COPPER, BURNDY YA2CL6BOX",
+    "description": "Burndy HYLUG one-hole compression lug, copper, 2 AWG, 1/2 in stud, standard barrel, UL 486A-486B listed",
+    "manufacturer": "Burndy (Hubbell)",
+    "manufacturerPartNumber": "YA2CL6BOX",
+    "spec": {
+      "lugType": "Compression",
+      "connectionType": "Compression",
+      "material": "Copper",
+      "wireRange": "#2 AWG",
+      "numBarrels": "Single",
+      "holes": 1,
+      "holeDiameterIn": 0.56,
+      "voltageRating": "600V",
+      "ulListing": "UL 486A-486B"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G4661562",
+        "price": 10.54,
+        "currency": "USD",
+        "url": "https://www.zoro.com/burndy-one-hole-lug-compression-connector-2-awg-ya2cl6box/i/G4661562/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.zoro.com/burndy-one-hole-lug-compression-connector-2-awg-ya2cl6box/i/G4661562/",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "LUGS",
+    "name": "LUG, COMPRESSION, 1-HOLE, 4/0 AWG, COPPER, BURNDY YAV28LTC14FX",
+    "description": "Burndy HYLUG one-hole compression lug, copper, 4/0 AWG max, standard barrel, purple color code, UL 486A-486B listed",
+    "manufacturer": "Burndy (Hubbell)",
+    "manufacturerPartNumber": "YAV28LTC14FX",
+    "spec": {
+      "lugType": "Compression",
+      "connectionType": "Compression",
+      "material": "Copper",
+      "wireRange": "#4/0 AWG",
+      "numBarrels": "Single",
+      "holes": 1,
+      "holeDiameterIn": 0.44,
+      "voltageRating": "600V",
+      "ulListing": "UL 486A-486B"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G005778291",
+        "price": 18.42,
+        "currency": "USD",
+        "url": "https://www.zoro.com/burndy-one-hole-compression-lug-40-awg-max-standard-barrel-copper-purple-yav28ltc14fx/i/G005778291/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.zoro.com/burndy-one-hole-compression-lug-40-awg-max-standard-barrel-copper-purple-yav28ltc14fx/i/G005778291/",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "LUGS",
+    "name": "LUG, COMPRESSION, 2-HOLE, 1/0 AWG, ALUMINUM, BURNDY YA25A5",
+    "description": "Burndy HYLUG two-hole long barrel compression lug, aluminum/copper dual rated, 1/0 AWG, 3/8 in stud, UL 486A-486B listed, AL9CU",
+    "manufacturer": "Burndy (Hubbell)",
+    "manufacturerPartNumber": "YA25A5",
+    "spec": {
+      "lugType": "Compression",
+      "connectionType": "Compression",
+      "material": "Aluminum/Copper (AL9CU)",
+      "wireRange": "#1/0 AWG",
+      "numBarrels": "Single",
+      "holes": 2,
+      "holeDiameterIn": 0.44,
+      "holeSpacingIn": 1.375,
+      "voltageRating": "600V",
+      "ulListing": "UL 486A-486B",
+      "csaListing": "CSA C22.2 No. 65"
+    },
+    "productUrl": "https://www.wireandcableyourway.com/burndy-ya25a5-1-0-awg-3-8-inch-two-hole-aluminum-long-barrel-lug",
+    "qualityRating": 5,
+    "popularity": 5
+  },
+  {
+    "category": "LUGS",
+    "name": "LUG, COMPRESSION, 2-HOLE, 4/0 AWG, ALUMINUM, BURNDY YA28A5",
+    "description": "Burndy HYLUG two-hole long barrel compression lug, aluminum/copper dual rated, 4/0 AWG, 1/2 in stud, white color code, UL 486A-486B listed, AL9CU",
+    "manufacturer": "Burndy (Hubbell)",
+    "manufacturerPartNumber": "YA28A5",
+    "spec": {
+      "lugType": "Compression",
+      "connectionType": "Compression",
+      "material": "Aluminum/Copper (AL9CU)",
+      "wireRange": "#4/0 AWG",
+      "numBarrels": "Single",
+      "holes": 2,
+      "holeDiameterIn": 0.56,
+      "holeSpacingIn": 1.75,
+      "voltageRating": "600V",
+      "ulListing": "UL 486A-486B",
+      "csaListing": "CSA C22.2 No. 65"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G4695564",
+        "price": 22.15,
+        "currency": "USD",
+        "url": "https://www.zoro.com/burndy-two-hole-lug-compress-connector-40-awg-ya28a5/i/G4695564/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.zoro.com/burndy-two-hole-lug-compress-connector-40-awg-ya28a5/i/G4695564/",
+    "qualityRating": 5,
+    "popularity": 5
+  },
+  {
+    "category": "LUGS",
+    "name": "LUG, COMPRESSION, 2-HOLE, 750 KCMIL, ALUMINUM, BURNDY YA39A5",
+    "description": "Burndy HYLUG two-hole long barrel compression lug, aluminum/copper dual rated, 750 kcmil, 1/2 in stud, yellow color code, hole C-C 1.75 in, UL 486A-486B listed",
+    "manufacturer": "Burndy (Hubbell)",
+    "manufacturerPartNumber": "YA39A5",
+    "spec": {
+      "lugType": "Compression",
+      "connectionType": "Compression",
+      "material": "Aluminum/Copper (AL9CU)",
+      "wireRange": "700-750 kcmil",
+      "numBarrels": "Single",
+      "holes": 2,
+      "holeDiameterIn": 0.56,
+      "holeSpacingIn": 1.75,
+      "tongueThicknessIn": 0.25,
+      "voltageRating": "600V",
+      "ulListing": "UL 486A-486B",
+      "csaListing": "CSA C22.2 No. 65"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G4655734",
+        "price": 65.65,
+        "currency": "USD",
+        "url": "https://www.zoro.com/burndy-two-hole-lug-compress-conct-750-kcmil-ya39a5/i/G4655734/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "imageUrl": "https://www.zoro.com/static/cms/product/large/G4655734.jpg",
+    "productUrl": "https://www.zoro.com/burndy-two-hole-lug-compress-conct-750-kcmil-ya39a5/i/G4655734/",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "LUGS",
+    "name": "LUG, COMPRESSION, 1-HOLE, 250-300 KCMIL, COPPER, BURNDY YAD30M20E34",
+    "description": "Burndy one-hole long barrel compression lug, copper, 250-300 kcmil, 3/4 in stud, UL 486A-486B listed",
+    "manufacturer": "Burndy (Hubbell)",
+    "manufacturerPartNumber": "YAD30M20E34",
+    "spec": {
+      "lugType": "Compression",
+      "connectionType": "Compression",
+      "material": "Copper",
+      "wireRange": "250-300 kcmil",
+      "numBarrels": "Single",
+      "holes": 1,
+      "holeDiameterIn": 0.81,
+      "voltageRating": "600V",
+      "ulListing": "UL 486A-486B"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G6195804",
+        "price": 38.74,
+        "currency": "USD",
+        "url": "https://www.zoro.com/burndy-one-hole-compression-lug-250-kcmil-to-300-kcmil-max-34-in-stud-long-barrel-copper-none-yad30m20e34/i/G6195804/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.zoro.com/burndy-one-hole-compression-lug-250-kcmil-to-300-kcmil-max-34-in-stud-long-barrel-copper-none-yad30m20e34/i/G6195804/",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "LUGS",
+    "name": "LUG, COMPRESSION, 2-HOLE, 500 KCMIL, COPPER, BURNDY YAZ382TC38FX",
+    "description": "Burndy two-hole long barrel compression lug, copper, 500 kcmil, 3/8 in stud, pink color code, UL 486A-486B listed",
+    "manufacturer": "Burndy (Hubbell)",
+    "manufacturerPartNumber": "YAZ382TC38FX",
+    "spec": {
+      "lugType": "Compression",
+      "connectionType": "Compression",
+      "material": "Copper",
+      "wireRange": "500 kcmil",
+      "numBarrels": "Single",
+      "holes": 2,
+      "holeDiameterIn": 0.44,
+      "holeSpacingIn": 1.375,
+      "voltageRating": "600V",
+      "ulListing": "UL 486A-486B"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G1135313",
+        "price": 58.22,
+        "currency": "USD",
+        "url": "https://www.zoro.com/burndy-two-hole-compression-lug-500-kcmil-max-38-in-stud-long-barrel-copper-pink-yaz382tc38fx/i/G1135313/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.zoro.com/burndy-two-hole-compression-lug-500-kcmil-max-38-in-stud-long-barrel-copper-pink-yaz382tc38fx/i/G1135313/",
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "LUGS",
+    "name": "LUG, COMPRESSION, 2-HOLE, 3/0 AWG, COPPER, BURNDY YA272N",
+    "description": "Burndy HYLUG two-hole compression lug, copper, 3/0 AWG, UL 486A-486B listed",
+    "manufacturer": "Burndy (Hubbell)",
+    "manufacturerPartNumber": "YA272N",
+    "spec": {
+      "lugType": "Compression",
+      "connectionType": "Compression",
+      "material": "Copper",
+      "wireRange": "#3/0 AWG",
+      "numBarrels": "Single",
+      "holes": 2,
+      "voltageRating": "600V",
+      "ulListing": "UL 486A-486B"
+    },
+    "productUrl": "https://www.zoro.com/burndy-two-hole-lug-compress-connector-30-awg-ya272n/i/G4695564/",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "LUGS",
+    "name": "LUG, COMPRESSION, 2-HOLE, 350 KCMIL, ALUMINUM, BURNDY YA31L",
+    "description": "Burndy HYLUG one-hole compression lug, aluminum, 350 kcmil, UL 486A-486B listed",
+    "manufacturer": "Burndy (Hubbell)",
+    "manufacturerPartNumber": "YA31L",
+    "spec": {
+      "lugType": "Compression",
+      "connectionType": "Compression",
+      "material": "Aluminum/Copper (AL9CU)",
+      "wireRange": "350 kcmil",
+      "numBarrels": "Single",
+      "holes": 1,
+      "voltageRating": "600V",
+      "ulListing": "UL 486A-486B"
+    },
+    "productUrl": "https://www.zoro.com/burndy-one-hole-lug-compress-conct-350-kcmil-ya31l/i/",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "LUGS",
+    "name": "LUG, MECHANICAL, 2-HOLE, 350-6 AWG, ALUMINUM, ILSCO AU-350-EC",
+    "description": "Ilsco aluminum mechanical lug, dual-rated AL/CU, 350-6 AWG, tin-plated, UL 486A-486B listed, CSA C22.2 No. 65",
+    "manufacturer": "Ilsco",
+    "manufacturerPartNumber": "AU-350-EC",
+    "spec": {
+      "lugType": "Mechanical",
+      "connectionType": "Mechanical",
+      "material": "Aluminum/Copper (AL9CU)",
+      "wireRange": "#6 to 350 kcmil",
+      "numBarrels": "Single",
+      "holes": 2,
+      "voltageRating": "600V",
+      "ulListing": "UL 486A-486B",
+      "csaListing": "CSA C22.2 No. 65"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G302016973",
+        "price": 26.81,
+        "currency": "USD",
+        "url": "https://www.zoro.com/ilsco-aluminum-mechanical-lug-onductor-350-6-au-350-ec/i/G302016973/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.zoro.com/ilsco-aluminum-mechanical-lug-onductor-350-6-au-350-ec/i/G302016973/",
+    "qualityRating": 4,
+    "popularity": 4
+  },
+  {
+    "category": "LUGS",
+    "name": "LUG, MECHANICAL, 2-HOLE, 1/0-14 AWG, ALUMINUM, ILSCO AU-0-EC",
+    "description": "Ilsco aluminum mechanical lug, dual-rated AL/CU, 1/0-14 AWG, tin-plated, pack of 4, UL 486A-486B listed, CSA C22.2 No. 65",
+    "manufacturer": "Ilsco",
+    "manufacturerPartNumber": "AU-0-EC",
+    "spec": {
+      "lugType": "Mechanical",
+      "connectionType": "Mechanical",
+      "material": "Aluminum/Copper (AL9CU)",
+      "wireRange": "#14 to 1/0 AWG",
+      "numBarrels": "Single",
+      "holes": 2,
+      "voltageRating": "600V",
+      "ulListing": "UL 486A-486B",
+      "csaListing": "CSA C22.2 No. 65"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G602016956",
+        "price": 27.35,
+        "currency": "USD",
+        "url": "https://www.zoro.com/ilsco-aluminum-mechanical-lug-onductor-pk4-au-0-ec/i/G602016956/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.zoro.com/ilsco-aluminum-mechanical-lug-onductor-pk4-au-0-ec/i/G602016956/",
+    "qualityRating": 4,
+    "popularity": 4
+  },
+  {
+    "category": "LUGS",
+    "name": "LUG, MECHANICAL, PANELBOARD, 300-6 AWG, ALUMINUM, ILSCO PB2-300-EC",
+    "description": "Ilsco aluminum panelboard lug, dual-rated AL/CU, 300-6 AWG, for use in load centers and panelboards, UL 486A-486B listed",
+    "manufacturer": "Ilsco",
+    "manufacturerPartNumber": "PB2-300-EC",
+    "spec": {
+      "lugType": "Mechanical",
+      "connectionType": "Mechanical",
+      "material": "Aluminum/Copper (AL9CU)",
+      "wireRange": "#6 to 300 kcmil",
+      "numBarrels": "Single",
+      "holes": 2,
+      "voltageRating": "600V",
+      "ulListing": "UL 486A-486B",
+      "csaListing": "CSA C22.2 No. 65"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G201981631",
+        "price": 18.45,
+        "currency": "USD",
+        "url": "https://www.zoro.com/ilsco-aluminum-panelboard-lug-onductor-300-6-pb2-300-ec/i/G201981631/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.zoro.com/ilsco-aluminum-panelboard-lug-onductor-300-6-pb2-300-ec/i/G201981631/",
+    "qualityRating": 4,
+    "popularity": 4
+  },
+  {
+    "category": "LUGS",
+    "name": "LUG, MECHANICAL, PANELBOARD, 600-2 AWG, ALUMINUM, ILSCO PB4-600-2N-EC",
+    "description": "Ilsco aluminum panelboard lug, dual-rated AL/CU, 600-2 AWG, large conductor range, UL 486A-486B listed",
+    "manufacturer": "Ilsco",
+    "manufacturerPartNumber": "PB4-600-2N-EC",
+    "spec": {
+      "lugType": "Mechanical",
+      "connectionType": "Mechanical",
+      "material": "Aluminum/Copper (AL9CU)",
+      "wireRange": "#2 AWG to 600 kcmil",
+      "numBarrels": "Single",
+      "holes": 2,
+      "voltageRating": "600V",
+      "ulListing": "UL 486A-486B"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G601981637",
+        "price": 48.72,
+        "currency": "USD",
+        "url": "https://www.zoro.com/ilsco-aluminum-panelboard-lug-onductor-600-2-pb4-600-2n-ec/i/G601981637/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.zoro.com/ilsco-aluminum-panelboard-lug-onductor-600-2-pb4-600-2n-ec/i/G601981637/",
+    "qualityRating": 4,
+    "popularity": 4
+  },
+  {
+    "category": "LUGS",
+    "name": "LUG, MECHANICAL, GROUND, 4 AWG, ALUMINUM, ILSCO GBL-4SS-EC",
+    "description": "Ilsco aluminum lay-in ground lug, 4 AWG, stainless set screw, pack of 4, UL 486A-486B listed",
+    "manufacturer": "Ilsco",
+    "manufacturerPartNumber": "GBL-4SS-EC",
+    "spec": {
+      "lugType": "Mechanical",
+      "connectionType": "Mechanical",
+      "material": "Aluminum/Copper (AL9CU)",
+      "wireRange": "#4 AWG",
+      "numBarrels": "Single",
+      "holes": 1,
+      "voltageRating": "600V",
+      "ulListing": "UL 486A-486B"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G201981655",
+        "price": 14.22,
+        "currency": "USD",
+        "url": "https://www.zoro.com/ilsco-aluminum-lay-in-ground-lug-onduct-pk4-gbl-4ss-ec/i/G201981655/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.zoro.com/ilsco-aluminum-lay-in-ground-lug-onduct-pk4-gbl-4ss-ec/i/G201981655/",
+    "qualityRating": 4,
+    "popularity": 3
+  },
+  {
+    "category": "LUGS",
+    "name": "LUG, MECHANICAL, SINGLE-BARREL, 4 AWG, 50PK, ILSCO SGB-4",
+    "description": "Ilsco SGB-series mechanical lug, set screw, aluminum/copper rated, #4 AWG, pack of 50, UL 486A-486B listed",
+    "manufacturer": "Ilsco",
+    "manufacturerPartNumber": "SGB-4",
+    "spec": {
+      "lugType": "Mechanical",
+      "connectionType": "Mechanical",
+      "material": "Aluminum/Copper (AL9CU)",
+      "wireRange": "#4 AWG",
+      "numBarrels": "Single",
+      "holes": 1,
+      "voltageRating": "600V",
+      "ulListing": "UL 486A-486B"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G816524865",
+        "price": 32.50,
+        "currency": "USD",
+        "url": "https://www.zoro.com/ilsco-lugs-50pk-sgb-4/i/G816524865/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.zoro.com/ilsco-lugs-50pk-sgb-4/i/G816524865/",
+    "qualityRating": 4,
+    "popularity": 3
+  },
+  {
+    "category": "LUGS",
+    "name": "LUG, COMPRESSION, SURECRIMP, 2/0-3/8, COPPER, ILSCO CSWS-2/0-38-EC",
+    "description": "Ilsco SureCrimp copper compression lug, 2/0 AWG, 3/8 in stud, pack of 3, UL 486A-486B listed",
+    "manufacturer": "Ilsco",
+    "manufacturerPartNumber": "CSWS-2/0-38-EC",
+    "spec": {
+      "lugType": "Compression",
+      "connectionType": "Compression",
+      "material": "Copper",
+      "wireRange": "#2/0 AWG",
+      "numBarrels": "Single",
+      "holes": 1,
+      "holeDiameterIn": 0.44,
+      "voltageRating": "600V",
+      "ulListing": "UL 486A-486B",
+      "csaListing": "CSA C22.2 No. 65"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G301981579",
+        "price": 16.88,
+        "currency": "USD",
+        "url": "https://www.zoro.com/ilsco-surecrimp-copper-compression-lug-pk3-csws-20-38-ec/i/G301981579/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.zoro.com/ilsco-surecrimp-copper-compression-lug-pk3-csws-20-38-ec/i/G301981579/",
+    "qualityRating": 4,
+    "popularity": 3
+  },
+  {
+    "category": "LUGS",
+    "name": "LUG, MECHANICAL, 2-HOLE, 350-6 AWG, ALUMINUM, ILSCO TA-350",
+    "description": "Ilsco TA-series ClearChoice mechanical terminal lug, dual-rated AL/CU, 350-6 AWG, tin-plated, UL 486A-486B listed, CSA C22.2 No. 65",
+    "manufacturer": "Ilsco",
+    "manufacturerPartNumber": "TA-350",
+    "spec": {
+      "lugType": "Mechanical",
+      "connectionType": "Mechanical",
+      "material": "Aluminum/Copper (AL9CU)",
+      "wireRange": "#6 to 350 kcmil",
+      "numBarrels": "Single",
+      "holes": 2,
+      "voltageRating": "600V",
+      "ulListing": "UL 486A-486B",
+      "csaListing": "CSA C22.2 No. 65"
+    },
+    "productUrl": "https://www.mainelectricsupply.com/itemdetail/ILSTA350",
+    "qualityRating": 4,
+    "popularity": 4
+  },
+  {
+    "category": "LUGS",
+    "name": "LUG, MECHANICAL, COPPER OFFSET, 35 AWG, ILSCO SLU-35-EC",
+    "description": "Ilsco copper mechanical lug, offset style, pack of 15, small conductor range, UL 486A-486B listed",
+    "manufacturer": "Ilsco",
+    "manufacturerPartNumber": "SLU-35-EC",
+    "spec": {
+      "lugType": "Mechanical",
+      "connectionType": "Mechanical",
+      "material": "Copper",
+      "wireRange": "Small AWG",
+      "numBarrels": "Single",
+      "holes": 1,
+      "voltageRating": "600V",
+      "ulListing": "UL 486A-486B"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G802016923",
+        "price": 11.54,
+        "currency": "USD",
+        "url": "https://www.zoro.com/ilsco-copper-mechanical-lug-offset-cond-pk15-slu-35-ec/i/G802016923/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.zoro.com/ilsco-copper-mechanical-lug-offset-cond-pk15-slu-35-ec/i/G802016923/",
+    "qualityRating": 4,
+    "popularity": 3
+  },
+  {
+    "category": "LUGS",
+    "name": "LUG, COMPRESSION, 2-HOLE, 1/0 AWG, COPPER, BURNDY YA25L2TC14",
+    "description": "Burndy HYLUG two-hole compression lug, copper, 1/0 AWG, 1/4 in stud, standard barrel, UL 486A-486B listed",
+    "manufacturer": "Burndy (Hubbell)",
+    "manufacturerPartNumber": "YA25L2TC14",
+    "spec": {
+      "lugType": "Compression",
+      "connectionType": "Compression",
+      "material": "Copper",
+      "wireRange": "#1/0 AWG",
+      "numBarrels": "Single",
+      "holes": 2,
+      "holeDiameterIn": 0.31,
+      "holeSpacingIn": 1.375,
+      "voltageRating": "600V",
+      "ulListing": "UL 486A-486B"
+    },
+    "productUrl": "https://www.zoro.com/burndy-two-hole-lug-compression-connector-1-0-awg-ya25l2tc14/i/",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "LUGS",
+    "name": "LUG, COMPRESSION, 2-HOLE, 4 AWG, COPPER, BURNDY YA4C2TC14",
+    "description": "Burndy HYLUG two-hole compression lug, copper, 4 AWG, 1/4 in stud, standard barrel, UL 486A-486B listed",
+    "manufacturer": "Burndy (Hubbell)",
+    "manufacturerPartNumber": "YA4C2TC14",
+    "spec": {
+      "lugType": "Compression",
+      "connectionType": "Compression",
+      "material": "Copper",
+      "wireRange": "#4 AWG",
+      "numBarrels": "Single",
+      "holes": 2,
+      "holeDiameterIn": 0.31,
+      "holeSpacingIn": 1.0,
+      "voltageRating": "600V",
+      "ulListing": "UL 486A-486B"
+    },
+    "productUrl": "https://www.zoro.com/burndy-two-hole-lug-compression-connector-4-awg-ya4c2tc14/i/",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "LUGS",
+    "name": "LUG, COMPRESSION, 1-HOLE, 10 AWG, ALUMINUM, BURNDY YA25A9",
+    "description": "Burndy HYLUG one-hole aluminum compression lug, no inspection window, 10 AWG, UL 486A-486B listed, AL9CU dual rated",
+    "manufacturer": "Burndy (Hubbell)",
+    "manufacturerPartNumber": "YA25A9",
+    "spec": {
+      "lugType": "Compression",
+      "connectionType": "Compression",
+      "material": "Aluminum/Copper (AL9CU)",
+      "wireRange": "#10 AWG",
+      "numBarrels": "Single",
+      "holes": 1,
+      "voltageRating": "600V",
+      "ulListing": "UL 486A-486B"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G002438877",
+        "price": 3.21,
+        "currency": "USD",
+        "url": "https://www.zoro.com/burndy-aluminum-compression-lug-1-hole-wo-inspection-window-10-awg-12-ya25a9/i/G002438877/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.zoro.com/burndy-aluminum-compression-lug-1-hole-wo-inspection-window-10-awg-12-ya25a9/i/G002438877/",
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "LUGS",
+    "name": "LUG, COMPRESSION, 1-HOLE, 2 AWG, COPPER, BURNDY YAV2CL3",
+    "description": "Burndy HYLUG one-hole compression lug, copper, 2 AWG max, #10 stud, standard barrel, UL 486A-486B listed",
+    "manufacturer": "Burndy (Hubbell)",
+    "manufacturerPartNumber": "YAV2CL3",
+    "spec": {
+      "lugType": "Compression",
+      "connectionType": "Compression",
+      "material": "Copper",
+      "wireRange": "#2 AWG",
+      "numBarrels": "Single",
+      "holes": 1,
+      "holeDiameterIn": 0.22,
+      "voltageRating": "600V",
+      "ulListing": "UL 486A-486B"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Zoro",
+        "sku": "G909824261",
+        "price": 8.92,
+        "currency": "USD",
+        "url": "https://www.zoro.com/burndy-one-hole-compression-lug-2-awg-max-10-stud-standard-barrel-copper-none-yav2cl3/i/G909824261/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "productUrl": "https://www.zoro.com/burndy-one-hole-compression-lug-2-awg-max-10-stud-standard-barrel-copper-none-yav2cl3/i/G909824261/",
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "LUGS",
+    "name": "LUG, COMPRESSION, 2-HOLE, 2 AWG, COPPER, BURNDY YA2CL2TC14",
+    "description": "Burndy HYLUG two-hole compression lug, copper, 2 AWG, 1/4 in stud, standard barrel, UL 486A-486B listed",
+    "manufacturer": "Burndy (Hubbell)",
+    "manufacturerPartNumber": "YA2CL2TC14",
+    "spec": {
+      "lugType": "Compression",
+      "connectionType": "Compression",
+      "material": "Copper",
+      "wireRange": "#2 AWG",
+      "numBarrels": "Single",
+      "holes": 2,
+      "holeDiameterIn": 0.31,
+      "holeSpacingIn": 1.0,
+      "voltageRating": "600V",
+      "ulListing": "UL 486A-486B"
+    },
+    "productUrl": "https://www.zoro.com/burndy-two-hole-compression-lug-2-awg-ya2cl2tc14/i/",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "LUGS",
+    "name": "LUG, COMPRESSION, 2-HOLE, 2/0 AWG, ALUMINUM, BURNDY YAV4CL2NT10FX",
+    "description": "Burndy HYLUG two-hole compression lug, dual rated, 4 AWG, 10-32 stud, standard barrel, UL 486A-486B listed",
+    "manufacturer": "Burndy (Hubbell)",
+    "manufacturerPartNumber": "YAV4CL2NT10FX",
+    "spec": {
+      "lugType": "Compression",
+      "connectionType": "Compression",
+      "material": "Aluminum/Copper (AL9CU)",
+      "wireRange": "#4 AWG",
+      "numBarrels": "Single",
+      "holes": 2,
+      "voltageRating": "600V",
+      "ulListing": "UL 486A-486B"
+    },
+    "productUrl": "https://www.zoro.com/burndy-two-hole-lug-compression-connector-4-awg-yav4cl2nt10fx/i/G4679367/",
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "LUGS",
+    "name": "LUG, COMPRESSION, 2-HOLE, 750 KCMIL, COPPER, BURNDY YAZ392NNT",
+    "description": "Burndy two-hole compression lug, copper, 750 kcmil, long barrel, UL 486A-486B listed",
+    "manufacturer": "Burndy (Hubbell)",
+    "manufacturerPartNumber": "YAZ392NNT",
+    "spec": {
+      "lugType": "Compression",
+      "connectionType": "Compression",
+      "material": "Copper",
+      "wireRange": "750 kcmil",
+      "numBarrels": "Single",
+      "holes": 2,
+      "voltageRating": "600V",
+      "ulListing": "UL 486A-486B"
+    },
+    "productUrl": "https://www.zoro.com/burndy-two-hole-lug-compress-conct-750-kcmil-yaz392nnt/i/",
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "LUGS",
+    "name": "LUG, MECHANICAL, 4-HOLE, 350-6 AWG, ALUMINUM, ILSCO T4A4-350N",
+    "description": "Ilsco 4-conductor mechanical lug, aluminum, 350-6 AWG, tin-plated, 4-port tap, UL 486A-486B listed",
+    "manufacturer": "Ilsco",
+    "manufacturerPartNumber": "T4A4-350N",
+    "spec": {
+      "lugType": "Mechanical",
+      "connectionType": "Mechanical",
+      "material": "Aluminum/Copper (AL9CU)",
+      "wireRange": "#6 to 350 kcmil",
+      "numBarrels": "4 (tap)",
+      "holes": 2,
+      "voltageRating": "600V",
+      "ulListing": "UL 486A-486B"
+    },
+    "productUrl": "https://www.platt.com/p/0029385/ilsco/mechanical-lug-350-6-aluminum/783669912203/ilst4a4350n",
+    "qualityRating": 4,
+    "popularity": 3
+  },
+  {
+    "category": "LUGS",
+    "name": "LUG, COMPRESSION, 2-HOLE, 1/0 AWG, COPPER, BURNDY YA25L2TC14-MAIN",
+    "description": "Burndy two-hole compression lug, copper, 1/0 AWG, standard barrel, main board application, UL 486A-486B listed",
+    "manufacturer": "Burndy (Hubbell)",
+    "manufacturerPartNumber": "YA25L2TC14",
+    "spec": {
+      "lugType": "Compression",
+      "connectionType": "Compression",
+      "material": "Copper",
+      "wireRange": "#1/0 AWG",
+      "numBarrels": "Single",
+      "holes": 2,
+      "holeDiameterIn": 0.31,
+      "holeSpacingIn": 1.375,
+      "voltageRating": "600V",
+      "ulListing": "UL 486A-486B"
+    },
+    "productUrl": "https://www.zoro.com/burndy-two-hole-lug-compression-connector-1-0-awg-ya25l2tc14/i/",
+    "qualityRating": 5,
+    "popularity": 5
+  }
+]

@@ -1,0 +1,351 @@
+[
+  {
+    "category": "GLASTIC",
+    "name": "GLASTIC, GPO-3, SHEET, RED, 0.125 IN x 48 IN x 96 IN, ROCHLING W01-01510",
+    "description": "Rochling (Glastic) GPO-3 thermoset polyester sheet, red, 0.125 in thick x 48 in x 96 in, UL 94 V-0 flame rated, arc and track resistant, electrical insulation grade. Used for phase barriers, bus support fabrication, switchboard insulation panels.",
+    "manufacturer": "Rochling (Glastic)",
+    "manufacturerPartNumber": "W01-01510",
+    "spec": {
+      "material": "GPO-3",
+      "grade": "UTR (Rochling Glastic UTR series)",
+      "thicknessIn": 0.125,
+      "widthIn": 48,
+      "lengthIn": 96,
+      "color": "Red",
+      "dielectricStrength": 200,
+      "flameRating": "UL 94 V-0",
+      "temperatureIndexC": 120,
+      "form": "Sheet",
+      "ulRecognized": "Yes"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Curbell Plastics",
+        "sku": "W01-01510",
+        "price": 202.48,
+        "currency": "USD",
+        "url": "https://www.curbellplastics.com/product/w01-01510/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 202.48,
+    "imageUrl": "https://www.curbellplastics.com/wp-content/uploads/2022/11/GPO-3-sheet-2028x1544.jpg-1.jpeg",
+    "productUrl": "https://www.curbellplastics.com/product/w01-01510/",
+    "datasheetUrl": "https://www.curbellplastics.com/wp-content/uploads/2024/06/Rochling-Glastic-UTR-Data-Sheet.pdf",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "GLASTIC",
+    "name": "GLASTIC, GPO-3, SHEET, RED, 0.25 IN x 48 IN x 96 IN, ROCHLING W01-01516",
+    "description": "Rochling (Glastic) GPO-3 thermoset polyester sheet, red, 0.25 in thick x 48 in x 96 in, UL 94 V-0 flame rated. Standard thickness for switchboard phase barriers.",
+    "manufacturer": "Rochling (Glastic)",
+    "manufacturerPartNumber": "W01-01516",
+    "spec": {
+      "material": "GPO-3",
+      "grade": "UTR (Rochling Glastic UTR series)",
+      "thicknessIn": 0.25,
+      "widthIn": 48,
+      "lengthIn": 96,
+      "color": "Red",
+      "dielectricStrength": 200,
+      "flameRating": "UL 94 V-0",
+      "temperatureIndexC": 120,
+      "form": "Sheet",
+      "ulRecognized": "Yes"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Curbell Plastics",
+        "sku": "W01-01516",
+        "price": 425.00,
+        "currency": "USD",
+        "url": "https://www.curbellplastics.com/product/w01-01516/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "imageUrl": "https://www.curbellplastics.com/wp-content/uploads/2022/11/GPO-3-sheet-2028x1544.jpg-1.jpeg",
+    "productUrl": "https://www.curbellplastics.com/product/w01-01516/",
+    "datasheetUrl": "https://www.curbellplastics.com/wp-content/uploads/2024/06/Rochling-Glastic-UTR-Data-Sheet.pdf",
+    "qualityRating": 5,
+    "popularity": 5
+  },
+  {
+    "category": "GLASTIC",
+    "name": "GLASTIC, GPO-3, SHEET, RED, 0.312 IN x 36 IN x 72 IN, ROCHLING W01-01517",
+    "description": "Rochling (Glastic) GPO-3 thermoset polyester sheet, red, 5/16 in thick x 36 in x 72 in, UL 94 V-0 flame rated. Common switchboard phase barrier thickness.",
+    "manufacturer": "Rochling (Glastic)",
+    "manufacturerPartNumber": "W01-01517",
+    "spec": {
+      "material": "GPO-3",
+      "grade": "UTR (Rochling Glastic UTR series)",
+      "thicknessIn": 0.312,
+      "widthIn": 36,
+      "lengthIn": 72,
+      "color": "Red",
+      "dielectricStrength": 200,
+      "flameRating": "UL 94 V-0",
+      "temperatureIndexC": 120,
+      "form": "Sheet",
+      "ulRecognized": "Yes"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Curbell Plastics",
+        "sku": "W01-01517",
+        "price": 385.00,
+        "currency": "USD",
+        "url": "https://www.curbellplastics.com/Shop-Materials/Product/GPO-3-Thermoset-Sheet/W01-01517/GPO-3-Thermoset-Sheet-Red-(0-312-in-x-36-in-x-72-in)",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "imageUrl": "https://www.curbellplastics.com/wp-content/uploads/2022/11/GPO-3-sheet-2028x1544.jpg-1.jpeg",
+    "productUrl": "https://www.curbellplastics.com/Shop-Materials/Product/GPO-3-Thermoset-Sheet/W01-01517/GPO-3-Thermoset-Sheet-Red-(0-312-in-x-36-in-x-72-in)",
+    "datasheetUrl": "https://www.curbellplastics.com/wp-content/uploads/2024/06/Rochling-Glastic-UTR-Data-Sheet.pdf",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "GLASTIC",
+    "name": "GLASTIC, GPO-3, SHEET, RED, 0.5 IN x 48 IN x 96 IN, ROCHLING W01-01520",
+    "description": "Rochling (Glastic) GPO-3 thermoset polyester sheet, red, 0.5 in thick x 48 in x 96 in, UL 94 V-0 flame rated. Used for bus support blocks and heavier phase barriers.",
+    "manufacturer": "Rochling (Glastic)",
+    "manufacturerPartNumber": "W01-01520",
+    "spec": {
+      "material": "GPO-3",
+      "grade": "UTR (Rochling Glastic UTR series)",
+      "thicknessIn": 0.5,
+      "widthIn": 48,
+      "lengthIn": 96,
+      "color": "Red",
+      "dielectricStrength": 200,
+      "flameRating": "UL 94 V-0",
+      "temperatureIndexC": 120,
+      "form": "Sheet",
+      "ulRecognized": "Yes"
+    },
+    "productUrl": "https://www.curbellplastics.com/product-category/material/gpo-3-thermoset/",
+    "imageUrl": "https://www.curbellplastics.com/wp-content/uploads/2022/11/GPO-3-sheet-2028x1544.jpg-1.jpeg",
+    "datasheetUrl": "https://www.curbellplastics.com/wp-content/uploads/2024/06/Rochling-Glastic-UTR-Data-Sheet.pdf",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "GLASTIC",
+    "name": "GLASTIC, GPO-3, SHEET, RED, 0.75 IN x 48 IN x 96 IN, ROCHLING W01-01525",
+    "description": "Rochling (Glastic) GPO-3 thermoset polyester sheet, red, 0.75 in thick x 48 in x 96 in, also known as Red Barrier Board. Used for structural bus supports and phase barriers in switchgear.",
+    "manufacturer": "Rochling (Glastic)",
+    "manufacturerPartNumber": "W01-01525",
+    "spec": {
+      "material": "GPO-3",
+      "grade": "UTR (Rochling Glastic UTR series)",
+      "thicknessIn": 0.75,
+      "widthIn": 48,
+      "lengthIn": 96,
+      "color": "Red",
+      "dielectricStrength": 190,
+      "flameRating": "UL 94 V-0",
+      "temperatureIndexC": 120,
+      "form": "Sheet",
+      "ulRecognized": "Yes"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Curbell Plastics",
+        "sku": "W01-01525",
+        "price": 1516.94,
+        "currency": "USD",
+        "url": "https://www.curbellplastics.com/product/w01-01525/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 1516.94,
+    "imageUrl": "https://www.curbellplastics.com/wp-content/uploads/2022/11/GPO-3-sheet-2028x1544.jpg-1.jpeg",
+    "productUrl": "https://www.curbellplastics.com/product/w01-01525/",
+    "datasheetUrl": "https://www.curbellplastics.com/wp-content/uploads/2024/06/Rochling-Glastic-UTR-Data-Sheet.pdf",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "GLASTIC",
+    "name": "GLASTIC, GPO-3, SHEET, RED, 1 IN x 48 IN x 96 IN, ROCHLING W01-01527",
+    "description": "Rochling (Glastic) GPO-3 thermoset polyester sheet, red, 1 in thick x 48 in x 96 in, also known as Red Barrier Board. Used for structural bus supports, standoffs and spacers in 15kV class switchboards.",
+    "manufacturer": "Rochling (Glastic)",
+    "manufacturerPartNumber": "W01-01527",
+    "spec": {
+      "material": "GPO-3",
+      "grade": "UTR (Rochling Glastic UTR series)",
+      "thicknessIn": 1.0,
+      "widthIn": 48,
+      "lengthIn": 96,
+      "color": "Red",
+      "dielectricStrength": 180,
+      "flameRating": "UL 94 V-0",
+      "temperatureIndexC": 120,
+      "form": "Sheet",
+      "ulRecognized": "Yes"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Curbell Plastics",
+        "sku": "W01-01527",
+        "price": 1869.46,
+        "currency": "USD",
+        "url": "https://www.curbellplastics.com/product/w01-01527/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 1869.46,
+    "imageUrl": "https://www.curbellplastics.com/wp-content/uploads/2022/11/GPO-3-sheet-2028x1544.jpg-1.jpeg",
+    "productUrl": "https://www.curbellplastics.com/product/w01-01527/",
+    "datasheetUrl": "https://www.curbellplastics.com/wp-content/uploads/2024/06/Rochling-Glastic-UTR-Data-Sheet.pdf",
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "GLASTIC",
+    "name": "GLASTIC, GPO-3, SHEET, RED, 1.25 IN x 48 IN x 96 IN, ROCHLING W01-01529",
+    "description": "Rochling (Glastic) GPO-3 thermoset polyester sheet, red, 1.25 in thick x 48 in x 96 in, UL 94 V-0 flame rated. Heavy structural bus support fabrication stock.",
+    "manufacturer": "Rochling (Glastic)",
+    "manufacturerPartNumber": "W01-01529",
+    "spec": {
+      "material": "GPO-3",
+      "grade": "UTR (Rochling Glastic UTR series)",
+      "thicknessIn": 1.25,
+      "widthIn": 48,
+      "lengthIn": 96,
+      "color": "Red",
+      "dielectricStrength": 170,
+      "flameRating": "UL 94 V-0",
+      "temperatureIndexC": 120,
+      "form": "Sheet",
+      "ulRecognized": "Yes"
+    },
+    "productUrl": "https://www.curbellplastics.com/product/w01-01529/",
+    "imageUrl": "https://www.curbellplastics.com/wp-content/uploads/2022/11/GPO-3-sheet-2028x1544.jpg-1.jpeg",
+    "datasheetUrl": "https://www.curbellplastics.com/wp-content/uploads/2024/06/Rochling-Glastic-UTR-Data-Sheet.pdf",
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "GLASTIC",
+    "name": "GLASTIC, GPO-3, SHEET, RED, 1.5 IN x 48 IN x 96 IN, ROCHLING W01-01531",
+    "description": "Rochling (Glastic) GPO-3 thermoset polyester sheet, red, 1.5 in thick x 48 in x 96 in, UL 94 V-0 flame rated. Used for heavy bus support blocks and spacers.",
+    "manufacturer": "Rochling (Glastic)",
+    "manufacturerPartNumber": "W01-01531",
+    "spec": {
+      "material": "GPO-3",
+      "grade": "UTR (Rochling Glastic UTR series)",
+      "thicknessIn": 1.5,
+      "widthIn": 48,
+      "lengthIn": 96,
+      "color": "Red",
+      "dielectricStrength": 160,
+      "flameRating": "UL 94 V-0",
+      "temperatureIndexC": 120,
+      "form": "Sheet",
+      "ulRecognized": "Yes"
+    },
+    "productUrl": "https://www.curbellplastics.com/product/w01-01531/",
+    "imageUrl": "https://www.curbellplastics.com/wp-content/uploads/2022/11/GPO-3-sheet-2028x1544.jpg-1.jpeg",
+    "datasheetUrl": "https://www.curbellplastics.com/wp-content/uploads/2024/06/Rochling-Glastic-UTR-Data-Sheet.pdf",
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "GLASTIC",
+    "name": "GLASTIC, GPO-3, SHEET, RED, 2.75 IN x 36 IN x 72 IN, ROCHLING W01-06776",
+    "description": "Rochling (Glastic) GPO-3 thermoset polyester sheet, red, 2.75 in thick x 36 in x 72 in, UL 94 V-0. Extra heavy stock for machined bus support blocks and standoff insulators.",
+    "manufacturer": "Rochling (Glastic)",
+    "manufacturerPartNumber": "W01-06776",
+    "spec": {
+      "material": "GPO-3",
+      "grade": "UTR (Rochling Glastic UTR series)",
+      "thicknessIn": 2.75,
+      "widthIn": 36,
+      "lengthIn": 72,
+      "color": "Red",
+      "dielectricStrength": 140,
+      "flameRating": "UL 94 V-0",
+      "temperatureIndexC": 120,
+      "form": "Sheet",
+      "ulRecognized": "Yes"
+    },
+    "productUrl": "https://www.curbellplastics.com/product/w01-06776/",
+    "imageUrl": "https://www.curbellplastics.com/wp-content/uploads/2022/11/GPO-3-sheet-2028x1544.jpg-1.jpeg",
+    "datasheetUrl": "https://www.curbellplastics.com/wp-content/uploads/2024/06/Rochling-Glastic-UTR-Data-Sheet.pdf",
+    "qualityRating": 5,
+    "popularity": 2
+  },
+  {
+    "category": "GLASTIC",
+    "name": "GLASTIC, GPO-3, SHEET, RED, 0.0625 IN x 48 IN x 96 IN, ROCHLING W01-01511",
+    "description": "Rochling (Glastic) GPO-3 thermoset polyester sheet, red, 1/16 in thick x 48 in x 96 in, UL 94 V-0 flame rated. Thin sheet for flexible phase barriers and slot liners.",
+    "manufacturer": "Rochling (Glastic)",
+    "manufacturerPartNumber": "W01-01511",
+    "spec": {
+      "material": "GPO-3",
+      "grade": "UTR (Rochling Glastic UTR series)",
+      "thicknessIn": 0.0625,
+      "widthIn": 48,
+      "lengthIn": 96,
+      "color": "Red",
+      "dielectricStrength": 220,
+      "flameRating": "UL 94 V-0",
+      "temperatureIndexC": 120,
+      "form": "Sheet",
+      "ulRecognized": "Yes"
+    },
+    "productUrl": "https://www.curbellplastics.com/product/W01-01511/",
+    "imageUrl": "https://www.curbellplastics.com/wp-content/uploads/2022/11/GPO-3-sheet-2028x1544.jpg-1.jpeg",
+    "datasheetUrl": "https://www.curbellplastics.com/wp-content/uploads/2024/06/Rochling-Glastic-UTR-Data-Sheet.pdf",
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "GLASTIC",
+    "name": "GLASTIC, GPO-3, SHEET, RED, PIEDMONT PLASTICS STOCK",
+    "description": "GPO-3 thermoset polyester sheet stock, red, various thicknesses, available through Piedmont Plastics. Glass fiber reinforced thermoset polyester, UL 94 V-0, excellent arc and track resistance for switchboard bus support and phase barriers.",
+    "manufacturer": "Rochling (Glastic)",
+    "manufacturerPartNumber": "GPO-3-RED-SHEET",
+    "spec": {
+      "material": "GPO-3",
+      "grade": "GPO-3 per NEMA LI-1",
+      "thicknessIn": 0.25,
+      "widthIn": 48,
+      "lengthIn": 96,
+      "color": "Red",
+      "dielectricStrength": 200,
+      "flameRating": "UL 94 V-0",
+      "temperatureIndexC": 120,
+      "form": "Sheet",
+      "ulRecognized": "Yes"
+    },
+    "productUrl": "https://www.piedmontplastics.com/products/gpo-3",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "GLASTIC",
+    "name": "GLASTIC, GPO-3, SHEET, RED, PROFESSIONAL PLASTICS STOCK",
+    "description": "GPO-3 thermoset polyester sheet stock available from Professional Plastics in various thicknesses and sizes. Electrical grade, UL 94 V-0 listed, for switchboard phase barriers, bus supports, and terminal barriers.",
+    "manufacturer": "Rochling (Glastic)",
+    "manufacturerPartNumber": "GPO-3-RED-PROFPLASTICS",
+    "spec": {
+      "material": "GPO-3",
+      "grade": "GPO-3 per NEMA LI-1",
+      "thicknessIn": 0.25,
+      "widthIn": 48,
+      "lengthIn": 96,
+      "color": "Red",
+      "dielectricStrength": 200,
+      "flameRating": "UL 94 V-0",
+      "temperatureIndexC": 120,
+      "form": "Sheet",
+      "ulRecognized": "Yes"
+    },
+    "productUrl": "https://www.professionalplastics.com/GPO-3SHEET",
+    "qualityRating": 4,
+    "popularity": 3
+  }
+]

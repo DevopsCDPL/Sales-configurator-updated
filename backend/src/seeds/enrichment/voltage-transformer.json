@@ -1,0 +1,392 @@
+[
+  {
+    "category": "VOLTAGE TRANSFORMER",
+    "name": "CPT, 100VA, PRI 240X480/SEC 120V, SQUARE D 9070TF100D1",
+    "description": "Square D Class 9070 Type TF industrial control power transformer, 100VA, 240x480V primary, 120V secondary, 1-phase, 50/60Hz, open frame with fuse blocks, UL Listed",
+    "manufacturer": "Square D",
+    "manufacturerPartNumber": "9070TF100D1",
+    "spec": {
+      "transformerType": "CPT",
+      "voltageRating": "240/480V",
+      "secondaryVoltage": "120V",
+      "vaRating": 100,
+      "ptRatio": "4:1",
+      "phases": "1-phase",
+      "mounting": "Panel/bolt-mount",
+      "enclosureType": "Open frame",
+      "primaryFusing": "Integral fuse blocks",
+      "series": "9070 Type TF",
+      "ulListing": "UL 506"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Grainger",
+        "sku": "4R904",
+        "price": 233.62,
+        "currency": "USD",
+        "url": "https://www.grainger.com/product/SQUARE-D-Control-Transformer-Fused-4R904",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 233.62,
+    "productUrl": "https://www.grainger.com/product/SQUARE-D-Control-Transformer-Fused-4R904",
+    "qualityRating": 5,
+    "popularity": 5
+  },
+  {
+    "category": "VOLTAGE TRANSFORMER",
+    "name": "CPT, 150VA, PRI 240X480/SEC 120V, SQUARE D 9070TF150D1",
+    "description": "Square D Class 9070 Type TF industrial control power transformer, 150VA, 240x480V primary, 120V secondary, 1-phase, open frame with fuse blocks, UL Listed",
+    "manufacturer": "Square D",
+    "manufacturerPartNumber": "9070TF150D1",
+    "spec": {
+      "transformerType": "CPT",
+      "voltageRating": "240/480V",
+      "secondaryVoltage": "120V",
+      "vaRating": 150,
+      "phases": "1-phase",
+      "mounting": "Panel/bolt-mount",
+      "enclosureType": "Open frame",
+      "primaryFusing": "Integral fuse blocks",
+      "series": "9070 Type TF",
+      "ulListing": "UL 506"
+    },
+    "vendorOffers": [],
+    "productUrl": "https://www.simplybreakers.com/products/square-d-industrial-control-9070tf150d1",
+    "qualityRating": 5,
+    "popularity": 5
+  },
+  {
+    "category": "VOLTAGE TRANSFORMER",
+    "name": "CPT, 500VA, PRI 240X480/SEC 120V, SQUARE D 9070TF500D1",
+    "description": "Square D Class 9070 Type TF industrial control power transformer, 500VA, 240x480V primary, 120V secondary, 1-phase, open frame with fuse blocks, UL Listed",
+    "manufacturer": "Square D",
+    "manufacturerPartNumber": "9070TF500D1",
+    "spec": {
+      "transformerType": "CPT",
+      "voltageRating": "240/480V",
+      "secondaryVoltage": "120V",
+      "vaRating": 500,
+      "phases": "1-phase",
+      "mounting": "Panel/bolt-mount",
+      "enclosureType": "Open frame",
+      "primaryFusing": "Integral fuse blocks",
+      "series": "9070 Type TF",
+      "ulListing": "UL 506"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Blackhawk Supply",
+        "sku": "9070TF500D1",
+        "price": 559.66,
+        "currency": "USD",
+        "url": "https://blackhawksupply.com/products/schneider-electric-9070tf500d1-industrial-control-transformer-500va-240-480v-120v",
+        "seenAt": "2026-06-13"
+      },
+      {
+        "vendor": "Zoro",
+        "sku": "G3251202",
+        "price": 559.66,
+        "currency": "USD",
+        "url": "https://www.zoro.com/square-d-control-transformer-500va-443-in-h-9070tf500d1/i/G3251202/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 559.66,
+    "productUrl": "https://blackhawksupply.com/products/schneider-electric-9070tf500d1-industrial-control-transformer-500va-240-480v-120v",
+    "qualityRating": 5,
+    "popularity": 5
+  },
+  {
+    "category": "VOLTAGE TRANSFORMER",
+    "name": "CPT, 1000VA, PRI 240X480/SEC 120V, SQUARE D 9070TF1000D1",
+    "description": "Square D Class 9070 Type TF industrial control power transformer, 1000VA, 240x480V primary, 120V secondary, 1-phase, open frame with fuse blocks, UL Listed",
+    "manufacturer": "Square D",
+    "manufacturerPartNumber": "9070TF1000D1",
+    "spec": {
+      "transformerType": "CPT",
+      "voltageRating": "240/480V",
+      "secondaryVoltage": "120V",
+      "kvaRating": 1.0,
+      "phases": "1-phase",
+      "mounting": "Panel/bolt-mount",
+      "enclosureType": "Open frame",
+      "primaryFusing": "Integral fuse blocks",
+      "series": "9070 Type TF",
+      "ulListing": "UL 506"
+    },
+    "vendorOffers": [],
+    "productUrl": "https://blackhawksupply.com/products/schneider-electric-9070t1000d1-industrial-control-transformer-500va-240-480v-120v",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "VOLTAGE TRANSFORMER",
+    "name": "CPT, 300VA, PRI 240X480/SEC 120V, SQUARE D 9070TF300D1",
+    "description": "Square D Class 9070 Type TF industrial control power transformer, 300VA, 240x480V primary, 120V secondary, 1-phase, open frame with integral fuse blocks, UL Listed",
+    "manufacturer": "Square D",
+    "manufacturerPartNumber": "9070TF300D1",
+    "spec": {
+      "transformerType": "CPT",
+      "voltageRating": "240/480V",
+      "secondaryVoltage": "120V",
+      "vaRating": 300,
+      "phases": "1-phase",
+      "mounting": "Panel/bolt-mount",
+      "enclosureType": "Open frame",
+      "primaryFusing": "Integral fuse blocks",
+      "series": "9070 Type TF",
+      "ulListing": "UL 506"
+    },
+    "vendorOffers": [],
+    "productUrl": "https://www.grainger.com/product/SQUARE-D-Trans-Fused-4R918",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "VOLTAGE TRANSFORMER",
+    "name": "VT, 480:120V, 75VA, 0.6 CLASS, SINGLE PHASE, FLEX-CORE 468-480",
+    "description": "Flex-Core Model 468 low voltage potential transformer, 480V:120V ratio, 75VA thermal rating at 30°C, 0.6% metering accuracy, 10kV BIL, 600V insulation class, 60Hz, thermoplastic encapsulated, ANSI C57.13",
+    "manufacturer": "Flex-Core",
+    "manufacturerPartNumber": "468-480",
+    "spec": {
+      "transformerType": "VT",
+      "voltageRating": "480V",
+      "secondaryVoltage": "120V",
+      "vaRating": 75,
+      "ptRatio": "4:1",
+      "accuracyClass": "0.6",
+      "phases": "1-phase",
+      "mounting": "Panel mount",
+      "enclosureType": "Potted thermoplastic",
+      "primaryFusing": "External fuse required",
+      "series": "468",
+      "ulListing": "UL Listed, ANSI C57.13"
+    },
+    "vendorOffers": [],
+    "productUrl": "https://www.flex-core.com/products/468-low-voltage-potential-transformers/",
+    "qualityRating": 5,
+    "popularity": 5
+  },
+  {
+    "category": "VOLTAGE TRANSFORMER",
+    "name": "VT, 277:120V, 75VA, 0.6 CLASS, SINGLE PHASE, FLEX-CORE 468-277",
+    "description": "Flex-Core Model 468 low voltage potential transformer, 277V:120V ratio, 75VA thermal rating at 30°C, 0.6% metering accuracy, 10kV BIL, 600V insulation class, 60Hz, line-to-neutral switchboard metering",
+    "manufacturer": "Flex-Core",
+    "manufacturerPartNumber": "468-277",
+    "spec": {
+      "transformerType": "VT",
+      "voltageRating": "277V",
+      "secondaryVoltage": "120V",
+      "vaRating": 75,
+      "ptRatio": "2.31:1",
+      "accuracyClass": "0.6",
+      "phases": "1-phase",
+      "mounting": "Panel mount",
+      "enclosureType": "Potted thermoplastic",
+      "primaryFusing": "External fuse required",
+      "series": "468",
+      "ulListing": "UL Listed, ANSI C57.13"
+    },
+    "vendorOffers": [],
+    "productUrl": "https://www.flex-core.com/products/468-low-voltage-potential-transformers/",
+    "qualityRating": 5,
+    "popularity": 5
+  },
+  {
+    "category": "VOLTAGE TRANSFORMER",
+    "name": "VT, 480:120V, 75VA, 0.6 CLASS, INDOOR, CROMPTON 468-480",
+    "description": "Crompton (TE Connectivity) Model 468 voltage transformer, 480V:120V, 0.6% metering class, 7.5VA, 600V, 10kV BIL, 60Hz, single-phase indoor VT for switchboard revenue metering",
+    "manufacturer": "Crompton",
+    "manufacturerPartNumber": "468-480",
+    "spec": {
+      "transformerType": "VT",
+      "voltageRating": "480V",
+      "secondaryVoltage": "120V",
+      "vaRating": 75,
+      "ptRatio": "4:1",
+      "accuracyClass": "0.6",
+      "phases": "1-phase",
+      "mounting": "Panel mount",
+      "enclosureType": "Potted/enclosed",
+      "primaryFusing": "External fuse required",
+      "series": "468",
+      "ulListing": "ANSI C57.13, 600V class"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "RS Components",
+        "sku": "73636517",
+        "price": 85.00,
+        "currency": "USD",
+        "url": "https://us.rs-online.com/product/crompton-instruments-te-connectivity-/468-480/73636517/",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 85.00,
+    "productUrl": "https://us.rs-online.com/product/crompton-instruments-te-connectivity-/468-480/73636517/",
+    "qualityRating": 4,
+    "popularity": 4
+  },
+  {
+    "category": "VOLTAGE TRANSFORMER",
+    "name": "CPT, 250VA, PRI 240X480/SEC 24V, SQUARE D 9070TF250D2",
+    "description": "Square D Class 9070 Type TF control power transformer, 250VA, 240x480V primary, 24V secondary, 1-phase, open frame with fuse blocks — for 24V control circuits",
+    "manufacturer": "Square D",
+    "manufacturerPartNumber": "9070TF250D2",
+    "spec": {
+      "transformerType": "CPT",
+      "voltageRating": "240/480V",
+      "secondaryVoltage": "24V",
+      "vaRating": 250,
+      "phases": "1-phase",
+      "mounting": "Panel/bolt-mount",
+      "enclosureType": "Open frame",
+      "primaryFusing": "Integral fuse blocks",
+      "series": "9070 Type TF",
+      "ulListing": "UL 506"
+    },
+    "vendorOffers": [],
+    "productUrl": "https://www.se.com/us/en/product/9070TF250D2/",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "VOLTAGE TRANSFORMER",
+    "name": "CPT, 1500VA, PRI 240X480/SEC 120V, SQUARE D 9070T1500D1",
+    "description": "Square D Class 9070 Type T industrial control transformer, 1500VA, 240x480V primary, 120V secondary, 1-phase, heavy-duty for large contactor banks",
+    "manufacturer": "Square D",
+    "manufacturerPartNumber": "9070T1500D1",
+    "spec": {
+      "transformerType": "CPT",
+      "voltageRating": "240/480V",
+      "secondaryVoltage": "120V",
+      "kvaRating": 1.5,
+      "phases": "1-phase",
+      "mounting": "Panel/bolt-mount",
+      "enclosureType": "Open frame",
+      "primaryFusing": "External fuse required",
+      "series": "9070 Type T",
+      "ulListing": "UL 506"
+    },
+    "vendorOffers": [],
+    "productUrl": "https://www.grainger.com/product/SQUARE-D-Transformer-4RM77",
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "VOLTAGE TRANSFORMER",
+    "name": "CPT, 750VA, PRI 240X480/SEC 120V, SQUARE D 9070TF750D1",
+    "description": "Square D Class 9070 Type TF control power transformer, 750VA, 240/480V primary, 120V secondary, 1-phase, open frame with fuse blocks",
+    "manufacturer": "Square D",
+    "manufacturerPartNumber": "9070TF750D1",
+    "spec": {
+      "transformerType": "CPT",
+      "voltageRating": "240/480V",
+      "secondaryVoltage": "120V",
+      "vaRating": 750,
+      "phases": "1-phase",
+      "mounting": "Panel/bolt-mount",
+      "enclosureType": "Open frame",
+      "primaryFusing": "Integral fuse blocks",
+      "series": "9070 Type TF",
+      "ulListing": "UL 506"
+    },
+    "vendorOffers": [],
+    "productUrl": "https://www.grainger.com/product/SQUARE-D-Control-Transformer-240V-AC-4R928",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "VOLTAGE TRANSFORMER",
+    "name": "CPT, 1KVA, PRI 480V/SEC 120V, HAMMOND HPS IMPERATOR TE1000",
+    "description": "Hammond Power Solutions 1kVA enclosed control power transformer, 480V primary, 120V secondary, 1-phase, encapsulated, UL 508 industrial control panel rated",
+    "manufacturer": "Hammond Power Solutions",
+    "manufacturerPartNumber": "TE1000",
+    "spec": {
+      "transformerType": "CPT",
+      "voltageRating": "480V",
+      "secondaryVoltage": "120V",
+      "kvaRating": 1.0,
+      "phases": "1-phase",
+      "mounting": "Panel mount",
+      "enclosureType": "Enclosed/encapsulated",
+      "primaryFusing": "External fuse required",
+      "series": "Imperator",
+      "ulListing": "UL 506, UL 508"
+    },
+    "vendorOffers": [],
+    "productUrl": "https://americas.hammondpowersolutions.com/products/control-automation/control-transformers",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "VOLTAGE TRANSFORMER",
+    "name": "CPT, 250VA, PRI 480V/SEC 120V, EATON C0250E2AFB",
+    "description": "Eaton MTE Series enclosed control power transformer, 250VA, 480V primary, 120V secondary, 1-phase, 60Hz, fuse block included, UL Listed",
+    "manufacturer": "Eaton",
+    "manufacturerPartNumber": "C0250E2AFB",
+    "spec": {
+      "transformerType": "CPT",
+      "voltageRating": "480V",
+      "secondaryVoltage": "120V",
+      "vaRating": 250,
+      "phases": "1-phase",
+      "mounting": "Panel/foot mount",
+      "enclosureType": "Open frame",
+      "primaryFusing": "Integral fuse blocks",
+      "series": "MTE",
+      "ulListing": "UL 506"
+    },
+    "vendorOffers": [],
+    "productUrl": "https://www.eaton.com",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "VOLTAGE TRANSFORMER",
+    "name": "CPT, 75VA, PRI 480V/SEC 120V, EATON C0075E2AFB",
+    "description": "Eaton MTE Series control power transformer, 75VA, 220/230/240x440/460/480V primary, 110/115/120V secondary, 1-phase, fuse block, panel mount",
+    "manufacturer": "Eaton",
+    "manufacturerPartNumber": "C0075E2AFB",
+    "spec": {
+      "transformerType": "CPT",
+      "voltageRating": "480V",
+      "secondaryVoltage": "120V",
+      "vaRating": 75,
+      "phases": "1-phase",
+      "mounting": "Panel/foot mount",
+      "enclosureType": "Open frame",
+      "primaryFusing": "Integral fuse blocks",
+      "series": "MTE",
+      "ulListing": "UL 506"
+    },
+    "vendorOffers": [],
+    "productUrl": "https://www.platt.com/p/0312878/eaton/transformer-75va-220-230-240x440-460-480-110-15-120-mte-series/786680420825/cutc0075e2afb",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "VOLTAGE TRANSFORMER",
+    "name": "CPT, 350VA, PRI 240X480/SEC 120V, SQUARE D 9070TF350D1",
+    "description": "Square D Class 9070 Type TF control power transformer, 350VA, 220/230/240x440/460/480V primary, 110/115/120V secondary, 1-phase, foot mount with fuse blocks",
+    "manufacturer": "Square D",
+    "manufacturerPartNumber": "9070TF350D1",
+    "spec": {
+      "transformerType": "CPT",
+      "voltageRating": "240/480V",
+      "secondaryVoltage": "120V",
+      "vaRating": 350,
+      "phases": "1-phase",
+      "mounting": "Foot mount",
+      "enclosureType": "Open frame",
+      "primaryFusing": "Integral fuse blocks",
+      "series": "9070 Type TF",
+      "ulListing": "UL 506"
+    },
+    "vendorOffers": [],
+    "productUrl": "https://www.grainger.com/product/SQUARE-D-Control-Transformer-220V-AC-4R920",
+    "qualityRating": 5,
+    "popularity": 3
+  }
+]

@@ -1,0 +1,340 @@
+[
+  {
+    "category": "POWER SUPPLY",
+    "name": "POWER SUPPLY, 24VDC, 5A, 120W, DIN RAIL, PHOENIX QUINT-PS/1AC/24DC/5 2866750",
+    "description": "Phoenix Contact QUINT series primary-switched DIN rail power supply, 24VDC 5A 120W, 85-264VAC input, SFB Technology (Selective Fuse Breaking), POWER BOOST to 10A, IP20, UL 508 Listed",
+    "manufacturer": "Phoenix Contact",
+    "manufacturerPartNumber": "2866750",
+    "spec": {
+      "outputVoltageVDC": 24,
+      "ratedCurrentA": 5,
+      "outputPowerW": 120,
+      "inputVoltageRange": "85-264 VAC / 110-350 VDC",
+      "inputPhases": "1-phase",
+      "mounting": "DIN rail TS35",
+      "protectionFeatures": "SFB (6x In trip), OCP, OVP, POWER BOOST",
+      "efficiency": 91,
+      "operatingTempC": "-25 to +70",
+      "approvals": "UL 508, cUL, CE",
+      "series": "QUINT"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "eBay",
+        "sku": "B0028YU592",
+        "price": 149.96,
+        "currency": "USD",
+        "url": "https://www.amazon.com/Phoenix-Contact-QUINT-PS-Supply-1-Phase/dp/B0028YU592",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 149.96,
+    "productUrl": "https://www.phoenixcontact.com/en-us/products/power-supply-quint-ps1ac24dc-5-2866750",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "POWER SUPPLY",
+    "name": "POWER SUPPLY, 24VDC, 20A, 480W, DIN RAIL, PHOENIX QUINT-PS/1AC/24DC/20 2866776",
+    "description": "Phoenix Contact QUINT series primary-switched DIN rail power supply, 24VDC 20A 480W, 85-264VAC input, SFB Technology, POWER BOOST to 40A, IP20, UL 508 Listed",
+    "manufacturer": "Phoenix Contact",
+    "manufacturerPartNumber": "2866776",
+    "spec": {
+      "outputVoltageVDC": 24,
+      "ratedCurrentA": 20,
+      "outputPowerW": 480,
+      "inputVoltageRange": "85-264 VAC / 110-350 VDC",
+      "inputPhases": "1-phase",
+      "mounting": "DIN rail TS35",
+      "protectionFeatures": "SFB (6x In trip), OCP, OVP, POWER BOOST",
+      "efficiency": 92,
+      "operatingTempC": "-25 to +70",
+      "approvals": "UL 508, cUL, CE",
+      "series": "QUINT"
+    },
+    "vendorOffers": [],
+    "productUrl": "https://www.phoenixcontact.com/en-us/products/power-supply-quint-ps1ac24dc20-2866776",
+    "qualityRating": 5,
+    "popularity": 4
+  },
+  {
+    "category": "POWER SUPPLY",
+    "name": "POWER SUPPLY, 24VDC, 40A, 960W, DIN RAIL, PHOENIX QUINT-PS/1AC/24DC/40 2866789",
+    "description": "Phoenix Contact QUINT series primary-switched DIN rail power supply, 24VDC 40A 960W, 85-264VAC input, SFB Technology, POWER BOOST to 80A, IP20, UL 508 Listed — high-load switchboard controls",
+    "manufacturer": "Phoenix Contact",
+    "manufacturerPartNumber": "2866789",
+    "spec": {
+      "outputVoltageVDC": 24,
+      "ratedCurrentA": 40,
+      "outputPowerW": 960,
+      "inputVoltageRange": "85-264 VAC / 110-350 VDC",
+      "inputPhases": "1-phase",
+      "mounting": "DIN rail TS35",
+      "protectionFeatures": "SFB (6x In trip), OCP, OVP, POWER BOOST",
+      "efficiency": 93,
+      "operatingTempC": "-25 to +70",
+      "approvals": "UL 508, cUL, CE",
+      "series": "QUINT"
+    },
+    "vendorOffers": [],
+    "productUrl": "https://www.phoenixcontact.com/en-us/products/power-supply-quint-ps1ac24dc40-2866789",
+    "qualityRating": 5,
+    "popularity": 3
+  },
+  {
+    "category": "POWER SUPPLY",
+    "name": "POWER SUPPLY, 24VDC, 10A, 240W, DIN RAIL, PULS CP10.241",
+    "description": "PULS CP10.241 single-phase DIN rail power supply, 24VDC 10A 240W, 95.2% efficiency, 39mm wide, 120/240VAC input, built-in boost function, UL 508 Listed",
+    "manufacturer": "PULS",
+    "manufacturerPartNumber": "CP10.241",
+    "spec": {
+      "outputVoltageVDC": 24,
+      "ratedCurrentA": 10,
+      "outputPowerW": 240,
+      "inputVoltageRange": "100-240 VAC",
+      "inputPhases": "1-phase",
+      "mounting": "DIN rail TS35",
+      "protectionFeatures": "OCP, OVP, thermal protection, boost function",
+      "efficiency": 95.2,
+      "operatingTempC": "-25 to +70",
+      "approvals": "UL 508, cUL, CE",
+      "series": "CP"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "DigiKey",
+        "sku": "CP10-241",
+        "price": 297.00,
+        "currency": "USD",
+        "url": "https://www.digikey.com/en/products/detail/puls-lp/CP10-241/6591556",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 297.00,
+    "productUrl": "https://products.pulspower.com/en/cp10-241.html",
+    "qualityRating": 4,
+    "popularity": 4
+  },
+  {
+    "category": "POWER SUPPLY",
+    "name": "POWER SUPPLY, 24VDC, 20A, 480W, DIN RAIL, PULS CP20.241",
+    "description": "PULS CP20.241 single-phase DIN rail power supply, 24VDC 20A 480W, high efficiency compact design, 100-240VAC input, UL 508 Listed",
+    "manufacturer": "PULS",
+    "manufacturerPartNumber": "CP20.241",
+    "spec": {
+      "outputVoltageVDC": 24,
+      "ratedCurrentA": 20,
+      "outputPowerW": 480,
+      "inputVoltageRange": "100-240 VAC",
+      "inputPhases": "1-phase",
+      "mounting": "DIN rail TS35",
+      "protectionFeatures": "OCP, OVP, thermal protection",
+      "efficiency": 95.0,
+      "operatingTempC": "-25 to +70",
+      "approvals": "UL 508, cUL, CE",
+      "series": "CP"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "DigiKey",
+        "sku": "CP20-241",
+        "price": 450.00,
+        "currency": "USD",
+        "url": "https://www.digikey.com/en/products/detail/puls-lp/CP20-241/8019575",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 450.00,
+    "productUrl": "https://products.pulspower.com/en/cp10-241.html",
+    "qualityRating": 4,
+    "popularity": 3
+  },
+  {
+    "category": "POWER SUPPLY",
+    "name": "POWER SUPPLY, 24VDC, 10A, 240W, DIN RAIL, SOLA SDN10-24-100P",
+    "description": "Sola/Hevi-Duty SDN-P series DIN rail power supply, 24VDC 10A 240W, 85-264VAC universal input, cULus Listed UL 508, IP20, short-circuit/overload/overvoltage protection",
+    "manufacturer": "Sola/Hevi-Duty",
+    "manufacturerPartNumber": "SDN10-24-100P",
+    "spec": {
+      "outputVoltageVDC": 24,
+      "ratedCurrentA": 10,
+      "outputPowerW": 240,
+      "inputVoltageRange": "85-264 VAC, 47-63 Hz",
+      "inputPhases": "1-phase",
+      "mounting": "DIN rail TS35",
+      "protectionFeatures": "OCP, OVP, short circuit protection",
+      "efficiency": 88,
+      "operatingTempC": "-10 to +60",
+      "approvals": "cULus UL 508, CSA C22.2, CE",
+      "series": "SDN-P"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Newark",
+        "sku": "80K9315",
+        "price": 175.00,
+        "currency": "USD",
+        "url": "https://www.newark.com/solahd/sdn10-24-100p/ac-dc-converter-din-rail-1-o-p/dp/80K9315",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 175.00,
+    "productUrl": "https://www.newark.com/solahd/sdn10-24-100p/ac-dc-converter-din-rail-1-o-p/dp/80K9315",
+    "qualityRating": 4,
+    "popularity": 4
+  },
+  {
+    "category": "POWER SUPPLY",
+    "name": "POWER SUPPLY, 24VDC, 5A, 120W, DIN RAIL, MEAN WELL NDR-120-24",
+    "description": "Mean Well NDR-120-24 economical DIN rail power supply, 24VDC 5A 120W, 90-264VAC input, 88% efficiency, metal housing, UL 508 Listed, free-air convection cooling",
+    "manufacturer": "Mean Well",
+    "manufacturerPartNumber": "NDR-120-24",
+    "spec": {
+      "outputVoltageVDC": 24,
+      "ratedCurrentA": 5,
+      "outputPowerW": 120,
+      "inputVoltageRange": "90-264 VAC",
+      "inputPhases": "1-phase",
+      "mounting": "DIN rail TS35/7.5 or 15",
+      "protectionFeatures": "OCP, OVP, over-temperature, short circuit",
+      "efficiency": 88,
+      "operatingTempC": "-20 to +70",
+      "approvals": "UL 508, UL 1310, cUL, CE",
+      "series": "NDR"
+    },
+    "vendorOffers": [
+      {
+        "vendor": "Newark",
+        "sku": "44AC5774",
+        "price": 42.00,
+        "currency": "USD",
+        "url": "https://www.newark.com/mean-well/ndr-120-24/power-supply-ac-dc-24v-5a/dp/44AC5774",
+        "seenAt": "2026-06-13"
+      }
+    ],
+    "listPrice": 42.00,
+    "productUrl": "https://www.newark.com/mean-well/ndr-120-24/power-supply-ac-dc-24v-5a/dp/44AC5774",
+    "qualityRating": 4,
+    "popularity": 4
+  },
+  {
+    "category": "POWER SUPPLY",
+    "name": "POWER SUPPLY, 24VDC, 10A, 240W, DIN RAIL, MEAN WELL NDR-240-24",
+    "description": "Mean Well NDR-240-24 economical DIN rail power supply, 24VDC 10A 240W, 90-264VAC input, metal housing, free-air convection, UL 508 Listed",
+    "manufacturer": "Mean Well",
+    "manufacturerPartNumber": "NDR-240-24",
+    "spec": {
+      "outputVoltageVDC": 24,
+      "ratedCurrentA": 10,
+      "outputPowerW": 240,
+      "inputVoltageRange": "90-264 VAC",
+      "inputPhases": "1-phase",
+      "mounting": "DIN rail TS35/7.5 or 15",
+      "protectionFeatures": "OCP, OVP, over-temperature, short circuit",
+      "efficiency": 89,
+      "operatingTempC": "-20 to +70",
+      "approvals": "UL 508, cUL, CE",
+      "series": "NDR"
+    },
+    "vendorOffers": [],
+    "productUrl": "https://www.meanwell.com/webapp/product/search.aspx?prod=NDR-240",
+    "qualityRating": 4,
+    "popularity": 4
+  },
+  {
+    "category": "POWER SUPPLY",
+    "name": "POWER SUPPLY, 24VDC, 2.5A, 60W, DIN RAIL, AUTOMATION DIRECT PSP24-060S",
+    "description": "AutomationDirect RHINO PSP24-060S switching power supply, 24VDC 2.5A 60W, 85-264VAC universal input, DIN rail TS35, enclosed plastic housing, IP20, UL 508 Listed — value tier",
+    "manufacturer": "AutomationDirect",
+    "manufacturerPartNumber": "PSP24-060S",
+    "spec": {
+      "outputVoltageVDC": 24,
+      "ratedCurrentA": 2.5,
+      "outputPowerW": 60,
+      "inputVoltageRange": "85-264 VAC",
+      "inputPhases": "1-phase",
+      "mounting": "DIN rail TS35",
+      "protectionFeatures": "OCP, OVP, short circuit",
+      "efficiency": 85,
+      "operatingTempC": "-10 to +55",
+      "approvals": "UL 508, cUL",
+      "series": "RHINO PSP"
+    },
+    "vendorOffers": [],
+    "productUrl": "https://www.automationdirect.com/adc/shopping/catalog/power_products_(electrical)/dc_power_supplies/din_rail_mount/psp24-060s",
+    "qualityRating": 3,
+    "popularity": 3
+  },
+  {
+    "category": "POWER SUPPLY",
+    "name": "POWER SUPPLY, 24VDC, 5A, 120W, DIN RAIL, AUTOMATION DIRECT PSP24-120S",
+    "description": "AutomationDirect RHINO PSP24-120S switching power supply, 24VDC 5A 120W, 85-264VAC universal input, DIN rail TS35, enclosed plastic housing, UL 508 Listed — value tier",
+    "manufacturer": "AutomationDirect",
+    "manufacturerPartNumber": "PSP24-120S",
+    "spec": {
+      "outputVoltageVDC": 24,
+      "ratedCurrentA": 5,
+      "outputPowerW": 120,
+      "inputVoltageRange": "85-264 VAC",
+      "inputPhases": "1-phase",
+      "mounting": "DIN rail TS35",
+      "protectionFeatures": "OCP, OVP, short circuit",
+      "efficiency": 85,
+      "operatingTempC": "-10 to +55",
+      "approvals": "UL 508, cUL",
+      "series": "RHINO PSP"
+    },
+    "vendorOffers": [],
+    "productUrl": "https://www.automationdirect.com/adc/shopping/catalog/power_products_(electrical)/dc_power_supplies/din_rail_mount/psp24-120s",
+    "qualityRating": 3,
+    "popularity": 3
+  },
+  {
+    "category": "POWER SUPPLY",
+    "name": "POWER SUPPLY, 24VDC, 10A, 240W, DIN RAIL, AUTOMATION DIRECT PSP24-240S",
+    "description": "AutomationDirect RHINO PSP24-240S switching power supply, 24VDC 10A 240W, 120/240VAC input, DIN rail TS35, enclosed plastic housing, UL 508 Listed — value tier",
+    "manufacturer": "AutomationDirect",
+    "manufacturerPartNumber": "PSP24-240S",
+    "spec": {
+      "outputVoltageVDC": 24,
+      "ratedCurrentA": 10,
+      "outputPowerW": 240,
+      "inputVoltageRange": "100-240 VAC",
+      "inputPhases": "1-phase",
+      "mounting": "DIN rail TS35",
+      "protectionFeatures": "OCP, OVP, short circuit",
+      "efficiency": 86,
+      "operatingTempC": "-10 to +55",
+      "approvals": "UL 508, cUL",
+      "series": "RHINO PSP"
+    },
+    "vendorOffers": [],
+    "productUrl": "https://www.automationdirect.com/pn/psp24-240s",
+    "qualityRating": 3,
+    "popularity": 4
+  },
+  {
+    "category": "POWER SUPPLY",
+    "name": "POWER SUPPLY, 24VDC, 40A, 3-PHASE, DIN RAIL, PHOENIX QUINT-PS/3AC/24DC/40 2866802",
+    "description": "Phoenix Contact QUINT series 3-phase DIN rail power supply, 24VDC 40A 960W, 3-phase 400-500VAC input, SFB Technology, DIN rail mount, UL 508 Listed — for 3-phase switchboard controls",
+    "manufacturer": "Phoenix Contact",
+    "manufacturerPartNumber": "2866802",
+    "spec": {
+      "outputVoltageVDC": 24,
+      "ratedCurrentA": 40,
+      "outputPowerW": 960,
+      "inputVoltageRange": "340-550 VAC 3-phase",
+      "inputPhases": "3-phase",
+      "mounting": "DIN rail TS35",
+      "protectionFeatures": "SFB, OCP, OVP, POWER BOOST",
+      "efficiency": 93,
+      "operatingTempC": "-25 to +70",
+      "approvals": "UL 508, cUL, CE",
+      "series": "QUINT"
+    },
+    "vendorOffers": [],
+    "productUrl": "https://www.amazon.com/Phoenix-Contact-QUINT-PS-2866802-D573717/dp/B0751JVFWM",
+    "qualityRating": 5,
+    "popularity": 3
+  }
+]
