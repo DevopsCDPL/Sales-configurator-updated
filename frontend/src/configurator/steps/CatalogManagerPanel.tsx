@@ -26,6 +26,7 @@ import { configuratorService, ConfiguratorComponent } from '../../services/confi
 import configuratorV2Service from '../../services/configuratorV2Service';
 import PriceSourceDot from '../components/PriceSourceDot';
 import CbFilterPanel from '../components/CbFilterPanel';
+import CategoryFilterPanel, { FilterFieldDef } from '../components/CategoryFilterPanel';
 import CatalogNumberBuilderDialog from '../components/CatalogNumberBuilderDialog';
 import { displayCase, compactSku } from '../lib/displayCase';
 import { vendorService } from '../../services/vendorService';
@@ -85,6 +86,36 @@ const DEFAULT_CATEGORIES = [
   'GLASTIC','LIGHT','STANDARD PRODUCT','UNKNOWN PARTS',
 ];
 
+const CATEGORY_FILTERS: Record<string, { title: string; fields: FilterFieldDef[] }> = {
+  'ENCLOSURE': { title: 'Enclosure filters', fields: [
+    { key: 'manufacturer', label: 'Manufacturer', source: 'spec' },
+    { key: 'subcategory', label: 'Type', source: 'spec' },
+    { key: 'nemaRating', label: 'NEMA rating', source: 'spec' },
+    { key: 'material', label: 'Material', source: 'spec' },
+  ]},
+  'WIRE CABLE': { title: 'Wire & cable filters', fields: [
+    { key: 'manufacturer', label: 'Manufacturer', source: 'spec' },
+    { key: 'wireType', label: 'Type', source: 'spec', deriveFromName: /^(THHN|DLO)/i },
+    { key: 'awgSize', label: 'Size (AWG/KCMIL)', source: 'spec', deriveFromName: /(?<![.\d])(#?\d+(?:\/\d+)?\s*(?:AWG|KCMIL|MCM))/i },
+    { key: 'color', label: 'Color', source: 'spec', deriveFromName: /,\s*(BLK|WHT|GRN|RED|BLU)\s*$/i },
+  ]},
+  'LUGS': { title: 'Lug filters', fields: [
+    { key: 'manufacturer', label: 'Manufacturer', source: 'spec' },
+    { key: 'lugType', label: 'Type (mech/comp)', source: 'spec', deriveFromName: /LUG,\s*(MECH|COMP)/i },
+    { key: 'holes', label: 'Holes', source: 'spec', deriveFromName: /(\d)-HOLE/i },
+    { key: 'wireRange', label: 'Wire range', source: 'spec', deriveFromName: /HOLE,\s*([^,]+KCMIL)/i },
+  ]},
+  'CAMLOCK': { title: 'Camlock filters', fields: [
+    { key: 'gender', label: 'Gender', source: 'spec', deriveFromName: /(MALE|FEMALE)/i },
+    { key: 'color', label: 'Color', source: 'spec', deriveFromName: /,(BRN|ORG|YEL|GRN|WHT|BLK|RED|BLU),/i },
+    { key: 'style', label: 'Style (stud/cap)', source: 'spec', deriveFromName: /(STUD|CAP)\s*$/i },
+  ]},
+  'CB ACCESSORIES': { title: 'Accessory filters', fields: [
+    { key: 'manufacturer', label: 'Manufacturer', source: 'spec' },
+    { key: 'legacyType', label: 'Type', source: 'spec' },
+  ]},
+};
+
 const CatalogManagerPanel: React.FC = () => {
   const [counts, setCounts] = useState<{ category: string; count: number }[]>([]);
   const [category, setCategory] = useState('');
@@ -128,7 +159,8 @@ const CatalogManagerPanel: React.FC = () => {
   // CIRCUIT BREAKER tab gets a cascading filter slot; others render all rows.
   useEffect(() => { setFilteredRows(rows); }, [rows, category]);
   const isCb = (category || '').toUpperCase() === 'CIRCUIT BREAKER';
-  const gridRows = isCb ? filteredRows : rows;
+  const hasFilter = isCb || !!CATEGORY_FILTERS[category];
+  const gridRows = hasFilter ? filteredRows : rows;
 
   const openEdit = (r?: ConfiguratorComponent, duplicate = false) => {
     if (!r) { setEdit(emptyEdit(category || undefined)); return; }
@@ -347,6 +379,14 @@ const CatalogManagerPanel: React.FC = () => {
 
       {isCb && !loading && (
         <CbFilterPanel items={rows} onFiltered={setFilteredRows} />
+      )}
+      {!isCb && !loading && !!CATEGORY_FILTERS[category] && (
+        <CategoryFilterPanel
+          title={CATEGORY_FILTERS[category].title}
+          fields={CATEGORY_FILTERS[category].fields}
+          items={rows}
+          onFiltered={setFilteredRows}
+        />
       )}
 
       {loading ? (
