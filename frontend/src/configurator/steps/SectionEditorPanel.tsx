@@ -460,7 +460,7 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
                     key={sec.id}
                     sx={{
                       minWidth: 0,
-                      bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px',
+                      bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px',
                       display: 'flex', flexDirection: 'column',
                     }}
                   >
@@ -519,7 +519,7 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
                         <Select
                           size="small" value={role} disabled={locked || !!busyKey}
                           onChange={(e) => setRole(sec, String(e.target.value))}
-                          sx={{ flex: 1, bgcolor: C.bg, color: C.text, fontSize: 11.5, '& fieldset': { borderColor: C.border } }}
+                          sx={{ flex: 1, bgcolor: C.surface, color: C.text, fontSize: 11.5, '& fieldset': { borderColor: C.border } }}
                         >
                           {['MAIN', 'FEEDER', 'TIE', 'DISTRIBUTION', 'METERING'].map((r) => (
                             <MenuItem key={r} value={r} sx={{ fontSize: 11.5 }}>{displayCase(r)}</MenuItem>
@@ -530,7 +530,7 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
                         size="small" displayEmpty fullWidth disabled={locked || !!busyKey || !frames}
                         value={frame?.frameCode ?? ''}
                         onChange={(e) => setFrame(sec, String(e.target.value))}
-                        sx={{ bgcolor: C.bg, color: C.text, fontSize: 11.5, '& fieldset': { borderColor: C.border } }}
+                        sx={{ bgcolor: C.surface, color: C.text, fontSize: 11.5, '& fieldset': { borderColor: C.border } }}
                       >
                         <MenuItem value="" sx={{ fontSize: 11.5 }}>{frames ? 'Select frame...' : 'Loading frames...'}</MenuItem>
                         {(frames ?? []).map((f) => (
@@ -584,7 +584,7 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
                       ) : (
                         <Stack spacing={0.5}>
                           {devices.map((l) => (
-                            <Box key={l.id} sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '8px', p: 0.75 }}>
+                            <Box key={l.id} sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '8px', p: 0.75 }}>
                               <Stack direction="row" alignItems="center" justifyContent="space-between">
                                 <Stack direction="row" alignItems="center" spacing={0.5} sx={{ minWidth: 0 }}>
                                   {editingDesig === l.id ? (
@@ -663,7 +663,7 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
                         disabled={locked || !!busyKey}
                         aria-label="Add breaker"
                         onClick={() => { setError(null); setPickerSectionId(sec.id); }}
-                        sx={{ color: C.blue, textTransform: 'none', fontSize: 11.5, border: '1px solid ' + C.border }}
+                        sx={{ color: C.blue, bgcolor: C.surface, textTransform: 'none', fontSize: 11.5, border: '1px solid ' + C.border, '&:hover': { borderColor: C.blue, bgcolor: C.surface } }}
                       >
                         Add breaker
                       </Button>

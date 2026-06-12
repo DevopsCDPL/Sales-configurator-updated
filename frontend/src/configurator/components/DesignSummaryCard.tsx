@@ -38,8 +38,8 @@ const DesignSummaryCard: React.FC<DesignSummaryCardProps> = ({
       bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', p: 1.5,
     }}
   >
-    <Typography sx={{ color: '#A9B6C9', fontSize: 10.5, letterSpacing: 0.5, mb: 1 }}>
-      DESIGN SUMMARY
+    <Typography sx={{ color: '#F0F6FF', fontSize: 12, fontWeight: 800, letterSpacing: 0.5, mb: 1 }}>
+      Design summary
     </Typography>
     <Row label="Devices" value={devices} />
     <Row label="Mains" value={mains} />
