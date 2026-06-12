@@ -27,6 +27,7 @@ import { ConfiguratorComponent } from '../../services/configuratorService';
 import ComponentPickerDialog from '../components/ComponentPickerDialog';
 import DesignSummaryCard from '../components/DesignSummaryCard';
 import { displayCase } from '../lib/displayCase';
+import { DEVICE_ENVELOPE_IN } from '../lib/lineup-proposal';
 
 const C = {
   bg: '#000000', surface: '#0B0B0D', border: '#1E2235', blue: '#00c8ff',
@@ -35,7 +36,6 @@ const C = {
 
 const MAX_SECTIONS = 10;
 /** Device height fallback (inches) by role — shared [SEED] envelopes with the lineup packer. */
-import { DEVICE_ENVELOPE_IN } from '../lib/lineup-proposal';
 const ACB_FALLBACK_H = DEVICE_ENVELOPE_IN.MAIN;
 const FEEDER_FALLBACK_H = DEVICE_ENVELOPE_IN.FEEDER;
 
