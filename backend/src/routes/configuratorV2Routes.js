@@ -760,68 +760,11 @@ router.post('/catalog/import-bundled', wrap(async (req, res) => {
   res.json({ ok: true, created, repaired, skipped: seed.length - created, total: count });
 }));
 
-/** Idempotent import of the legacy sales-configurator catalog (old app, 267 parts / 21 categories). */
+/** Idempotent manual re-sync of the legacy catalog (auto-seeded once at boot by migration 20260612000002). */
 router.post('/catalog/import-legacy', wrap(async (req, res) => {
-  const seed = require('../seeds/legacyComponentsSeed.json');
-  const junk = /^(demo|test)$|^test_|_demo_/i;
-  const num = (v) => { const n = Number(String(v ?? '').replace(/[^\d.]/g, '')); return Number.isFinite(n) && n > 0 ? n : undefined; };
-  let created = 0, updated = 0, skipped = 0;
-  for (const row of seed) {
-    if (junk.test(String(row.name || '').trim())) { skipped += 1; continue; }
-    const price = Number(row.price) || 0;
-    const old = row.specifications || {};
-    const spec = { ...old, priceSource: 'vendor-import', legacySource: 'sales-configurator-v1' };
-    if (row.subcategory && !spec.manufacturer) spec.manufacturer = row.subcategory;
-    if (row.subcategory && !spec.subcategory) spec.subcategory = row.subcategory;
-    if (row.type && !spec.legacyType) spec.legacyType = row.type;
-    const hay = [row.name, row.description, row.type, old.sec1Desc].filter(Boolean).join(' ');
-    if (!spec.deviceClass) {
-      if (/MCCB/i.test(hay)) spec.deviceClass = 'MCCB';
-      else if (/\bNW\b|Masterpact|Emax|\bACB\b/i.test(hay)) spec.deviceClass = 'ACB';
-    }
-    if (old.frameAmps && !spec.ratedCurrentA) spec.ratedCurrentA = num(old.frameAmps);
-    if (old.breakerKic && !spec.interruptingKA) spec.interruptingKA = num(old.breakerKic);
-    if (old.poles && !spec.poles) spec.poles = num(old.poles);
-    if (old.breakerVoltage && !spec.voltageRating) spec.voltageRating = String(old.breakerVoltage);
-    if (old.protectFunc && !spec.protectionFunctions) spec.protectionFunctions = String(old.protectFunc);
-    if (old.cbDesc && !spec.catalogNumber && /^[A-Za-z0-9-]{8,}$/.test(String(old.cbDesc))) spec.catalogNumber = String(old.cbDesc);
-    Object.keys(spec).forEach((k) => { if (spec[k] === undefined || spec[k] === '') delete spec[k]; });
-    // Recategorize: breaker accessories and unidentifiable parts out of CIRCUIT BREAKER
-    let category = row.category;
-    if (category === 'CIRCUIT BREAKER') {
-      const n = String(row.name || '');
-      if (/Cradle|Shunt Trip|UV Coil|Remote Reset|^Motor - |Aux Contacts|Kirk Key|Padlock|ATS Built In|Power Supply - |^RELT|Modbus Comm|Signaling Module|^Lugs .*MCB/i.test(n)) {
-        category = 'CB ACCESSORIES';
-      } else if (/Load Center|Panel Board|Panelboard/i.test(n)) {
-        category = 'UNKNOWN PARTS';
-      }
-    }
-    const payload = {
-      name: row.name,
-      category,
-      part_number: row.part_number,
-      description: row.description ?? null,
-      price,
-      mat_cost: price,
-      lbr_cu: Number(row.lbr_cu) || 0, lbr_asm: Number(row.lbr_asm) || 0, lbr_cnt: Number(row.lbr_cnt) || 0,
-      lbr_qc: Number(row.lbr_qc) || 0, lbr_tst: Number(row.lbr_tst) || 0, lbr_eng: Number(row.lbr_eng) || 0,
-      lbr_cad: Number(row.lbr_cad) || 0,
-      price_status: price > 0 ? 'FIRM' : 'PENDING_RFQ',
-      specifications: spec,
-      is_active: true,
-    };
-    const existing = await models.ConfiguratorComponent.findOne({ where: { part_number: row.part_number } });
-    if (existing) {
-      payload.specifications = { ...(existing.specifications || {}), ...spec };
-      await existing.update(payload).catch(() => {});
-      updated += 1;
-    } else {
-      await models.ConfiguratorComponent.create({ ...payload, company_id: req.companyId ?? null }).catch(() => { skipped += 1; created -= 1; });
-      created += 1;
-    }
-  }
-  const total = await models.ConfiguratorComponent.count();
-  res.json({ ok: true, created, updated, skipped, total });
+  const { importLegacyCatalog } = require('../services/configurator/legacyCatalogImporter');
+  const out = await importLegacyCatalog(models.ConfiguratorComponent, { companyId: req.companyId ?? null });
+  res.json({ ok: true, ...out });
 }));
 
 /* ── TPS estimate workbook import (components + labour + standards) ── */
