@@ -148,6 +148,9 @@ async function generateComponents(switchboardId, { companyId = null } = {}) {
     if (qty === 0) continue;
     activeRuleIds.add(rule.ruleId);
 
+    // Provenance rank: TPS-negotiated parts first (policy 2026-06-13), then rfq, manual, web.
+    const SRC_RANK = { 'vendor-import': 0, rfq: 1, manual: 2, web: 3 };
+    const srcRank = (c) => SRC_RANK[(c.specifications || {}).priceSource] ?? 4;
     // catalog match: cheapest priced in category (name regex preferred), else any
     const where = { category: rule.catalogCategory };
     let candidates = await models.ConfiguratorComponent.findAll({ where, limit: 200 });
@@ -177,13 +180,13 @@ async function generateComponents(switchboardId, { companyId = null } = {}) {
       };
       const adequate = candidates.filter((c) => { const a = ampsOf(c); return Number.isFinite(a) && a >= need; });
       if (adequate.length) {
-        adequate.sort((a, b) => (ampsOf(a) - ampsOf(b)) || ((Number(a.price) || Infinity) - (Number(b.price) || Infinity)));
+        adequate.sort((a, b) => srcRank(a) - srcRank(b) || (ampsOf(a) - ampsOf(b)) || ((Number(a.price) || Infinity) - (Number(b.price) || Infinity)));
         candidates = adequate;
       } else {
-        candidates.sort((a, b) => ((Number(a.price) || Infinity) - (Number(b.price) || Infinity)));
+        candidates.sort((a, b) => srcRank(a) - srcRank(b) || ((Number(a.price) || Infinity) - (Number(b.price) || Infinity)));
       }
     } else {
-      candidates.sort((a, b) => ((Number(a.price) || Infinity) - (Number(b.price) || Infinity)));
+      candidates.sort((a, b) => srcRank(a) - srcRank(b) || ((Number(a.price) || Infinity) - (Number(b.price) || Infinity)));
     }
     const pick = candidates[0] ?? null;
 

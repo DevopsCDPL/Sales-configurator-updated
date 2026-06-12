@@ -1218,6 +1218,7 @@ router.get('/catalog/cbs', wrap(async (req, res) => {
       depthIn: r.dims_d_in != null ? Number(r.dims_d_in) : null,
       price: r.price != null ? Number(r.price) : null,
       priceStatus: r.price_status ?? 'PENDING_RFQ',
+      priceSource: sp.priceSource ?? null,
     };
   }));
 }));

@@ -24,6 +24,9 @@ import { displayCase, compactSku } from '../lib/displayCase';
 import PriceSourceDot from './PriceSourceDot';
 import CbFilterPanel from './CbFilterPanel';
 
+/** TPS-first provenance rank (policy 2026-06-13): vendor-import → rfq → manual → web → unmarked. */
+const SRC_RANK: Record<string, number> = { 'vendor-import': 0, rfq: 1, manual: 2, web: 3 };
+const srcRank = (c: any) => SRC_RANK[c?.specifications?.priceSource ?? ''] ?? 4;
 const C = {
   bg: '#000000', surface: '#0B0B0D', border: '#1E2235', blue: '#00c8ff',
   text: '#E2E8F0', sub: '#64748B', green: '#22C55E', amber: '#D97706', red: '#EF4444',
@@ -119,7 +122,7 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
           const pb = Number(b.price) || 0;
           const sa = pa <= 0 ? Infinity : pa;
           const sb = pb <= 0 ? Infinity : pb;
-          return sa - sb;
+          return srcRank(a) - srcRank(b) || sa - sb;
         });
       }
       setResults(rows);
@@ -206,6 +209,13 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
   // Final display rows: CB mode uses cbFiltered (from CbFilterPanel), else results/sorted
   const displayRows: ConfiguratorComponent[] = (() => {
     if (isCbMode) return cbFiltered;
+    if (ratingSort === 'price') {
+      return [...(isCbMode ? cbFiltered : results)].sort((a, b) => {
+        const pa = Number(a.price) || Infinity;
+        const pb = Number(b.price) || Infinity;
+        return srcRank(a) - srcRank(b) || pa - pb;
+      });
+    }
     if (mode === 'add' && !pickOnly && ratingSort === 'rating') {
       return [...results].sort((a, b) => {
         const ra = (a as any).specifications?.qualityRating ?? 0;

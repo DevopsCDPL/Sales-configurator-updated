@@ -60,6 +60,7 @@ export interface CandidateDevice {
   depthIn: number | null;
   price: number | null;
   priceStatus: 'FIRM' | 'ESTIMATED' | 'PENDING_RFQ';
+  priceSource?: string | null;  // 'vendor-import' (TPS) | 'rfq' | 'web' | 'manual'
 }
 
 export interface ProposedDevice {
@@ -120,12 +121,19 @@ export interface LineupOptions {
   }) => CandidateDevice[];
 }
 
+/** Provenance rank: TPS-negotiated parts first, then RFQ-confirmed, then web/manual.
+ *  Policy (Vikraman 2026-06-13): always use TPS parts when one satisfies the requirement. */
+const SOURCE_RANK: Record<string, number> = { 'vendor-import': 0, rfq: 1, manual: 2, web: 3 };
+const srcRank = (c: CandidateDevice) => SOURCE_RANK[c.priceSource ?? ''] ?? 4;
+
 function pickCheapest(cands: CandidateDevice[]): CandidateDevice | null {
   if (!cands.length) return null;
   const firm = cands.filter((c) => c.priceStatus === 'FIRM' && c.price != null);
   const est = cands.filter((c) => c.priceStatus === 'ESTIMATED' && c.price != null);
   const pool = firm.length ? firm : est.length ? est : cands;
-  return [...pool].sort((a, b) => (a.price ?? Infinity) - (b.price ?? Infinity) || a.ratedA - b.ratedA)[0];
+  // TPS-first, then cheapest, then smallest adequate rating
+  return [...pool].sort((a, b) =>
+    srcRank(a) - srcRank(b) || (a.price ?? Infinity) - (b.price ?? Infinity) || a.ratedA - b.ratedA)[0];
 }
 
 export function proposeLineup(
