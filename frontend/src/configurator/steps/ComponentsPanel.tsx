@@ -15,6 +15,9 @@ import {
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
+import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
+import SwapHorizRoundedIcon from '@mui/icons-material/SwapHorizRounded';
+import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { configuratorService, ConfiguratorComponent } from '../../services/configuratorService';
 import configuratorV2Service, { FullBoard, ComponentLineRow } from '../../services/configuratorV2Service';
 
@@ -58,6 +61,10 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
   const [loading, setLoading] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
+  const [generating, setGenerating] = useState(false);
+  const [swapLine, setSwapLine] = useState<ComponentLineRow | null>(null);
+  const [swapCands, setSwapCands] = useState<ConfiguratorComponent[]>([]);
 
   const sections = board.sections;
 
@@ -133,6 +140,63 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
     }
   };
 
+  const generate = async () => {
+    setGenerating(true);
+    setError(null);
+    try {
+      const out = await configuratorV2Service.generateComponents(switchboardId);
+      setInfo(`Components generated — ${out.created} new, ${out.updated} qty-refreshed, ${out.kept} kept (engineer-edited), ${out.removed} removed` +
+        (out.placeholders ? `, ${out.placeholders} NO-CATALOG-MATCH placeholder(s) need attention` : ''));
+      await refreshLines();
+    } catch (e: any) {
+      setError(e?.response?.data?.error ?? 'Generation failed');
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const setQty = async (line: ComponentLineRow, qty: number) => {
+    if (!Number.isFinite(qty) || qty < 0) return;
+    try {
+      await configuratorV2Service.patchLine(line.id, { quantity: qty, meta: { qtyEdited: true } });
+      await refreshLines();
+    } catch (e: any) { setError(e?.response?.data?.error ?? 'Qty update failed'); }
+  };
+
+  const openSwap = async (line: ComponentLineRow) => {
+    setSwapLine(line);
+    setSwapCands([]);
+    try {
+      const rows = await configuratorService.listComponents({ category: line.category ?? undefined, limit: 100 } as any);
+      rows.sort((a: any, b: any) => ((Number(a.price) || Infinity) - (Number(b.price) || Infinity)));
+      setSwapCands(rows.filter((r) => r.part_number !== line.part_number).slice(0, 15));
+    } catch { /* dialog shows empty-state */ }
+  };
+
+  const doSwap = async (c: ConfiguratorComponent) => {
+    if (!swapLine) return;
+    try {
+      const price = Number(c.price ?? c.mat_cost ?? 0) || 0;
+      await configuratorV2Service.patchLine(swapLine.id, {
+        component_id: c.id, part_number: c.part_number ?? null, name: c.name ?? null,
+        unit_cost: price, price_status: price > 0 ? 'FIRM' : 'PENDING_RFQ',
+        meta: { swapped: true, placeholder: false },
+      });
+      setSwapLine(null);
+      await refreshLines();
+    } catch (e: any) { setError(e?.response?.data?.error ?? 'Swap failed'); }
+  };
+
+  const ruleGroups = useMemo(() => {
+    const ruleLines = lines.filter((l) => l.source === 'rule');
+    const g = new Map<string, ComponentLineRow[]>();
+    for (const l of ruleLines) {
+      const k = String(l.meta?.group ?? 'Other');
+      g.set(k, [...(g.get(k) ?? []), l]);
+    }
+    return [...g.entries()];
+  }, [lines]);
+
   const userLines = useMemo(
     () => lines.filter((l) => l.source === 'user'),
     [lines]
@@ -151,10 +215,112 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
         </Alert>
       )}
 
+      {info && (
+        <Alert severity="success" onClose={() => setInfo(null)} sx={{ mb: 1.5, bgcolor: 'rgba(34,197,94,0.08)', color: '#86EFAC', border: '1px solid ' + C.border, fontSize: 12 }}>
+          {info}
+        </Alert>
+      )}
+
+      {/* ── Auto components (rule-driven, swappable, qty-editable) ── */}
+      <Box sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', mb: 2, overflow: 'hidden' }}>
+        <Stack direction="row" alignItems="center" sx={{ px: 2, py: 1, borderBottom: '1px solid ' + C.border }}>
+          <Typography sx={{ color: '#CBD5E1', fontSize: 12.5, fontWeight: 700, flex: 1 }}>
+            Auto components — engine-selected from the design (rules editable in Standards)
+          </Typography>
+          <Button
+            size="small" startIcon={<AutoAwesomeRoundedIcon sx={{ fontSize: 14 }} />}
+            disabled={generating}
+            onClick={generate}
+            sx={{ bgcolor: '#00c8ff', color: '#06151c', textTransform: 'none', fontWeight: 700, fontSize: 12, px: 1.5, '&:hover': { bgcolor: '#33d4ff' } }}
+          >
+            {generating ? 'Generating…' : ruleGroups.length ? 'Regenerate' : 'Generate components'}
+          </Button>
+        </Stack>
+        {!ruleGroups.length ? (
+          <Typography sx={{ color: C.sub, fontSize: 12, px: 2, py: 1.5, fontStyle: 'italic' }}>
+            Click Generate — every component the design implies is created automatically
+            (hardware, terminations, wiring, identification…). No catalog match still creates
+            a placeholder line so nothing is missed.
+          </Typography>
+        ) : ruleGroups.map(([group, rows]) => (
+          <Box key={group}>
+            <Typography sx={{ color: '#A9B6C9', fontSize: 10.5, fontWeight: 700, letterSpacing: 0.5, px: 2, pt: 1, pb: 0.5, textTransform: 'uppercase' }}>
+              {group}
+            </Typography>
+            <Table size="small">
+              <TableBody>
+                {rows.map((l) => (
+                  <TableRow key={l.id}>
+                    <TableCell sx={{ ...cellSx, width: 260, color: C.sub }}>{l.meta?.ruleDescription ?? l.category}</TableCell>
+                    <TableCell sx={cellSx}>
+                      {l.meta?.placeholder ? (
+                        <Chip label={'NO CATALOG MATCH — ' + (l.meta?.ruleDescription ?? '')} size="small"
+                          sx={{ bgcolor: 'rgba(217,119,6,0.12)', color: '#FCD34D', fontSize: 9.5, height: 18 }} />
+                      ) : l.name}
+                      {l.meta?.swapped && (
+                        <Chip label="swapped" size="small" sx={{ ml: 0.5, bgcolor: 'transparent', border: '1px solid ' + C.amber, color: C.amber, fontSize: 8.5, height: 15 }} />
+                      )}
+                    </TableCell>
+                    <TableCell sx={{ ...cellSx, width: 90, color: C.sub, fontSize: 10.5 }}>{l.meta?.qtyFormula ?? ''}</TableCell>
+                    <TableCell sx={{ ...cellSx, width: 70 }}>
+                      <TextField
+                        size="small" defaultValue={l.quantity} key={l.id + ':' + l.quantity}
+                        onBlur={(e) => { const v = Number(e.target.value); if (v !== Number(l.quantity)) setQty(l, v); }}
+                        inputProps={{ style: { textAlign: 'center', padding: '4px 6px', fontSize: 12 } }}
+                        sx={{ width: 56, '& .MuiOutlinedInput-root': { bgcolor: C.bg, color: C.text, '& fieldset': { borderColor: C.border } } }}
+                      />
+                    </TableCell>
+                    <TableCell sx={{ ...cellSx, width: 90 }} align="right">{Number(l.unit_cost) ? usd(Number(l.unit_cost)) : '—'}</TableCell>
+                    <TableCell sx={{ ...cellSx, width: 64 }}>
+                      <Chip label={l.price_status === 'PENDING_RFQ' ? 'RFQ' : l.price_status} size="small"
+                        sx={{ bgcolor: 'transparent', border: '1px solid ' + (l.price_status === 'FIRM' ? C.green : C.amber), color: l.price_status === 'FIRM' ? C.green : C.amber, fontSize: 9, height: 17 }} />
+                    </TableCell>
+                    <TableCell sx={{ ...cellSx, width: 110, whiteSpace: 'nowrap' }} align="right">
+                      <Button size="small" startIcon={<SwapHorizRoundedIcon sx={{ fontSize: 13 }} />} onClick={() => openSwap(l)}
+                        sx={{ color: '#00c8ff', textTransform: 'none', fontSize: 10.5, minWidth: 0, mr: 0.5 }}>
+                        Swap
+                      </Button>
+                      <IconButton size="small" disabled={busyId === l.id} onClick={() => remove(l)} sx={{ color: C.sub, p: 0.3, '&:hover': { color: C.red } }}>
+                        <DeleteOutlineRoundedIcon sx={{ fontSize: 15 }} />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Box>
+        ))}
+      </Box>
+
+      {/* Swap dialog (same-category alternatives, cheapest first) */}
+      <Dialog open={!!swapLine} onClose={() => setSwapLine(null)} maxWidth="sm" fullWidth
+        PaperProps={{ sx: { bgcolor: C.surface, border: '1px solid ' + C.border, backgroundImage: 'none' } }}>
+        <DialogTitle sx={{ color: C.text, fontSize: 14, fontWeight: 700 }}>
+          Swap — {swapLine?.meta?.ruleDescription ?? swapLine?.name} ({swapLine?.category})
+        </DialogTitle>
+        <DialogContent>
+          {!swapCands.length ? (
+            <Typography sx={{ color: C.sub, fontSize: 12.5 }}>No alternatives in this category yet — add one in Library → Catalog.</Typography>
+          ) : swapCands.map((c) => (
+            <Stack key={c.id} direction="row" alignItems="center" spacing={1} sx={{ py: 0.6, borderBottom: '1px solid ' + C.border }}>
+              <Typography sx={{ color: C.text, fontSize: 12, flex: 1 }} noWrap>{c.name}</Typography>
+              <Typography sx={{ color: C.sub, fontSize: 11 }}>{Number(c.price) ? usd(Number(c.price)) : 'RFQ'}</Typography>
+              <Button size="small" onClick={() => doSwap(c)}
+                sx={{ color: C.green, textTransform: 'none', fontSize: 11, border: '1px solid ' + C.border }}>
+                Use this
+              </Button>
+            </Stack>
+          ))}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setSwapLine(null)} sx={{ color: C.sub, textTransform: 'none' }}>Close</Button>
+        </DialogActions>
+      </Dialog>
+
       {/* Selected components (user lines) */}
       <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', mb: 2, overflow: 'hidden' }}>
         <Typography sx={{ color: '#CBD5E1', fontSize: 12.5, fontWeight: 700, px: 2, py: 1, borderBottom: '1px solid ' + C.border }}>
-          Selected components — {userLines.length} line(s) · flow straight into BOM &amp; Quote
+          Manual additions — {userLines.length} line(s) · picked from the catalog below
         </Typography>
         {!userLines.length ? (
           <Typography sx={{ color: C.sub, fontSize: 12, px: 2, py: 1.5, fontStyle: 'italic' }}>

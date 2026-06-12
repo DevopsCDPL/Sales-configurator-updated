@@ -472,6 +472,15 @@ export const configuratorV2Service = {
     return res.data ?? [];
   },
 
+
+  async generateComponents(switchboardId: string): Promise<{
+    ok: boolean; created: number; updated: number; removed: number;
+    placeholders: number; kept: number; rulesEvaluated: number;
+  }> {
+    const res = await api.post(`${ROOT}/switchboards/${switchboardId}/generate-components`);
+    return res.data;
+  },
+
   async applyProposal(id: string, payload: {
     intake: IntakeInput;
     boardPatch: LineupProposal['boardPatch'] & { totalFeederLoadA?: number; sldTopology?: unknown };

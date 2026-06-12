@@ -35,6 +35,7 @@ const { importTpsWorkbook } = require('../services/configurator/workbookImporter
 const { renderV2QuotationPdf } = require('../services/configurator/v2QuotePdf');
 const { buildEpicorWorkbook } = require('../services/configurator/epicorExport');
 const { buildProposalPdf } = require('../services/configurator/tpsProposalPdf');
+const { generateComponents } = require('../services/configurator/componentRules');
 const multer = require('multer');
 const wbUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20 * 1024 * 1024 } });
 
@@ -200,6 +201,21 @@ router.get('/switchboards/:id/change-orders', wrap(async (req, res) => {
     order: [['created_at', 'DESC']],
   });
   res.json(rows);
+}));
+
+/* ── Component auto-rules (AP registry) ───────────────────────────────
+ * POST /switchboards/:id/generate-components — evaluate the versioned
+ * component_rules table against the design; upsert source='rule' lines
+ * (cheapest catalog match or NO-CATALOG-MATCH placeholder). Engineer
+ * qty edits and swaps survive regeneration.                            */
+router.post('/switchboards/:id/generate-components', wrap(async (req, res) => {
+  try {
+    const out = await generateComponents(req.params.id, { companyId: req.companyId ?? null });
+    res.json({ ok: true, ...out });
+  } catch (e) {
+    if (e.status) return res.status(e.status).json({ error: e.message });
+    throw e;
+  }
 }));
 
 // Component lines

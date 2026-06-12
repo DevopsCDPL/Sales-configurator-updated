@@ -23,6 +23,7 @@ const C = {
 
 const TABLES: { key: string; label: string }[] = [
   { key: 'costing_defaults', label: 'Costing defaults (rates, GM%, copper $/lb)' },
+  { key: 'component_rules', label: 'Component auto-rules (qty factors, conditions)' },
   { key: 'neutral_bus_schedule', label: 'Neutral bus schedule' },
   { key: 'bus_schedule', label: 'Bus schedule (A → bars)' },
   { key: 'bus_support_spacing', label: 'Bus support spacing (SCCR)' },
