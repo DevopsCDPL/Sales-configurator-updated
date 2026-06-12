@@ -7,13 +7,18 @@
  * old quotes keep pointing at the version they were built with.
  * Cells are edited as a JSON grid; TPS engineering signs off by
  * replacing seed:true rows with verified values.
+ *
+ * "Import TPS workbook" lives here because the workbook carries
+ * standards + labour rates — it belongs with Engineering Standards,
+ * not the component catalog.
  */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Box, Typography, Stack, Chip, Button, Alert, CircularProgress, TextField,
   Table, TableHead, TableRow, TableCell, TableBody, MenuItem, Select,
 } from '@mui/material';
 import SaveRoundedIcon from '@mui/icons-material/SaveRounded';
+import UploadFileRoundedIcon from '@mui/icons-material/UploadFileRounded';
 import configuratorV2Service, { StandardsTableRow } from '../../services/configuratorV2Service';
 
 const C = {
@@ -44,8 +49,10 @@ const StandardsPanel: React.FC = () => {
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [importing, setImporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
+  const wbRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async (key: string) => {
     setLoading(true);
@@ -61,6 +68,27 @@ const StandardsPanel: React.FC = () => {
   }, []);
 
   useEffect(() => { load(tableKey); }, [tableKey, load]);
+
+  const importWb = async (file: File) => {
+    setImporting(true);
+    setError(null);
+    try {
+      const out = await configuratorV2Service.importWorkbook(file);
+      setInfo(
+        `Workbook imported — ${out.componentsCreated} new / ${out.componentsUpdated} updated components, ` +
+        `bus schedule ${out.busScheduleRows} rows, neutral ${out.neutralRows} rows, ` +
+        `copper $${out.copperPricePerLb}/lb, rates ${Object.keys(out.ratesFound).length} buckets.` +
+        (out.warnings.length ? ` ${out.warnings.length} warning(s).` : '')
+      );
+      // Reload the current standards table so freshly imported values are visible
+      await load(tableKey);
+    } catch (e: any) {
+      setError(e?.response?.data?.error ?? 'Workbook import failed');
+    } finally {
+      setImporting(false);
+      if (wbRef.current) wbRef.current.value = '';
+    }
+  };
 
   const rows: any[] = draft ?? table?.rows ?? [];
   const columns = useMemo(() => {
@@ -123,6 +151,19 @@ const StandardsPanel: React.FC = () => {
           <Chip label={seedCount + ' [SEED] rows — unverified by TPS'} size="small" sx={{ bgcolor: 'transparent', border: '1px solid ' + C.amber, color: C.amber, fontSize: 10.5, height: 20 }} />
         )}
         <Box sx={{ flex: 1 }} />
+        {/* Import TPS workbook — ingests standards + labour rates from TPS_Estimate_23XX.xlsm */}
+        <input
+          ref={wbRef} type="file" accept=".xlsm,.xlsx" hidden
+          onChange={(e) => { const f = e.target.files?.[0]; if (f) importWb(f); }}
+        />
+        <Button
+          startIcon={<UploadFileRoundedIcon sx={{ fontSize: 16 }} />}
+          disabled={importing}
+          onClick={() => wbRef.current?.click()}
+          sx={{ color: C.text, border: '1px solid ' + C.border, bgcolor: C.bg, textTransform: 'none', fontSize: 12.5, '&:hover': { borderColor: C.blue } }}
+        >
+          {importing ? 'Importing…' : 'Import TPS workbook'}
+        </Button>
         {draft && (
           <>
             <TextField

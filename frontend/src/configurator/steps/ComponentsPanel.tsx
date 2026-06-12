@@ -6,45 +6,41 @@
  * componentLines on the OPEN switchboard — so every pick lands in the
  * BOM, the Quote and the handoff automatically. Engine-managed
  * categories (circuit breakers) are excluded; the Designer owns those.
+ *
+ * Tab layout:
+ *   "Designer's pick"  — Auto-components (rule-driven, swappable, qty-editable)
+ *                        + "+ Add component" button that opens the picker dialog.
+ *   "Manual additions" — User-picked lines table.
+ *
+ * The inline Catalog browser section has been replaced by the shared
+ * ComponentPickerDialog (used for both swap and add).
  */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Box, Typography, Stack, Chip, Button, Alert, CircularProgress, TextField,
-  Table, TableHead, TableRow, TableCell, TableBody, MenuItem, Select, IconButton, Tooltip,
+  Table, TableHead, TableRow, TableCell, TableBody, IconButton, Tooltip,
+  Tabs, Tab,
 } from '@mui/material';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
-import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 import SwapHorizRoundedIcon from '@mui/icons-material/SwapHorizRounded';
-import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { configuratorService, ConfiguratorComponent } from '../../services/configuratorService';
 import configuratorV2Service, { FullBoard, ComponentLineRow } from '../../services/configuratorV2Service';
 import PriceSourceDot from '../components/PriceSourceDot';
 import { displayCase, compactSku } from '../lib/displayCase';
+import ComponentPickerDialog from '../components/ComponentPickerDialog';
 
 const C = {
   bg: '#000000', surface: '#0B0B0D', border: '#1E2235', blue: '#00c8ff',
   text: '#E2E8F0', sub: '#64748B', green: '#22C55E', amber: '#D97706', red: '#EF4444',
 };
 
-/** Engine-managed categories never picked by hand here. */
-const EXCLUDED = new Set(['CIRCUIT BREAKER']);
-
 const cellSx = { color: C.text, fontSize: 12, borderBottom: '1px solid ' + C.border, py: 0.6 };
 const headSx = { color: C.sub, fontSize: 10.5, fontWeight: 700, letterSpacing: 0.5, borderBottom: '1px solid ' + C.border, py: 0.7 };
 
 const usd = (n: number) =>
   n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 });
-
-const inputSx = {
-  '& .MuiOutlinedInput-root': {
-    bgcolor: C.surface, color: C.text, fontSize: 12.5,
-    '& fieldset': { borderColor: C.border },
-    '&.Mui-focused fieldset': { borderColor: C.blue },
-  },
-  '& input': { color: C.text },
-};
 
 export interface ComponentsPanelProps {
   board: FullBoard;
@@ -53,48 +49,20 @@ export interface ComponentsPanelProps {
 
 const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged }) => {
   const switchboardId = board.board.id;
-  const [categories, setCategories] = useState<{ category: string; count: number }[]>([]);
-  const [category, setCategory] = useState<string>('');
-  const [q, setQ] = useState('');
-  const [results, setResults] = useState<ConfiguratorComponent[]>([]);
+  const [tab, setTab] = useState(0);
   const [lines, setLines] = useState<ComponentLineRow[]>(board.lines);
-  const [qty, setQty] = useState<Record<string, string>>({});
-  const [scope, setScope] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
+
+  // Picker dialog state
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [pickerMode, setPickerMode] = useState<'swap' | 'add'>('add');
+  const [pickerCategory, setPickerCategory] = useState<string | null>(null);
   const [swapLine, setSwapLine] = useState<ComponentLineRow | null>(null);
-  const [swapCands, setSwapCands] = useState<ConfiguratorComponent[]>([]);
 
   const sections = board.sections;
-
-  useEffect(() => {
-    configuratorService.componentCategoryCounts()
-      .then((rows: any[]) => setCategories(
-        (rows ?? []).filter((r) => !EXCLUDED.has((r.category || '').toUpperCase()) && r.count > 0)
-      ))
-      .catch(() => setCategories([]));
-  }, []);
-
-  const search = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const params: any = { limit: 100 };
-      if (category) params.category = category;
-      if (q.trim()) params.q = q.trim();
-      const rows = await configuratorService.listComponents(params);
-      setResults(rows.filter((r) => !EXCLUDED.has((r.category || '').toUpperCase())));
-    } catch (e: any) {
-      setError(e?.response?.data?.error ?? e?.message ?? 'Catalog search failed');
-    } finally {
-      setLoading(false);
-    }
-  }, [category, q]);
-
-  useEffect(() => { search(); }, [category]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const refreshLines = useCallback(async () => {
     const full = await configuratorV2Service.getFull(switchboardId);
@@ -102,31 +70,66 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
     onLinesChanged(full.lines);
   }, [switchboardId, onLinesChanged]);
 
-  const add = async (comp: ConfiguratorComponent) => {
+  const openAddPicker = () => {
+    setPickerMode('add');
+    setPickerCategory(null);
+    setSwapLine(null);
+    setPickerOpen(true);
+  };
+
+  const openSwap = (line: ComponentLineRow) => {
+    setPickerMode('swap');
+    setPickerCategory(line.category ?? null);
+    setSwapLine(line);
+    setPickerOpen(true);
+  };
+
+  const doSwap = async (c: ConfiguratorComponent) => {
+    if (!swapLine) return;
+    try {
+      const price = Number(c.price ?? (c as any).mat_cost ?? 0) || 0;
+      await configuratorV2Service.patchLine(swapLine.id, {
+        component_id: c.id, part_number: c.part_number ?? null, name: c.name ?? null,
+        unit_cost: price, price_status: price > 0 ? 'FIRM' : 'PENDING_RFQ',
+        meta: { swapped: true, placeholder: false },
+      });
+      setSwapLine(null);
+      setPickerOpen(false);
+      await refreshLines();
+    } catch (e: any) { setError(e?.response?.data?.error ?? 'Swap failed'); }
+  };
+
+  const doAdd = async (comp: ConfiguratorComponent, qty: number) => {
     setBusyId(comp.id);
     setError(null);
     try {
-      const price = Number(comp.price ?? comp.mat_cost ?? comp.material_cost) || 0;
-      const sc = scope[comp.id] ?? 'board';
-      const section = sections.find((s) => s.id === sc);
+      const price = Number(comp.price ?? (comp as any).mat_cost ?? (comp as any).material_cost) || 0;
       await configuratorV2Service.addLine(switchboardId, {
-        scope: section ? 'section' : 'board',
-        section_id: section?.id ?? null,
+        scope: 'board',
+        section_id: null,
         component_id: comp.id,
         category: comp.category ?? null,
         part_number: comp.part_number ?? null,
         name: comp.name ?? null,
-        quantity: Math.max(1, Number(qty[comp.id]) || 1),
+        quantity: Math.max(1, qty),
         unit_cost: price,
         price_status: price > 0 ? 'FIRM' : 'PENDING_RFQ',
         source: 'user',
-        meta: section ? { sectionIndex: section.section_number } : {},
+        meta: {},
       });
       await refreshLines();
     } catch (e: any) {
       setError(e?.response?.data?.error ?? 'Failed to add component');
     } finally {
       setBusyId(null);
+    }
+  };
+
+  const handlePick = async (c: ConfiguratorComponent, qty: number) => {
+    if (pickerMode === 'swap') {
+      await doSwap(c);
+    } else {
+      await doAdd(c, qty);
     }
   };
 
@@ -165,30 +168,6 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
     } catch (e: any) { setError(e?.response?.data?.error ?? 'Qty update failed'); }
   };
 
-  const openSwap = async (line: ComponentLineRow) => {
-    setSwapLine(line);
-    setSwapCands([]);
-    try {
-      const rows = await configuratorService.listComponents({ category: line.category ?? undefined, limit: 100 } as any);
-      rows.sort((a: any, b: any) => ((Number(a.price) || Infinity) - (Number(b.price) || Infinity)));
-      setSwapCands(rows.filter((r) => r.part_number !== line.part_number).slice(0, 15));
-    } catch { /* dialog shows empty-state */ }
-  };
-
-  const doSwap = async (c: ConfiguratorComponent) => {
-    if (!swapLine) return;
-    try {
-      const price = Number(c.price ?? c.mat_cost ?? 0) || 0;
-      await configuratorV2Service.patchLine(swapLine.id, {
-        component_id: c.id, part_number: c.part_number ?? null, name: c.name ?? null,
-        unit_cost: price, price_status: price > 0 ? 'FIRM' : 'PENDING_RFQ',
-        meta: { swapped: true, placeholder: false },
-      });
-      setSwapLine(null);
-      await refreshLines();
-    } catch (e: any) { setError(e?.response?.data?.error ?? 'Swap failed'); }
-  };
-
   const ruleGroups = useMemo(() => {
     const ruleLines = lines.filter((l) => l.source === 'rule');
     const g = new Map<string, ComponentLineRow[]>();
@@ -203,6 +182,7 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
     () => lines.filter((l) => l.source === 'user'),
     [lines]
   );
+
   const sectionLabel = (l: ComponentLineRow) => {
     if (l.scope !== 'section') return 'Board';
     const s = sections.find((x) => x.id === l.section_id);
@@ -216,307 +196,221 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
           {error}
         </Alert>
       )}
-
       {info && (
         <Alert severity="success" onClose={() => setInfo(null)} sx={{ mb: 1.5, bgcolor: 'rgba(34,197,94,0.08)', color: '#86EFAC', border: '1px solid ' + C.border, fontSize: 12 }}>
           {info}
         </Alert>
       )}
 
-      {/* ── Auto components (rule-driven, swappable, qty-editable) ── */}
-      <Box sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', mb: 2, overflow: 'hidden' }}>
-        <Stack direction="row" alignItems="center" sx={{ px: 2, py: 1, borderBottom: '1px solid ' + C.border }}>
-          <Typography sx={{ color: '#CBD5E1', fontSize: 12.5, fontWeight: 700, flex: 1 }}>
-            Auto components — engine-selected from the design (rules editable in Standards)
-          </Typography>
-          <Button
-            size="small" startIcon={<AutoAwesomeRoundedIcon sx={{ fontSize: 14 }} />}
-            disabled={generating}
-            onClick={generate}
-            sx={{ bgcolor: '#00c8ff', color: '#06151c', textTransform: 'none', fontWeight: 700, fontSize: 12, px: 1.5, '&:hover': { bgcolor: '#33d4ff' } }}
-          >
-            {generating ? 'Generating…' : ruleGroups.length ? 'Regenerate' : 'Generate components'}
-          </Button>
-        </Stack>
-        {!ruleGroups.length ? (
-          <Typography sx={{ color: C.sub, fontSize: 12, px: 2, py: 1.5, fontStyle: 'italic' }}>
-            Click Generate — every component the design implies is created automatically
-            (hardware, terminations, wiring, identification…). No catalog match still creates
-            a placeholder line so nothing is missed.
-          </Typography>
-        ) : (
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7, width: 240 }}>Component</TableCell>
-                <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7 }}>Catalog item</TableCell>
-                <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7, width: 110 }}>Qty basis</TableCell>
-                <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7, width: 70 }}>Qty</TableCell>
-                <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7, width: 100 }} align="right">Unit price</TableCell>
-                <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7, width: 56 }} align="center">Status</TableCell>
-                <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7, width: 90 }} />
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {ruleGroups.map(([group, rows]) => (
-                <React.Fragment key={group}>
-                  <TableRow>
-                    <TableCell colSpan={7} sx={{ color: '#A9B6C9', fontSize: 10.5, fontWeight: 700, letterSpacing: 0.5, borderBottom: '1px solid ' + C.border, bgcolor: 'rgba(0,200,255,0.04)', py: 0.6 }}>
-                      {displayCase(group)}
-                    </TableCell>
-                  </TableRow>
-                  {rows.map((l) => {
-                    const unitCost = Number(l.unit_cost);
-                    const statusColor = l.price_status === 'FIRM' ? C.green : l.price_status === 'ESTIMATED' ? C.amber : C.red;
-                    const statusLabel = l.price_status === 'FIRM' ? 'Firm price' : l.price_status === 'ESTIMATED' ? 'Estimated price' : 'No firm price — RFQ required';
-                    return (
-                      <TableRow key={l.id}>
-                        <TableCell sx={{ ...cellSx, width: 240, verticalAlign: 'middle', py: 0.55, color: C.text, fontSize: 12 }}>
-                          {l.meta?.ruleDescription ?? l.category}
-                        </TableCell>
-                        <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.55 }}>
-                          {l.meta?.placeholder ? (
-                            <Box>
-                              <Chip label="No catalog match" size="small"
-                                sx={{ bgcolor: 'rgba(217,119,6,0.12)', color: '#FCD34D', fontSize: 9.5, height: 18 }} />
-                              <Typography sx={{ color: C.sub, fontSize: 10.5, fontStyle: 'italic', mt: 0.2 }}>
-                                add to catalog or swap
-                              </Typography>
-                            </Box>
-                          ) : (
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                              <Typography sx={{ color: C.text, fontSize: 12 }}>{displayCase(l.name)}</Typography>
-                              {l.meta?.swapped && (
-                                <Chip label="swapped" size="small" sx={{ bgcolor: 'transparent', border: '1px solid ' + C.amber, color: C.amber, fontSize: 8.5, height: 15 }} />
-                              )}
-                            </Box>
-                          )}
-                        </TableCell>
-                        <TableCell sx={{ ...cellSx, width: 110, verticalAlign: 'middle', py: 0.55, color: C.sub, fontSize: 10.5, whiteSpace: 'nowrap' }}>
-                          {l.meta?.qtyFormula ?? ''}
-                        </TableCell>
-                        <TableCell sx={{ ...cellSx, width: 70, verticalAlign: 'middle', py: 0.55 }}>
-                          <TextField
-                            size="small" defaultValue={l.quantity} key={l.id + ':' + l.quantity}
-                            onBlur={(e) => { const v = Number(e.target.value); if (v !== Number(l.quantity)) setLineQty(l, v); }}
-                            inputProps={{ style: { textAlign: 'center', padding: '4px 6px', fontSize: 12 } }}
-                            sx={{ width: 56, '& .MuiOutlinedInput-root': { bgcolor: C.bg, color: C.text, '& fieldset': { borderColor: C.border } } }}
-                          />
-                        </TableCell>
-                        <TableCell sx={{ ...cellSx, width: 100, verticalAlign: 'middle', py: 0.55 }} align="right">
-                          {unitCost > 0 ? (
-                            <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
-                              <PriceSourceDot source={(l.meta as any)?.priceSource} />
-                              {usd(unitCost)}
-                            </Box>
-                          ) : (
-                            <Tooltip title="No quote received yet — raise an RFQ" arrow>
-                              <Typography sx={{ color: C.red, fontWeight: 800, fontSize: 12, display: 'inline' }}>RFQ $</Typography>
-                            </Tooltip>
-                          )}
-                        </TableCell>
-                        <TableCell sx={{ ...cellSx, width: 56, verticalAlign: 'middle', py: 0.55 }} align="center">
-                          <Tooltip title={statusLabel} arrow>
-                            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: statusColor, boxShadow: '0 0 6px ' + statusColor, display: 'inline-block' }} />
-                          </Tooltip>
-                        </TableCell>
-                        <TableCell sx={{ ...cellSx, width: 90, verticalAlign: 'middle', py: 0.55, whiteSpace: 'nowrap' }} align="right">
-                          <Button size="small" startIcon={<SwapHorizRoundedIcon sx={{ fontSize: 13 }} />} onClick={() => openSwap(l)}
-                            sx={{ color: '#00c8ff', textTransform: 'none', fontSize: 10.5, minWidth: 0, mr: 0.5 }}>
-                            Swap
-                          </Button>
-                          <IconButton size="small" disabled={busyId === l.id} onClick={() => remove(l)} sx={{ color: C.sub, p: 0.3, '&:hover': { color: C.red } }}>
-                            <DeleteOutlineRoundedIcon sx={{ fontSize: 15 }} />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </React.Fragment>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </Box>
+      {/* ── Tabs ── */}
+      <Tabs
+        value={tab}
+        onChange={(_e, v) => setTab(v)}
+        sx={{
+          mb: 2, minHeight: 36,
+          '& .MuiTabs-indicator': { bgcolor: C.blue, height: 2 },
+          '& .MuiTab-root': {
+            textTransform: 'none', fontSize: 12.5, minHeight: 36,
+            color: 'rgba(217,228,251,0.7)',
+            '&.Mui-selected': { color: C.blue },
+          },
+        }}
+      >
+        <Tab label="Designer's pick" />
+        <Tab label="Manual additions" />
+      </Tabs>
 
-      {/* Swap dialog (same-category alternatives, cheapest first) */}
-      <Dialog open={!!swapLine} onClose={() => setSwapLine(null)} maxWidth="sm" fullWidth
-        PaperProps={{ sx: { bgcolor: C.surface, border: '1px solid ' + C.border, backgroundImage: 'none' } }}>
-        <DialogTitle sx={{ color: C.text, fontSize: 14, fontWeight: 700 }}>
-          Swap — {displayCase(swapLine?.meta?.ruleDescription ?? swapLine?.name)} ({displayCase(swapLine?.category)})
-        </DialogTitle>
-        <DialogContent>
-          {!swapCands.length ? (
-            <Typography sx={{ color: C.sub, fontSize: 12.5 }}>No alternatives in this category yet — add one in Library → Catalog.</Typography>
-          ) : swapCands.map((c) => (
-            <Stack key={c.id} direction="row" alignItems="center" spacing={1} sx={{ py: 0.6, borderBottom: '1px solid ' + C.border }}>
-              <Typography sx={{ color: C.text, fontSize: 12, flex: 1 }} noWrap>{c.name}</Typography>
-              <Typography sx={{ color: C.sub, fontSize: 11 }}>{Number(c.price) ? usd(Number(c.price)) : 'RFQ'}</Typography>
-              <Button size="small" onClick={() => doSwap(c)}
-                sx={{ color: C.green, textTransform: 'none', fontSize: 11, border: '1px solid ' + C.border }}>
-                Use this
-              </Button>
-            </Stack>
-          ))}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setSwapLine(null)} sx={{ color: C.sub, textTransform: 'none' }}>Close</Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Selected components (user lines) */}
-      <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', mb: 2, overflow: 'hidden' }}>
-        <Typography sx={{ color: '#CBD5E1', fontSize: 12.5, fontWeight: 700, px: 2, py: 1, borderBottom: '1px solid ' + C.border }}>
-          Manual additions — {userLines.length} line(s) · picked from the catalog below
-        </Typography>
-        {!userLines.length ? (
-          <Typography sx={{ color: C.sub, fontSize: 12, px: 2, py: 1.5, fontStyle: 'italic' }}>
-            Nothing picked yet. Breakers, bus, supports, labels and lugs are engine-managed — add everything else from the catalog below.
-          </Typography>
-        ) : (
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell sx={headSx}>Category</TableCell>
-                <TableCell sx={headSx}>Part #</TableCell>
-                <TableCell sx={headSx}>Name</TableCell>
-                <TableCell sx={headSx}>Where</TableCell>
-                <TableCell sx={headSx} align="right">Qty</TableCell>
-                <TableCell sx={headSx} align="right">Unit cost</TableCell>
-                <TableCell sx={headSx}>Price</TableCell>
-                <TableCell sx={headSx} />
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {userLines.map((l) => (
-                <TableRow key={l.id}>
-                  <TableCell sx={{ ...cellSx, color: C.sub }}>{displayCase(l.category)}</TableCell>
-                  <TableCell sx={cellSx}>
-                    <Tooltip title={l.part_number ?? ''}><span>{compactSku(l.part_number) || '—'}</span></Tooltip>
-                  </TableCell>
-                  <TableCell sx={cellSx}>{displayCase(l.name)}</TableCell>
-                  <TableCell sx={{ ...cellSx, color: C.sub }}>{sectionLabel(l)}</TableCell>
-                  <TableCell sx={cellSx} align="right">{l.quantity}</TableCell>
-                  <TableCell sx={cellSx} align="right">{l.unit_cost ? usd(Number(l.unit_cost)) : '—'}</TableCell>
-                  <TableCell sx={cellSx}>
-                    <Chip
-                      label={l.price_status === 'PENDING_RFQ' ? 'RFQ' : l.price_status}
-                      size="small"
-                      sx={{ bgcolor: 'transparent', border: '1px solid ' + (l.price_status === 'FIRM' ? C.green : C.amber), color: l.price_status === 'FIRM' ? C.green : C.amber, fontSize: 9.5, height: 18 }}
-                    />
-                  </TableCell>
-                  <TableCell sx={cellSx} align="right">
-                    <IconButton size="small" disabled={busyId === l.id} onClick={() => remove(l)} sx={{ color: C.sub, '&:hover': { color: C.red } }}>
-                      <DeleteOutlineRoundedIcon sx={{ fontSize: 16 }} />
-                    </IconButton>
-                  </TableCell>
+      {/* ── Tab 0: Auto components ── */}
+      {tab === 0 && (
+        <Box sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', mb: 2, overflow: 'hidden' }}>
+          <Stack direction="row" alignItems="center" sx={{ px: 2, py: 1, borderBottom: '1px solid ' + C.border }}>
+            <Typography sx={{ color: '#CBD5E1', fontSize: 12.5, fontWeight: 700, flex: 1 }}>
+              Auto components — engine-selected from the design (rules editable in Standards)
+            </Typography>
+            <Button
+              size="small"
+              startIcon={<AddRoundedIcon sx={{ fontSize: 14 }} />}
+              onClick={openAddPicker}
+              sx={{ color: C.text, textTransform: 'none', fontSize: 12, border: '1px solid ' + C.border, bgcolor: C.bg, mr: 1, '&:hover': { borderColor: C.blue } }}
+            >
+              + Add component
+            </Button>
+            <Button
+              size="small" startIcon={<AutoAwesomeRoundedIcon sx={{ fontSize: 14 }} />}
+              disabled={generating}
+              onClick={generate}
+              sx={{ bgcolor: C.blue, color: '#06151c', textTransform: 'none', fontWeight: 700, fontSize: 12, px: 1.5, '&:hover': { bgcolor: '#33d4ff' } }}
+            >
+              {generating ? 'Generating…' : ruleGroups.length ? 'Regenerate' : 'Generate components'}
+            </Button>
+          </Stack>
+          {!ruleGroups.length ? (
+            <Typography sx={{ color: C.sub, fontSize: 12, px: 2, py: 1.5, fontStyle: 'italic' }}>
+              Click Generate — every component the design implies is created automatically
+              (hardware, terminations, wiring, identification…). No catalog match still creates
+              a placeholder line so nothing is missed.
+            </Typography>
+          ) : (
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7, width: 240 }}>Component</TableCell>
+                  <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7 }}>Catalog item</TableCell>
+                  <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7, width: 110 }}>Qty basis</TableCell>
+                  <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7, width: 70 }}>Qty</TableCell>
+                  <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7, width: 100 }} align="right">Unit price</TableCell>
+                  <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7, width: 56 }} align="center">Status</TableCell>
+                  <TableCell sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, borderBottom: '1px solid ' + C.border, whiteSpace: 'nowrap', py: 0.7, width: 90 }} />
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </Box>
-
-      {/* Catalog browser */}
-      <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1.5 }} flexWrap="wrap" useFlexGap>
-        <Select
-          size="small" value={category} displayEmpty onChange={(e) => setCategory(e.target.value)}
-          sx={{ minWidth: 200, bgcolor: C.bg, color: C.text, fontSize: 12.5, '& fieldset': { borderColor: C.border } }}
-        >
-          <MenuItem value="" sx={{ fontSize: 12.5 }}>All categories</MenuItem>
-          {categories.map((c) => (
-            <MenuItem key={c.category} value={c.category} sx={{ fontSize: 12.5 }}>
-              {displayCase(c.category)} ({c.count})
-            </MenuItem>
-          ))}
-        </Select>
-        <TextField
-          size="small" placeholder="Search part #, name, description…" value={q}
-          onChange={(e) => setQ(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter') search(); }}
-          sx={{ ...inputSx, flex: 1, minWidth: 220 }}
-        />
-        <Button
-          startIcon={<SearchRoundedIcon sx={{ fontSize: 16 }} />} onClick={search} disabled={loading}
-          sx={{ bgcolor: C.blue, color: '#06151c', textTransform: 'none', fontWeight: 600, fontSize: 12.5, '&:hover': { bgcolor: '#33d4ff' } }}
-        >
-          Search
-        </Button>
-      </Stack>
-
-      {loading ? (
-        <Stack alignItems="center" sx={{ py: 5 }}><CircularProgress size={22} sx={{ color: C.blue }} /></Stack>
-      ) : !results.length ? (
-        <Box sx={{ bgcolor: C.bg, border: '1px dashed ' + C.border, borderRadius: '10px', p: 3, textAlign: 'center' }}>
-          <Typography sx={{ color: C.sub, fontSize: 12.5 }}>
-            No catalog items match. The catalog is shared with the legacy screens — anything added there is available here.
-          </Typography>
-        </Box>
-      ) : (
-        <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', overflow: 'hidden' }}>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell sx={headSx}>Category</TableCell>
-                <TableCell sx={headSx}>Part #</TableCell>
-                <TableCell sx={headSx}>Name</TableCell>
-                <TableCell sx={headSx} align="right">Price</TableCell>
-                <TableCell sx={headSx}>Qty</TableCell>
-                <TableCell sx={headSx}>Scope</TableCell>
-                <TableCell sx={headSx} />
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {results.map((r) => {
-                const price = Number(r.price ?? r.mat_cost ?? r.material_cost) || 0;
-                return (
-                  <TableRow key={r.id}>
-                    <TableCell sx={{ ...cellSx, color: C.sub }}>{displayCase(r.category)}</TableCell>
-                    <TableCell sx={cellSx}>
-                      <Tooltip title={r.part_number ?? ''}><span>{compactSku(r.part_number) || '—'}</span></Tooltip>
-                    </TableCell>
-                    <TableCell sx={cellSx}>{displayCase(r.name)}</TableCell>
-                    <TableCell sx={cellSx} align="right">
-                      {price > 0 ? usd(price) : <Chip label="RFQ" size="small" sx={{ bgcolor: 'transparent', border: '1px solid ' + C.amber, color: C.amber, fontSize: 9.5, height: 18 }} />}
-                    </TableCell>
-                    <TableCell sx={cellSx}>
-                      <TextField
-                        size="small" value={qty[r.id] ?? '1'}
-                        onChange={(e) => setQty((m) => ({ ...m, [r.id]: e.target.value.replace(/[^0-9]/g, '') }))}
-                        sx={{ ...inputSx, width: 60 }}
-                      />
-                    </TableCell>
-                    <TableCell sx={cellSx}>
-                      <Select
-                        size="small" value={scope[r.id] ?? 'board'}
-                        onChange={(e) => setScope((m) => ({ ...m, [r.id]: e.target.value }))}
-                        sx={{ minWidth: 110, bgcolor: C.surface, color: C.text, fontSize: 11.5, '& fieldset': { borderColor: C.border } }}
-                      >
-                        <MenuItem value="board" sx={{ fontSize: 11.5 }}>Board</MenuItem>
-                        {sections.map((s) => (
-                          <MenuItem key={s.id} value={s.id} sx={{ fontSize: 11.5 }}>Section {s.section_number}</MenuItem>
-                        ))}
-                      </Select>
-                    </TableCell>
-                    <TableCell sx={cellSx} align="right">
-                      <Button
-                        size="small" startIcon={<AddRoundedIcon sx={{ fontSize: 14 }} />}
-                        disabled={busyId === r.id}
-                        onClick={() => add(r)}
-                        sx={{ color: C.blue, textTransform: 'none', fontSize: 11.5, border: '1px solid ' + C.border }}
-                      >
-                        Add
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
+              </TableHead>
+              <TableBody>
+                {ruleGroups.map(([group, rows]) => (
+                  <React.Fragment key={group}>
+                    <TableRow>
+                      <TableCell colSpan={7} sx={{ color: '#A9B6C9', fontSize: 10.5, fontWeight: 700, letterSpacing: 0.5, borderBottom: '1px solid ' + C.border, bgcolor: 'rgba(0,200,255,0.04)', py: 0.6 }}>
+                        {displayCase(group)}
+                      </TableCell>
+                    </TableRow>
+                    {rows.map((l) => {
+                      const unitCost = Number(l.unit_cost);
+                      const statusColor = l.price_status === 'FIRM' ? C.green : l.price_status === 'ESTIMATED' ? C.amber : C.red;
+                      const statusLabel = l.price_status === 'FIRM' ? 'Firm price' : l.price_status === 'ESTIMATED' ? 'Estimated price' : 'No firm price — RFQ required';
+                      return (
+                        <TableRow key={l.id}>
+                          <TableCell sx={{ ...cellSx, width: 240, verticalAlign: 'middle', py: 0.55, color: C.text, fontSize: 12 }}>
+                            {l.meta?.ruleDescription ?? l.category}
+                          </TableCell>
+                          <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.55 }}>
+                            {l.meta?.placeholder ? (
+                              <Box>
+                                <Chip label="No catalog match" size="small"
+                                  sx={{ bgcolor: 'rgba(217,119,6,0.12)', color: '#FCD34D', fontSize: 9.5, height: 18 }} />
+                                <Typography sx={{ color: C.sub, fontSize: 10.5, fontStyle: 'italic', mt: 0.2 }}>
+                                  add to catalog or swap
+                                </Typography>
+                              </Box>
+                            ) : (
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <Typography sx={{ color: C.text, fontSize: 12 }}>{displayCase(l.name)}</Typography>
+                                {l.meta?.swapped && (
+                                  <Chip label="swapped" size="small" sx={{ bgcolor: 'transparent', border: '1px solid ' + C.amber, color: C.amber, fontSize: 8.5, height: 15 }} />
+                                )}
+                              </Box>
+                            )}
+                          </TableCell>
+                          <TableCell sx={{ ...cellSx, width: 110, verticalAlign: 'middle', py: 0.55, color: C.sub, fontSize: 10.5, whiteSpace: 'nowrap' }}>
+                            {l.meta?.qtyFormula ?? ''}
+                          </TableCell>
+                          <TableCell sx={{ ...cellSx, width: 70, verticalAlign: 'middle', py: 0.55 }}>
+                            <TextField
+                              size="small" defaultValue={l.quantity} key={l.id + ':' + l.quantity}
+                              onBlur={(e) => { const v = Number(e.target.value); if (v !== Number(l.quantity)) setLineQty(l, v); }}
+                              inputProps={{ style: { textAlign: 'center', padding: '4px 6px', fontSize: 12 } }}
+                              sx={{ width: 56, '& .MuiOutlinedInput-root': { bgcolor: C.bg, color: C.text, '& fieldset': { borderColor: C.border } } }}
+                            />
+                          </TableCell>
+                          <TableCell sx={{ ...cellSx, width: 100, verticalAlign: 'middle', py: 0.55 }} align="right">
+                            {unitCost > 0 ? (
+                              <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
+                                <PriceSourceDot source={(l.meta as any)?.priceSource} />
+                                {usd(unitCost)}
+                              </Box>
+                            ) : (
+                              <Tooltip title="No quote received yet — raise an RFQ" arrow>
+                                <Typography sx={{ color: C.red, fontWeight: 800, fontSize: 12, display: 'inline' }}>RFQ $</Typography>
+                              </Tooltip>
+                            )}
+                          </TableCell>
+                          <TableCell sx={{ ...cellSx, width: 56, verticalAlign: 'middle', py: 0.55 }} align="center">
+                            <Tooltip title={statusLabel} arrow>
+                              <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: statusColor, boxShadow: '0 0 6px ' + statusColor, display: 'inline-block' }} />
+                            </Tooltip>
+                          </TableCell>
+                          <TableCell sx={{ ...cellSx, width: 90, verticalAlign: 'middle', py: 0.55, whiteSpace: 'nowrap' }} align="right">
+                            <Button size="small" startIcon={<SwapHorizRoundedIcon sx={{ fontSize: 13 }} />} onClick={() => openSwap(l)}
+                              sx={{ color: C.blue, textTransform: 'none', fontSize: 10.5, minWidth: 0, mr: 0.5 }}>
+                              Swap
+                            </Button>
+                            <IconButton size="small" disabled={busyId === l.id} onClick={() => remove(l)} sx={{ color: C.sub, p: 0.3, '&:hover': { color: C.red } }}>
+                              <DeleteOutlineRoundedIcon sx={{ fontSize: 15 }} />
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </React.Fragment>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </Box>
       )}
+
+      {/* ── Tab 1: Manual additions ── */}
+      {tab === 1 && (
+        <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', mb: 2, overflow: 'hidden' }}>
+          <Typography sx={{ color: '#CBD5E1', fontSize: 12.5, fontWeight: 700, px: 2, py: 1, borderBottom: '1px solid ' + C.border }}>
+            Manual additions — {userLines.length} line(s) · picked via Add component
+          </Typography>
+          {!userLines.length ? (
+            <Typography sx={{ color: C.sub, fontSize: 12, px: 2, py: 1.5, fontStyle: 'italic' }}>
+              Nothing picked yet. Breakers, bus, supports, labels and lugs are engine-managed — add everything else via the "+ Add component" button in Designer's pick.
+            </Typography>
+          ) : (
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={headSx}>Category</TableCell>
+                  <TableCell sx={headSx}>Part #</TableCell>
+                  <TableCell sx={headSx}>Name</TableCell>
+                  <TableCell sx={headSx}>Where</TableCell>
+                  <TableCell sx={headSx} align="right">Qty</TableCell>
+                  <TableCell sx={headSx} align="right">Unit cost</TableCell>
+                  <TableCell sx={headSx}>Price</TableCell>
+                  <TableCell sx={headSx} />
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {userLines.map((l) => (
+                  <TableRow key={l.id}>
+                    <TableCell sx={{ ...cellSx, color: C.sub }}>{displayCase(l.category)}</TableCell>
+                    <TableCell sx={cellSx}>
+                      <Tooltip title={l.part_number ?? ''}><span>{compactSku(l.part_number) || '—'}</span></Tooltip>
+                    </TableCell>
+                    <TableCell sx={cellSx}>{displayCase(l.name)}</TableCell>
+                    <TableCell sx={{ ...cellSx, color: C.sub }}>{sectionLabel(l)}</TableCell>
+                    <TableCell sx={cellSx} align="right">{l.quantity}</TableCell>
+                    <TableCell sx={cellSx} align="right">{l.unit_cost ? usd(Number(l.unit_cost)) : '—'}</TableCell>
+                    <TableCell sx={cellSx}>
+                      <Chip
+                        label={l.price_status === 'PENDING_RFQ' ? 'RFQ' : l.price_status}
+                        size="small"
+                        sx={{ bgcolor: 'transparent', border: '1px solid ' + (l.price_status === 'FIRM' ? C.green : C.amber), color: l.price_status === 'FIRM' ? C.green : C.amber, fontSize: 9.5, height: 18 }}
+                      />
+                    </TableCell>
+                    <TableCell sx={cellSx} align="right">
+                      <IconButton size="small" disabled={busyId === l.id} onClick={() => remove(l)} sx={{ color: C.sub, '&:hover': { color: C.red } }}>
+                        <DeleteOutlineRoundedIcon sx={{ fontSize: 16 }} />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </Box>
+      )}
+
+      {/* ── Shared picker dialog (swap + add) ── */}
+      <ComponentPickerDialog
+        open={pickerOpen}
+        mode={pickerMode}
+        lockedCategory={pickerCategory}
+        onClose={() => { setPickerOpen(false); setSwapLine(null); }}
+        onPick={handlePick}
+      />
     </Box>
   );
 };
 
-export default ComponentsPanel
+export default ComponentsPanel;

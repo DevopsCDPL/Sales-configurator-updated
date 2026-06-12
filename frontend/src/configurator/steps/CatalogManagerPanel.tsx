@@ -19,7 +19,6 @@ import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
-import UploadFileRoundedIcon from '@mui/icons-material/UploadFileRounded';
 import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
 import TableRowsRoundedIcon from '@mui/icons-material/TableRowsRounded';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
@@ -100,7 +99,6 @@ const CatalogManagerPanel: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [builderFor, setBuilderFor] = useState<ConfiguratorComponent | null>(null);
-  const fileRef = useRef<HTMLInputElement>(null);
   const xlsRef = useRef<HTMLInputElement>(null);
   const [vendors, setVendors] = useState<Vendor[]>([]);
 
@@ -220,40 +218,6 @@ const CatalogManagerPanel: React.FC = () => {
     }
   };
 
-  const importLegacy = async () => {
-    setImporting(true);
-    setError(null);
-    try {
-      const out = await configuratorV2Service.importLegacy();
-      setInfo(`Legacy catalog imported \u2014 ${out.created} new, ${out.updated} updated, ${out.skipped} skipped. Catalog total: ${out.total}.`);
-      await Promise.all([search(), loadCounts()]);
-    } catch (e: any) {
-      setError(e?.response?.data?.error ?? 'Legacy import failed');
-    } finally {
-      setImporting(false);
-    }
-  };
-
-  const importWb = async (file: File) => {
-    setImporting(true);
-    setError(null);
-    try {
-      const out = await configuratorV2Service.importWorkbook(file);
-      setInfo(
-        `Workbook imported — ${out.componentsCreated} new / ${out.componentsUpdated} updated components, ` +
-        `bus schedule ${out.busScheduleRows} rows, neutral ${out.neutralRows} rows, ` +
-        `copper $${out.copperPricePerLb}/lb, rates ${Object.keys(out.ratesFound).length} buckets.` +
-        (out.warnings.length ? ` ${out.warnings.length} warning(s).` : '')
-      );
-      await Promise.all([search(), loadCounts()]);
-    } catch (e: any) {
-      setError(e?.response?.data?.error ?? 'Workbook import failed');
-    } finally {
-      setImporting(false);
-      if (fileRef.current) fileRef.current.value = '';
-    }
-  };
-
   const importComponents = async (file: File) => {
     setImporting(true);
     setError(null);
@@ -297,10 +261,6 @@ const CatalogManagerPanel: React.FC = () => {
         />
         <Box sx={{ flex: 1 }} />
         <input
-          ref={fileRef} type="file" accept=".xlsm,.xlsx" hidden
-          onChange={(e) => { const f = e.target.files?.[0]; if (f) importWb(f); }}
-        />
-        <input
           ref={xlsRef} type="file" accept=".xlsx" hidden
           onChange={(e) => { const f = e.target.files?.[0]; if (f) importComponents(f); }}
         />
@@ -319,21 +279,6 @@ const CatalogManagerPanel: React.FC = () => {
           sx={{ color: C.text, textTransform: 'none', fontSize: 12.5, border: '1px solid ' + C.border, bgcolor: C.bg, '&:hover': { borderColor: C.blue } }}
         >
           {importing ? 'Importing…' : 'Upload Excel'}
-        </Button>
-        <Button
-          disabled={importing}
-          onClick={importLegacy}
-          sx={{ color: C.text, textTransform: 'none', fontSize: 12.5, border: '1px solid ' + C.border, bgcolor: C.bg, '&:hover': { borderColor: C.blue } }}
-        >
-          {importing ? 'Importing\u2026' : 'Import legacy catalog'}
-        </Button>
-        <Button
-          startIcon={<UploadFileRoundedIcon sx={{ fontSize: 16 }} />}
-          disabled={importing}
-          onClick={() => fileRef.current?.click()}
-          sx={{ color: C.text, textTransform: 'none', fontSize: 12.5, border: '1px solid ' + C.border, bgcolor: C.bg, '&:hover': { borderColor: C.blue } }}
-        >
-          {importing ? 'Importing…' : 'Import TPS workbook'}
         </Button>
         <Button
           startIcon={<AddRoundedIcon sx={{ fontSize: 16 }} />}
