@@ -623,7 +623,7 @@ export const configuratorV2Service = {
 
   async generateComponents(switchboardId: string): Promise<{
     ok: boolean; created: number; updated: number; removed: number;
-    placeholders: number; kept: number; rulesEvaluated: number;
+    placeholders: number; kept: number; rematched?: number; rulesEvaluated: number;
   }> {
     const res = await api.post(`${ROOT}/switchboards/${switchboardId}/generate-components`);
     return res.data;

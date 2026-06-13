@@ -16,6 +16,7 @@
  * ComponentPickerDialog (used for both swap and add).
  */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useNotification } from '../../contexts/NotificationContext';
 import {
   Box, Typography, Stack, Chip, Button, Alert, CircularProgress, TextField,
   Table, TableHead, TableRow, TableCell, TableBody, IconButton, Tooltip,
@@ -53,7 +54,7 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, view, onLinesC
   const [lines, setLines] = useState<ComponentLineRow[]>(board.lines);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [info, setInfo] = useState<string | null>(null);
+  const { showSuccess, showError } = useNotification();
   const [generating, setGenerating] = useState(false);
 
   // Picker dialog state
@@ -178,11 +179,14 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, view, onLinesC
     setError(null);
     try {
       const out = await configuratorV2Service.generateComponents(switchboardId);
-      setInfo(`Components generated — ${out.created} new, ${out.updated} qty-refreshed, ${out.kept} kept (engineer-edited), ${out.removed} removed` +
-        (out.placeholders ? `, ${out.placeholders} NO-CATALOG-MATCH placeholder(s) need attention` : ''));
+      showSuccess(`Components generated — ${out.created} new`
+        + (out.rematched ? `, ${out.rematched} matched to catalog` : '')
+        + `, ${out.updated} qty-refreshed, ${out.kept} kept`
+        + (out.placeholders ? `, ${out.placeholders} still need a catalog match` : '')
+        + (out.removed ? `, ${out.removed} removed` : ''));
       await refreshLines();
     } catch (e: any) {
-      setError(e?.response?.data?.error ?? 'Generation failed');
+      showError(e?.response?.data?.error ?? 'Generation failed');
     } finally {
       setGenerating(false);
     }
@@ -224,11 +228,6 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, view, onLinesC
           {error}
         </Alert>
       )}
-      {info && (
-        <Alert severity="success" onClose={() => setInfo(null)} sx={{ mb: 1.5, bgcolor: 'rgba(34,197,94,0.08)', color: '#86EFAC', border: '1px solid ' + C.border, fontSize: 12 }}>
-          {info}
-        </Alert>
-      )}
 
       {/* ── Picks view: Auto components ── */}
       {view === 'picks' && (() => {
@@ -256,7 +255,14 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, view, onLinesC
             <Box sx={{ flex: 1, minWidth: 0 }}>
               <Box sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', mb: 2, overflow: 'hidden' }}>
                 <Stack direction="row" alignItems="center" sx={{ px: 2, py: 1, borderBottom: '1px solid ' + C.border }}>
-                  <Box sx={{ flex: 1 }} />
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Typography sx={{ color: '#F0F6FF', fontSize: 13, fontWeight: 800 }}>
+                      Auto-selected components
+                    </Typography>
+                    <Typography sx={{ color: C.sub, fontSize: 11 }}>
+                      Engine picks from the catalog per the design rules — swap, adjust qty, or add your own.
+                    </Typography>
+                  </Box>
                   <Button
                     size="small"
                     startIcon={<AddRoundedIcon sx={{ fontSize: 14 }} />}

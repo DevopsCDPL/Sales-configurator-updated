@@ -195,6 +195,24 @@ async function generateComponents(switchboardId, { companyId = null } = {}) {
       // engineer's swap/qty edits win; refresh qty only if untouched
       const patch = {};
       if (!prev.meta?.qtyEdited && Number(prev.quantity) !== qty) patch.quantity = qty;
+      // RE-MATCH: a line that is still a placeholder (no real catalog part) and was
+      // NOT engineer-swapped gets upgraded to a real component if the catalog now
+      // has a match. This fixes placeholders created when the catalog was empty —
+      // they previously stayed "NO CATALOG MATCH" forever across regenerations.
+      const wasPlaceholder = prev.meta?.placeholder || !prev.component_id;
+      if (wasPlaceholder && !prev.meta?.swapped && pick) {
+        patch.component_id = pick.id;
+        patch.part_number = pick.part_number ?? null;
+        patch.name = pick.name || pick.part_number || prev.name;
+        patch.unit_cost = Number(pick.price) || 0;
+        patch.price_status = Number(pick.price) > 0 ? 'FIRM' : 'PENDING_RFQ';
+        patch.meta = {
+          ...(prev.meta || {}),
+          placeholder: false,
+          priceSource: pick.specifications?.priceSource ?? null,
+        };
+        out.rematched = (out.rematched || 0) + 1;
+      }
       if (Object.keys(patch).length) { await prev.update(patch); out.updated += 1; } else out.kept += 1;
       continue;
     }
