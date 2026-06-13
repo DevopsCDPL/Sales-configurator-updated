@@ -73,7 +73,9 @@ function compileBomV2(board, sections, lines, std, copperEst = null) {
     const barDesc = `${sched.barThk_in}" x ${sched.barW_in}" ${sched.material} bar, ${sched.plating}`;
     rows.push(genRow(board, gid, ih, 'BUSSING', `Phase bus — ${barDesc} × ${mainRun}" run`, sched.barsPerPhase * 3, 'bar-run'));
     rows.push(genRow(board, gid, ih, 'BUSSING', `Neutral bus (${neutralPct}%) — ${barDesc}`, Math.ceil(sched.barsPerPhase * (neutralPct / 100)), 'bar-run'));
-    rows.push(genRow(board, gid, ih, 'BUSSING', `Ground bus — 0.25" x 2" Cu × ${mainRun}" [SEED]`, 1, 'bar-run'));
+    const gbThk = Number(std.groundBus?.thk_in) || 0.25;
+    const gbW = Number(std.groundBus?.w_in) || 2;
+    rows.push(genRow(board, gid, ih, 'BUSSING', `Ground bus — ${gbThk}" x ${gbW}" Cu × ${mainRun}" [SEED]`, 1, 'bar-run'));
   }
 
   // 3. GEN-GLASTIC — supports per SCCR spacing
@@ -88,7 +90,8 @@ function compileBomV2(board, sections, lines, std, copperEst = null) {
 
   // 4. GEN-HW-JOINT — joint kits at section boundaries
   if (sections.length > 1 && sched) {
-    const joints = (sections.length - 1) * sched.barsPerPhase * 3;
+    const jkPerJoint = Number(std.termination?.joint_kits_per_joint) || 1;
+    const joints = (sections.length - 1) * sched.barsPerPhase * 3 * jkPerJoint;
     rows.push(genRow(board, 'GEN-HW-JOINT', hashInputs({ joints }), 'HARDWARE',
       'Bus joint kit (bolts + Belleville washers) [SEED 1/joint]', joints, 'kit'));
   }
@@ -142,7 +145,8 @@ function compileBomV2(board, sections, lines, std, copperEst = null) {
 
   // 7. GEN-LUG — terminations [v1: devices × poles]
   const deviceLines = lines.filter((l) => (l.category || '').toUpperCase() === 'CIRCUIT BREAKER');
-  const lugQty = deviceLines.reduce((a, l) => a + (Number(l.meta?.poles) || 3) * (Number(l.quantity) || 1), 0);
+  const lugsPerPole = Number(std.termination?.lugs_per_pole) || 1;
+  const lugQty = deviceLines.reduce((a, l) => a + (Number(l.meta?.poles) || 3) * (Number(l.quantity) || 1) * lugsPerPole, 0);
   if (lugQty > 0) {
     rows.push(genRow(board, 'GEN-LUG', hashInputs({ lugQty }), 'LUGS',
       'Mechanical lug, load-side termination [SEED 1/pole — refined with cable sizing]', lugQty, 'ea'));

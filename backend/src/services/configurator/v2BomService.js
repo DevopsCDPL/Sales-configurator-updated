@@ -10,6 +10,7 @@
 const models = require('../../models');
 const { compileBomV2 } = require('./bomEngineV2');
 const { estimateCopper } = require('./copperEstimator');
+const { getStandard, firstRow } = require('./standardsService');
 const { getCostingDefaults } = require('./costingDefaults');
 
 async function stdRows(tableKey) {
@@ -86,6 +87,17 @@ async function compileBoardBom(switchboardId, { copperPricePerLb = null } = {}) 
       sectionIndex: Number(l.meta?.sectionIndex) || 1,
     }));
 
+  const copperEstStd = firstRow(await getStandard('copper_estimator'));
+  const groundStd    = firstRow(await getStandard('ground_bus'));
+  const gradeRows    = await getStandard('copper_grades');
+  const termStd      = firstRow(await getStandard('termination_factors'));
+
+  const isAl = bd.busMaterial === 'Aluminium';
+  const gradeRow = isAl
+    ? gradeRows.find(g => /alumin/i.test(g.grade))
+    : (gradeRows.find(g => g.isDefault) || gradeRows.find(g => !/alumin/i.test(g.grade)));
+  const densityLbIn3 = Number(gradeRow?.density_lb_in3) || (isAl ? 0.098 : 0.323);
+
   const copper = estimateCopper(
     { busSchedule, busSupportSpacing, neutralSchedule },
     {
@@ -96,9 +108,11 @@ async function compileBoardBom(switchboardId, { copperPricePerLb = null } = {}) 
       sectionWidthsIn: sections.map((s) => Number(s.layout?.frame?.width_in) || 0),
       busZoneHeightsIn: sections.map((s) => Number(s.layout?.frame?.topBusZone_in) || 12),
       devices,
-      groundBar: { thkIn: 0.25, wIn: 2 }, // [SEED]
+      groundBar: { thkIn: Number(groundStd?.thk_in) || 0.25, wIn: Number(groundStd?.w_in) || 2 },
+      densityLbIn3,
       pricePerLb,
-    }
+    },
+    { fabFactor: Number(copperEstStd?.fab_factor) || 1.15, contingencyPct: Number(copperEstStd?.contingency_pct) || 10, stubLenIn: Number(copperEstStd?.stub_len_in) || 24 }
   );
 
   const bom = compileBomV2(
@@ -114,7 +128,7 @@ async function compileBoardBom(switchboardId, { copperPricePerLb = null } = {}) 
     },
     sections,
     lines,
-    { busSchedule, busSupportSpacing, frameLibrary, safetyItemsMap },
+    { busSchedule, busSupportSpacing, frameLibrary, safetyItemsMap, groundBus: groundStd, termination: termStd },
     copper.estimatedLbs > 0 ? copper : null
   );
 

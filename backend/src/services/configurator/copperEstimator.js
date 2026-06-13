@@ -39,7 +39,7 @@ function supportSpacingFor(busSupportSpacing, sccrKA) {
  */
 function estimateCopper(std, input, settings = DEFAULT_SETTINGS) {
   const notes = [];
-  const density = input.material === 'Cu' ? CU_DENSITY_LB_IN3 : AL_DENSITY_LB_IN3;
+  const density = Number(input.densityLbIn3) || (input.material === 'Cu' ? CU_DENSITY_LB_IN3 : AL_DENSITY_LB_IN3);
 
   const row = busScheduleFor(std.busSchedule, input.mainBusRatingA, input.material);
   if (!row) {
