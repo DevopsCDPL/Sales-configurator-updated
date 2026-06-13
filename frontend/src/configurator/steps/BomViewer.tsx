@@ -35,6 +35,67 @@ const StatusDot: React.FC<{ status: string }> = ({ status }) => {
 const cellSx = { color: C.text, fontSize: 12, borderBottom: '1px solid ' + C.border, py: 0.7 };
 const headSx = { color: C.sub, fontSize: 10.5, fontWeight: 700, letterSpacing: 0.5, borderBottom: '1px solid ' + C.border, py: 0.7 };
 
+// Build-order ranking for category grouping; unknown categories fall after these (alphabetical).
+const CAT_ORDER = [
+  'ENCLOSURE', 'BUSSING', 'GLASTIC', 'CIRCUIT BREAKER', 'LUGS', 'TERMINALS',
+  'CONTROLS', 'WIRE CABLE', 'CONDUIT', 'HARDWARE', 'SAFETY',
+];
+const catRank = (cat: string) => {
+  const i = CAT_ORDER.indexOf((cat || '').toUpperCase());
+  return i === -1 ? CAT_ORDER.length : i;
+};
+
+type ConsRow = {
+  cat: string;
+  part_number: string | null;
+  description: string | null;
+  quantity: number;
+  unit: string;
+  unit_cost: number;
+  price_status: string;
+  source: string;
+  generator_id: string | null;
+  copper_weight_lbs: number | null;
+};
+
+/**
+ * Consolidate the full flat board rows into one category-grouped list.
+ * Identical lines (same category + part_number + description + generator_id)
+ * are merged: quantity + copper_weight_lbs summed, ext recomputed from qty×unit_cost.
+ * Generator (GEN-*) rows stay distinct via their generator_id/part key.
+ */
+const consolidate = (rows: BomRow[]): ConsRow[] => {
+  const map = new Map<string, ConsRow>();
+  rows.forEach((r) => {
+    const cat = (r.category || 'OTHER').toUpperCase();
+    const key = cat + '|' + (r.part_number ?? '') + '|' + (r.description ?? '') + '|' + (r.generator_id ?? '');
+    const existing = map.get(key);
+    if (existing) {
+      existing.quantity += r.quantity;
+      if (r.copper_weight_lbs != null) existing.copper_weight_lbs = (existing.copper_weight_lbs ?? 0) + r.copper_weight_lbs;
+    } else {
+      map.set(key, {
+        cat,
+        part_number: r.part_number,
+        description: r.description,
+        quantity: r.quantity,
+        unit: r.unit,
+        unit_cost: r.unit_cost,
+        price_status: r.price_status,
+        source: r.source,
+        generator_id: r.generator_id,
+        copper_weight_lbs: r.copper_weight_lbs,
+      });
+    }
+  });
+  return Array.from(map.values()).sort((a, b) => {
+    const rk = catRank(a.cat) - catRank(b.cat);
+    if (rk !== 0) return rk;
+    if (a.cat !== b.cat) return a.cat.localeCompare(b.cat);
+    return String(a.description ?? '').localeCompare(String(b.description ?? ''));
+  });
+};
+
 const Stat: React.FC<{ label: string; value: string; accent?: string }> = ({ label, value, accent }) => (
   <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', px: 2, py: 1.25, minWidth: 130 }}>
     <Typography sx={{ color: C.sub, fontSize: 10.5, letterSpacing: 0.5, textTransform: 'uppercase' }}>{label}</Typography>
@@ -48,7 +109,6 @@ const BomViewer: React.FC<BomViewerProps> = ({ switchboardId }) => {
   const [bom, setBom] = useState<BomResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [view, setView] = useState<'ebom' | 'mbom'>('ebom');
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -84,6 +144,19 @@ const BomViewer: React.FC<BomViewerProps> = ({ switchboardId }) => {
   const { totals, copper } = bom;
   const laborTotal = Number(totals.laborHours?.total ?? 0);
 
+  // Single consolidated, category-grouped view of the FULL board BOM
+  // (every line incl. copper / bus / glastic generator rows).
+  const consRows = consolidate(bom.rows);
+  // Compute per-category rowSpan metadata + continuous S.No for merged Category cells.
+  const groupCounts = new Map<string, number>();
+  consRows.forEach((r) => groupCounts.set(r.cat, (groupCounts.get(r.cat) ?? 0) + 1));
+  const seenCat = new Set<string>();
+  const consFlat = consRows.map((r, i) => {
+    const isFirstInGroup = !seenCat.has(r.cat);
+    if (isFirstInGroup) seenCat.add(r.cat);
+    return { r, isFirstInGroup, rowsInGroup: groupCounts.get(r.cat) ?? 1, sno: i + 1 };
+  });
+
   return (
     <Box sx={{ px: 3, pb: 4 }}>
       {/* Totals strip */}
@@ -91,7 +164,7 @@ const BomViewer: React.FC<BomViewerProps> = ({ switchboardId }) => {
         <Stat label="Material total" value={usd(totals.materialTotal)} accent={C.green} />
         <Stat label="Copper (est.)" value={totals.copperEstLbs + ' lb'} />
         <Stat label="Copper cost" value={usd(copper.costUsd)} />
-        <Stat label="BOM rows" value={String(totals.rowCount)} />
+        <Stat label="BOM rows" value={String(consRows.length)} />
         <Stat
           label="Awaiting price"
           value={String(totals.nonFirmCount)}
@@ -141,149 +214,65 @@ const BomViewer: React.FC<BomViewerProps> = ({ switchboardId }) => {
         ))}
       </Box>
 
-      {/* eBOM / mBOM toggle — segmented control (matches catalog Source/Status toggles) */}
-      <Stack direction="row" sx={{ mb: 1.5 }}>
-        <Box sx={{ display: 'inline-flex', bgcolor: '#0B0B0D', border: '1px solid ' + C.border, borderRadius: '8px', p: 0.25 }}>
-          {(['ebom', 'mbom'] as const).map((v) => (
-            <Box
-              key={v}
-              onClick={() => setView(v)}
-              sx={{
-                cursor: 'pointer', userSelect: 'none', fontSize: 11.5, fontWeight: 600,
-                px: 1.25, height: 24, display: 'inline-flex', alignItems: 'center',
-                borderRadius: '6px', whiteSpace: 'nowrap',
-                color: view === v ? C.blue : C.sub,
-                bgcolor: view === v ? 'rgba(0,200,255,0.14)' : 'transparent',
-                transition: 'background-color .12s, color .12s',
-              }}
-            >
-              {v === 'ebom' ? 'eBOM · by section' : 'mBOM · by part'}
-            </Box>
-          ))}
-        </Box>
-      </Stack>
-
-      {view === 'ebom' ? (
-        Object.entries(bom.ebom).map(([secName, cats]) => {
-          // Flatten this section's categories into rows with continuous S.No
-          // and merged-Category rowSpan metadata (first row of each cat group renders the cell).
-          const flat: { r: BomRow; cat: string; rowsInGroup: number; isFirstInGroup: boolean; sno: number }[] = [];
-          let sno = 0;
-          Object.entries(cats).forEach(([cat, rows]) => {
-            (rows as BomRow[]).forEach((r, i) => {
-              sno += 1;
-              flat.push({ r, cat, rowsInGroup: (rows as BomRow[]).length, isFirstInGroup: i === 0, sno });
-            });
-          });
-          return (
-            <Box key={secName} sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', mb: 1.5, overflow: 'hidden' }}>
-              <Typography sx={{ color: '#CBD5E1', fontSize: 12.5, fontWeight: 700, px: 2, py: 1, borderBottom: '1px solid ' + C.border }}>
-                {secName}
-              </Typography>
-              <Box sx={{ maxHeight: '52vh', overflow: 'auto' }}>
-                <Table size="small" stickyHeader>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell sx={{ ...headSx, width: 40, whiteSpace: 'nowrap', borderRight: '1px solid #1E2235', bgcolor: '#0B0B0D' }} align="center">S.No</TableCell>
-                      <TableCell sx={{ ...headSx, width: 130, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Category</TableCell>
-                      <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D', minWidth: 260 }}>Description</TableCell>
-                      <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Part #</TableCell>
-                      <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }} align="right">Qty</TableCell>
-                      <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Unit</TableCell>
-                      <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }} align="right">Unit cost</TableCell>
-                      <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }} align="right">Ext.</TableCell>
-                      <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Source</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {flat.map(({ r, cat, rowsInGroup, isFirstInGroup, sno: n }, idx) => (
-                      <TableRow key={cat + idx}>
-                        <TableCell align="center" sx={{ ...cellSx, width: 40, color: C.sub, fontSize: 11.5, textAlign: 'center', verticalAlign: 'middle', py: 0.5, borderRight: '1px solid #1E2235' }}>{n}</TableCell>
-                        {isFirstInGroup && (
-                          <TableCell rowSpan={rowsInGroup} sx={{ ...cellSx, width: 130, color: '#A9B6C9', fontWeight: 700, fontSize: 11, verticalAlign: 'middle', borderRight: '1px solid #1E2235' }}>
-                            {cat}
-                          </TableCell>
-                        )}
-                        <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5, minWidth: 260 }}>
-                          <Tooltip title={String(r.description ?? '') + (r.copper_weight_lbs ? ' · ' + r.copper_weight_lbs + ' lb Cu' : '')} arrow>
-                            <Box sx={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                              {r.description}
-                              {r.copper_weight_lbs ? (
-                                <Typography component="span" sx={{ color: C.sub, fontSize: 11 }}> · {r.copper_weight_lbs} lb Cu</Typography>
-                              ) : null}
-                            </Box>
-                          </Tooltip>
-                        </TableCell>
-                        <TableCell sx={{ ...cellSx, color: C.sub, verticalAlign: 'middle', py: 0.5 }}>
-                          <Stack spacing={0.4} alignItems="flex-start">
-                            <Box component="span">{r.part_number ?? '—'}</Box>
-                            <StatusDot status={r.price_status} />
-                          </Stack>
-                        </TableCell>
-                        <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5 }} align="right">{r.quantity}</TableCell>
-                        <TableCell sx={{ ...cellSx, color: C.sub, verticalAlign: 'middle', py: 0.5 }}>{r.unit}</TableCell>
-                        <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5, textAlign: 'right' }} align="right">{r.unit_cost ? usd(r.unit_cost) : '—'}</TableCell>
-                        <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5, textAlign: 'right' }} align="right">{r.unit_cost ? usd(r.unit_cost * r.quantity) : '—'}</TableCell>
-                        <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5 }}>
-                          {r.source === 'generator' ? (
-                            <Tooltip title={'Auto-generated (' + (r.generator_id ?? '') + ') — recomputed from the design, cannot drift'}>
-                              <Chip label={r.generator_id ?? 'GEN'} size="small" sx={{ bgcolor: 'rgba(0,200,255,0.12)', color: '#60A5FA', fontSize: 9.5, height: 18 }} />
-                            </Tooltip>
-                          ) : (
-                            <Typography sx={{ color: C.sub, fontSize: 11 }}>{r.source}</Typography>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </Box>
-            </Box>
-          );
-        })
-      ) : (
-        <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', overflow: 'hidden' }}>
-          <Box sx={{ maxHeight: '58vh', overflow: 'auto' }}>
-            <Table size="small" stickyHeader>
-              <TableHead>
-                <TableRow>
-                  <TableCell sx={{ ...headSx, width: 40, whiteSpace: 'nowrap', borderRight: '1px solid #1E2235', bgcolor: '#0B0B0D' }} align="center">S.No</TableCell>
-                  <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Part #</TableCell>
-                  <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Category</TableCell>
-                  <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D', minWidth: 260 }}>Description</TableCell>
-                  <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }} align="right">Total qty</TableCell>
-                  <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Unit</TableCell>
-                  <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }} align="right">Unit cost</TableCell>
-                  <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Where used</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {bom.mbom.map((m, i) => (
-                  <TableRow key={i}>
-                    <TableCell align="center" sx={{ ...cellSx, width: 40, color: C.sub, fontSize: 11.5, textAlign: 'center', verticalAlign: 'middle', py: 0.5, borderRight: '1px solid #1E2235' }}>{i + 1}</TableCell>
-                    <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5 }}>
-                      <Stack spacing={0.4} alignItems="flex-start">
-                        <Box component="span">{m.part_number ?? '—'}</Box>
-                        <StatusDot status={m.price_status} />
-                      </Stack>
-                    </TableCell>
-                    <TableCell sx={{ ...cellSx, color: C.sub, verticalAlign: 'middle', py: 0.5 }}>{m.category}</TableCell>
+      {/* Consolidated board BOM — single category-grouped table (assembly + procurement) */}
+      <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', overflow: 'hidden' }}>
+        <Box sx={{ maxHeight: '58vh', overflow: 'auto' }}>
+          <Table size="small" stickyHeader>
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ ...headSx, width: 40, whiteSpace: 'nowrap', borderRight: '1px solid #1E2235', bgcolor: '#0B0B0D' }} align="center">S.No</TableCell>
+                <TableCell sx={{ ...headSx, width: 130, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Category</TableCell>
+                <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D', minWidth: 260 }}>Description</TableCell>
+                <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Part #</TableCell>
+                <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }} align="right">Qty</TableCell>
+                <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Unit</TableCell>
+                <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }} align="right">Unit cost</TableCell>
+                <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }} align="right">Ext.</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {consFlat.map(({ r, isFirstInGroup, rowsInGroup, sno: n }, idx) => {
+                const isGen = r.source === 'generator' || !!r.generator_id;
+                return (
+                  <TableRow key={r.cat + '|' + idx}>
+                    <TableCell align="center" sx={{ ...cellSx, width: 40, color: C.sub, fontSize: 11.5, textAlign: 'center', verticalAlign: 'middle', py: 0.5, borderRight: '1px solid #1E2235' }}>{n}</TableCell>
+                    {isFirstInGroup && (
+                      <TableCell rowSpan={rowsInGroup} sx={{ ...cellSx, width: 130, color: '#A9B6C9', fontWeight: 700, fontSize: 11, verticalAlign: 'middle', borderRight: '1px solid #1E2235' }}>
+                        {r.cat}
+                      </TableCell>
+                    )}
                     <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5, minWidth: 260 }}>
-                      <Tooltip title={String(m.description ?? '')} arrow>
-                        <Box sx={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{m.description}</Box>
+                      <Tooltip title={String(r.description ?? '') + (r.copper_weight_lbs ? ' · ' + r.copper_weight_lbs + ' lb Cu' : '')} arrow>
+                        <Box sx={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                          {r.description}
+                          {r.copper_weight_lbs ? (
+                            <Typography component="span" sx={{ color: C.sub, fontSize: 11 }}> · {r.copper_weight_lbs} lb Cu</Typography>
+                          ) : null}
+                          {isGen ? (
+                            <Tooltip title={'Auto-computed from the design (' + (r.generator_id ?? 'GEN') + ') — recomputed, cannot drift'} arrow>
+                              <Chip label="GEN" size="small" sx={{ ml: 0.75, bgcolor: 'rgba(0,200,255,0.12)', color: '#60A5FA', fontSize: 8.5, height: 15, '& .MuiChip-label': { px: 0.6 } }} />
+                            </Tooltip>
+                          ) : null}
+                        </Box>
                       </Tooltip>
                     </TableCell>
-                    <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5 }} align="right">{m.quantity}</TableCell>
-                    <TableCell sx={{ ...cellSx, color: C.sub, verticalAlign: 'middle', py: 0.5 }}>{m.unit}</TableCell>
-                    <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5, textAlign: 'right' }} align="right">{m.unit_cost ? usd(m.unit_cost) : '—'}</TableCell>
-                    <TableCell sx={{ ...cellSx, color: C.sub, fontSize: 11, verticalAlign: 'middle', py: 0.5 }}>{[...new Set(m.whereUsed)].join(', ')}</TableCell>
+                    <TableCell sx={{ ...cellSx, color: C.sub, verticalAlign: 'middle', py: 0.5 }}>
+                      <Stack spacing={0.4} alignItems="flex-start">
+                        <Box component="span">{r.part_number ?? '—'}</Box>
+                        <StatusDot status={r.price_status} />
+                      </Stack>
+                    </TableCell>
+                    <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5 }} align="right">{r.quantity}</TableCell>
+                    <TableCell sx={{ ...cellSx, color: C.sub, verticalAlign: 'middle', py: 0.5 }}>{r.unit !== 'ea' ? r.unit : ''}</TableCell>
+                    <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5, textAlign: 'right' }} align="right">{r.unit_cost ? usd(r.unit_cost) : '—'}</TableCell>
+                    <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5, textAlign: 'right' }} align="right">{r.unit_cost ? usd(r.unit_cost * r.quantity) : '—'}</TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Box>
+                );
+              })}
+            </TableBody>
+          </Table>
         </Box>
-      )}
+      </Box>
     </Box>
   );
 };
