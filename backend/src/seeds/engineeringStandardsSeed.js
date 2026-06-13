@@ -110,4 +110,51 @@ module.exports = {
     { ruleId: 'R9', description: 'Key interlock pair (main-tie scheme)', partNumber: null, qtyFormula: 'per_tie', seed: true, verified: false },
     { ruleId: 'R10', description: 'Space heater + thermostat (outdoor)', partNumber: null, qtyFormula: 'per_section', seed: true, verified: false },
   ],
+
+  /** Conductor material densities (lb/in^3). [SEED] - current audited values. */
+  copper_grades: [
+    { grade: 'C110 ETP', density_lb_in3: 0.323, isDefault: true, seed: true, verified: false },
+    { grade: 'C101 OFE', density_lb_in3: 0.323, seed: true, verified: false },
+    { grade: 'Aluminium 6101', density_lb_in3: 0.098, seed: true, verified: false },
+  ],
+
+  /** Copper cost model (single-row). [SEED]. */
+  copper_cost: [
+    { comex_source: 'live', manual_price_per_lb: 9.2, fabrication_adder_per_lb: 0, plating_tin_adder_per_lb: 0, plating_silver_adder_per_lb: 0, escalation_threshold_pct: 5, seed: true, verified: false },
+  ],
+
+  /** Copper estimator constants (single-row). [SEED]. */
+  copper_estimator: [
+    { fab_factor: 1.15, contingency_pct: 10, stub_len_in: 24, seed: true, verified: false },
+  ],
+
+  /** Ground bus dimensions (single-row). [SEED]. */
+  ground_bus: [
+    { thk_in: 0.25, w_in: 2, seed: true, verified: false },
+  ],
+
+  /** Enclosure costing model (single-row). model 'fabricated' is a placeholder pending TPS confirmation. [SEED]. */
+  enclosure_costing: [
+    { model: 'fabricated', steel_price_per_lb: 0, gauge_structure: 12, gauge_covers: 14, fab_hours_per_frame: 0, nema1_mult: 1, nema3r_mult: 1, nema4_mult: 1, nema4x_mult: 1, finish_adder: 0, seed: true, verified: false },
+  ],
+
+  /** Load calc factors (single-row). [SEED]. */
+  load_calc: [
+    { continuous_factor: 1.25, default_power_factor: 0.85, motor_factor: 1.25, default_continuous: true, seed: true, verified: false },
+  ],
+
+  /** Breaker selection rules (single-row). [SEED]. */
+  breaker_rules: [
+    { default_pct_rated: 80, acb_threshold_A: 1600, mccb_max_A: 1200, sccr_basis: 'fully', drawout_mains: true, seed: true, verified: false },
+  ],
+
+  /** Termination factors (single-row). [SEED]. */
+  termination_factors: [
+    { lugs_per_pole: 1, joint_kits_per_joint: 1, seed: true, verified: false },
+  ],
+
+  /** Proposal settings (single-row). [SEED]. */
+  proposal_settings: [
+    { boards_per_block: 4, page_orientation: 'portrait', terms_clause_set: 'TPS_v4', seed: true, verified: false },
+  ],
 };

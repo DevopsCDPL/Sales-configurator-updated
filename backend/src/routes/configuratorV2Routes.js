@@ -36,6 +36,7 @@ const { renderV2QuotationPdf } = require('../services/configurator/v2QuotePdf');
 const { buildEpicorWorkbook } = require('../services/configurator/epicorExport');
 const { buildProposalPdf } = require('../services/configurator/tpsProposalPdf');
 const { generateComponents } = require('../services/configurator/componentRules');
+const standardsService = require('../services/configurator/standardsService');
 const multer = require('multer');
 const wbUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20 * 1024 * 1024 } });
 const ExcelJS = require('exceljs');
@@ -440,7 +441,11 @@ router.get('/engineering-standards/:tableKey', wrap(async (req, res) => {
     where: { table_key: req.params.tableKey, is_current: true },
     order: [['version', 'DESC']],
   });
-  res.json(row);
+  if (row) return res.json(row);
+  // No current DB version: surface the seed default so new keys are
+  // visible/editable in the UI and PUT can create the first version.
+  const rows = await standardsService.getStandard(req.params.tableKey, req.companyId ?? null);
+  return res.json({ table_key: req.params.tableKey, version: 0, rows, is_current: false, seed: true });
 }));
 
 router.put('/engineering-standards/:tableKey', wrap(async (req, res) => {
