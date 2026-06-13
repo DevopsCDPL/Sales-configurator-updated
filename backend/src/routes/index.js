@@ -51,6 +51,7 @@ const calendarEventRoutes = require('./calendarEventRoutes');
 const configuratorRoutes = require('./configuratorRoutes');
 const configuratorV2Routes = require('./configuratorV2Routes');
 const overwatchRoutes = require('./overwatchRoutes');
+const capacityRoutes = require('./capacityRoutes');
 
 // Register UUID param validators on every sub-router.
 // router.param() is local to the router instance where the param is defined,
@@ -121,5 +122,7 @@ router.use('/configurator', configuratorRoutes);
 router.use('/configurator-v2', configuratorV2Routes);
 // Owner Overwatch dashboard — rule-based analytics + risk board (LLM layer parked)
 router.use('/overwatch', overwatchRoutes);
+// Capacity planning — Teams/Workers/Machines masters + tasks (planner automation parked)
+router.use('/capacity', capacityRoutes);
 
 module.exports = router;

@@ -1,23 +1,18 @@
 'use strict';
 
 /**
- * Capacity Planning + Production Traveller — CRUD skeleton (NOT MOUNTED).
+ * Capacity Planning + Production Traveller — CRUD routes.
  *
  * Design: docs/capacity-traveler-design.md. Aligns with Phase F §4 (F3
  * Production) and §10 debt #3 (capacity planner automation).
  *
- * STATUS: this router is NOT wired into routes/index.js. It is unreachable
- * at runtime until the owner answers the design questionnaire and someone
- * uncomments these two lines in routes/index.js:
- *
- *     const capacityRoutes = require('./capacityRoutes');
- *     router.use('/capacity', capacityRoutes);
+ * Mounted in routes/index.js at /capacity.
  *
  * Authorization: every route requires an authenticated user, tenant scope,
  * and the 'workorders' department resource (middleware/departments.js).
- * v1 surface = read + create for the capacity masters + read for tasks.
+ * v1 surface = list/create/delete for the capacity masters + read for tasks.
  * Mutation of task state (check-in/out, quality adjudication, the planner)
- * is intentionally OUT of this skeleton — added in P1/P2/P3 once contracts
+ * is intentionally OUT of this surface — added in P1/P2/P3 once contracts
  * (checklist formats, quality gates, roster) are confirmed.
  */
 
@@ -147,7 +142,7 @@ router.post('/machines', async (req, res) => {
   }
 });
 
-// ── Tasks (read-only in skeleton) ────────────────────────────────
+// ── Tasks (read-only) ────────────────────────────────────────────
 router.get('/tasks', async (req, res) => {
   try {
     const where = companyWhere(req);
@@ -169,6 +164,40 @@ router.get('/tasks/:id', async (req, res) => {
     const row = await models.WorkTask.findByPk(req.params.id);
     if (!row) return res.status(404).json({ success: false, message: 'Task not found.' });
     return res.json({ success: true, data: row });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// ── Delete (capacity masters) ────────────────────────────────────
+// Tenant-scoped destroys: a row is only removed when it belongs to the
+// caller's company (companyWhere adds company_id when present). Returns 404
+// if no matching row was deleted so callers don't silently no-op.
+router.delete('/teams/:id', async (req, res) => {
+  try {
+    const count = await models.CapacityTeam.destroy({ where: companyWhere(req, { id: req.params.id }) });
+    if (!count) return res.status(404).json({ success: false, message: 'Team not found.' });
+    return res.json({ success: true });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+router.delete('/workers/:id', async (req, res) => {
+  try {
+    const count = await models.CapacityWorker.destroy({ where: companyWhere(req, { id: req.params.id }) });
+    if (!count) return res.status(404).json({ success: false, message: 'Worker not found.' });
+    return res.json({ success: true });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+router.delete('/machines/:id', async (req, res) => {
+  try {
+    const count = await models.CapacityMachine.destroy({ where: companyWhere(req, { id: req.params.id }) });
+    if (!count) return res.status(404).json({ success: false, message: 'Machine not found.' });
+    return res.json({ success: true });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }

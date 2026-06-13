@@ -48,6 +48,7 @@ import PartsMasterPage from './pages/PartsMasterPage';
 import DatabaseHubPage from './pages/DatabaseHubPage';
 import AnalyticsHubPage from './pages/AnalyticsHubPage';
 import OverwatchPage from './pages/OverwatchPage';
+import CapacityPlanningPage from './pages/CapacityPlanningPage';
 import RawMaterialMasterPage from './pages/RawMaterialMasterPage';
 import VendorPOPage from './pages/VendorPOPage';
 import VendorProcurementPage from './pages/VendorProcurementPage';
@@ -198,6 +199,8 @@ const App: React.FC = () => {
           <Route path="activity-timeline" element={<RBACRoute path="/activity-timeline"><ActivityTimelineView /></RBACRoute>} />
           {/* Owner Overwatch dashboard — admin / super admin only (page self-guards by role) */}
           <Route path="overwatch" element={<RBACRoute path="/overwatch"><OverwatchPage /></RBACRoute>} />
+          {/* Capacity planning — admin / super admin (page self-guards by role); planner automation parked */}
+          <Route path="capacity" element={<RBACRoute path="/capacity"><CapacityPlanningPage /></RBACRoute>} />
           <Route path="messages" element={<ChatPage />} />
         </Route>
 

@@ -36,6 +36,7 @@ import {
   Settings as SettingsIcon,
   Shield as ShieldIcon,
   Radar as RadarIcon,
+  Engineering as EngineeringIcon,
   Logout as LogoutIcon,
   Person as PersonIcon,
   Notifications as NotificationsIcon,
@@ -522,6 +523,7 @@ const Layout: React.FC = () => {
           <List disablePadding>
             {renderNavItem(<DashboardIcon />, 'Dashboard', '/', c)}
             {isAdminPlus && renderNavItem(<RadarIcon />, 'Overwatch', '/overwatch', c)}
+            {isAdminPlus && renderNavItem(<EngineeringIcon />, 'Capacity', '/capacity', c)}
             {renderNavItem(<FolderIcon />, 'Projects', '/projects', c)}
             {canSeeSidebarItem(user?.role, '/procurement', userIsCoAdmin) && renderNavItem(<ShoppingCartIcon />, 'Procurement', '/procurement', c)}
             {canSeeSidebarItem(user?.role, '/material-stock', userIsCoAdmin) && renderNavItem(<InventoryIcon />, 'Inventory', '/material-stock', c)}
