@@ -35,6 +35,7 @@ import {
   LocalShipping as ShippingIcon,
   Settings as SettingsIcon,
   Shield as ShieldIcon,
+  Radar as RadarIcon,
   Logout as LogoutIcon,
   Person as PersonIcon,
   Notifications as NotificationsIcon,
@@ -520,6 +521,7 @@ const Layout: React.FC = () => {
           {renderSectionLabel('Operations', c)}
           <List disablePadding>
             {renderNavItem(<DashboardIcon />, 'Dashboard', '/', c)}
+            {isAdminPlus && renderNavItem(<RadarIcon />, 'Overwatch', '/overwatch', c)}
             {renderNavItem(<FolderIcon />, 'Projects', '/projects', c)}
             {canSeeSidebarItem(user?.role, '/procurement', userIsCoAdmin) && (
               <ListItem disablePadding sx={{ mb: 0.3 }}>

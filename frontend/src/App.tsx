@@ -47,6 +47,7 @@ import BusinessAnalyticsPage from './pages/BusinessAnalyticsPage';
 import PartsMasterPage from './pages/PartsMasterPage';
 import DatabaseHubPage from './pages/DatabaseHubPage';
 import AnalyticsHubPage from './pages/AnalyticsHubPage';
+import OverwatchPage from './pages/OverwatchPage';
 import RawMaterialMasterPage from './pages/RawMaterialMasterPage';
 import VendorPOPage from './pages/VendorPOPage';
 import VendorProcurementPage from './pages/VendorProcurementPage';
@@ -195,6 +196,8 @@ const App: React.FC = () => {
           <Route path="business-analytics" element={<RBACRoute path="/business-analytics"><BusinessAnalyticsPage /></RBACRoute>} />
           <Route path="analytics" element={<RBACRoute path="/analytics"><BusinessAnalyticsPage /></RBACRoute>} />
           <Route path="activity-timeline" element={<RBACRoute path="/activity-timeline"><ActivityTimelineView /></RBACRoute>} />
+          {/* Owner Overwatch dashboard — admin / super admin only (page self-guards by role) */}
+          <Route path="overwatch" element={<RBACRoute path="/overwatch"><OverwatchPage /></RBACRoute>} />
           <Route path="messages" element={<ChatPage />} />
         </Route>
 

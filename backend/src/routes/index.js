@@ -50,6 +50,7 @@ const platformAdminRoutes = require('./platformAdminRoutes');
 const calendarEventRoutes = require('./calendarEventRoutes');
 const configuratorRoutes = require('./configuratorRoutes');
 const configuratorV2Routes = require('./configuratorV2Routes');
+const overwatchRoutes = require('./overwatchRoutes');
 
 // Register UUID param validators on every sub-router.
 // router.param() is local to the router instance where the param is defined,
@@ -118,5 +119,7 @@ router.use('/calendar-events', calendarEventRoutes);
 router.use('/configurator', configuratorRoutes);
 // V2 spine (Phases A–F) — inert unless CONFIGURATOR_V2_SPINE=true
 router.use('/configurator-v2', configuratorV2Routes);
+// Owner Overwatch dashboard — rule-based analytics + risk board (LLM layer parked)
+router.use('/overwatch', overwatchRoutes);
 
 module.exports = router;
