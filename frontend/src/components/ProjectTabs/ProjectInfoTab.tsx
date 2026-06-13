@@ -5,13 +5,11 @@ import {
   Grid,
   TextField,
   Button,
-  FormControl,
-  Select,
-  MenuItem,
   Checkbox,
   FormControlLabel,
   Chip,
   Fade,
+  Autocomplete,
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import { useNotification } from '../../contexts/NotificationContext';
@@ -23,8 +21,8 @@ import { Project, Client } from '../../types';
 import { projectService } from '../../services/projectService';
 import { clientService } from '../../services/clientService';
 import {
-  UI, TabContainer, AnimatedSection, MotionBox, InfoBanner,
-  inputSx, textareaSx, selectSx, FieldLabel as FL, FieldGroup as FG,
+  UI, TabContainer, AnimatedSection, MotionBox,
+  FieldLabel as FL, FieldGroup as FG,
 } from '../UIComponents';
 
 // Helpers
@@ -168,6 +166,8 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, onUpdate, onPr
         billing_address: '',
         client_poc: '',
         client_poc_phone: '',
+        client_poc_email: '',
+        client_poc_designation: '',
         seller_prepared_by: '',
         seller_poc: '',
         seller_designation: '',
@@ -176,6 +176,8 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, onUpdate, onPr
         project_name: '',
         ship_to_address: '',
         same_as_billing: true,
+        required_by_date: '',
+        project_notes: '',
         revision: 'R_01',
       };
     }
@@ -189,6 +191,8 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, onUpdate, onPr
       billing_address: billingAddr,
       client_poc: qi.client_poc ?? project?.client?.poc_name ?? '',
       client_poc_phone: qi.client_poc_phone ?? project?.client?.poc_phone ?? '',
+      client_poc_email: (qi as any).client_poc_email ?? project?.client?.poc_email ?? '',
+      client_poc_designation: (qi as any).client_poc_designation ?? project?.client?.position ?? '',
       seller_prepared_by: qi.seller_prepared_by ?? preparedBy?.name ?? '',
       seller_poc: qi.seller_poc ?? preparedBy?.name ?? '',
       seller_designation: qi.seller_designation ?? preparedBy?.position ?? '',
@@ -197,6 +201,8 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, onUpdate, onPr
       project_name: project?.project_name ?? '',
       ship_to_address: sameAsBilling ? billingAddr : savedShip,
       same_as_billing: sameAsBilling,
+      required_by_date: (qi as any).required_by_date ?? '',
+      project_notes: (qi as any).project_notes ?? '',
       revision: formatRevision(project?.revision || 1),
     };
   }, [project]);
@@ -226,10 +232,12 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, onUpdate, onPr
         quote_info: {
           client_name: form.client_name, billing_address: form.billing_address,
           client_poc: form.client_poc, client_poc_phone: form.client_poc_phone,
+          client_poc_email: form.client_poc_email, client_poc_designation: form.client_poc_designation,
           seller_prepared_by: form.seller_prepared_by, seller_poc: form.seller_poc,
           seller_designation: form.seller_designation, seller_poc_phone: form.seller_poc_phone,
           seller_email: form.seller_email, ship_to_address: form.ship_to_address,
-        },
+          required_by_date: form.required_by_date, project_notes: form.project_notes,
+        } as any,
       });
       setLastSaved(new Date());
     } catch { /* silent fail for auto-save */ }
@@ -262,28 +270,82 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, onUpdate, onPr
         ...f, selected_client_id: clientId, client_name: client.client_name,
         billing_address: client.address || '', client_poc: client.poc_name || '',
         client_poc_phone: client.poc_phone || '',
+        client_poc_email: client.poc_email || '',
+        client_poc_designation: client.position || '',
       }));
     } else {
       setForm(f => ({ ...f, selected_client_id: clientId }));
     }
   };
 
+  /* Resolve the client to link on save:
+     - empty company name → keep existing link (client optional)
+     - matches an existing client (case-insensitive trimmed) → link it; if the
+       user edited details, update that client (idempotent, no duplicate)
+     - new name → create a client in the DB, then link it. */
+  const resolveClient = async (): Promise<string | undefined> => {
+    const name = form.client_name.trim();
+    if (!name) return form.selected_client_id || project?.client_id || undefined;
+
+    const payload = {
+      client_name: name,
+      address: form.billing_address || undefined,
+      poc_name: form.client_poc || undefined,
+      poc_phone: form.client_poc_phone || undefined,
+      poc_email: form.client_poc_email || undefined,
+      position: form.client_poc_designation || undefined,
+    };
+
+    // Match against the loaded list first (covers the selected-client case too).
+    const match = clients.find(
+      c => c.client_name.trim().toLowerCase() === name.toLowerCase()
+    );
+
+    try {
+      if (match) {
+        // Update only when the user actually changed something to avoid noise.
+        const changed =
+          (form.billing_address || '') !== (match.address || '') ||
+          (form.client_poc || '') !== (match.poc_name || '') ||
+          (form.client_poc_phone || '') !== (match.poc_phone || '') ||
+          (form.client_poc_email || '') !== (match.poc_email || '') ||
+          (form.client_poc_designation || '') !== (match.position || '');
+        if (changed) {
+          await clientService.update(match.id, payload);
+        }
+        return match.id;
+      }
+      const created = await clientService.create(payload);
+      setClients(prev => [...prev, created]);
+      return created.id;
+    } catch {
+      // If client persistence fails, don't block the project save — keep prior link.
+      return form.selected_client_id || project?.client_id || undefined;
+    }
+  };
+
+  const buildQuoteInfo = (): any => ({
+    client_name: form.client_name, billing_address: form.billing_address,
+    client_poc: form.client_poc, client_poc_phone: form.client_poc_phone,
+    client_poc_email: form.client_poc_email, client_poc_designation: form.client_poc_designation,
+    seller_prepared_by: form.seller_prepared_by, seller_poc: form.seller_poc,
+    seller_designation: form.seller_designation, seller_poc_phone: form.seller_poc_phone,
+    seller_email: form.seller_email, ship_to_address: form.ship_to_address,
+    required_by_date: form.required_by_date, project_notes: form.project_notes,
+  });
+
   const handleSave = async () => {
     if (!project?.id) return;
     setSaving(true);
     try {
+      const clientId = await resolveClient();
       await projectService.update(project.id, {
         project_name: form.project_name,
-        client_id: form.selected_client_id || project?.client_id,
+        ...(clientId ? { client_id: clientId } : {}),
         ship_to_address: form.ship_to_address,
-        quote_info: {
-          client_name: form.client_name, billing_address: form.billing_address,
-          client_poc: form.client_poc, client_poc_phone: form.client_poc_phone,
-          seller_prepared_by: form.seller_prepared_by, seller_poc: form.seller_poc,
-          seller_designation: form.seller_designation, seller_poc_phone: form.seller_poc_phone,
-          seller_email: form.seller_email, ship_to_address: form.ship_to_address,
-        },
+        quote_info: buildQuoteInfo(),
       });
+      if (clientId) setForm(f => ({ ...f, selected_client_id: clientId }));
       setLastSaved(new Date());
       showSuccess('Project info saved successfully');
       setEditing(false);
@@ -307,8 +369,8 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, onUpdate, onPr
 
   // Count filled fields per card
   const clientFieldCount = {
-    filled: [form.billing_address, form.client_name].filter(v => v.trim()).length,
-    total: 2,
+    filled: [form.client_name, form.billing_address, form.client_poc, form.client_poc_phone, form.client_poc_email].filter(v => v.trim()).length,
+    total: 5,
   };
   const sellerFieldCount = {
     filled: [form.seller_prepared_by, form.seller_poc_phone, form.seller_designation, form.seller_email].filter(v => v.trim()).length,
@@ -327,27 +389,45 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, onUpdate, onPr
     return `${mins}m ago`;
   };
 
-  const readOnlySx = (disabled: boolean) => ({
-    ...inputSx(disabled),
-    ...(disabled ? {
-      '& .MuiOutlinedInput-root': {
-        ...(inputSx(disabled) as any)?.['& .MuiOutlinedInput-root'],
-        backgroundColor: UI.muted,
-        '& .MuiOutlinedInput-notchedOutline': { borderColor: UI.border, borderStyle: 'solid' },
+  /* Legible field styling — strict 3-color palette.
+     Cards are #0B0B0D (UI.card); inputs sit one notch on #000 (UI.muted).
+     Edit mode: brighter surface + #E2E8F0 text so values are clearly readable.
+     Read-only: muted surface, same legible text. Focus border = sky-blue. */
+  const FIELD_TEXT = '#E2E8F0';
+  const FIELD_LABEL = '#64748B';
+  const ACCENT = '#00c8ff';
+  const fieldSx = (disabled: boolean) => ({
+    '& .MuiOutlinedInput-root': {
+      height: 38,
+      fontSize: '0.8125rem',
+      fontFamily: '"Inter", sans-serif',
+      color: FIELD_TEXT,
+      backgroundColor: disabled ? '#000000' : '#15151F',
+      borderRadius: UI.radiusXs,
+      transition: 'all 0.2s ease',
+      '& .MuiOutlinedInput-input': {
+        color: FIELD_TEXT,
+        WebkitTextFillColor: FIELD_TEXT,
+        '&::placeholder': { color: FIELD_LABEL, opacity: 1 },
       },
-    } : {}),
-  });
-
-  const readOnlyTextarea = (disabled: boolean) => ({
-    ...textareaSx(disabled),
-    ...(disabled ? {
-      '& .MuiOutlinedInput-root': {
-        ...(textareaSx(disabled) as any)?.['& .MuiOutlinedInput-root'],
-        backgroundColor: UI.muted,
-        '& .MuiOutlinedInput-notchedOutline': { borderColor: UI.border, borderStyle: 'solid' },
+      '& fieldset': { borderColor: UI.border, borderWidth: 1, borderStyle: 'solid' },
+      '&:hover fieldset': { borderColor: disabled ? UI.border : '#2A2F44' },
+      '&.Mui-focused fieldset': { borderColor: ACCENT, borderWidth: 1 },
+      '&.Mui-disabled': {
+        '& .MuiOutlinedInput-input': { color: FIELD_TEXT, WebkitTextFillColor: FIELD_TEXT },
+        '& fieldset': { borderColor: UI.border },
       },
-    } : {}),
+    },
   });
+  const fieldTextareaSx = (disabled: boolean) => ({
+    ...fieldSx(disabled),
+    '& .MuiOutlinedInput-root': {
+      ...(fieldSx(disabled) as any)['& .MuiOutlinedInput-root'],
+      height: 'auto',
+    },
+  });
+  const readOnlySx = (disabled: boolean) => fieldSx(disabled);
+  const readOnlyTextarea = (disabled: boolean) => fieldTextareaSx(disabled);
 
   return (
     <TabContainer>
@@ -355,29 +435,28 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, onUpdate, onPr
       {/* Edit mode banner */}
       {editing && (
         <AnimatedSection>
-          <InfoBanner
-            variant="warning"
-            message={
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, width: '100%' }}>
-                <Typography sx={{ fontSize: 12.5, fontWeight: 600, color: '#92400E', flex: 1 }}>
-                  You are in edit mode. Changes auto-save after 4 seconds of inactivity.
-                </Typography>
-                {lastSaved && (
-                  <Chip
-                    icon={<Clock size={12} />}
-                    label={`Last saved ${formatTimeSince(lastSaved)}`}
-                    size="small"
-                    sx={{
-                      height: 22, fontSize: 10.5, fontWeight: 600,
-                      bgcolor: alpha(UI.primary, 0.08), color: UI.primary,
-                      border: `1px solid ${alpha(UI.primary, 0.3)}`,
-                      '& .MuiChip-icon': { color: UI.primary },
-                    }}
-                  />
-                )}
-              </Box>
-            }
-          />
+          <Box sx={{
+            display: 'flex', alignItems: 'center', gap: 1.5, width: '100%',
+            px: 2, py: 1.25, borderRadius: UI.radiusSm,
+            backgroundColor: '#0B0B0D', border: `1px solid ${alpha('#00c8ff', 0.35)}`,
+          }}>
+            <Typography sx={{ fontSize: 12.5, fontWeight: 600, color: '#00c8ff', flex: 1 }}>
+              You are in edit mode. Changes auto-save after 4 seconds of inactivity.
+            </Typography>
+            {lastSaved && (
+              <Chip
+                icon={<Clock size={12} />}
+                label={`Last saved ${formatTimeSince(lastSaved)}`}
+                size="small"
+                sx={{
+                  height: 22, fontSize: 10.5, fontWeight: 600,
+                  bgcolor: alpha('#00c8ff', 0.1), color: '#00c8ff',
+                  border: `1px solid ${alpha('#00c8ff', 0.3)}`,
+                  '& .MuiChip-icon': { color: '#00c8ff' },
+                }}
+              />
+            )}
+          </Box>
         </AnimatedSection>
       )}
 
@@ -390,27 +469,42 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, onUpdate, onPr
             icon={<Building2 size={18} />}
             title="Client Details"
             subtitle="Customer & billing information"
-            accentColor="#0099cc"
-            iconBg={alpha('#0099cc', 0.1)}
+            accentColor="#00c8ff"
+            iconBg={alpha('#00c8ff', 0.1)}
             locked={dis}
             fieldCount={clientFieldCount}
           >
             <FG fullWidth>
-              <FL>Load Client (Optional)</FL>
-              <FormControl fullWidth>
-                <Select
-                  value={form.selected_client_id}
-                  onChange={(e) => handleClientSelect(e.target.value)}
-                  displayEmpty disabled={dis} sx={selectSx(dis)}
-                >
-                  <MenuItem value="">Select from list...</MenuItem>
-                  {clients.map(c => <MenuItem key={c.id} value={c.id}>{c.client_name}</MenuItem>)}
-                </Select>
-              </FormControl>
+              <FL>Company name (optional)</FL>
+              <Autocomplete
+                freeSolo
+                disabled={dis}
+                options={clients.map(c => c.client_name)}
+                value={form.client_name}
+                inputValue={form.client_name}
+                onInputChange={(_e, value, reason) => {
+                  if (reason === 'reset') return;
+                  // typing a (possibly new) company name unlinks any selected client
+                  setForm(f => ({ ...f, client_name: value, selected_client_id: '' }));
+                }}
+                onChange={(_e, value) => {
+                  // selecting an option from the list → autofill from that client
+                  const match = value
+                    ? clients.find(c => c.client_name === value)
+                    : undefined;
+                  if (match) handleClientSelect(match.id);
+                  else setForm(f => ({ ...f, client_name: value || '', selected_client_id: '' }));
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} fullWidth
+                    placeholder={dis ? '' : 'Type to search or add a new client...'}
+                    sx={readOnlySx(dis)} />
+                )}
+              />
             </FG>
             <ValidatedField isValid={fieldValid('billing_address')} showCheck={editing}>
               <FG fullWidth>
-                <FL required>Billing Address</FL>
+                <FL required>Billing address</FL>
                 <TextField fullWidth multiline rows={1} value={form.billing_address}
                   onChange={set('billing_address')} disabled={dis}
                   error={!!fieldError('billing_address')}
@@ -419,6 +513,32 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, onUpdate, onPr
                   sx={readOnlyTextarea(dis)} />
               </FG>
             </ValidatedField>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, columnGap: 2, rowGap: 0.5 }}>
+              <FG>
+                <FL>POC name</FL>
+                <TextField fullWidth value={form.client_poc} onChange={set('client_poc')}
+                  disabled={dis} placeholder={dis ? '' : 'Contact name...'}
+                  sx={readOnlySx(dis)} />
+              </FG>
+              <FG>
+                <FL>POC phone</FL>
+                <TextField fullWidth value={form.client_poc_phone} onChange={set('client_poc_phone')}
+                  disabled={dis} placeholder={dis ? '' : 'Phone number...'}
+                  sx={readOnlySx(dis)} />
+              </FG>
+              <FG>
+                <FL>POC email</FL>
+                <TextField fullWidth type="email" value={form.client_poc_email} onChange={set('client_poc_email')}
+                  disabled={dis} placeholder={dis ? '' : 'email@example.com'}
+                  sx={readOnlySx(dis)} />
+              </FG>
+              <FG>
+                <FL>POC designation</FL>
+                <TextField fullWidth value={form.client_poc_designation} onChange={set('client_poc_designation')}
+                  disabled={dis} placeholder={dis ? '' : 'Role / Title...'}
+                  sx={readOnlySx(dis)} />
+              </FG>
+            </Box>
           </SectionCard>
         </Grid>
 
@@ -428,8 +548,8 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, onUpdate, onPr
             icon={<User size={18} />}
             title="Sellers Details"
             subtitle="Sales team contact info"
-            accentColor="#0099cc"
-            iconBg={alpha('#0099cc', 0.1)}
+            accentColor="#00c8ff"
+            iconBg={alpha('#00c8ff', 0.1)}
             locked={dis}
             fieldCount={sellerFieldCount}
           >
@@ -480,7 +600,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, onUpdate, onPr
             <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, columnGap: 2, rowGap: 0.5 }}>
               <ValidatedField isValid={fieldValid('project_name')} showCheck={editing}>
                 <FG fullWidth>
-                  <FL required>Project Name</FL>
+                  <FL required>Project name</FL>
                   <TextField fullWidth value={form.project_name} onChange={set('project_name')}
                     disabled={dis} error={!!fieldError('project_name')}
                     helperText={fieldError('project_name') ? 'Required' : ''}
@@ -489,7 +609,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, onUpdate, onPr
                 </FG>
               </ValidatedField>
               <FG fullWidth>
-                <FL>Ship to Address</FL>
+                <FL>Ship to address</FL>
                 <TextField fullWidth multiline rows={1} value={form.ship_to_address}
                   onChange={set('ship_to_address')} disabled={dis || form.same_as_billing}
                   placeholder={dis ? '' : 'Delivery address...'}
@@ -498,18 +618,32 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, onUpdate, onPr
                   control={
                     <Checkbox size="small" checked={form.same_as_billing}
                       onChange={(e) => handleSameAsBilling(e.target.checked)} disabled={dis}
-                      sx={{ color: UI.border, '&.Mui-checked': { color: UI.primary }, p: 0.5 }} />
+                      sx={{ color: UI.border, '&.Mui-checked': { color: '#00c8ff' }, p: 0.5 }} />
                   }
-                  label={<Typography sx={{ fontSize: 12, color: UI.textMuted }}>Same as Billing</Typography>}
+                  label={<Typography sx={{ fontSize: 12, color: '#64748B' }}>Same as billing</Typography>}
                   sx={{ mt: 0.5, ml: 0 }}
                 />
+              </FG>
+              <FG>
+                <FL>Required by date</FL>
+                <TextField fullWidth type="date" value={form.required_by_date}
+                  onChange={set('required_by_date')} disabled={dis}
+                  InputLabelProps={{ shrink: true }}
+                  sx={readOnlySx(dis)} />
+              </FG>
+              <FG fullWidth>
+                <FL>Project notes</FL>
+                <TextField fullWidth multiline rows={2} value={form.project_notes}
+                  onChange={set('project_notes')} disabled={dis}
+                  placeholder={dis ? '' : 'Optional notes, voltage class, project type...'}
+                  sx={readOnlyTextarea(dis)} />
               </FG>
             </Box>
           </SectionCard>
         </Grid>
       </Grid>
 
-      {/* â•â•â• ACTION BAR â•â•â• */}
+      {/* ACTION BAR */}
       <Box
         sx={{
           mt: 2,
@@ -527,20 +661,20 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, onUpdate, onPr
             <>
               <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#F59E0B', animation: 'pulse 2s infinite',
                 '@keyframes pulse': { '0%,100%': { opacity: 1 }, '50%': { opacity: 0.4 } } }} />
-              <Typography sx={{ fontSize: 12, color: '#92400E', fontWeight: 600 }}>
+              <Typography sx={{ fontSize: 12, color: '#F59E0B', fontWeight: 600 }}>
                 Editing
               </Typography>
               {lastSaved && (
                 <Typography sx={{ fontSize: 11, color: UI.textLight, fontWeight: 500 }}>
-                  Â· Saved {formatTimeSince(lastSaved)}
+                  · Saved {formatTimeSince(lastSaved)}
                 </Typography>
               )}
             </>
           ) : (
             <>
-              <Lock size={13} color={UI.bg} />
+              <Lock size={13} color="#64748B" />
               <Typography sx={{ fontSize: 12, color: UI.textLight, fontWeight: 500 }}>
-                Read-only A· Click Edit to modify
+                Read-only · Click Edit to modify
               </Typography>
             </>
           )}
@@ -556,7 +690,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, onUpdate, onPr
               sx={{
                 height: 36, borderRadius: UI.radiusXs, px: 2.5, fontSize: 13, fontWeight: 600,
                 borderColor: UI.border, color: UI.textSecondary, textTransform: 'none',
-                '&:hover': { borderColor: UI.primary, color: UI.primary, backgroundColor: UI.primaryBg },
+                '&:hover': { borderColor: '#00c8ff', color: '#00c8ff', backgroundColor: 'rgba(0,200,255,0.10)' },
                 transition: 'all 0.15s ease',
               }}
             >
@@ -570,7 +704,7 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, onUpdate, onPr
               sx={{
                 height: 36, borderRadius: UI.radiusXs, px: 2, fontSize: 13, fontWeight: 600,
                 borderColor: UI.border, color: UI.textSecondary, textTransform: 'none',
-                '&:hover': { borderColor: '#DC2626', color: '#DC2626', backgroundColor: '#FEF2F2' },
+                '&:hover': { borderColor: '#f87171', color: '#f87171', backgroundColor: 'rgba(248,113,113,0.10)' },
               }}
             >
               Cancel
@@ -585,8 +719,8 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, onUpdate, onPr
               disabled={saving}
               sx={{
                 height: 36, borderRadius: UI.radiusXs, px: 2.5, fontSize: 13, fontWeight: 700,
-                backgroundColor: UI.primary, color: '#000', boxShadow: 'none', textTransform: 'none',
-                '&:hover': { backgroundColor: UI.primaryLight, color: '#000', boxShadow: '0 2px 8px rgba(51, 214, 255, 0.30)' },
+                backgroundColor: '#00c8ff', color: '#06151c', boxShadow: 'none', textTransform: 'none',
+                '&:hover': { backgroundColor: '#33d4ff', color: '#06151c', boxShadow: '0 2px 8px rgba(0,200,255,0.30)' },
               }}
             >
               {saving ? 'Saving...' : 'Save'}
@@ -601,11 +735,11 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, onUpdate, onPr
             sx={{
               height: 36, borderRadius: UI.radiusXs, fontSize: 13, fontWeight: 700, px: 2.5,
               textTransform: 'none',
-              backgroundColor: isFormValid ? UI.primary : 'rgba(51, 214, 255, 0.20)',
-              color: isFormValid ? '#000' : 'rgba(255,255,255,0.55)',
-              boxShadow: isFormValid ? '0 2px 8px rgba(51, 214, 255, 0.30)' : 'none',
+              backgroundColor: isFormValid ? '#00c8ff' : 'rgba(0,200,255,0.20)',
+              color: isFormValid ? '#06151c' : 'rgba(226,232,240,0.55)',
+              boxShadow: isFormValid ? '0 2px 8px rgba(0,200,255,0.30)' : 'none',
               '&:hover': isFormValid
-                ? { backgroundColor: UI.primaryLight, color: '#000', boxShadow: '0 4px 12px rgba(51, 214, 255, 0.40)' }
+                ? { backgroundColor: '#33d4ff', color: '#06151c', boxShadow: '0 4px 12px rgba(0,200,255,0.40)' }
                 : {},
             }}
           >
