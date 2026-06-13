@@ -230,7 +230,7 @@ const PriceQueuePanel: React.FC = () => {
       {/* Panel A: Awaiting price */}
       <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
         <Box>
-          <Typography sx={{ color: C.title, fontWeight: 700, fontSize: 15 }}>Awaiting price</Typography>
+          <Typography sx={{ color: C.title, fontWeight: 800, fontSize: 15 }}>Awaiting price</Typography>
           <Typography sx={{ color: C.sub, fontSize: 12 }}>
             Parts without firm vendor pricing, grouped by vendor. Select lines and raise a request for quotation.
           </Typography>
@@ -389,7 +389,7 @@ const PriceQueuePanel: React.FC = () => {
 
       {/* Panel B: RFQ batches */}
       <Box sx={{ mt: 4 }}>
-        <Typography sx={{ color: C.title, fontWeight: 700, fontSize: 15, mb: 0.3 }}>RFQ batches</Typography>
+        <Typography sx={{ color: C.title, fontWeight: 800, fontSize: 15, mb: 0.3 }}>RFQ batches</Typography>
         <Typography sx={{ color: C.sub, fontSize: 12, mb: 1.5 }}>
           Quotation requests raised to vendors. Prices come back through the record action above.
         </Typography>

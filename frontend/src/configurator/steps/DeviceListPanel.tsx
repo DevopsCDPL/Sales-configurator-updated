@@ -126,7 +126,7 @@ const DeviceListPanel: React.FC<DeviceListPanelProps> = ({ lines, intake, catalo
 
   return (
     <Box sx={{ px: 3, pb: 2 }}>
-      <Typography sx={{ color: '#CBD5E1', fontSize: 13.5, fontWeight: 600, mb: 1 }}>
+      <Typography sx={{ color: '#F0F6FF', fontSize: 13.5, fontWeight: 800, mb: 1 }}>
         Devices (saved design) — engineer may swap any pick
       </Typography>
       <Stack direction="row" spacing={2} alignItems="flex-start">
