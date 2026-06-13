@@ -564,14 +564,6 @@ const V2PreviewStep: React.FC = () => {
           ) : boardView === 'components' ? (
             <ComponentsPanel
               key={'comp-' + openBoard.board.id}
-              view="picks"
-              board={openBoard}
-              onLinesChanged={(lines) => setOpenBoard((ob) => (ob ? { ...ob, lines } : ob))}
-            />
-          ) : boardView === 'component_review' ? (
-            <ComponentsPanel
-              key={'comp-review-' + openBoard.board.id}
-              view="review"
               board={openBoard}
               onLinesChanged={(lines) => setOpenBoard((ob) => (ob ? { ...ob, lines } : ob))}
             />

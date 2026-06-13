@@ -10,7 +10,6 @@ export const FLOW_STEPS = [
   ['sections', 'Section Design'],
   ['section_review', 'Section Review'],
   ['components', 'Components'],
-  ['component_review', 'Component Review'],
   ['bom', 'Bill of Materials'],
   ['quote', 'Pricing'],
   ['sld', 'SLD'],

@@ -45,11 +45,11 @@ const usd = (n: number) =>
 
 export interface ComponentsPanelProps {
   board: FullBoard;
-  view: 'picks' | 'review';
+  view?: 'picks' | 'review';
   onLinesChanged: (lines: ComponentLineRow[]) => void;
 }
 
-const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, view, onLinesChanged }) => {
+const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged }) => {
   const switchboardId = board.board.id;
   const [lines, setLines] = useState<ComponentLineRow[]>(board.lines);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -73,18 +73,15 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, view, onLinesC
   const [bomLoading, setBomLoading] = useState(false);
   const [bomError, setBomError] = useState(false);
 
-  // Lazily fetch BOM rows once when picks view mounts
+  // Lazily fetch BOM rows once on mount
   useEffect(() => {
-    if (view !== 'picks') return;
     setBomLoading(true);
     configuratorV2Service.getBom(switchboardId)
       .then((resp) => { setBomRows(resp.rows); setBomError(false); })
       .catch(() => { setBomError(true); })
       .finally(() => setBomLoading(false));
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [switchboardId, view]);
-
-  const sections = board.sections;
+  }, [switchboardId]);
 
   const refreshLines = useCallback(async () => {
     const full = await configuratorV2Service.getFull(switchboardId);
@@ -200,37 +197,48 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, view, onLinesC
     } catch (e: any) { setError(e?.response?.data?.error ?? 'Qty update failed'); }
   };
 
-  const ruleGroups = useMemo(() => {
-    const ruleLines = lines.filter((l) => l.source === 'rule');
-    const g = new Map<string, ComponentLineRow[]>();
-    for (const l of ruleLines) {
-      const k = String(l.meta?.group ?? 'Other');
-      g.set(k, [...(g.get(k) ?? []), l]);
-    }
-    return [...g.entries()];
-  }, [lines]);
-
   const userLines = useMemo(
     () => lines.filter((l) => l.source === 'user'),
     [lines]
   );
 
-  const sectionLabel = (l: ComponentLineRow) => {
-    if (l.scope !== 'section') return 'Board';
-    const s = sections.find((x) => x.id === l.section_id);
-    return s ? 'Section ' + s.section_number : 'Section ' + (l.meta?.sectionIndex ?? '?');
-  };
+  // Merged groups: rule (engine) lines grouped by meta.group, with manual
+  // (source==='user') lines folded into the matching category group (after the
+  // engine rows). Manual lines whose category has no rule group get their own
+  // group keyed by category.
+  const ruleGroups = useMemo(() => {
+    const ruleLines = lines.filter((l) => l.source === 'rule');
+    const g = new Map<string, ComponentLineRow[]>();
+    const order: string[] = [];
+    const push = (k: string, l: ComponentLineRow) => {
+      if (!g.has(k)) { g.set(k, []); order.push(k); }
+      g.get(k)!.push(l);
+    };
+    for (const l of ruleLines) push(String(l.meta?.group ?? 'Other'), l);
+    // Fold manual lines: match an existing group by group-name or category.
+    for (const l of userLines) {
+      const cat = String(l.meta?.group ?? l.category ?? 'Other');
+      let key = cat;
+      if (!g.has(key)) {
+        // try matching an existing group whose label equals this category
+        const match = order.find((k) => k.toLowerCase() === cat.toLowerCase());
+        if (match) key = match;
+      }
+      push(key, l);
+    }
+    return order.map((k) => [k, g.get(k)!] as [string, ComponentLineRow[]]);
+  }, [lines, userLines]);
 
   return (
-    <Box sx={{ px: 3, pt: 1, pb: 4 }}>
+    <Box sx={{ px: 3, pt: 1, pb: 1, height: 'calc(100vh - 200px)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
       {error && (
         <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 1.5, bgcolor: 'rgba(239,68,68,0.08)', color: '#FCA5A5', border: '1px solid ' + C.border, fontSize: 12 }}>
           {error}
         </Alert>
       )}
 
-      {/* ── Picks view: Auto components ── */}
-      {view === 'picks' && (() => {
+      {/* ── Merged components table (engine picks + manual additions) ── */}
+      {(() => {
         const ruleLines = lines.filter((l) => l.source === 'rule');
         const placeholderCount = ruleLines.filter((l) => l.meta?.placeholder).length;
         const catalogMatched = ruleLines.length - placeholderCount;
@@ -239,7 +247,7 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, view, onLinesC
         const rfqCount = allLines.filter((l) => l.price_status === 'PENDING_RFQ').length;
         const subtotal = allLines.reduce((s, l) => s + (Number(l.quantity) || 0) * (Number(l.unit_cost) || 0), 0);
 
-        // Build flat row list with group rowspan info
+        // Build flat row list with group rowspan info (engine + manual)
         let snoCounter = 0;
         const flatRows: Array<{ l: ComponentLineRow; group: string; rowsInGroup: number; isFirstInGroup: boolean; sno: number }> = [];
         for (const [group, rows] of ruleGroups) {
@@ -250,17 +258,17 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, view, onLinesC
         }
 
         return (
-          <Stack direction="row" spacing={1.5} alignItems="flex-start">
+          <Stack direction="row" spacing={1.5} alignItems="flex-start" sx={{ flex: 1, minHeight: 0 }}>
             {/* Left: panel */}
-            <Box sx={{ flex: 1, minWidth: 0 }}>
-              <Box sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', mb: 2, overflow: 'hidden' }}>
+            <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
+              <Box sx={{ bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '10px', display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
                 <Stack direction="row" alignItems="center" sx={{ px: 2, py: 1, borderBottom: '1px solid ' + C.border }}>
                   <Box sx={{ flex: 1, minWidth: 0 }}>
                     <Typography sx={{ color: '#F0F6FF', fontSize: 13, fontWeight: 800 }}>
                       Auto-selected components
                     </Typography>
                     <Typography sx={{ color: C.sub, fontSize: 11 }}>
-                      Engine picks from the catalog per the design rules — swap, adjust qty, or add your own.
+                      Engine picks from the catalog per the design rules; manual additions are tagged. Swap, adjust qty, or add your own.
                     </Typography>
                   </Box>
                   <Button
@@ -287,7 +295,7 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, view, onLinesC
                     a placeholder line so nothing is missed.
                   </Typography>
                 ) : (
-                  <Box sx={{ maxHeight: '58vh', overflow: 'auto' }}>
+                  <Box sx={{ flex: 1, minHeight: 0, maxHeight: 'calc(100vh - 320px)', overflow: 'auto' }}>
                   <Table size="small" stickyHeader>
                     <TableHead>
                       <TableRow>
@@ -305,10 +313,11 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, view, onLinesC
                     <TableBody>
                       {flatRows.map(({ l, group, rowsInGroup, isFirstInGroup, sno }) => {
                         const unitCost = Number(l.unit_cost);
+                        const isManual = l.source === 'user';
                         const statusColor = l.price_status === 'FIRM' ? C.green : l.price_status === 'ESTIMATED' ? C.amber : C.red;
                         const statusLabel = l.price_status === 'FIRM' ? 'Firm price' : l.price_status === 'ESTIMATED' ? 'Estimated price' : 'No firm price — RFQ required';
                         return (
-                          <TableRow key={l.id}>
+                          <TableRow key={l.id} sx={isManual ? { bgcolor: 'rgba(217,119,6,0.04)' } : undefined}>
                             {/* S.No */}
                             <TableCell align="center" sx={{ ...cellSx, width: 40, color: C.sub, fontSize: 11.5, textAlign: 'center', verticalAlign: 'middle', py: 0.5, borderRight: '1px solid #1E2235' }}>
                               {sno}
@@ -321,11 +330,19 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, view, onLinesC
                             )}
                             {/* Component */}
                             <TableCell sx={{ ...cellSx, width: 230, verticalAlign: 'middle', py: 0.5, color: C.text, fontSize: 12 }}>
-                              <Tooltip title={String(l.meta?.ruleDescription ?? l.category ?? '')} arrow>
-                                <Box sx={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                                  {l.meta?.ruleDescription ?? l.category}
-                                </Box>
-                              </Tooltip>
+                              <Stack direction="row" alignItems="flex-start" spacing={0.5}>
+                                <Tooltip title={String(l.meta?.ruleDescription ?? l.name ?? l.category ?? '')} arrow>
+                                  <Box sx={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', flex: 1, minWidth: 0 }}>
+                                    {l.meta?.ruleDescription ?? l.name ?? l.category}
+                                  </Box>
+                                </Tooltip>
+                                {isManual && (
+                                  <Tooltip title="Manually added" arrow>
+                                    <Chip label="Manual" size="small"
+                                      sx={{ bgcolor: 'rgba(217,119,6,0.12)', color: '#FCD34D', fontSize: 9, height: 16, flexShrink: 0 }} />
+                                  </Tooltip>
+                                )}
+                              </Stack>
                             </TableCell>
                             {/* SKU + stacked source/status dots beneath */}
                             <TableCell sx={{ ...cellSx, width: 96, verticalAlign: 'middle', py: 0.5 }}>
@@ -398,11 +415,13 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, view, onLinesC
                             </TableCell>
                             {/* Actions */}
                             <TableCell sx={{ ...cellSx, width: 80, verticalAlign: 'middle', py: 0.5, whiteSpace: 'nowrap' }} align="right">
-                              <Tooltip title="Swap" arrow>
-                                <IconButton size="small" onClick={() => openSwap(l)} sx={{ color: C.blue, p: 0.4, mr: 0.25 }}>
-                                  <SwapHorizRoundedIcon sx={{ fontSize: 16 }} />
-                                </IconButton>
-                              </Tooltip>
+                              {!isManual && (
+                                <Tooltip title="Swap" arrow>
+                                  <IconButton size="small" onClick={() => openSwap(l)} sx={{ color: C.blue, p: 0.4, mr: 0.25 }}>
+                                    <SwapHorizRoundedIcon sx={{ fontSize: 16 }} />
+                                  </IconButton>
+                                </Tooltip>
+                              )}
                               <IconButton size="small" disabled={busyId === l.id} onClick={() => remove(l)} sx={{ color: C.sub, p: 0.3, '&:hover': { color: C.red } }}>
                                 <DeleteOutlineRoundedIcon sx={{ fontSize: 15 }} />
                               </IconButton>
@@ -417,8 +436,8 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, view, onLinesC
               </Box>
             </Box>
 
-            {/* Right: sticky summary card */}
-            <Box sx={{ width: 250, flexShrink: 0, position: 'sticky', top: 8 }}>
+            {/* Right: summary card (scrolls within bounded step height) */}
+            <Box sx={{ width: 250, flexShrink: 0, height: '100%', minHeight: 0, overflowY: 'auto', pb: 1 }}>
               <Box sx={{ bgcolor: '#0B0B0D', border: '1px solid #1E2235', borderRadius: '10px', p: 1.5 }}>
                 <Typography sx={{ fontSize: 12, fontWeight: 800, color: '#F0F6FF', mb: 1 }}>
                   Components summary
@@ -522,61 +541,6 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, view, onLinesC
           </Stack>
         );
       })()}
-
-      {/* —— Review view: Manual additions —— */}
-      {view === 'review' && (
-        <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', mb: 2, overflow: 'hidden' }}>
-          <Typography sx={{ color: '#CBD5E1', fontSize: 12.5, fontWeight: 700, px: 2, py: 1, borderBottom: '1px solid ' + C.border }}>
-            Component review — manual additions & audit ({userLines.length} line(s))
-          </Typography>
-          {!userLines.length ? (
-            <Typography sx={{ color: C.sub, fontSize: 12, px: 2, py: 1.5, fontStyle: 'italic' }}>
-              Nothing picked yet. Breakers, bus, supports, labels and lugs are engine-managed — add everything else via the "+ Add component" button in Designer's pick.
-            </Typography>
-          ) : (
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell sx={headSx}>Category</TableCell>
-                  <TableCell sx={headSx}>Part #</TableCell>
-                  <TableCell sx={headSx}>Name</TableCell>
-                  <TableCell sx={headSx}>Where</TableCell>
-                  <TableCell sx={headSx} align="right">Qty</TableCell>
-                  <TableCell sx={headSx} align="right">Unit cost</TableCell>
-                  <TableCell sx={headSx}>Price</TableCell>
-                  <TableCell sx={headSx} />
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {userLines.map((l) => (
-                  <TableRow key={l.id}>
-                    <TableCell sx={{ ...cellSx, color: C.sub }}>{displayCase(l.category)}</TableCell>
-                    <TableCell sx={cellSx}>
-                      <Tooltip title={l.part_number ?? ''}><span>{compactSku(l.part_number) || '—'}</span></Tooltip>
-                    </TableCell>
-                    <TableCell sx={cellSx}>{displayCase(l.name)}</TableCell>
-                    <TableCell sx={{ ...cellSx, color: C.sub }}>{sectionLabel(l)}</TableCell>
-                    <TableCell sx={cellSx} align="right">{l.quantity}</TableCell>
-                    <TableCell sx={cellSx} align="right">{l.unit_cost ? usd(Number(l.unit_cost)) : '—'}</TableCell>
-                    <TableCell sx={cellSx}>
-                      <Chip
-                        label={l.price_status === 'PENDING_RFQ' ? 'RFQ' : l.price_status}
-                        size="small"
-                        sx={{ bgcolor: 'transparent', border: '1px solid ' + (l.price_status === 'FIRM' ? C.green : C.amber), color: l.price_status === 'FIRM' ? C.green : C.amber, fontSize: 9.5, height: 18 }}
-                      />
-                    </TableCell>
-                    <TableCell sx={cellSx} align="right">
-                      <IconButton size="small" disabled={busyId === l.id} onClick={() => remove(l)} sx={{ color: C.sub, '&:hover': { color: C.red } }}>
-                        <DeleteOutlineRoundedIcon sx={{ fontSize: 16 }} />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </Box>
-      )}
 
       {/* —— Shared picker dialog (swap + add + pickOnly) —— */}
       <ComponentPickerDialog
