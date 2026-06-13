@@ -126,14 +126,26 @@ export interface LineupOptions {
 const SOURCE_RANK: Record<string, number> = { 'vendor-import': 0, rfq: 1, manual: 2, web: 3 };
 const srcRank = (c: CandidateDevice) => SOURCE_RANK[c.priceSource ?? ''] ?? 4;
 
+/** Firmness tier within a provenance group: FIRM > ESTIMATED > no/zero price. */
+const firmRank = (c: CandidateDevice) =>
+  c.priceStatus === 'FIRM' && c.price != null ? 0
+  : c.priceStatus === 'ESTIMATED' && c.price != null ? 1 : 2;
+
+/**
+ * Best-fit pick. `cands` are ALREADY electrically suitable (candidateProvider
+ * filters by kA/voltage/ampere). Policy (Vikraman 2026-06-13/14): use TPS
+ * (vendor-import) parts FIRST even when they carry no price yet — provenance
+ * outranks price availability. Within the same source: firm-priced beats
+ * estimated beats unpriced, then cheapest, then smallest adequate frame.
+ * (Name kept for callers; no longer "cheapest-first".)
+ */
 function pickCheapest(cands: CandidateDevice[]): CandidateDevice | null {
   if (!cands.length) return null;
-  const firm = cands.filter((c) => c.priceStatus === 'FIRM' && c.price != null);
-  const est = cands.filter((c) => c.priceStatus === 'ESTIMATED' && c.price != null);
-  const pool = firm.length ? firm : est.length ? est : cands;
-  // TPS-first, then cheapest, then smallest adequate rating
-  return [...pool].sort((a, b) =>
-    srcRank(a) - srcRank(b) || (a.price ?? Infinity) - (b.price ?? Infinity) || a.ratedA - b.ratedA)[0];
+  return [...cands].sort((a, b) =>
+    srcRank(a) - srcRank(b)                                   // TPS first, even if unpriced
+    || firmRank(a) - firmRank(b)                              // firm > estimated > unpriced
+    || (a.price ?? Infinity) - (b.price ?? Infinity)          // cheaper first
+    || a.ratedA - b.ratedA)[0];                               // smallest adequate frame
 }
 
 export function proposeLineup(
