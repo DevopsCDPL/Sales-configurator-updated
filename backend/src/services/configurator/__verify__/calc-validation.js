@@ -17,6 +17,7 @@ const copper = require(path.join(DIR, 'copperEstimator.js'));
 const { compileBomV2 } = require(path.join(DIR, 'bomEngineV2.js'));
 const labour = require(path.join(DIR, 'labourEngine.js'));
 const pricing = require(path.join(DIR, 'pricingEngine.js'));
+const lineMargin = require(path.join(DIR, 'lineMarginEngine.js'));
 
 let pass = 0, fail = 0;
 const fails = [];
@@ -238,6 +239,116 @@ const STD = {
   // sanity: prorating design once is cheaper than naive ×units (which would
   // be 1507×3 = 4521 cost → more). design-once cost 3707 < naive 4521.
   ok('5g design-once cost < naive ×units', totalCostN < total_cost * units, [totalCostN, total_cost * units]);
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// 6. PER-COMPONENT / PER-LINE MARGIN (lineMarginEngine, spec §3).
+//    GM is TRUE margin throughout: lineSell = lineCost/(1−m).
+//    Shared rate lookup: ASM $40/h, ENG $85/h. No overhead unless stated
+//    (engineTotals.total_cost == Σ lineCost so ohFactor == 1).
+// ─────────────────────────────────────────────────────────────────────────
+const LK = { LBR_ASM_rate: 40, LBR_ENG_rate: 85, LBR_CU_rate: 40 };
+
+// CASE 6a: LINE MARGIN OVERRIDE math.
+//   Line A: material 100 + ASM 2h×40 = 80 → cost 180. meta.marginPctOverride 25.
+//   sell = 180/(1−0.25) = 180/0.75 = 240.   (NOT 180×1.25 = 225 markup.)
+{
+  const rows = [{ part_number: 'A', quantity: 1, unit_material_cost: 100, lbr_asm: 2, meta: { marginPctOverride: 25 } }];
+  const b = lineMargin.computeBlendedPricing(rows, LK, { desired_gm_pct: 0.40, roundup_factor: 0 }, { total_cost: 180 });
+  ok('6a line cost 180', approx(b.lines[0].cost, 180), b.lines[0].cost);
+  ok('6a override sell = 180/0.75 = 240', approx(b.overridden_sell, 240), b.overridden_sell);
+  ok('6a NOT markup (225)', Math.abs(b.overridden_sell - 225) > 10, b.overridden_sell);
+  ok('6a one overridden line, zero pooled', b.overridden_count === 1 && approx(b.pooled_cost, 0), [b.overridden_count, b.pooled_cost]);
+}
+
+// CASE 6b: INHERIT from component specifications.marginPct.
+//   No meta override; specifications.marginPct 30 → m 0.30.
+//   cost = 200 (material only). sell = 200/0.70 = 285.714.
+{
+  const rows = [{ part_number: 'B', quantity: 1, unit_material_cost: 200, specifications: { marginPct: 30 } }];
+  const b = lineMargin.computeBlendedPricing(rows, LK, { desired_gm_pct: 0.40, roundup_factor: 2 }, { total_cost: 200 });
+  ok('6b resolveLineMargin reads spec 30%', approx(lineMargin.resolveLineMargin(rows[0]), 0.30), lineMargin.resolveLineMargin(rows[0]));
+  ok('6b inherit sell = 200/0.70 = 285.71', approx(b.overridden_sell, 285.7143, 0.01), b.overridden_sell);
+  ok('6b override beats spec', approx(lineMargin.resolveLineMargin({ specifications: { marginPct: 30 }, meta: { marginPctOverride: 50 } }), 0.50));
+}
+
+// CASE 6c: MIXED pooled + overridden total (the core blend).
+//   A: cost 180, override 25% → 240.   B: cost 285 (200 mat + ENG 1h×85), pooled.
+//   pooledSell = 285/(1−0.40) = 475.   target = 240 + 475 = 715.
+//   roundup(-1) → 720.  blendedGM = (720−465)/720 = 0.354166.
+{
+  const rows = [
+    { part_number: 'A', quantity: 1, unit_material_cost: 100, lbr_asm: 2, meta: { marginPctOverride: 25 } },
+    { part_number: 'B', quantity: 1, unit_material_cost: 200, lbr_eng: 1, meta: {} },
+  ];
+  const b = lineMargin.computeBlendedPricing(rows, LK, { desired_gm_pct: 0.40, roundup_factor: -1 }, { total_cost: 465 });
+  ok('6c pooled cost 285', approx(b.pooled_cost, 285), b.pooled_cost);
+  ok('6c pooled sell = 285/0.60 = 475', approx(b.pooled_sell, 475), b.pooled_sell);
+  ok('6c target = 240 + 475 = 715', approx(b.target_price, 715), b.target_price);
+  ok('6c rounded(-1) = 720', b.rounded_price === 720, b.rounded_price);
+  ok('6c blended GM = 255/720 = 0.35417', approx(b.actual_gm, 0.354166, 0.0001), b.actual_gm);
+}
+
+// CASE 6d: BLENDED == LEGACY when NO line is overridden (parity guard).
+//   Two pooled lines cost 180 + 285 = 465; global GM 0.40.
+//   blend target = 465/0.60 = 775 == single-GM cost/(1−GM). roundup(-1)=780.
+//   This is the determinism contract: untouched lines behave EXACTLY as today.
+{
+  const rows = [
+    { part_number: 'A', quantity: 1, unit_material_cost: 100, lbr_asm: 2 },
+    { part_number: 'B', quantity: 1, unit_material_cost: 200, lbr_eng: 1 },
+  ];
+  const b = lineMargin.computeBlendedPricing(rows, LK, { desired_gm_pct: 0.40, roundup_factor: -1 }, { total_cost: 465 });
+  const legacy = pricing.computePricing({ totalCost: 465, pricing: { strategy: 'DESIRED GM%', desired_gm_pct: 0.40, roundup_factor: -1 } });
+  ok('6d no overrides → overridden_count 0', b.overridden_count === 0, b.overridden_count);
+  ok('6d blend target == 465/0.60 = 775', approx(b.target_price, 775), b.target_price);
+  ok('6d blend rounded == legacy rounded (780)', b.rounded_price === legacy.rounded_price && b.rounded_price === 780, [b.rounded_price, legacy.rounded_price]);
+}
+
+// CASE 6e: labourAdj DELTA math.
+//   Base ASM 2h. meta.labourAdj { lbr_asm: +3 } → 5h × 40 = 200 labour.
+//   cost = material 100 + 200 = 300.  (lowercase lbr_ key normalised to ASM.)
+//   Negative delta clamps via hour sum, e.g. { ASM: -1 } → 1h×40 = 40.
+{
+  const hPlus = lineMargin.lineLabourHours({ quantity: 1, lbr_asm: 2, meta: { labourAdj: { lbr_asm: 3 } } });
+  ok('6e labourAdj +3 → ASM 5h', approx(hPlus.ASM, 5), hPlus.ASM);
+  const c = lineMargin.lineBaseCost({ quantity: 1, unit_material_cost: 100, lbr_asm: 2, meta: { labourAdj: { lbr_asm: 3 } } }, LK);
+  ok('6e cost = 100 + 5×40 = 300', approx(c.cost, 300), c.cost);
+  const hMinus = lineMargin.lineLabourHours({ quantity: 1, lbr_asm: 2, meta: { labourAdj: { ASM: -1 } } });
+  ok('6e bucket-key −1 → ASM 1h', approx(hMinus.ASM, 1), hMinus.ASM);
+}
+
+// CASE 6f: margin = 0 EDGE (explicit zero margin ≠ inherit).
+//   meta.marginPctOverride 0 → m 0 (sell == cost), NOT pooled/null.
+//   cost 150, sell 150. Pair with a pooled line cost 100 @ GM 0.50 → 200.
+//   target = 150 + 200 = 350. roundup(0) = 350.
+{
+  ok('6f resolve override 0 → margin 0 (not null)', lineMargin.resolveLineMargin({ meta: { marginPctOverride: 0 } }) === 0, lineMargin.resolveLineMargin({ meta: { marginPctOverride: 0 } }));
+  const rows = [
+    { part_number: 'Z', quantity: 1, unit_material_cost: 150, meta: { marginPctOverride: 0 } },
+    { part_number: 'P', quantity: 1, unit_material_cost: 100, meta: {} },
+  ];
+  const b = lineMargin.computeBlendedPricing(rows, LK, { desired_gm_pct: 0.50, roundup_factor: 0 }, { total_cost: 250 });
+  ok('6f zero-margin line sell == cost 150', approx(b.overridden_sell, 150), b.overridden_sell);
+  ok('6f pooled 100 @ 50% = 200', approx(b.pooled_sell, 200), b.pooled_sell);
+  ok('6f target = 350', approx(b.target_price, 350), b.target_price);
+}
+
+// CASE 6g: OVERHEAD distribution — per-line costs scale to engine total_cost.
+//   sumBase = 465; engine total_cost = 511.5 (10% overhead). ohFactor = 1.1.
+//   Line A pooled 180 → 198; B overridden 25% costed-up 285→313.5; sell 313.5/0.75=418.
+//   pooled 198 @ GM 0.40 → 330.  target = 418 + 330 = 748.
+{
+  const rows = [
+    { part_number: 'A', quantity: 1, unit_material_cost: 100, lbr_asm: 2, meta: {} },                      // 180 pooled
+    { part_number: 'B', quantity: 1, unit_material_cost: 200, lbr_eng: 1, meta: { marginPctOverride: 25 } }, // 285 overridden
+  ];
+  const b = lineMargin.computeBlendedPricing(rows, LK, { desired_gm_pct: 0.40, roundup_factor: 2 }, { total_cost: 511.5 });
+  ok('6g ohFactor lifts overridden 285→313.5', approx(b.overridden_cost, 313.5, 0.01), b.overridden_cost);
+  ok('6g overridden sell 313.5/0.75 = 418', approx(b.overridden_sell, 418, 0.02), b.overridden_sell);
+  ok('6g pooled 198 @ 0.60 = 330', approx(b.pooled_sell, 330, 0.02), b.pooled_sell);
+  ok('6g target = 418 + 330 = 748', approx(b.target_price, 748, 0.02), b.target_price);
+  ok('6g per-line costed_up sums to total_cost 511.5', approx(b.lines.reduce((a, l) => a + l.costed_up, 0), 511.5, 0.01), b.lines.reduce((a, l) => a + l.costed_up, 0));
 }
 
 // ─────────────────────────────────────────────────────────────────────────

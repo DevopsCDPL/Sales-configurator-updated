@@ -89,6 +89,9 @@ export interface BomRow {
   source: string;
   generator_id: string | null;
   copper_weight_lbs: number | null;
+  /** Per-line margin layer: keys edits back to a ConfiguratorComponentLine. */
+  line_id?: string | null;
+  meta?: Record<string, any> | null;
 }
 
 export interface CopperEstimate {
@@ -148,6 +151,30 @@ export interface QuoteComputed {
   pricing: { target_price: number; rounded_price: number; actual_profit: number; actual_gm: number; roundup_factor: number };
 }
 
+export interface LineMargin {
+  part_number: string | null;
+  description: string | null;
+  /** ConfiguratorComponentLine id — null for generator/copper rows (not editable). */
+  line_id: string | null;
+  cost: number;
+  costed_up: number;
+  labour_hours: number;
+  /** Effective margin fraction (0–1), or null when pooled under the global GM. */
+  margin: number | null;
+  pooled: boolean;
+  sell: number | null;
+}
+
+export interface MarginSummary {
+  overriddenCount: number;
+  overriddenCost: number;
+  overriddenSell: number;
+  pooledCost: number;
+  pooledSell: number;
+  globalGmPct: number;
+  blendedGm: number;
+}
+
 export interface QuotePreviewResponse {
   board: { id: string; name: string; status: string };
   quote: QuoteComputed;
@@ -159,7 +186,9 @@ export interface QuotePreviewResponse {
   nonFirmCount: number;
   blockers: string[];
   canIssue: boolean;
-  bomRows?: { category: string | null; quantity: number; unit_cost: number }[];
+  bomRows?: Array<{ category: string | null; quantity: number; unit_cost: number; description?: string | null; part_number?: string | null; line_id?: string | null; meta?: Record<string, any> | null; price_status?: string; source?: string }>;
+  lineMargins?: LineMargin[];
+  marginSummary?: MarginSummary | null;
   multiUnit?: {
     units: number;
     prorateDesign: boolean;

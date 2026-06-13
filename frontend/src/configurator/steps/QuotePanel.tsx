@@ -16,6 +16,9 @@ import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import RequestQuoteRoundedIcon from '@mui/icons-material/RequestQuoteRounded';
 import PictureAsPdfRoundedIcon from '@mui/icons-material/PictureAsPdfRounded';
+import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded';
+import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
+import { Collapse } from '@mui/material';
 import configuratorV2Service, {
   QuotePreviewResponse, QuoteRevisionRow, LaborAdjustment,
 } from '../../services/configuratorV2Service';
@@ -47,6 +50,7 @@ const input = {
 
 const cellSx = { color: C.text, fontSize: 12, borderBottom: '1px solid ' + C.border, py: 0.7 };
 const headSx = { color: C.sub, fontSize: 10.5, fontWeight: 700, letterSpacing: 0.5, borderBottom: '1px solid ' + C.border, py: 0.7 };
+const LBR_KEYS = ['lbr_cu', 'lbr_asm', 'lbr_cnt', 'lbr_qc', 'lbr_tst', 'lbr_eng', 'lbr_cad'] as const;
 
 let adjSeq = 0;
 
@@ -64,6 +68,8 @@ const QuotePanel: React.FC<QuotePanelProps> = ({ switchboardId }) => {
   const [issuing, setIssuing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [issued, setIssued] = useState<string | null>(null);
+  const [expandedLines, setExpandedLines] = useState<Record<string, boolean>>({});
+  const [savingLine, setSavingLine] = useState<string | null>(null);
 
   const body = useCallback(() => ({
     ...(gmPctInput !== '' ? { gmPct: (Number(gmPctInput) || 30) / 100 } : {}),
@@ -131,6 +137,29 @@ const QuotePanel: React.FC<QuotePanelProps> = ({ switchboardId }) => {
       setIssuing(false);
     }
   };
+
+  const boardLocked = preview?.board?.status === 'locked';
+
+  /** Merge a meta patch onto a line, PATCH it, then recompute the draft.
+   *  ISSUED revisions are immutable — only the live (unlocked) draft moves. */
+  const patchLineMeta = useCallback(async (lineId: string, metaPatch: Record<string, any>) => {
+    if (!lineId) return;
+    setSavingLine(lineId);
+    setError(null);
+    try {
+      await configuratorV2Service.patchLine(lineId, { meta: metaPatch });
+      await runPreview();
+    } catch (e: any) {
+      setError(e?.response?.data?.error ?? 'Line update failed');
+    } finally {
+      setSavingLine(null);
+    }
+  }, [runPreview]);
+
+  // Join per-line margin rows with their BOM row (for line_id + meta + labour
+  // bucket adjustments). Only lines with a line_id are editable.
+  const bomByLineId = new Map((preview?.bomRows ?? []).filter((r) => r.line_id).map((r) => [r.line_id as string, r]));
+  const editableLines = (preview?.lineMargins ?? []).filter((l) => l.line_id);
 
   const q = preview?.quote;
   const labourCost = q ? Object.values(q.labor_costs).reduce((a, b) => a + b, 0) : 0;
@@ -334,6 +363,124 @@ const QuotePanel: React.FC<QuotePanelProps> = ({ switchboardId }) => {
           ) : null}
         </Box>
       </Stack>
+
+      {/* Per-component labour + margin (spec §4) — edits the live draft only */}
+      {preview && editableLines.length > 0 && (
+        <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', mt: 2, overflow: 'hidden' }}>
+          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ px: 2, py: 1, borderBottom: '1px solid ' + C.border }}>
+            <Typography sx={{ color: '#F0F6FF', fontSize: 13, fontWeight: 800 }}>Per-line labour and margin</Typography>
+            {preview.marginSummary && preview.marginSummary.overriddenCount > 0 && (
+              <Typography sx={{ color: C.sub, fontSize: 11 }}>
+                {preview.marginSummary.overriddenCount} line(s) with own margin · {(preview.marginSummary.globalGmPct * 100).toFixed(0)}% pools the rest · blended {(preview.marginSummary.blendedGm * 100).toFixed(1)}%
+              </Typography>
+            )}
+          </Stack>
+          {boardLocked && (
+            <Alert severity="info" sx={{ m: 1, bgcolor: 'rgba(0,200,255,0.06)', color: '#7DD3FC', border: '1px solid ' + C.border, fontSize: 11.5, py: 0.25 }}>
+              Switchboard is locked — issued revision is immutable. Raise a change order to edit lines.
+            </Alert>
+          )}
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell sx={headSx} />
+                <TableCell sx={headSx}>LINE</TableCell>
+                <TableCell sx={headSx} align="right">COST</TableCell>
+                <TableCell sx={headSx} align="right">LABOUR (H)</TableCell>
+                <TableCell sx={headSx} align="right">MARGIN %</TableCell>
+                <TableCell sx={headSx} align="right">SELL</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {editableLines.map((l) => {
+                const lid = l.line_id as string;
+                const bom = bomByLineId.get(lid);
+                const meta = (bom?.meta ?? {}) as Record<string, any>;
+                const labourAdj = (meta.labourAdj ?? {}) as Record<string, number>;
+                const ovr = meta.marginPctOverride;
+                const inherited = l.margin != null ? (l.margin * 100).toFixed(0) + '%' : (preview.marginSummary ? (preview.marginSummary.globalGmPct * 100).toFixed(0) + '%' : '');
+                const open = !!expandedLines[lid];
+                const busy = savingLine === lid;
+                return (
+                  <React.Fragment key={lid}>
+                    <TableRow sx={{ opacity: busy ? 0.5 : 1 }}>
+                      <TableCell sx={{ ...cellSx, width: 36 }}>
+                        <IconButton size="small" onClick={() => setExpandedLines((s) => ({ ...s, [lid]: !s[lid] }))} sx={{ color: C.sub, p: 0.25 }}>
+                          {open ? <ExpandMoreRoundedIcon sx={{ fontSize: 18 }} /> : <ChevronRightRoundedIcon sx={{ fontSize: 18 }} />}
+                        </IconButton>
+                      </TableCell>
+                      <TableCell sx={cellSx}>
+                        <Typography sx={{ color: C.text, fontSize: 12 }}>{l.description ?? l.part_number ?? 'Line'}</Typography>
+                        {l.pooled && <Typography sx={{ color: C.sub, fontSize: 10 }}>pooled · global GM</Typography>}
+                      </TableCell>
+                      <TableCell sx={cellSx} align="right">{usd(l.costed_up)}</TableCell>
+                      <TableCell sx={cellSx} align="right">{l.labour_hours.toFixed(1)}</TableCell>
+                      <TableCell sx={cellSx} align="right">
+                        <TextField
+                          size="small" variant="standard" disabled={boardLocked || busy}
+                          defaultValue={ovr != null ? String(ovr) : ''}
+                          placeholder={'inherit ' + inherited}
+                          onBlur={(e) => {
+                            const raw = e.target.value.trim().replace(/[^0-9.]/g, '');
+                            const next = raw === '' ? undefined : Math.max(0, Math.min(90, Number(raw)));
+                            if ((ovr ?? undefined) === next) return;
+                            // null (not delete) so the route's shallow meta merge actually
+                            // clears it; the engine treats null as "inherit".
+                            patchLineMeta(lid, { ...meta, marginPctOverride: next === undefined ? null : next });
+                          }}
+                          sx={{ width: 84, '& input': { color: C.text, fontSize: 12, textAlign: 'right' }, '& .MuiInput-underline:before': { borderColor: C.border } }}
+                          InputProps={{ disableUnderline: false }}
+                        />
+                      </TableCell>
+                      <TableCell sx={{ ...cellSx, fontWeight: 700, color: l.pooled ? C.sub : '#60A5FA' }} align="right">
+                        {l.sell != null ? usd(l.sell) : '—'}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell sx={{ p: 0, border: 0 }} colSpan={6}>
+                        <Collapse in={open} unmountOnExit>
+                          <Box sx={{ px: 5, py: 1.5, bgcolor: C.surface }}>
+                            <Typography sx={{ color: C.sub, fontSize: 10.5, fontWeight: 700, mb: 1 }}>
+                              Labour hour adjustments (signed, added on top of part hour buckets)
+                            </Typography>
+                            <Stack direction="row" spacing={1.5} flexWrap="wrap" useFlexGap>
+                              {LBR_KEYS.map((k) => {
+                                const label = BUCKET_LABEL[k.replace('lbr_', '').toUpperCase()] ?? k;
+                                return (
+                                  <Box key={k}>
+                                    <Typography sx={{ color: C.sub, fontSize: 10, mb: 0.25 }}>{label}</Typography>
+                                    <TextField
+                                      size="small" variant="standard" disabled={boardLocked || busy}
+                                      defaultValue={labourAdj[k] != null ? String(labourAdj[k]) : ''}
+                                      placeholder="±h"
+                                      onBlur={(e) => {
+                                        const raw = e.target.value.trim();
+                                        const next = raw === '' ? undefined : Number(raw.replace(/[^0-9.\-]/g, ''));
+                                        const cur = labourAdj[k];
+                                        if ((cur ?? undefined) === (next ?? undefined)) return;
+                                        const na = { ...labourAdj };
+                                        if (next === undefined || next === 0 || Number.isNaN(next)) delete na[k]; else na[k] = next;
+                                        // Always send the full labourAdj object (or {}) so the
+                                        // route's shallow merge replaces it wholesale.
+                                        patchLineMeta(lid, { ...meta, labourAdj: na });
+                                      }}
+                                      sx={{ width: 64, '& input': { color: C.text, fontSize: 12, textAlign: 'right' } }}
+                                    />
+                                  </Box>
+                                );
+                              })}
+                            </Stack>
+                          </Box>
+                        </Collapse>
+                      </TableCell>
+                    </TableRow>
+                  </React.Fragment>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </Box>
+      )}
 
       {/* Visual review before issuing */}
       {preview && q && <QuoteCharts preview={preview} revisions={revisions} />}

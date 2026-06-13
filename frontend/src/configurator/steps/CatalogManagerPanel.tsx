@@ -74,6 +74,7 @@ interface EditState {
 const emptyEdit = (cat?: string): EditState => ({
   name: '', category: cat ?? 'HARDWARE', part_number: '', description: '', price: '',
   priceType: 'FIRM',
+  marginPct: '',
   lbr_cu: '', lbr_asm: '', lbr_cnt: '', lbr_qc: '', lbr_tst: '', lbr_eng: '', lbr_cad: '',
   spec_deviceClass: '', spec_catalogNumber: '', spec_manufacturer: '',
   spec_series: '', spec_frameModel: '', spec_ratedCurrentA: '',
@@ -192,6 +193,7 @@ const CatalogManagerPanel: React.FC = () => {
       spec_interruptingKA: String((r as any).specifications?.interruptingKA ?? ''),
       vendorId: (r as any).specifications?.vendorId ?? '',
       vendorName: (r as any).specifications?.vendorName ?? '',
+      marginPct: (r as any).specifications?.marginPct != null ? String((r as any).specifications.marginPct) : '',
       __origSpec: (r as any).specifications ?? {},
     };
     BUCKETS.forEach((b) => { e[b] = String((r as any)[b] ?? '') === '0' ? '' : String((r as any)[b] ?? ''); });
@@ -222,9 +224,17 @@ const CatalogManagerPanel: React.FC = () => {
         frameModel: edit.spec_frameModel, ratedCurrentA: edit.spec_ratedCurrentA,
         poles: edit.spec_poles, interruptingKA: edit.spec_interruptingKA,
       };
+      const marginRaw = String(edit.marginPct ?? '').trim();
+      const hasMargin = marginRaw !== '';
       const hasAnySpec = Object.values(specFields).some((v) => v.trim() !== '');
-      if (isCbSave || hasAnySpec || edit.vendorId) {
+      if (isCbSave || hasAnySpec || edit.vendorId || hasMargin) {
         const specEdits: any = {};
+        // Per-component margin (spec §1): 0–90, stored on specifications.marginPct.
+        // Empty clears it (→ inherit global GM); otherwise clamp into range.
+        if (hasMargin) {
+          const m = Math.max(0, Math.min(90, Number(marginRaw) || 0));
+          specEdits.marginPct = m;
+        }
         if (specFields.deviceClass.trim()) specEdits.deviceClass = specFields.deviceClass.trim();
         if (specFields.catalogNumber.trim()) specEdits.catalogNumber = specFields.catalogNumber.trim();
         if (specFields.manufacturer.trim()) specEdits.manufacturer = specFields.manufacturer.trim();
@@ -238,6 +248,8 @@ const CatalogManagerPanel: React.FC = () => {
         if (ika) specEdits.interruptingKA = /^[\d.]+$/.test(ika) ? Number(ika) : ika;
         if (edit.vendorId) { specEdits.vendorId = edit.vendorId; specEdits.vendorName = edit.vendorName; }
         payload.specifications = { ...(edit.__origSpec ?? {}), ...specEdits };
+        if (!hasMargin) delete payload.specifications.marginPct; // empty = inherit global GM
+
       }
       if (edit.id) await configuratorService.updateComponent(edit.id, payload);
       else await configuratorService.createComponent(payload);
@@ -738,6 +750,14 @@ const CatalogManagerPanel: React.FC = () => {
                   <MenuItem value="FIRM">Firm price</MenuItem>
                   <MenuItem value="ESTIMATED">Approximate / estimated</MenuItem>
                 </TextField>
+                <TextField
+                  size="small" label="Margin %" value={edit.marginPct ?? ''}
+                  onChange={(e) => setEdit({ ...edit, marginPct: e.target.value.replace(/[^0-9.]/g, '') })}
+                  sx={{ ...inputSx, width: 120 }}
+                  placeholder="inherit"
+                  helperText="0–90, empty = global"
+                  InputProps={{ endAdornment: <InputAdornment position="end"><Typography sx={{ color: C.sub, fontSize: 12 }}>%</Typography></InputAdornment> }}
+                />
                 <TextField size="small" label="Description" value={edit.description} onChange={(e) => setEdit({ ...edit, description: e.target.value })} sx={inputSx} fullWidth />
               </Stack>
               <Autocomplete

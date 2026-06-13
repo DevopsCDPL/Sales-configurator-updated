@@ -136,6 +136,11 @@ function buildRow({ entry, comp, stepKey }) {
     step_key: stepKey,
     section_number: entry.section_number != null ? Number(entry.section_number) : null,
     meta: entry.meta || {},
+    // Per-line margin layer carry-through (lineMarginEngine). line_id keys
+    // edits back to a ConfiguratorComponentLine; specifications surfaces the
+    // catalog component's default marginPct. Pricing ignores both.
+    line_id: entry.line_id ?? null,
+    specifications: entry.specifications ?? (comp && comp.specifications) ?? null,
   };
   return row;
 }

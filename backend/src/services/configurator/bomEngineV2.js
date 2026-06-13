@@ -46,6 +46,13 @@ function compileBomV2(board, sections, lines, std, copperEst = null) {
       source: l.source ?? 'user',
       generator_id: null,
       copper_weight_lbs: null,
+      // Per-line margin layer carry-through (spec §2/§3). Surfaced so the
+      // quote pipeline can resolve marginPctOverride / labourAdj / the
+      // catalog default marginPct without re-querying. Pricing ignores them.
+      line_id: l.id ?? null,
+      component_id: l.component_id ?? null,
+      meta: l.meta ?? {},
+      specifications: l.specifications ?? null,
     });
   }
 

@@ -13,6 +13,7 @@
 
 const { buildRow, hydrateEntry, sectionsFromBomRows } = require('./bomEngine');
 const { computeQuote } = require('./pricingEngine');
+const { computeBlendedPricing } = require('./lineMarginEngine');
 
 /** Category → legacy step_key (for reporting continuity only — pricing ignores it). */
 const CATEGORY_TO_STEP = {
@@ -57,6 +58,9 @@ function lineToEntry(line) {
     section_number:
       (line.scope === 'section' && line.sectionIndex != null) ? Number(line.sectionIndex) : null,
     meta: line.meta ?? {},
+    // Per-line margin layer carry-through (cost build-up unaffected).
+    line_id: line.lineId ?? line.line_id ?? line.id ?? null,
+    specifications: line.specifications ?? null,
   };
 }
 
@@ -94,20 +98,32 @@ function v2BoardToBomRows(board, catalog) {
  * manual labour lines participate in pricing exactly like component
  * labour — auditable, never skippable.
  */
-function computeQuoteFromV2(board, catalog, lookup, pricing) {
+function computeQuoteFromV2(board, catalog, lookup, pricing, opts = {}) {
   const rows = v2BoardToBomRows(board, catalog);
   const sections = sectionsFromBomRows(rows);
 
-  const adj = board.laborAdjustments ?? [];
-  if (adj.length) {
-    const hours = { CU: 0, ASM: 0, CNT: 0, QC: 0, TST: 0, ENG: 0, CAD: 0 };
-    for (const a of adj) {
-      const k = String(a.bucket || '').toUpperCase();
-      if (k in hours) hours[k] += Number(a.hours) || 0;
+  // Manual board-level laborAdjustments AND per-line meta.labourAdj deltas
+  // are summed into one pseudo-section so the cost build-up (total_cost)
+  // includes them. lineMarginEngine re-applies the per-line deltas for the
+  // split; the two reconcile via the overhead factor (Sum lineCost -> total_cost).
+  const hours = { CU: 0, ASM: 0, CNT: 0, QC: 0, TST: 0, ENG: 0, CAD: 0 };
+  let anyAdj = false;
+  for (const a of board.laborAdjustments ?? []) {
+    const k = String(a.bucket || '').toUpperCase();
+    if (k in hours) { hours[k] += Number(a.hours) || 0; anyAdj = true; }
+  }
+  for (const r of rows) {
+    const adj = r.meta?.labourAdj;
+    if (!adj || typeof adj !== 'object') continue;
+    for (const [k, v] of Object.entries(adj)) {
+      const cat = String(k).replace(/^lbr_/i, '').toUpperCase();
+      if (cat in hours) { hours[cat] += Number(v) || 0; anyAdj = true; }
     }
+  }
+  if (anyAdj) {
     sections.push({
       id: 'labor-adjustments',
-      description: 'Manual labour adjustments',
+      description: 'Manual + per-line labour adjustments',
       qty: 1,
       unit_material_cost: 0,
       copper_weight_per_unit: 0,
@@ -116,7 +132,16 @@ function computeQuoteFromV2(board, catalog, lookup, pricing) {
     });
   }
 
-  return computeQuote({ sections, lookup, pricing });
+  const quote = computeQuote({ sections, lookup, pricing });
+
+  // Per-line margin layer (spec section 3): re-derive SELL when lines carry
+  // their own margin; pool the global GM over the rest. Cost build-up above
+  // is untouched and remains parity-proven.
+  if (opts.withLineMargin) {
+    const blended = computeBlendedPricing(rows, lookup, pricing, { total_cost: quote.total_cost });
+    return { quote, rows, blended };
+  }
+  return quote;
 }
 
 module.exports = { v2BoardToBomRows, computeQuoteFromV2, lineToEntry, CATEGORY_TO_STEP };

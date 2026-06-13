@@ -61,7 +61,8 @@ async function computeBoardQuote(switchboardId, opts = {}) {
   // BOM rows → adapter entries. unit_material_cost = unit_cost snapshot:
   // quote material ≡ BOM material by construction.
   const componentLines = bom.rows.map((r) => ({
-    component_id: null,
+    component_id: r.component_id ?? null,
+    line_id: r.line_id ?? null,
     part_number: r.part_number,
     name: r.description,
     description: r.description,
@@ -73,7 +74,11 @@ async function computeBoardQuote(switchboardId, opts = {}) {
     copper_weight_per_unit: 0,
     scope: r.scope,
     sectionIndex: r.sectionIndex,
-    meta: {},
+    // Per-line margin layer (spec section 2/3): meta carries marginPctOverride
+    // + labourAdj; specifications surfaces the catalog default marginPct
+    // (hydrateEntry fills it from the catalog when null here).
+    meta: r.meta ?? {},
+    specifications: r.specifications ?? null,
   }));
 
   const catalog = await buildCatalog(compiled.lines);
@@ -98,12 +103,29 @@ async function computeBoardQuote(switchboardId, opts = {}) {
   };
   const laborAdjustments = Array.isArray(opts.laborAdjustments) ? opts.laborAdjustments : [];
 
-  const quote = computeQuoteFromV2(
+  const computed = computeQuoteFromV2(
     { sections: [], componentLines, laborAdjustments },
     catalog,
     lookup,
-    pricing
+    pricing,
+    { withLineMargin: true }
   );
+  const quote = computed.quote;
+  const blended = computed.blended;
+
+  // Per-line margin layer (spec section 3): when any line carries its own
+  // margin, the SELL price + effective GM come from the blended computation.
+  // When NO line is overridden, blended.target_price === total_cost/(1-GM)
+  // so this is bit-identical to the legacy single-GM path.
+  if (blended && blended.overridden_count > 0) {
+    quote.pricing = {
+      target_price: blended.target_price,
+      rounded_price: blended.rounded_price,
+      actual_profit: blended.actual_profit,
+      actual_gm: blended.actual_gm,
+      roundup_factor: blended.roundup_factor,
+    };
+  }
 
   /* ── Multi-unit pricing (TPS SUMMARY "MULTIPLE UNITS" block) ──
    * Design labour (ENG + CAD) is charged ONCE across all units when
@@ -158,6 +180,18 @@ async function computeBoardQuote(switchboardId, opts = {}) {
     blockers,
     canIssue: blockers.length === 0,
     bomRows: bom.rows,
+    // Per-line margin layer (spec section 3/4): per-line cost/sell/margin/hours
+    // for the editable Quotation table, plus the blended summary.
+    lineMargins: blended ? blended.lines : [],
+    marginSummary: blended ? {
+      overriddenCount: blended.overridden_count,
+      overriddenCost: blended.overridden_cost,
+      overriddenSell: blended.overridden_sell,
+      pooledCost: blended.pooled_cost,
+      pooledSell: blended.pooled_sell,
+      globalGmPct: blended.global_gm_pct,
+      blendedGm: blended.actual_gm,
+    } : null,
   };
 }
 
