@@ -20,6 +20,7 @@ import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import TableRowsRoundedIcon from '@mui/icons-material/TableRowsRounded';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import { configuratorService, ConfiguratorComponent } from '../../services/configuratorService';
@@ -62,7 +63,7 @@ const inputSx = {
 interface EditState {
   id?: string;
   name: string; category: string; part_number: string; description: string;
-  price: string; priceType: string;
+  price: string; priceType: string; priceSource: string;
   spec_deviceClass: string; spec_catalogNumber: string; spec_manufacturer: string;
   spec_series: string; spec_frameModel: string; spec_ratedCurrentA: string;
   spec_poles: string; spec_interruptingKA: string;
@@ -74,6 +75,7 @@ interface EditState {
 const emptyEdit = (cat?: string): EditState => ({
   name: '', category: cat ?? 'HARDWARE', part_number: '', description: '', price: '',
   priceType: 'FIRM',
+  priceSource: '',
   marginPct: '',
   lbr_cu: '', lbr_asm: '', lbr_cnt: '', lbr_qc: '', lbr_tst: '', lbr_eng: '', lbr_cad: '',
   spec_deviceClass: '', spec_catalogNumber: '', spec_manufacturer: '',
@@ -183,6 +185,7 @@ const CatalogManagerPanel: React.FC = () => {
       description: r.description ?? '',
       price: String(r.price ?? r.mat_cost ?? ''),
       priceType: (r as any).price_status === 'ESTIMATED' ? 'ESTIMATED' : 'FIRM',
+      priceSource: (r as any).specifications?.priceSource ?? '',
       spec_deviceClass: String((r as any).specifications?.deviceClass ?? ''),
       spec_catalogNumber: String((r as any).specifications?.catalogNumber ?? ''),
       spec_manufacturer: String((r as any).specifications?.manufacturer ?? ''),
@@ -227,7 +230,7 @@ const CatalogManagerPanel: React.FC = () => {
       const marginRaw = String(edit.marginPct ?? '').trim();
       const hasMargin = marginRaw !== '';
       const hasAnySpec = Object.values(specFields).some((v) => v.trim() !== '');
-      if (isCbSave || hasAnySpec || edit.vendorId || hasMargin) {
+      if (isCbSave || hasAnySpec || edit.vendorId || hasMargin || edit.priceSource) {
         const specEdits: any = {};
         // Per-component margin (spec §1): 0–90, stored on specifications.marginPct.
         // Empty clears it (→ inherit global GM); otherwise clamp into range.
@@ -247,6 +250,7 @@ const CatalogManagerPanel: React.FC = () => {
         const ika = specFields.interruptingKA.trim();
         if (ika) specEdits.interruptingKA = /^[\d.]+$/.test(ika) ? Number(ika) : ika;
         if (edit.vendorId) { specEdits.vendorId = edit.vendorId; specEdits.vendorName = edit.vendorName; }
+        if (edit.priceSource) specEdits.priceSource = edit.priceSource;
         payload.specifications = { ...(edit.__origSpec ?? {}), ...specEdits };
         if (!hasMargin) delete payload.specifications.marginPct; // empty = inherit global GM
 
@@ -397,7 +401,7 @@ const CatalogManagerPanel: React.FC = () => {
         })()}
       </Tabs>
 
-      <Stack direction="row" alignItems="center" spacing={0.75} sx={{ mb: 1 }}>
+      <Stack direction="row" alignItems="center" spacing={0.75} sx={{ mb: 1.5 }}>
         <Typography sx={{ color: C.sub, fontSize: 11 }}>Source:</Typography>
         {([['all','All',''],['vendor-import','TPS','#00c8ff'],['rfq','RFQ firm','#22C55E'],['web','Web','#D97706'],['manual','Manual','#94A3B8'],['none','Unmarked','#475569'],['vendor-unresolved','Vendor?','#D97706']] as [string,string,string][]).map(([val,label,dot]) => (
           <Chip
@@ -419,23 +423,20 @@ const CatalogManagerPanel: React.FC = () => {
             }}
           />
         ))}
-      </Stack>
-      <Stack direction="row" justifyContent="flex-end" sx={{ mb: 1.5 }}>
-        <Stack direction="row" spacing={0}>
-          {([['cards', GridViewRoundedIcon], ['list', TableRowsRoundedIcon]] as const).map(([key, Icon]) => (
-            <IconButton
-              key={key} size="small" onClick={() => setView(key)}
-              sx={{
-                color: view === key ? '#06151c' : C.sub, borderRadius: '6px',
-                bgcolor: view === key ? C.blue : 'transparent',
-                border: '1px solid ' + (view === key ? C.blue : C.border),
-                ml: key === 'list' ? 0.5 : 0,
-              }}
-            >
-              <Icon sx={{ fontSize: 16 }} />
-            </IconButton>
-          ))}
-        </Stack>
+        <Box sx={{ flex: 1 }} />
+        {([['cards', GridViewRoundedIcon], ['list', TableRowsRoundedIcon]] as const).map(([key, Icon]) => (
+          <IconButton
+            key={key} size="small" onClick={() => setView(key)}
+            sx={{
+              color: view === key ? '#06151c' : C.sub, borderRadius: '6px',
+              bgcolor: view === key ? C.blue : 'transparent',
+              border: '1px solid ' + (view === key ? C.blue : C.border),
+              ml: key === 'list' ? 0.5 : 0,
+            }}
+          >
+            <Icon sx={{ fontSize: 16 }} />
+          </IconButton>
+        ))}
       </Stack>
 
       {isCb && !loading && (
@@ -482,6 +483,12 @@ const CatalogManagerPanel: React.FC = () => {
                     size="small"
                     sx={{ bgcolor: 'rgba(0,200,255,0.10)', color: '#00c8ff', fontSize: 9.5, height: 18, maxWidth: 120, '& .MuiChip-label': { px: 1 } }}
                   />
+                  <Tooltip title={'Price source — ' + (spec.priceSource ? String(spec.priceSource) : 'unmarked')}>
+                    <Box component="span" sx={{ display: 'inline-flex', flexShrink: 0 }}><PriceSourceDot source={spec.priceSource} /></Box>
+                  </Tooltip>
+                  <Tooltip title={dotTip}>
+                    <Box sx={{ width: 8, height: 8, borderRadius: '50%', flexShrink: 0, bgcolor: dotColor, boxShadow: `0 0 6px ${dotColor}` }} />
+                  </Tooltip>
                   {(r as any).specifications?.vendorUnresolved && (
                     <Tooltip title="Vendor name from spreadsheet didn't match a vendor record — open Edit to assign">
                       <Chip
@@ -538,14 +545,6 @@ const CatalogManagerPanel: React.FC = () => {
                       </Stack>
                     </Tooltip>
                   )}
-                  <Tooltip title={dotTip}>
-                    <Box
-                      sx={{
-                        width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
-                        bgcolor: dotColor, boxShadow: `0 0 6px ${dotColor}`,
-                      }}
-                    />
-                  </Tooltip>
                 </Stack>
 
                 {/* ROW 3-5 — labeled info rows (per category) */}
@@ -608,21 +607,15 @@ const CatalogManagerPanel: React.FC = () => {
                   )}
                   <Stack direction="row" alignItems="center">
                     {Number(r.price) > 0 ? (
-                      <>
-                        <PriceSourceDot source={spec.priceSource} />
-                        <Typography sx={{ color: '#00c8ff', fontSize: 16, fontWeight: 800 }}>
-                          {usd(Number(r.price))}
-                        </Typography>
-                      </>
+                      <Typography sx={{ color: '#00c8ff', fontSize: 16, fontWeight: 800 }}>
+                        {usd(Number(r.price))}
+                      </Typography>
                     ) : (
-                      <>
-                        <PriceSourceDot source={spec.priceSource} />
-                        <Tooltip title="No quote received yet — raise an RFQ">
-                          <Typography sx={{ color: C.red, fontSize: 14, fontWeight: 800 }}>
-                            RFQ $
-                          </Typography>
-                        </Tooltip>
-                      </>
+                      <Tooltip title="No quote received yet — raise an RFQ">
+                        <Typography sx={{ color: C.red, fontSize: 14, fontWeight: 800 }}>
+                          RFQ $
+                        </Typography>
+                      </Tooltip>
                     )}
                   </Stack>
                 </Stack>
@@ -753,13 +746,28 @@ const CatalogManagerPanel: React.FC = () => {
                 <TextField
                   size="small" label="Margin %" value={edit.marginPct ?? ''}
                   onChange={(e) => setEdit({ ...edit, marginPct: e.target.value.replace(/[^0-9.]/g, '') })}
-                  sx={{ ...inputSx, width: 120 }}
+                  sx={{ ...inputSx, width: 110 }}
                   placeholder="inherit"
-                  helperText="0–90, empty = global"
                   InputProps={{ endAdornment: <InputAdornment position="end"><Typography sx={{ color: C.sub, fontSize: 12 }}>%</Typography></InputAdornment> }}
                 />
-                <TextField size="small" label="Description" value={edit.description} onChange={(e) => setEdit({ ...edit, description: e.target.value })} sx={inputSx} fullWidth />
+                <TextField
+                  select size="small" label="Source" value={edit.priceSource}
+                  onChange={(e) => setEdit({ ...edit, priceSource: e.target.value })}
+                  sx={{ ...inputSx, width: 170 }}
+                >
+                  <MenuItem value="">Unmarked</MenuItem>
+                  <MenuItem value="vendor-import">TPS (negotiated)</MenuItem>
+                  <MenuItem value="rfq">RFQ confirmed</MenuItem>
+                  <MenuItem value="web">Web (approximate)</MenuItem>
+                  <MenuItem value="manual">Manual entry</MenuItem>
+                </TextField>
+                <Tooltip title="Margin %: 0–90, empty = inherit the global GM%. Source: how this price was confirmed — TPS = negotiated vendor price, RFQ = confirmed via request-for-quote, Web = scraped approximate, Manual = hand-entered. Leave Price empty → the part shows RFQ $ until a quote is received.">
+                  <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', color: C.sub, alignSelf: 'center', '&:hover': { color: C.blue } }}>
+                    <InfoOutlinedIcon sx={{ fontSize: 16 }} />
+                  </Box>
+                </Tooltip>
               </Stack>
+              <TextField size="small" label="Description" value={edit.description} onChange={(e) => setEdit({ ...edit, description: e.target.value })} sx={inputSx} fullWidth />
               <Autocomplete
                 options={vendors}
                 getOptionLabel={(v) => v.vendor_name}
@@ -772,9 +780,6 @@ const CatalogManagerPanel: React.FC = () => {
                   <TextField {...params} size="small" label="Vendor (for RFQ / procurement)" sx={inputSx} />
                 )}
               />
-              <Typography sx={{ color: C.sub, fontSize: 10.5 }}>
-                Leave price empty → component shows RFQ $ until a quote is received.
-              </Typography>
               {edit.category.toUpperCase().trim() === 'CIRCUIT BREAKER' && (
                 <>
                   <Typography sx={{ color: C.sub, fontSize: 11, fontWeight: 700, mt: 0.5 }}>
