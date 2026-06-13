@@ -373,8 +373,8 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, onUpdate, onPr
     total: 5,
   };
   const sellerFieldCount = {
-    filled: [form.seller_prepared_by, form.seller_poc_phone, form.seller_designation, form.seller_email].filter(v => v.trim()).length,
-    total: 4,
+    filled: [form.seller_prepared_by, form.seller_poc, form.seller_poc_phone, form.seller_email, form.seller_designation].filter(v => v.trim()).length,
+    total: 5,
   };
   const projectFieldCount = {
     filled: [form.project_name, form.ship_to_address].filter(v => v.trim()).length,
@@ -553,33 +553,39 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, onUpdate, onPr
             locked={dis}
             fieldCount={sellerFieldCount}
           >
+            <ValidatedField isValid={fieldValid('seller_prepared_by')} showCheck={editing}>
+              <FG fullWidth>
+                <FL required>Prepared by (name)</FL>
+                <TextField fullWidth value={form.seller_prepared_by} onChange={set('seller_prepared_by')}
+                  disabled={dis} error={!!fieldError('seller_prepared_by')}
+                  helperText={fieldError('seller_prepared_by') ? 'Required' : ''}
+                  placeholder={dis ? '' : 'Seller / team name...'}
+                  sx={readOnlySx(dis)} />
+              </FG>
+            </ValidatedField>
             <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, columnGap: 2, rowGap: 0.5 }}>
-              <ValidatedField isValid={fieldValid('seller_prepared_by')} showCheck={editing}>
-                <FG>
-                  <FL required>Prepared By</FL>
-                  <TextField fullWidth value={form.seller_prepared_by} onChange={set('seller_prepared_by')}
-                    disabled={dis} error={!!fieldError('seller_prepared_by')}
-                    helperText={fieldError('seller_prepared_by') ? 'Required' : ''}
-                    placeholder={dis ? '' : 'Name...'}
-                    sx={readOnlySx(dis)} />
-                </FG>
-              </ValidatedField>
               <FG>
-                <FL>POC Phone</FL>
+                <FL>POC name</FL>
+                <TextField fullWidth value={form.seller_poc} onChange={set('seller_poc')}
+                  disabled={dis} placeholder={dis ? '' : 'Contact name...'}
+                  sx={readOnlySx(dis)} />
+              </FG>
+              <FG>
+                <FL>POC phone</FL>
                 <TextField fullWidth value={form.seller_poc_phone} onChange={set('seller_poc_phone')}
                   disabled={dis} placeholder={dis ? '' : 'Phone number...'}
                   sx={readOnlySx(dis)} />
               </FG>
               <FG>
-                <FL>POC Designation</FL>
-                <TextField fullWidth value={form.seller_designation} onChange={set('seller_designation')}
-                  disabled={dis} placeholder={dis ? '' : 'Role / Title...'}
+                <FL>POC email</FL>
+                <TextField fullWidth type="email" value={form.seller_email} onChange={set('seller_email')}
+                  disabled={dis} placeholder={dis ? '' : 'email@example.com'}
                   sx={readOnlySx(dis)} />
               </FG>
               <FG>
-                <FL>POC Email</FL>
-                <TextField fullWidth type="email" value={form.seller_email} onChange={set('seller_email')}
-                  disabled={dis} placeholder={dis ? '' : 'email@example.com'}
+                <FL>POC designation</FL>
+                <TextField fullWidth value={form.seller_designation} onChange={set('seller_designation')}
+                  disabled={dis} placeholder={dis ? '' : 'Role / Title...'}
                   sx={readOnlySx(dis)} />
               </FG>
             </Box>
@@ -597,9 +603,10 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, onUpdate, onPr
             locked={dis}
             fieldCount={projectFieldCount}
           >
+            {/* Row 1: Project name | Required by date */}
             <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, columnGap: 2, rowGap: 0.5 }}>
               <ValidatedField isValid={fieldValid('project_name')} showCheck={editing}>
-                <FG fullWidth>
+                <FG>
                   <FL required>Project name</FL>
                   <TextField fullWidth value={form.project_name} onChange={set('project_name')}
                     disabled={dis} error={!!fieldError('project_name')}
@@ -608,22 +615,6 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, onUpdate, onPr
                     sx={readOnlySx(dis)} />
                 </FG>
               </ValidatedField>
-              <FG fullWidth>
-                <FL>Ship to address</FL>
-                <TextField fullWidth multiline rows={1} value={form.ship_to_address}
-                  onChange={set('ship_to_address')} disabled={dis || form.same_as_billing}
-                  placeholder={dis ? '' : 'Delivery address...'}
-                  sx={readOnlyTextarea(dis)} />
-                <FormControlLabel
-                  control={
-                    <Checkbox size="small" checked={form.same_as_billing}
-                      onChange={(e) => handleSameAsBilling(e.target.checked)} disabled={dis}
-                      sx={{ color: UI.border, '&.Mui-checked': { color: '#00c8ff' }, p: 0.5 }} />
-                  }
-                  label={<Typography sx={{ fontSize: 12, color: '#64748B' }}>Same as billing</Typography>}
-                  sx={{ mt: 0.5, ml: 0 }}
-                />
-              </FG>
               <FG>
                 <FL>Required by date</FL>
                 <TextField fullWidth type="date" value={form.required_by_date}
@@ -631,14 +622,32 @@ const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({ project, onUpdate, onPr
                   InputLabelProps={{ shrink: true }}
                   sx={readOnlySx(dis)} />
               </FG>
-              <FG fullWidth>
-                <FL>Project notes</FL>
-                <TextField fullWidth multiline rows={2} value={form.project_notes}
-                  onChange={set('project_notes')} disabled={dis}
-                  placeholder={dis ? '' : 'Optional notes, voltage class, project type...'}
-                  sx={readOnlyTextarea(dis)} />
-              </FG>
             </Box>
+            {/* Row 2: Ship-to address */}
+            <FG fullWidth>
+              <FL>Ship to address</FL>
+              <TextField fullWidth multiline rows={1} value={form.ship_to_address}
+                onChange={set('ship_to_address')} disabled={dis || form.same_as_billing}
+                placeholder={dis ? '' : 'Delivery address...'}
+                sx={readOnlyTextarea(dis)} />
+              <FormControlLabel
+                control={
+                  <Checkbox size="small" checked={form.same_as_billing}
+                    onChange={(e) => handleSameAsBilling(e.target.checked)} disabled={dis}
+                    sx={{ color: UI.border, '&.Mui-checked': { color: '#00c8ff' }, p: 0.5 }} />
+                }
+                label={<Typography sx={{ fontSize: 12, color: '#64748B' }}>Same as billing</Typography>}
+                sx={{ mt: 0.5, ml: 0 }}
+              />
+            </FG>
+            {/* Row 3: Project notes */}
+            <FG fullWidth>
+              <FL>Project notes</FL>
+              <TextField fullWidth multiline rows={2} value={form.project_notes}
+                onChange={set('project_notes')} disabled={dis}
+                placeholder={dis ? '' : 'Optional notes, voltage class, project type...'}
+                sx={readOnlyTextarea(dis)} />
+            </FG>
           </SectionCard>
         </Grid>
       </Grid>
