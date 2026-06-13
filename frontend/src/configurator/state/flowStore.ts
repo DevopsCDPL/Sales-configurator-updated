@@ -11,10 +11,10 @@ export const FLOW_STEPS = [
   ['section_review', 'Section Review'],
   ['components', 'Components'],
   ['component_review', 'Component Review'],
+  ['bom', 'Bill of Materials'],
+  ['quote', 'Pricing'],
   ['sld', 'SLD'],
   ['elevation', 'Elevation'],
-  ['bom', 'Bill of Materials'],
-  ['quote', 'Quote'],
   ['drawings', 'Drawings'],
 ] as const;
 
