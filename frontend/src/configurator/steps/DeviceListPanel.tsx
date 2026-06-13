@@ -184,10 +184,10 @@ const DeviceListPanel: React.FC<DeviceListPanelProps> = ({ lines, intake, catalo
               <TableRow>
                 <TableCell sx={{ ...headSx, width: 40, whiteSpace: 'nowrap', borderRight: '1px solid ' + C.border }} align="center">S.No</TableCell>
                 <TableCell sx={{ ...headSx, width: 64, whiteSpace: 'nowrap', borderRight: '1px solid ' + C.border }}>Section</TableCell>
-                <TableCell sx={headSx}>Designation</TableCell>
+                <TableCell sx={headSx}>Tag</TableCell>
                 <TableCell sx={headSx}>Role</TableCell>
                 <TableCell sx={headSx}>Connected load</TableCell>
-                <TableCell sx={headSx}>Part #</TableCell>
+                <TableCell sx={headSx}>SKU</TableCell>
                 <TableCell sx={headSx}>Manufacturer</TableCell>
                 <TableCell sx={headSx}>Poles</TableCell>
                 <TableCell sx={headSx}>Mounting</TableCell>
@@ -212,22 +212,29 @@ const DeviceListPanel: React.FC<DeviceListPanelProps> = ({ lines, intake, catalo
                         {'S' + sectionKey}
                       </TableCell>
                     )}
-                    {/* Designation */}
+                    {/* Tag — yellow chip + tooltip when swapped, else blue */}
                     <TableCell sx={{ ...cellSx, verticalAlign: 'middle' }}>
-                      <Chip label={l.meta?.designation ?? '?'} size="small" sx={{ bgcolor: 'rgba(0,200,255,0.12)', color: '#60A5FA', fontWeight: 700, fontSize: 10.5, height: 20 }} />
-                      {l.meta?.swapped && (
-                        <Chip label={'swapped (was ' + (l.meta?.swapped_from ?? '?') + ')'} size="small" sx={{ ml: 1, bgcolor: 'transparent', border: '1px solid ' + C.amber, color: C.amber, fontSize: 9, height: 16 }} />
+                      {l.meta?.swapped ? (
+                        <Tooltip title={'Swapped — was ' + (l.meta?.swapped_from ?? l.meta?.swappedFrom ?? '—')} arrow>
+                          <Chip label={l.meta?.designation ?? '?'} size="small" sx={{ bgcolor: 'rgba(251,191,36,0.14)', color: '#FBBF24', fontWeight: 700, fontSize: 10.5, height: 20 }} />
+                        </Tooltip>
+                      ) : (
+                        <Chip label={l.meta?.designation ?? '?'} size="small" sx={{ bgcolor: 'rgba(0,200,255,0.12)', color: '#60A5FA', fontWeight: 700, fontSize: 10.5, height: 20 }} />
                       )}
                     </TableCell>
                     {/* Role */}
-                    <TableCell sx={{ ...cellSx, color: C.sub, verticalAlign: 'middle' }}>{l.meta?.role ?? '—'}</TableCell>
-                    {/* Connected load */}
-                    <TableCell sx={{ ...cellSx, verticalAlign: 'middle' }}>{loadNameFor(l)}</TableCell>
-                    {/* Part # + stacked source/status dots beneath */}
+                    <TableCell sx={{ ...cellSx, color: C.sub, verticalAlign: 'middle', whiteSpace: 'nowrap' }}>{l.meta?.role ?? '—'}</TableCell>
+                    {/* Connected load — ellipsis + tooltip */}
+                    <TableCell sx={{ ...cellSx, verticalAlign: 'middle' }}>
+                      <Tooltip title={loadNameFor(l)} arrow>
+                        <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 150 }}>{loadNameFor(l)}</Box>
+                      </Tooltip>
+                    </TableCell>
+                    {/* SKU + stacked source/status dots beneath */}
                     <TableCell sx={{ ...cellSx, verticalAlign: 'middle' }}>
                       <Stack spacing={0.4} alignItems="flex-start">
-                        <Tooltip title={l.part_number ?? ''} arrow>
-                          <Box sx={{ color: C.text }}>{compactSku(l.part_number) || '—'}</Box>
+                        <Tooltip title={(l.part_number ?? '') + (l.meta?.catalogNumber ? ' · ' + l.meta.catalogNumber : '')} arrow>
+                          <Box sx={{ color: C.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 120 }}>{compactSku(l.part_number) || '—'}</Box>
                         </Tooltip>
                         <Stack direction="row" alignItems="center" spacing={0.5}>
                           <PriceSourceDot source={(l.meta as any)?.priceSource} />
@@ -244,7 +251,7 @@ const DeviceListPanel: React.FC<DeviceListPanelProps> = ({ lines, intake, catalo
                     {/* Mounting */}
                     <TableCell sx={{ ...cellSx, color: C.sub, verticalAlign: 'middle' }}>{l.meta?.mounting ?? 'Fixed'}</TableCell>
                     {/* Rating — left */}
-                    <TableCell sx={{ ...cellSx, verticalAlign: 'middle' }}>{l.meta?.ratedA ?? '—'} A / {l.meta?.interruptingKA ?? '—'} kA</TableCell>
+                    <TableCell sx={{ ...cellSx, verticalAlign: 'middle', whiteSpace: 'nowrap' }}>{l.meta?.ratedA ?? '—'} A / {l.meta?.interruptingKA ?? '—'} kA</TableCell>
                     {/* Cost — right, no decimals */}
                     <TableCell sx={{ ...cellSx, verticalAlign: 'middle' }} align="right">{Number(l.unit_cost) ? usd(Number(l.unit_cost)) : '—'}</TableCell>
                     {/* Actions */}
