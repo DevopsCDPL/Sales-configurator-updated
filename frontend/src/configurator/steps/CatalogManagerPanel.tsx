@@ -265,11 +265,20 @@ const CatalogManagerPanel: React.FC = () => {
         if (!hasMargin) delete payload.specifications.marginPct; // empty = inherit global GM
 
       }
-      if (edit.id) await configuratorService.updateComponent(edit.id, payload);
-      else await configuratorService.createComponent(payload);
-      setInfo(edit.id ? 'Component updated' : 'Component added');
-      setEdit(null);
-      await Promise.all([search(), loadCounts()]);
+      if (edit.id) {
+        await configuratorService.updateComponent(edit.id, payload);
+        setInfo('Component updated');
+        setEdit(null);
+        await Promise.all([search(), loadCounts()]);
+      } else {
+        await configuratorService.createComponent(payload);
+        setInfo('Component added');
+        setEdit(null);
+        setSourceFilter('all');
+        setStatusFilter('all');
+        setCategory(payload.category);
+        await loadCounts();
+      }
     } catch (e: any) {
       setError(e?.response?.data?.error ?? e?.response?.data?.message ?? 'Save failed');
     } finally {
@@ -302,6 +311,10 @@ const CatalogManagerPanel: React.FC = () => {
       if (xlsRef.current) xlsRef.current.value = '';
     }
   };
+
+  // Helper: format vendor offer price - avoids bare $ before {} in JSX text
+  const fmtOfferPrice = (offer: any): string =>
+    typeof offer.price === 'number' ? offer.price.toFixed(2) : String(offer.price || '');
 
   return (
     <Box sx={{ px: 3, pb: 4, pt: 2 }}>
@@ -411,29 +424,67 @@ const CatalogManagerPanel: React.FC = () => {
         })()}
       </Tabs>
 
-      <Stack direction="row" alignItems="center" spacing={0.75} sx={{ mb: 1.5 }}>
-        <Typography sx={{ color: C.sub, fontSize: 11 }}>Source:</Typography>
-        {([['all','All',''],['vendor-import','TPS','#00c8ff'],['rfq','RFQ','#22C55E'],['web','Web','#D97706'],['manual','Manual','#94A3B8'],['none','Unmarked','#475569'],['vendor-unresolved','Vendor?','#D97706']] as [string,string,string][]).map(([val,label,dot]) => (
-          <Chip
-            key={val}
-            size="small"
-            onClick={() => setSourceFilter(val)}
-            label={(
-              <Stack direction="row" alignItems="center" spacing={0.5}>
-                {dot ? <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: dot }} /> : null}
+      {/* Combined Source + Status filter row — segmented tab-block style */}
+      <Stack direction="row" alignItems="center" sx={{ mb: 1.5, flexWrap: 'wrap', gap: 1.5 }}>
+        {/* Source segmented group */}
+        <Stack direction="row" alignItems="center" spacing={0.5}>
+          <Typography sx={{ color: C.sub, fontSize: 10.5, mr: 0.25 }}>Source</Typography>
+          <Box sx={{ display: 'inline-flex', alignItems: 'center', bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '8px', p: '2px', gap: '2px' }}>
+            {([['all','All',''],['vendor-import','TPS','#00c8ff'],['rfq','RFQ','#22C55E'],['web','Web','#D97706'],['manual','Manual','#94A3B8'],['none','Unmarked','#475569'],['vendor-unresolved','Vendor?','#D97706']] as [string,string,string][]).map(([val,label,dot]) => (
+              <Box
+                key={val}
+                onClick={() => setSourceFilter(val)}
+                sx={{
+                  display: 'inline-flex', alignItems: 'center', gap: '4px',
+                  px: '7px', height: 22, borderRadius: '6px', cursor: 'pointer',
+                  bgcolor: sourceFilter === val ? 'rgba(0,200,255,0.14)' : 'transparent',
+                  color: sourceFilter === val ? C.blue : C.sub,
+                  fontSize: 10.5, fontWeight: sourceFilter === val ? 600 : 400,
+                  transition: 'all .12s',
+                  userSelect: 'none',
+                }}
+              >
+                {dot && <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: dot, flexShrink: 0 }} />}
                 <span>{label}</span>
-              </Stack>
-            )}
-            sx={{
-              height: 20, fontSize: 10.5, cursor: 'pointer',
-              bgcolor: sourceFilter === val ? 'rgba(0,200,255,0.12)' : 'transparent',
-              border: '1px solid ' + (sourceFilter === val ? C.blue : C.border),
-              color: sourceFilter === val ? C.blue : C.sub,
-              '& .MuiChip-label': { px: 1 },
-            }}
-          />
-        ))}
+              </Box>
+            ))}
+          </Box>
+        </Stack>
+
+        {/* Status segmented group */}
+        <Stack direction="row" alignItems="center" spacing={0.5}>
+          <Typography sx={{ color: C.sub, fontSize: 10.5, mr: 0.25 }}>Status</Typography>
+          <Box sx={{ display: 'inline-flex', alignItems: 'center', bgcolor: C.surface, border: '1px solid ' + C.border, borderRadius: '8px', p: '2px', gap: '2px' }}>
+            {([['all','All',''],['FIRM','Firm','#22C55E'],['ESTIMATED','Est','#D97706'],['PENDING_RFQ','RFQ','#EF4444']] as [string,string,string][]).map(([val,label,dot]) => (
+              <Box
+                key={val}
+                onClick={() => setStatusFilter(val)}
+                sx={{
+                  display: 'inline-flex', alignItems: 'center', gap: '4px',
+                  px: '7px', height: 22, borderRadius: '6px', cursor: 'pointer',
+                  bgcolor: statusFilter === val ? 'rgba(0,200,255,0.14)' : 'transparent',
+                  color: statusFilter === val ? C.blue : C.sub,
+                  fontSize: 10.5, fontWeight: statusFilter === val ? 600 : 400,
+                  transition: 'all .12s',
+                  userSelect: 'none',
+                }}
+              >
+                {dot && <Box sx={{ width: 6, height: 6, borderRadius: '1px', bgcolor: dot, flexShrink: 0 }} />}
+                <span>{label}</span>
+              </Box>
+            ))}
+          </Box>
+        </Stack>
+
+        <Tooltip title="Two independent axes — Source = where the price came from (one per part); Status = whether that price is firm, estimated, or still awaiting an RFQ.">
+          <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', color: C.sub, cursor: 'default' }}>
+            <InfoOutlinedIcon sx={{ fontSize: 13 }} />
+          </Box>
+        </Tooltip>
+
         <Box sx={{ flex: 1 }} />
+
+        {/* View toggle */}
         {([['cards', GridViewRoundedIcon], ['list', TableRowsRoundedIcon]] as const).map(([key, Icon]) => (
           <IconButton
             key={key} size="small" onClick={() => setView(key)}
@@ -441,41 +492,11 @@ const CatalogManagerPanel: React.FC = () => {
               color: view === key ? '#06151c' : C.sub, borderRadius: '6px',
               bgcolor: view === key ? C.blue : 'transparent',
               border: '1px solid ' + (view === key ? C.blue : C.border),
-              ml: key === 'list' ? 0.5 : 0,
             }}
           >
             <Icon sx={{ fontSize: 16 }} />
           </IconButton>
         ))}
-      </Stack>
-
-      <Stack direction="row" alignItems="center" spacing={0.75} sx={{ mb: 1.5 }}>
-        <Typography sx={{ color: C.sub, fontSize: 11 }}>Status:</Typography>
-        {([['all','All',''],['FIRM','Firm','#22C55E'],['ESTIMATED','Estimated','#D97706'],['PENDING_RFQ','Awaiting RFQ','#EF4444']] as [string,string,string][]).map(([val,label,dot]) => (
-          <Chip
-            key={val}
-            size="small"
-            onClick={() => setStatusFilter(val)}
-            label={(
-              <Stack direction="row" alignItems="center" spacing={0.5}>
-                {dot ? <Box sx={{ width: 7, height: 7, borderRadius: 2, bgcolor: dot }} /> : null}
-                <span>{label}</span>
-              </Stack>
-            )}
-            sx={{
-              height: 20, fontSize: 10.5, cursor: 'pointer',
-              bgcolor: statusFilter === val ? 'rgba(0,200,255,0.12)' : 'transparent',
-              border: '1px solid ' + (statusFilter === val ? C.blue : C.border),
-              color: statusFilter === val ? C.blue : C.sub,
-              '& .MuiChip-label': { px: 1 },
-            }}
-          />
-        ))}
-        <Tooltip title="Two independent axes — Source = where the price came from (one per part); Status = whether that price is firm, estimated, or still awaiting an RFQ.">
-          <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', color: C.sub, '&:hover': { color: C.blue } }}>
-            <InfoOutlinedIcon sx={{ fontSize: 14 }} />
-          </Box>
-        </Tooltip>
       </Stack>
 
       {isCb && !loading && (
@@ -866,7 +887,7 @@ const CatalogManagerPanel: React.FC = () => {
                       <span style={{ color: '#2A3050' }}>—</span>
                       <span>{offer.sku}</span>
                       <span style={{ color: '#2A3050' }}>—</span>
-                      <span style={{ color: '#E2E8F0' }}>${typeof offer.price === 'number' ? offer.price.toFixed(2) : offer.price}</span>
+                      <span style={{ color: '#E2E8F0' }}>{'$'}{fmtOfferPrice(offer)}</span>
                       {offer.seenAt && <span style={{ color: '#2A3050' }}>— {offer.seenAt}</span>}
                     </Box>
                   ))}
