@@ -59,7 +59,7 @@ export function computeLoadV2(std: StandardsSet, input: LoadInputV2): LoadResult
     };
   }
 
-  const pf = input.powerFactor ?? 0.85;
+  const pf = input.powerFactor ?? std.loadCalc?.defaultPowerFactor ?? 0.85;
   const sqrt3 = Math.sqrt(3);
   let I = 0;
 
@@ -83,7 +83,7 @@ export function computeLoadV2(std: StandardsSet, input: LoadInputV2): LoadResult
         errors.push(`No FLA table entry for ${input.loadValue} HP`);
         I = 0;
       } else {
-        I = fla * (input.isLargestMotorInSection ? 1.25 : 1.0); // NEC 430.24
+        I = fla * (input.isLargestMotorInSection ? (std.loadCalc?.motorFactor ?? 1.25) : 1.0); // NEC 430.24
       }
       break;
     }
@@ -98,7 +98,7 @@ export function computeLoadV2(std: StandardsSet, input: LoadInputV2): LoadResult
 
   const continuous = input.continuous ?? true;
   // HP-mode motor loads already carry their NEC 430 factor — no double 1.25.
-  const continuousFactor = input.loadInputMode === 'HP' ? 1.0 : (continuous ? 1.25 : 1.0);
+  const continuousFactor = input.loadInputMode === 'HP' ? 1.0 : (continuous ? (std.loadCalc?.continuousFactor ?? 1.25) : 1.0);
   const design = adjusted * continuousFactor;
 
   const recommended = nextLadder(std.deviceLadder_A, design);

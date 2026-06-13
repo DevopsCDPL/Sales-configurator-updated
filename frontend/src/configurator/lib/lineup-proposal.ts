@@ -167,11 +167,12 @@ export function proposeLineup(
   }
 
   // SCCR (AP-04/AP-05)
+  const defaultSccr = std.defaultSccr_kA ?? DEFAULT_SCCR_KA;
   const sccrAssumed = intake.utilityFaultKA === 'Unknown';
   const sccrKA = sccrAssumed
-    ? DEFAULT_SCCR_KA
-    : (nextLadder(std.sccrLadder_kA, intake.utilityFaultKA as number) ?? DEFAULT_SCCR_KA);
-  if (sccrAssumed) warnings.push(`Utility fault data unknown — SCCR assumed ${DEFAULT_SCCR_KA} kA [SEED]; verify before release`);
+    ? defaultSccr
+    : (nextLadder(std.sccrLadder_kA, intake.utilityFaultKA as number) ?? defaultSccr);
+  if (sccrAssumed) warnings.push(`Utility fault data unknown — SCCR assumed ${defaultSccr} kA [SEED]; verify before release`);
 
   // 1. Feeder devices
   const feederDevices: ProposedDevice[] = [];
@@ -257,18 +258,21 @@ export function proposeLineup(
   const open: OpenSection[] = [];
   const unplaced: ProposedDevice[] = [];
 
-  const deviceH = (d: ProposedDevice) => d.device?.heightIn ?? DEVICE_ENVELOPE_IN[d.role] ?? 9; // [SEED] role-based fallback envelope
+  const clearance = std.packing?.interdeviceClearance_in ?? INTERDEVICE_CLEARANCE_IN;
+  const maxFill = std.packing?.maxFillPct ?? MAX_FILL_PCT;
+  const mainDedicated = std.packing?.mainDedicatedPct ?? MAIN_DEDICATED_PCT;
+  const deviceH = (d: ProposedDevice) => d.device?.heightIn ?? (d.role === 'MAIN' ? (std.packing?.mainEnvelope_in ?? DEVICE_ENVELOPE_IN.MAIN) : d.role === 'TIE' ? (std.packing?.tieEnvelope_in ?? DEVICE_ENVELOPE_IN.TIE) : (std.packing?.feederEnvelope_in ?? DEVICE_ENVELOPE_IN.FEEDER)); // [SEED] role-based fallback envelope
   const place = (d: ProposedDevice, dedicated: boolean) => {
-    const h = deviceH(d) + INTERDEVICE_CLEARANCE_IN;
+    const h = deviceH(d) + clearance;
     if (!dedicated) {
       for (const s of open) {
-        if (s.role === 'FEEDER' && d.role === 'FEEDER' && s.used + h <= MAX_FILL_PCT * s.frame.usableDeviceHeight_in) {
+        if (s.role === 'FEEDER' && d.role === 'FEEDER' && s.used + h <= maxFill * s.frame.usableDeviceHeight_in) {
           s.devices.push(d); s.used += h; return;
         }
       }
     }
     if (open.length >= (maxSections)) { unplaced.push(d); return; }
-    const frame = fittingFrames.find((f) => deviceH(d) + INTERDEVICE_CLEARANCE_IN <= f.usableDeviceHeight_in
+    const frame = fittingFrames.find((f) => deviceH(d) + clearance <= f.usableDeviceHeight_in
       && (d.device?.mounting !== 'Drawout' || f.drawoutCapable)) ?? fittingFrames[fittingFrames.length - 1];
     if (!frame) { unplaced.push(d); return; }
     open.push({ frame, role: d.role, devices: [d], used: h });
@@ -276,7 +280,7 @@ export function proposeLineup(
 
   // MAINs first — dedicated section when tall device
   for (const m of mains) {
-    const dedicated = deviceH(m) > MAIN_DEDICATED_PCT * (fittingFrames[0]?.usableDeviceHeight_in ?? 62);
+    const dedicated = deviceH(m) > mainDedicated * (fittingFrames[0]?.usableDeviceHeight_in ?? 62);
     place(m, dedicated || true); // MAIN always own section in v1 (deterministic + safe)
   }
   for (const t of ties) place(t, true);

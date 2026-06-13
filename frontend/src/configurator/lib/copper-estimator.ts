@@ -57,7 +57,9 @@ export function estimateCopper(
   settings: CopperSettings = DEFAULT_COPPER_SETTINGS
 ): CopperEstimateResult {
   const notes: string[] = [];
-  const density = input.material === 'Cu' ? CU_DENSITY_LB_IN3 : AL_DENSITY_LB_IN3;
+  const s = settings === DEFAULT_COPPER_SETTINGS && std.copperEstimator ? { fabFactor: std.copperEstimator.fabFactor, contingencyPct: std.copperEstimator.contingencyPct, stubLenIn: std.copperEstimator.stubLenIn } : settings;
+  const gradeRow = input.material === 'Cu' ? (std.copperGrades?.find(g => g.isDefault) || std.copperGrades?.find(g => !/alumin/i.test(g.grade))) : std.copperGrades?.find(g => /alumin/i.test(g.grade));
+  const density = Number(gradeRow?.density_lb_in3) || (input.material === 'Cu' ? CU_DENSITY_LB_IN3 : AL_DENSITY_LB_IN3);
 
   const row = busScheduleFor(std, input.mainBusRatingA, input.material);
   if (!row) {
@@ -101,12 +103,12 @@ export function estimateCopper(
   let stubLbs = 0;
   for (const d of input.devices) {
     const stubRow = busScheduleFor(std, d.ratedA, input.material) ?? row;
-    stubLbs += (stubRow.barThk_in * stubRow.barW_in) * settings.stubLenIn * d.poles * density;
+    stubLbs += (stubRow.barThk_in * stubRow.barW_in) * s.stubLenIn * d.poles * density;
   }
 
   const rawLbs = mainBusLbs + neutralLbs + groundLbs + riserLbs + stubLbs;
-  const estimatedLbs = rawLbs * settings.fabFactor;
-  const costUsd = estimatedLbs * input.pricePerLb * (1 + settings.contingencyPct / 100);
+  const estimatedLbs = rawLbs * s.fabFactor;
+  const costUsd = estimatedLbs * input.pricePerLb * (1 + s.contingencyPct / 100);
 
   // Glastic supports (GEN-GLASTIC): per phase-run, spacing per SCCR
   const spacingRow = supportSpacingFor(std, input.sccrKA);

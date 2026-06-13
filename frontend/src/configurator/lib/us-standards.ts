@@ -71,6 +71,11 @@ export interface StandardsSet {
   busSupportSpacing: BusSupportRow[];
   frameLibrary: FrameRow[];
   motorFla: MotorFlaRow[];
+  packing?: { feederEnvelope_in: number; mainEnvelope_in: number; tieEnvelope_in: number; maxFillPct: number; interdeviceClearance_in: number; mainDedicatedPct: number };
+  loadCalc?: { continuousFactor: number; defaultPowerFactor: number; motorFactor: number };
+  defaultSccr_kA?: number;
+  copperGrades?: { grade: string; density_lb_in3: number; isDefault?: boolean }[];
+  copperEstimator?: { fabFactor: number; contingencyPct: number; stubLenIn: number };
 }
 
 export const DEFAULT_STANDARDS: StandardsSet = {
@@ -133,6 +138,11 @@ export const DEFAULT_STANDARDS: StandardsSet = {
     { hp: 150, v208: 396, v230: 360, v460: 180, v575: 144 },
     { hp: 200, v208: 528, v230: 480, v460: 240, v575: 192 },
   ],
+  packing: { feederEnvelope_in: 9, mainEnvelope_in: 20, tieEnvelope_in: 20, maxFillPct: 0.8, interdeviceClearance_in: 4, mainDedicatedPct: 0.5 },
+  loadCalc: { continuousFactor: 1.25, defaultPowerFactor: 0.85, motorFactor: 1.25 },
+  defaultSccr_kA: 65,
+  copperGrades: [{ grade: 'C110 ETP', density_lb_in3: 0.323, isDefault: true }, { grade: 'C101 OFE', density_lb_in3: 0.323 }, { grade: 'Aluminium 6101', density_lb_in3: 0.098 }],
+  copperEstimator: { fabFactor: 1.15, contingencyPct: 10, stubLenIn: 24 },
 };
 
 /** Next ladder value ≥ x (null if x exceeds the ladder). */
