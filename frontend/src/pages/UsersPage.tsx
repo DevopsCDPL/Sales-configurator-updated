@@ -4,7 +4,7 @@ import {
   Tooltip, alpha, Skeleton,
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
   Menu, MenuItem, ListItemIcon, ListItemText, Divider,
-  Select, FormControl, InputLabel,
+  Select, FormControl, InputLabel, ListSubheader,
   Dialog, DialogTitle, DialogContent, DialogActions, Grid,
   Chip,
 } from '@mui/material';
@@ -28,6 +28,7 @@ import {
 } from '@mui/icons-material';
 import { userManagementService, UserRecord, CreateUserData, UpdateUserData } from '../services/userManagementService';
 import { useAuth } from '../contexts/AuthContext';
+import { useCanAccess } from '../lib/permissions';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
@@ -39,7 +40,22 @@ const ROLE_LABELS: Record<string, { label: string; bg: string; fg: string }> = {
   admin: { label: 'Admin', bg: '#dbeafe', fg: '#0D3D2F' },
   user: { label: 'User', bg: '#f1f5f9', fg: '#475569' },
   sales_engineer: { label: 'Sales Engineer', bg: '#E8F7F2', fg: '#0D3D2F' },
+  // Department roles (additive — see backend departments middleware)
+  manufacturing: { label: 'Manufacturing', bg: '#eef2ff', fg: '#3730a3' },
+  procurement: { label: 'Procurement', bg: '#eef2ff', fg: '#3730a3' },
+  assembly: { label: 'Assembly', bg: '#eef2ff', fg: '#3730a3' },
+  outsourcing: { label: 'Outsourcing', bg: '#eef2ff', fg: '#3730a3' },
+  quality: { label: 'Quality', bg: '#eef2ff', fg: '#3730a3' },
+  packing: { label: 'Packing', bg: '#eef2ff', fg: '#3730a3' },
+  logistics: { label: 'Logistics', bg: '#eef2ff', fg: '#3730a3' },
+  commissioning: { label: 'Commissioning', bg: '#eef2ff', fg: '#3730a3' },
 };
+// Department roles for the role select (grouped under "Departments").
+const DEPARTMENT_ROLE_OPTIONS = [
+  'manufacturing', 'procurement', 'assembly', 'outsourcing',
+  'quality', 'packing', 'logistics', 'commissioning',
+];
+const displayCase = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const PAL = ['#1F7A63', '#0891b2', '#ea580c', '#166354', '#dc2626', '#1F7A63', '#d97706', '#059669'];
 const hashColor = (s: string) => PAL[Math.abs([...(s || 'N')].reduce((a, c) => a + c.charCodeAt(0), 0)) % PAL.length];
 const initials = (s: string) => (s || 'N').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
@@ -118,7 +134,11 @@ const StatusBadge: React.FC<{ active: boolean }> = ({ active }) => (
 /* ═════════════════════════════════════════════════════════════════════ */
 const UsersPage: React.FC = () => {
   const { user: currentUser } = useAuth();
-  const canWrite = currentUser?.role === 'main_admin' || currentUser?.role === 'admin';
+  // Existing admin-only write gate, now also expressed through the department
+  // permission system ('users' resource). Behavior is unchanged: admins keep
+  // write access; department roles never reach this page (RBACRoute guards it).
+  const canManageUsers = useCanAccess('users');
+  const canWrite = (currentUser?.role === 'main_admin' || currentUser?.role === 'admin') && canManageUsers;
 
   /* data state */
   const [users, setUsers] = useState<UserRecord[]>([]);
@@ -729,8 +749,13 @@ const UsersPage: React.FC = () => {
                 <InputLabel>Role</InputLabel>
                 <Select value={formData.role} label="Role"
                   onChange={e => setFormData(f => ({ ...f, role: e.target.value as string }))}>
+                  <ListSubheader>Admin</ListSubheader>
                   <MenuItem value="admin">Admin</MenuItem>
                   <MenuItem value="sales_engineer">Sales Engineer</MenuItem>
+                  <ListSubheader>Departments</ListSubheader>
+                  {DEPARTMENT_ROLE_OPTIONS.map(r => (
+                    <MenuItem key={r} value={r}>{displayCase(r)}</MenuItem>
+                  ))}
                 </Select>
               </FormControl>
             </Grid>
@@ -796,7 +821,7 @@ const UsersPage: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      {/* ═══ DELETE CONFIRMATION ══════════════════════════════════════ */}
+      {/* DELETE CONFIRMATION */}
       <Dialog open={Boolean(deleteTarget)} onClose={() => setDeleteTarget(null)} maxWidth="xs" fullWidth
         PaperProps={{ sx: { borderRadius: '14px' } }}>
         <DialogTitle sx={{ fontWeight: 700, fontSize: '1rem', pt: 3 }}>Delete User</DialogTitle>
@@ -816,12 +841,12 @@ const UsersPage: React.FC = () => {
               bgcolor: '#dc2626', '&:hover': { bgcolor: '#b91c1c' },
               textTransform: 'none', fontWeight: 700, borderRadius: '8px', boxShadow: 'none',
             }}>
-            {deleting ? 'Deleting…' : 'Delete'}
+            {deleting ? 'Deleting...' : 'Delete'}
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* ═══ SUCCESS SNACKBAR ═════════════════════════════════════════ */}
+      {/* SUCCESS SNACKBAR */}
       <Snackbar
         open={Boolean(successMsg)}
         autoHideDuration={3000}
@@ -833,4 +858,4 @@ const UsersPage: React.FC = () => {
   );
 };
 
-export default UsersPage;
+export default UsersPage; // department RBAC: role groups + useCanAccess('users')

@@ -1,11 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const { authenticate, authorize } = require('../middleware/auth');
+const { requireResource } = require('../middleware/departments');
 const { tenantScope } = require('../middleware/tenantScope');
 const ctrl = require('../controllers/vendorProcurementController');
 
 router.use(authenticate);
 router.use(tenantScope);
+// Department RBAC: only procurement-allowed roles (and admins) reach these routes.
+router.use(requireResource('procurement'));
 
 // Procurement items overview
 router.get('/', ctrl.getProcurementItems);

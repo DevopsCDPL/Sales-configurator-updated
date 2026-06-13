@@ -24,7 +24,13 @@ module.exports = (sequelize) => {
       allowNull: false
     },
     role: {
-      type: DataTypes.ENUM('platform_admin', 'main_admin', 'admin', 'user', 'sales_engineer'),
+      type: DataTypes.ENUM(
+        // Existing roles - KEPT unchanged for backward compatibility.
+        'platform_admin', 'main_admin', 'admin', 'user', 'sales_engineer',
+        // Department roles (additive; see 20260613000001-department-roles migration).
+        'manufacturing', 'procurement', 'assembly', 'outsourcing',
+        'quality', 'packing', 'logistics', 'commissioning'
+      ),
       allowNull: false,
       defaultValue: 'user'
     },
