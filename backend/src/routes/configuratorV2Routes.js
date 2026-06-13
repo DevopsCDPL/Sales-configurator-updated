@@ -910,9 +910,30 @@ router.get('/switchboards/:id/full', wrap(async (req, res) => {
     where: { switchboard_id: board.id },
     order: [['section_number', 'ASC']],
   });
-  const lines = await models.ConfiguratorComponentLine.findAll({
+  const lineRows = await models.ConfiguratorComponentLine.findAll({
     where: { switchboard_id: board.id },
     order: [['created_at', 'ASC']],
+  });
+  // Enrich each line with provenance (priceSource) + deviceClass/manufacturer from
+  // its linked catalog component, so cards show the right source dot even for lines
+  // created before meta-stamping existed. Component spec is the source of truth.
+  const compIds = [...new Set(lineRows.map((l) => l.component_id).filter(Boolean))];
+  const compMap = {};
+  if (compIds.length) {
+    const comps = await models.ConfiguratorComponent.findAll({
+      where: { id: compIds },
+      attributes: ['id', 'specifications', 'price_status'],
+    });
+    comps.forEach((c) => { compMap[c.id] = c; });
+  }
+  const lines = lineRows.map((l) => {
+    const j = l.toJSON();
+    const sp = (l.component_id && compMap[l.component_id]?.specifications) || {};
+    j.meta = j.meta || {};
+    if (j.meta.priceSource == null && sp.priceSource != null) j.meta.priceSource = sp.priceSource;
+    if (j.meta.deviceClass == null && sp.deviceClass != null) j.meta.deviceClass = sp.deviceClass;
+    if (j.meta.manufacturer == null && sp.manufacturer != null) j.meta.manufacturer = sp.manufacturer;
+    return j;
   });
   res.json({ board, sections, lines });
 }));

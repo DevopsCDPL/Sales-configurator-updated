@@ -638,7 +638,13 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
                                       sx={{ bgcolor: 'rgba(0,200,255,0.12)', color: '#60A5FA', fontWeight: 700, fontSize: 10, height: 18, cursor: locked ? 'default' : 'pointer' }}
                                     />
                                   )}
-                                  <PriceSourceDot source={l.meta?.priceSource} />
+                                  {l.meta?.priceSource ? (
+                                    <PriceSourceDot source={l.meta?.priceSource} />
+                                  ) : (
+                                    <Tooltip title="Source not marked — set it on the component in Database → Components">
+                                      <Box component="span" sx={{ display: 'inline-block', width: 7, height: 7, borderRadius: '50%', mr: 0.5, bgcolor: '#475569', verticalAlign: 'middle' }} />
+                                    </Tooltip>
+                                  )}
                                   {l.meta?.catalogNumber ? (
                                     <Tooltip title="Configured via part-number decoder">
                                       <Box
