@@ -287,18 +287,20 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, view, onLinesC
                     a placeholder line so nothing is missed.
                   </Typography>
                 ) : (
-                  <Table size="small">
+                  <Box sx={{ maxHeight: '58vh', overflow: 'auto' }}>
+                  <Table size="small" stickyHeader>
                     <TableHead>
                       <TableRow>
-                        <TableCell sx={{ ...headSx, width: 40, whiteSpace: 'nowrap', borderRight: '1px solid #1E2235' }}>S.No</TableCell>
-                        <TableCell sx={{ ...headSx, width: 110, whiteSpace: 'nowrap' }}>Category</TableCell>
-                        <TableCell sx={{ ...headSx, width: 210, whiteSpace: 'nowrap' }}>Component</TableCell>
-                        <TableCell sx={{ ...headSx, whiteSpace: 'nowrap' }}>Catalog item (SKU)</TableCell>
-                        <TableCell sx={{ ...headSx, width: 95, whiteSpace: 'nowrap' }}>Qty basis</TableCell>
-                        <TableCell sx={{ ...headSx, width: 64, whiteSpace: 'nowrap' }}>Qty</TableCell>
-                        <TableCell sx={{ ...headSx, width: 90, whiteSpace: 'nowrap' }} align="right">Unit price</TableCell>
-                        <TableCell sx={{ ...headSx, width: 44, whiteSpace: 'nowrap' }} align="center">Status</TableCell>
-                        <TableCell sx={{ ...headSx, width: 80, whiteSpace: 'nowrap' }} align="right">Actions</TableCell>
+                        <TableCell sx={{ ...headSx, width: 40, whiteSpace: 'nowrap', borderRight: '1px solid #1E2235', bgcolor: '#0B0B0D' }}>S.No</TableCell>
+                        <TableCell sx={{ ...headSx, width: 110, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Category</TableCell>
+                        <TableCell sx={{ ...headSx, width: 200, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Component</TableCell>
+                        <TableCell sx={{ ...headSx, width: 96, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>SKU</TableCell>
+                        <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Catalog description</TableCell>
+                        <TableCell sx={{ ...headSx, width: 95, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Qty basis</TableCell>
+                        <TableCell sx={{ ...headSx, width: 64, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Qty</TableCell>
+                        <TableCell sx={{ ...headSx, width: 90, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }} align="right">Unit price</TableCell>
+                        <TableCell sx={{ ...headSx, width: 44, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }} align="center">Status</TableCell>
+                        <TableCell sx={{ ...headSx, width: 80, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }} align="right">Actions</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -322,39 +324,37 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, view, onLinesC
                             <TableCell sx={{ ...cellSx, width: 210, verticalAlign: 'middle', py: 0.5, color: C.text, fontSize: 12 }}>
                               {l.meta?.ruleDescription ?? l.category}
                             </TableCell>
-                            {/* Catalog item (SKU) */}
+                            {/* SKU */}
+                            <TableCell sx={{ ...cellSx, width: 96, verticalAlign: 'middle', py: 0.5 }}>
+                              {l.meta?.placeholder ? (
+                                <Chip label="No match" size="small"
+                                  sx={{ bgcolor: 'rgba(217,119,6,0.12)', color: '#FCD34D', fontSize: 9.5, height: 18 }} />
+                              ) : (
+                                <Tooltip title={l.part_number ?? ''} arrow>
+                                  <Chip
+                                    label={compactSku(l.part_number)}
+                                    size="small"
+                                    sx={{ bgcolor: 'transparent', border: '1px solid #1E2235', color: '#A9B6C9', fontSize: 9.5, height: 18 }}
+                                  />
+                                </Tooltip>
+                              )}
+                            </TableCell>
+                            {/* Catalog description */}
                             <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5 }}>
                               {l.meta?.placeholder ? (
-                                <Box>
-                                  <Stack direction="row" alignItems="center" gap={0.75} sx={{ mb: 0.25 }}>
-                                    <Chip label="No catalog match" size="small"
-                                      sx={{ bgcolor: 'rgba(217,119,6,0.12)', color: '#FCD34D', fontSize: 9.5, height: 18, flexShrink: 0 }} />
-                                    <Typography sx={{ color: '#8E9AAD', fontSize: 10.5, fontStyle: 'italic' }}>
-                                      add to catalog or swap
-                                    </Typography>
-                                  </Stack>
-                                  {(l.meta?.ruleDescription != null || l.meta?.qtyFormula != null) ? (
-                                    <Typography sx={{ color: '#8E9AAD', fontSize: 10.5, lineHeight: 1.3 }}>
-                                      {String(l.meta?.ruleDescription ?? '')}
-                                      {l.meta?.qtyFormula ? ' (' + String(l.meta.qtyFormula) + ')' : ''}
-                                    </Typography>
-                                  ) : null}
-                                </Box>
-                              ) : (
-                                <Stack direction="row" gap={0.75} alignItems="center" sx={{ minWidth: 0 }}>
-                                  <Tooltip title={l.part_number ?? ''} arrow>
-                                    <Chip
-                                      label={compactSku(l.part_number)}
-                                      size="small"
-                                      sx={{ bgcolor: 'transparent', border: '1px solid #1E2235', color: '#A9B6C9', fontSize: 9.5, height: 18 }}
-                                    />
-                                  </Tooltip>
-                                  <Tooltip title={l.name ?? ''} arrow>
-                                    <Typography sx={{ color: C.text, fontSize: 12, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                      {displayCase(l.name)}
-                                    </Typography>
-                                  </Tooltip>
+                                <Stack direction="row" alignItems="center" gap={0.75}>
+                                  <Typography sx={{ color: '#8E9AAD', fontSize: 11, fontStyle: 'italic' }}>
+                                    {String(l.meta?.ruleDescription ?? 'No catalog match')}
+                                    {l.meta?.qtyFormula ? ' (' + String(l.meta.qtyFormula) + ')' : ''}
+                                  </Typography>
+                                  <Typography sx={{ color: '#5A6678', fontSize: 10, fontStyle: 'italic' }}>— add to catalog or swap</Typography>
                                 </Stack>
+                              ) : (
+                                <Tooltip title={l.name ?? ''} arrow>
+                                  <Typography sx={{ color: C.text, fontSize: 12, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                    {displayCase(l.name)}
+                                  </Typography>
+                                </Tooltip>
                               )}
                             </TableCell>
                             {/* Qty basis */}
@@ -405,6 +405,7 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, view, onLinesC
                       })}
                     </TableBody>
                   </Table>
+                  </Box>
                 )}
               </Box>
             </Box>
