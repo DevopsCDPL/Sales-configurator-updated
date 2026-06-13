@@ -45,15 +45,15 @@ interface TabDef {
 }
 
 const TABS: TabDef[] = [
-  { key: 'vendors',        label: 'Vendor Data',         icon: <ShippingIcon sx={{ fontSize: 16 }} /> },
-  { key: 'clients',        label: 'Client Data',         icon: <PeopleIcon sx={{ fontSize: 16 }} /> },
-  { key: 'raw-materials',  label: 'Raw Material',        icon: <ScienceIcon sx={{ fontSize: 16 }} /> },
-  { key: 'parts',          label: 'Parts Master',        icon: <BuildIcon sx={{ fontSize: 16 }} /> },
-  { key: 'components',     label: 'Components',          icon: <ComponentsIcon sx={{ fontSize: 16 }} /> },
-  { key: 'price-queue',    label: 'Price Queue',         icon: <BuildIcon sx={{ fontSize: 16 }} /> },
-  { key: 'engg-standards', label: 'Engg Standards',      icon: <ScienceIcon sx={{ fontSize: 16 }} /> },
-  { key: 'saved-configs',  label: 'Saved Configuration', icon: <BookmarkIcon sx={{ fontSize: 16 }} /> },
-  { key: 'comex',          label: 'Comex Copper',        icon: <TrendingUpIcon sx={{ fontSize: 16 }} /> },
+  { key: 'components',     label: 'Components',           icon: <ComponentsIcon sx={{ fontSize: 16 }} /> },
+  { key: 'parts',          label: 'Parts Master',         icon: <BuildIcon sx={{ fontSize: 16 }} /> },
+  { key: 'raw-materials',  label: 'Raw Material',         icon: <ScienceIcon sx={{ fontSize: 16 }} /> },
+  { key: 'engg-standards', label: 'Engg Standards',       icon: <ScienceIcon sx={{ fontSize: 16 }} /> },
+  { key: 'saved-configs',  label: 'Saved Configurations', icon: <BookmarkIcon sx={{ fontSize: 16 }} /> },
+  { key: 'clients',        label: 'Client List',          icon: <PeopleIcon sx={{ fontSize: 16 }} /> },
+  { key: 'vendors',        label: 'Vendor List',          icon: <ShippingIcon sx={{ fontSize: 16 }} /> },
+  { key: 'comex',          label: 'Comex Copper',         icon: <TrendingUpIcon sx={{ fontSize: 16 }} /> },
+  { key: 'price-queue',    label: 'Price Queue',          icon: <BuildIcon sx={{ fontSize: 16 }} /> },
 ];
 
 const DatabaseHubPage: React.FC = () => {
