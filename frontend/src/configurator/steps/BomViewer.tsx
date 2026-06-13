@@ -17,6 +17,7 @@ import configuratorV2Service, { BomResponse, BomRow } from '../../services/confi
 const C = {
   bg: '#000000', surface: '#0B0B0D', border: '#1E2235', blue: '#00c8ff',
   text: '#E2E8F0', sub: '#64748B', green: '#22C55E', amber: '#D97706', red: '#EF4444',
+  title: '#F0F6FF',
 };
 
 const usd = (n: number) =>
@@ -35,9 +36,10 @@ const StatusDot: React.FC<{ status: string }> = ({ status }) => {
 const cellSx = { color: C.text, fontSize: 12, borderBottom: '1px solid ' + C.border, py: 0.7 };
 const headSx = { color: C.sub, fontSize: 10.5, fontWeight: 700, letterSpacing: 0.5, borderBottom: '1px solid ' + C.border, py: 0.7 };
 
-// Build-order ranking for category grouping; unknown categories fall after these (alphabetical).
+// Build-order ranking for category grouping; breakers FIRST, then the rest in
+// build order. Unknown categories fall after these (alphabetical).
 const CAT_ORDER = [
-  'ENCLOSURE', 'BUSSING', 'GLASTIC', 'CIRCUIT BREAKER', 'LUGS', 'TERMINALS',
+  'CIRCUIT BREAKER', 'ENCLOSURE', 'BUSSING', 'GLASTIC', 'LUGS', 'TERMINALS',
   'CONTROLS', 'WIRE CABLE', 'CONDUIT', 'HARDWARE', 'SAFETY',
 ];
 const catRank = (cat: string) => {
@@ -49,7 +51,6 @@ type ConsRow = {
   cat: string;
   part_number: string | null;
   description: string | null;
-  manufacturer: string | null;
   quantity: number;
   unit: string;
   unit_cost: number;
@@ -59,12 +60,25 @@ type ConsRow = {
   copper_weight_lbs: number | null;
 };
 
-/** Manufacturer for a BOM row: prefer meta.specifications.manufacturer, then
- *  meta.manufacturer; GEN/structural rows usually carry none → null. */
-const mfgOf = (r: BomRow): string | null => {
+/**
+ * Description for a BOM row. For CIRCUIT BREAKER rows the description is
+ * composed as `manufacturer deviceClass — ratedA / interruptingKA / poles`
+ * from the line meta (carried through bomEngineV2). Missing pieces are
+ * omitted gracefully; if nothing composable, fall back to the raw description.
+ * Non-breaker rows keep their existing description.
+ */
+const descOf = (r: BomRow): string | null => {
+  if ((r.category || '').toUpperCase() !== 'CIRCUIT BREAKER') return r.description;
   const m: any = r.meta ?? {};
-  const v = m?.specifications?.manufacturer ?? m?.manufacturer ?? null;
-  return v ? String(v) : null;
+  const mfr = m.manufacturer ?? m?.specifications?.manufacturer ?? null;
+  const cls = m.deviceClass ?? null;
+  const rated = m.ratedA ? `${m.ratedA}A` : null;
+  const ka = m.interruptingKA ? `${m.interruptingKA}kA` : null;
+  const poles = m.poles ? `${m.poles}P` : null;
+  const lead = [mfr, cls].filter(Boolean).join(' ');
+  const tail = [rated, ka, poles].filter(Boolean).join(' / ');
+  const composed = [lead, tail].filter(Boolean).join(' — ');
+  return composed || r.description;
 };
 
 /**
@@ -86,8 +100,7 @@ const consolidate = (rows: BomRow[]): ConsRow[] => {
       map.set(key, {
         cat,
         part_number: r.part_number,
-        description: r.description,
-        manufacturer: mfgOf(r),
+        description: descOf(r),
         quantity: r.quantity,
         unit: r.unit,
         unit_cost: r.unit_cost,
@@ -173,20 +186,20 @@ const BomViewer: React.FC<BomViewerProps> = ({ switchboardId }) => {
       <Stack direction="row" spacing={1.5} alignItems="flex-start">
         {/* LEFT — consolidated board BOM table */}
         <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Typography sx={{ color: C.title, fontSize: 16, fontWeight: 800, mt: 2.5, mb: 1.5 }}>
+            Bill of materials — {bom.board?.name ?? 'Switchboard'}
+          </Typography>
           <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', overflow: 'hidden' }}>
             <Box sx={{ maxHeight: '74vh', overflow: 'auto' }}>
               <Table size="small" stickyHeader sx={{ tableLayout: 'fixed', width: '100%' }}>
                 <TableHead>
                   <TableRow>
                     <TableCell sx={{ ...headSx, width: 40, whiteSpace: 'nowrap', borderRight: '1px solid #1E2235', bgcolor: '#0B0B0D' }} align="center">S.No</TableCell>
-                    <TableCell sx={{ ...headSx, width: 110, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Category</TableCell>
+                    <TableCell sx={{ ...headSx, width: 130, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Category</TableCell>
                     <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Description</TableCell>
-                    <TableCell sx={{ ...headSx, width: 120, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Part #</TableCell>
-                    <TableCell sx={{ ...headSx, width: 110, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Manufacturer</TableCell>
+                    <TableCell sx={{ ...headSx, width: 100, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }} align="right">Unit price</TableCell>
                     <TableCell sx={{ ...headSx, width: 50, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }} align="right">Qty</TableCell>
-                    <TableCell sx={{ ...headSx, width: 48, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Unit</TableCell>
-                    <TableCell sx={{ ...headSx, width: 90, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }} align="right">Unit cost</TableCell>
-                    <TableCell sx={{ ...headSx, width: 90, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }} align="right">Ext.</TableCell>
+                    <TableCell sx={{ ...headSx, width: 100, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }} align="right">Total price</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -215,20 +228,13 @@ const BomViewer: React.FC<BomViewerProps> = ({ switchboardId }) => {
                             </Box>
                           </Tooltip>
                         </TableCell>
-                        <TableCell sx={{ ...cellSx, color: C.sub, verticalAlign: 'middle', py: 0.5 }}>
-                          <Stack spacing={0.4} alignItems="flex-start">
-                            <Tooltip title={r.part_number ?? ''} arrow>
-                              <Box component="span" sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 110, display: 'block' }}>{r.part_number ?? '—'}</Box>
-                            </Tooltip>
+                        <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5, textAlign: 'right' }} align="right">
+                          <Stack direction="row" spacing={0.6} alignItems="center" justifyContent="flex-end">
                             <StatusDot status={r.price_status} />
+                            <Box component="span">{r.unit_cost ? usd(r.unit_cost) : '—'}</Box>
                           </Stack>
                         </TableCell>
-                        <TableCell sx={{ ...cellSx, color: C.sub, verticalAlign: 'middle', py: 0.5, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 110 }}>
-                          {r.manufacturer ?? '—'}
-                        </TableCell>
                         <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5 }} align="right">{r.quantity}</TableCell>
-                        <TableCell sx={{ ...cellSx, color: C.sub, verticalAlign: 'middle', py: 0.5 }}>{r.unit !== 'ea' ? r.unit : ''}</TableCell>
-                        <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5, textAlign: 'right' }} align="right">{r.unit_cost ? usd(r.unit_cost) : '—'}</TableCell>
                         <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5, textAlign: 'right' }} align="right">{r.unit_cost ? usd(r.unit_cost * r.quantity) : '—'}</TableCell>
                       </TableRow>
                     );
