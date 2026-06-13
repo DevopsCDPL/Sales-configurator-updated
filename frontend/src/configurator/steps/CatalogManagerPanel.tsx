@@ -163,13 +163,23 @@ const CatalogManagerPanel: React.FC = () => {
   useEffect(() => { search(); }, [category]); // eslint-disable-line react-hooks/exhaustive-deps
   // CIRCUIT BREAKER tab gets a cascading filter slot; others render all rows.
   const [sourceFilter, setSourceFilter] = useState<string>('all');
-  const sourceRows = React.useMemo(() => sourceFilter === 'all'
-    ? rows
-    : sourceFilter === 'vendor-unresolved'
-      ? rows.filter((r) => !!(r as any).specifications?.vendorUnresolved)
-      : rows.filter((r) => sourceFilter === 'none'
-          ? !((r as any).specifications?.priceSource)
-          : (r as any).specifications?.priceSource === sourceFilter), [rows, sourceFilter]);
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const sourceRows = React.useMemo(() => {
+    let out = rows;
+    // Axis 1 — PRICE SOURCE (provenance): where the price came from
+    if (sourceFilter !== 'all') {
+      out = sourceFilter === 'vendor-unresolved'
+        ? out.filter((r) => !!(r as any).specifications?.vendorUnresolved)
+        : sourceFilter === 'none'
+          ? out.filter((r) => !((r as any).specifications?.priceSource))
+          : out.filter((r) => (r as any).specifications?.priceSource === sourceFilter);
+    }
+    // Axis 2 — PRICE STATUS (firmness): FIRM / ESTIMATED / awaiting RFQ
+    if (statusFilter !== 'all') {
+      out = out.filter((r) => ((r as any).price_status ?? 'PENDING_RFQ') === statusFilter);
+    }
+    return out;
+  }, [rows, sourceFilter, statusFilter]);
   useEffect(() => { setFilteredRows(sourceRows); }, [sourceRows, category]);
   const isCb = (category || '').toUpperCase() === 'CIRCUIT BREAKER';
   const hasFilter = isCb || !!CATEGORY_FILTERS[category];
@@ -403,7 +413,7 @@ const CatalogManagerPanel: React.FC = () => {
 
       <Stack direction="row" alignItems="center" spacing={0.75} sx={{ mb: 1.5 }}>
         <Typography sx={{ color: C.sub, fontSize: 11 }}>Source:</Typography>
-        {([['all','All',''],['vendor-import','TPS','#00c8ff'],['rfq','RFQ firm','#22C55E'],['web','Web','#D97706'],['manual','Manual','#94A3B8'],['none','Unmarked','#475569'],['vendor-unresolved','Vendor?','#D97706']] as [string,string,string][]).map(([val,label,dot]) => (
+        {([['all','All',''],['vendor-import','TPS','#00c8ff'],['rfq','RFQ','#22C55E'],['web','Web','#D97706'],['manual','Manual','#94A3B8'],['none','Unmarked','#475569'],['vendor-unresolved','Vendor?','#D97706']] as [string,string,string][]).map(([val,label,dot]) => (
           <Chip
             key={val}
             size="small"
@@ -437,6 +447,35 @@ const CatalogManagerPanel: React.FC = () => {
             <Icon sx={{ fontSize: 16 }} />
           </IconButton>
         ))}
+      </Stack>
+
+      <Stack direction="row" alignItems="center" spacing={0.75} sx={{ mb: 1.5 }}>
+        <Typography sx={{ color: C.sub, fontSize: 11 }}>Status:</Typography>
+        {([['all','All',''],['FIRM','Firm','#22C55E'],['ESTIMATED','Estimated','#D97706'],['PENDING_RFQ','Awaiting RFQ','#EF4444']] as [string,string,string][]).map(([val,label,dot]) => (
+          <Chip
+            key={val}
+            size="small"
+            onClick={() => setStatusFilter(val)}
+            label={(
+              <Stack direction="row" alignItems="center" spacing={0.5}>
+                {dot ? <Box sx={{ width: 7, height: 7, borderRadius: 2, bgcolor: dot }} /> : null}
+                <span>{label}</span>
+              </Stack>
+            )}
+            sx={{
+              height: 20, fontSize: 10.5, cursor: 'pointer',
+              bgcolor: statusFilter === val ? 'rgba(0,200,255,0.12)' : 'transparent',
+              border: '1px solid ' + (statusFilter === val ? C.blue : C.border),
+              color: statusFilter === val ? C.blue : C.sub,
+              '& .MuiChip-label': { px: 1 },
+            }}
+          />
+        ))}
+        <Tooltip title="Two independent axes — Source = where the price came from (one per part); Status = whether that price is firm, estimated, or still awaiting an RFQ.">
+          <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', color: C.sub, '&:hover': { color: C.blue } }}>
+            <InfoOutlinedIcon sx={{ fontSize: 14 }} />
+          </Box>
+        </Tooltip>
       </Stack>
 
       {isCb && !loading && (
@@ -483,11 +522,15 @@ const CatalogManagerPanel: React.FC = () => {
                     size="small"
                     sx={{ bgcolor: 'rgba(0,200,255,0.10)', color: '#00c8ff', fontSize: 9.5, height: 18, maxWidth: 120, '& .MuiChip-label': { px: 1 } }}
                   />
-                  <Tooltip title={'Price source — ' + (spec.priceSource ? String(spec.priceSource) : 'unmarked')}>
+                  <Tooltip title={'Price source: ' + (({ 'vendor-import': 'TPS (negotiated)', rfq: 'RFQ confirmed', web: 'Web (approximate)', manual: 'Manual entry' } as Record<string, string>)[spec.priceSource] || 'Unmarked')}>
                     <Box component="span" sx={{ display: 'inline-flex', flexShrink: 0 }}><PriceSourceDot source={spec.priceSource} /></Box>
                   </Tooltip>
                   <Tooltip title={dotTip}>
-                    <Box sx={{ width: 8, height: 8, borderRadius: '50%', flexShrink: 0, bgcolor: dotColor, boxShadow: `0 0 6px ${dotColor}` }} />
+                    <Chip
+                      label={priceStatus === 'FIRM' ? 'FIRM' : priceStatus === 'ESTIMATED' ? 'EST' : 'RFQ'}
+                      size="small"
+                      sx={{ height: 16, fontSize: 8.5, fontWeight: 700, flexShrink: 0, bgcolor: 'transparent', border: '1px solid ' + dotColor, color: dotColor, borderRadius: '4px', '& .MuiChip-label': { px: 0.6 } }}
+                    />
                   </Tooltip>
                   {(r as any).specifications?.vendorUnresolved && (
                     <Tooltip title="Vendor name from spreadsheet didn't match a vendor record — open Edit to assign">
