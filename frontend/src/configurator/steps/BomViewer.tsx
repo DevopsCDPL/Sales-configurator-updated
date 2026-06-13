@@ -20,16 +20,15 @@ const C = {
 };
 
 const usd = (n: number) =>
-  n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 });
+  Math.ceil(n).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
 
-const StatusChip: React.FC<{ status: string }> = ({ status }) => {
+const StatusDot: React.FC<{ status: string }> = ({ status }) => {
   const color = status === 'FIRM' ? C.green : status === 'ESTIMATED' ? C.amber : C.red;
+  const tip = status === 'FIRM' ? 'Firm price' : status === 'ESTIMATED' ? 'Estimated price' : 'No firm price — RFQ required';
   return (
-    <Chip
-      label={status === 'PENDING_RFQ' ? 'RFQ' : status}
-      size="small"
-      sx={{ bgcolor: 'transparent', border: '1px solid ' + color, color, fontSize: 9.5, height: 18 }}
-    />
+    <Tooltip title={tip} arrow>
+      <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: color, display: 'inline-block' }} />
+    </Tooltip>
   );
 };
 
@@ -185,39 +184,46 @@ const BomViewer: React.FC<BomViewerProps> = ({ switchboardId }) => {
                 <Table size="small" stickyHeader>
                   <TableHead>
                     <TableRow>
-                      <TableCell sx={{ ...headSx, width: 40, whiteSpace: 'nowrap', borderRight: '1px solid #1E2235', bgcolor: '#0B0B0D' }}>S.No</TableCell>
+                      <TableCell sx={{ ...headSx, width: 40, whiteSpace: 'nowrap', borderRight: '1px solid #1E2235', bgcolor: '#0B0B0D' }} align="center">S.No</TableCell>
                       <TableCell sx={{ ...headSx, width: 130, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Category</TableCell>
-                      <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Description</TableCell>
+                      <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D', minWidth: 260 }}>Description</TableCell>
                       <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Part #</TableCell>
                       <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }} align="right">Qty</TableCell>
                       <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Unit</TableCell>
                       <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }} align="right">Unit cost</TableCell>
                       <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }} align="right">Ext.</TableCell>
-                      <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Price</TableCell>
                       <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Source</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {flat.map(({ r, cat, rowsInGroup, isFirstInGroup, sno: n }, idx) => (
                       <TableRow key={cat + idx}>
-                        <TableCell sx={{ ...cellSx, width: 40, color: C.sub, fontSize: 11.5, verticalAlign: 'middle', py: 0.5, borderRight: '1px solid #1E2235' }}>{n}</TableCell>
+                        <TableCell align="center" sx={{ ...cellSx, width: 40, color: C.sub, fontSize: 11.5, textAlign: 'center', verticalAlign: 'middle', py: 0.5, borderRight: '1px solid #1E2235' }}>{n}</TableCell>
                         {isFirstInGroup && (
                           <TableCell rowSpan={rowsInGroup} sx={{ ...cellSx, width: 130, color: '#A9B6C9', fontWeight: 700, fontSize: 11, verticalAlign: 'middle', borderRight: '1px solid #1E2235' }}>
                             {cat}
                           </TableCell>
                         )}
-                        <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5 }}>
-                          {r.description}
-                          {r.copper_weight_lbs ? (
-                            <Typography component="span" sx={{ color: C.sub, fontSize: 11 }}> · {r.copper_weight_lbs} lb Cu</Typography>
-                          ) : null}
+                        <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5, minWidth: 260 }}>
+                          <Tooltip title={String(r.description ?? '') + (r.copper_weight_lbs ? ' · ' + r.copper_weight_lbs + ' lb Cu' : '')} arrow>
+                            <Box sx={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                              {r.description}
+                              {r.copper_weight_lbs ? (
+                                <Typography component="span" sx={{ color: C.sub, fontSize: 11 }}> · {r.copper_weight_lbs} lb Cu</Typography>
+                              ) : null}
+                            </Box>
+                          </Tooltip>
                         </TableCell>
-                        <TableCell sx={{ ...cellSx, color: C.sub, verticalAlign: 'middle', py: 0.5 }}>{r.part_number ?? '—'}</TableCell>
+                        <TableCell sx={{ ...cellSx, color: C.sub, verticalAlign: 'middle', py: 0.5 }}>
+                          <Stack spacing={0.4} alignItems="flex-start">
+                            <Box component="span">{r.part_number ?? '—'}</Box>
+                            <StatusDot status={r.price_status} />
+                          </Stack>
+                        </TableCell>
                         <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5 }} align="right">{r.quantity}</TableCell>
                         <TableCell sx={{ ...cellSx, color: C.sub, verticalAlign: 'middle', py: 0.5 }}>{r.unit}</TableCell>
-                        <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5 }} align="right">{r.unit_cost ? usd(r.unit_cost) : '—'}</TableCell>
-                        <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5 }} align="right">{r.unit_cost ? usd(r.unit_cost * r.quantity) : '—'}</TableCell>
-                        <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5 }}><StatusChip status={r.price_status} /></TableCell>
+                        <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5, textAlign: 'right' }} align="right">{r.unit_cost ? usd(r.unit_cost) : '—'}</TableCell>
+                        <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5, textAlign: 'right' }} align="right">{r.unit_cost ? usd(r.unit_cost * r.quantity) : '—'}</TableCell>
                         <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5 }}>
                           {r.source === 'generator' ? (
                             <Tooltip title={'Auto-generated (' + (r.generator_id ?? '') + ') — recomputed from the design, cannot drift'}>
@@ -241,28 +247,35 @@ const BomViewer: React.FC<BomViewerProps> = ({ switchboardId }) => {
             <Table size="small" stickyHeader>
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ ...headSx, width: 40, whiteSpace: 'nowrap', borderRight: '1px solid #1E2235', bgcolor: '#0B0B0D' }}>S.No</TableCell>
+                  <TableCell sx={{ ...headSx, width: 40, whiteSpace: 'nowrap', borderRight: '1px solid #1E2235', bgcolor: '#0B0B0D' }} align="center">S.No</TableCell>
                   <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Part #</TableCell>
                   <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Category</TableCell>
-                  <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Description</TableCell>
+                  <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D', minWidth: 260 }}>Description</TableCell>
                   <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }} align="right">Total qty</TableCell>
                   <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Unit</TableCell>
                   <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }} align="right">Unit cost</TableCell>
-                  <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Price</TableCell>
                   <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Where used</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {bom.mbom.map((m, i) => (
                   <TableRow key={i}>
-                    <TableCell sx={{ ...cellSx, width: 40, color: C.sub, fontSize: 11.5, verticalAlign: 'middle', py: 0.5, borderRight: '1px solid #1E2235' }}>{i + 1}</TableCell>
-                    <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5 }}>{m.part_number ?? '—'}</TableCell>
+                    <TableCell align="center" sx={{ ...cellSx, width: 40, color: C.sub, fontSize: 11.5, textAlign: 'center', verticalAlign: 'middle', py: 0.5, borderRight: '1px solid #1E2235' }}>{i + 1}</TableCell>
+                    <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5 }}>
+                      <Stack spacing={0.4} alignItems="flex-start">
+                        <Box component="span">{m.part_number ?? '—'}</Box>
+                        <StatusDot status={m.price_status} />
+                      </Stack>
+                    </TableCell>
                     <TableCell sx={{ ...cellSx, color: C.sub, verticalAlign: 'middle', py: 0.5 }}>{m.category}</TableCell>
-                    <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5 }}>{m.description}</TableCell>
+                    <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5, minWidth: 260 }}>
+                      <Tooltip title={String(m.description ?? '')} arrow>
+                        <Box sx={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{m.description}</Box>
+                      </Tooltip>
+                    </TableCell>
                     <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5 }} align="right">{m.quantity}</TableCell>
                     <TableCell sx={{ ...cellSx, color: C.sub, verticalAlign: 'middle', py: 0.5 }}>{m.unit}</TableCell>
-                    <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5 }} align="right">{m.unit_cost ? usd(m.unit_cost) : '—'}</TableCell>
-                    <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5 }}><StatusChip status={m.price_status} /></TableCell>
+                    <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5, textAlign: 'right' }} align="right">{m.unit_cost ? usd(m.unit_cost) : '—'}</TableCell>
                     <TableCell sx={{ ...cellSx, color: C.sub, fontSize: 11, verticalAlign: 'middle', py: 0.5 }}>{[...new Set(m.whereUsed)].join(', ')}</TableCell>
                   </TableRow>
                 ))}

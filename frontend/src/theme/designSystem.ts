@@ -308,22 +308,42 @@ export const cellSx = {
  * Reuse for ALL data tables. Canonical reference: ComponentsPanel.tsx
  * "Auto-selected components" table and BomViewer.tsx eBOM/mBOM tables.
  *
- * Conventions:
+ * Conventions (REFINED standard — 6 rules):
  *   - Wrap the table in a scroll Box: { maxHeight: '58vh', overflow: 'auto' }
  *     (52vh is acceptable for per-section boxes).
  *   - <Table size="small" stickyHeader>.
  *   - Header cells: tableHeadCellSx (grey, sentence-case, nowrap, bgcolor #0B0B0D
  *     so the sticky header never bleeds). Headers are SENTENCE case
  *     ("Catalog description"), never ALL CAPS.
- *   - First column is S.No (snoCellSx): width 40, sub color, right border.
- *   - Category column is MERGED via rowSpan (mergedCatCellSx): only the first
- *     row of each category group renders the cell.
+ *   1. S.No (snoCellSx): width 40, sub color, right border, textAlign CENTER
+ *      (header AND body — pass align="center" too).
+ *   2. Category column is MERGED via rowSpan (mergedCatCellSx): left,
+ *      vertical-center, right divider; only first row of each group renders it.
+ *   3. Component / Description column: left, vertical-center, 2-line clamp
+ *      (descClampSx on an inner Box) + Tooltip with full text. WIDEN it —
+ *      componentColWidth (230) for fixed Component cols, descMinWidth (260)
+ *      minWidth for flexible BOM Description.
+ *   4. All other data columns (qty basis, unit, where-used…): left,
+ *      vertical-center.
+ *   5. Unit price / Unit cost / Ext.: NO DECIMALS, rounded UP via
+ *      usd()=Math.ceil(n).toLocaleString(...,{maximumFractionDigits:0}), and
+ *      RIGHT-aligned (priceCellSx + align="right"). No inline dots in price cells.
+ *   6. Dots stacked UNDER the SKU/Part# code: provenance dot
+ *      (<PriceSourceDot source={priceSource}/>) + price-status dot
+ *      (FIRM green / ESTIMATED amber / PENDING_RFQ red, 7px, tooltip), stacked
+ *      directly below the code chip. Because status now lives under the code,
+ *      there is NO standalone Status column. (BOM keeps the distinct Source
+ *      rule/GEN chip column — that is provenance-of-row, not price firmness.)
  *   - Body cells: cellSx with verticalAlign 'middle' and py 0.5.
  */
 export const STANDARD_TABLE = {
   scrollBoxSx: { maxHeight: '58vh', overflow: 'auto' as const },
   scrollBoxSectionSx: { maxHeight: '52vh', overflow: 'auto' as const },
   snoColWidth: 40,
+  /** Component/Name column width (px). Wide enough for a 2-line clamp. */
+  componentColWidth: 230,
+  /** Min width for a flexible Description column (BOM). */
+  descMinWidth: 260,
 } as const;
 
 /**
@@ -337,16 +357,43 @@ export const tableHeadCellSx = {
 } as const;
 
 /**
- * Standard S.No body cell (first column). Width 40, muted, right divider.
+ * Standard S.No body cell (first column). Width 40, muted, right divider,
+ * text-align CENTER (header + body). Pass align="center" on the cell too.
  */
 export const snoCellSx = {
   ...cellSx,
   width: STANDARD_TABLE.snoColWidth,
   color: COLORS.sub,
   fontSize: FONT_SIZE.sm,
+  textAlign: 'center' as const,
   verticalAlign: 'middle' as const,
   py: 0.5,
   borderRight: '1px solid ' + COLORS.border,
+} as const;
+
+/**
+ * 2-line clamp for Component / Description cells. Spread onto the inner Box
+ * that wraps the text; pair with a Tooltip showing the full string. The cell
+ * itself stays left-aligned + vertically centered.
+ */
+export const descClampSx = {
+  display: '-webkit-box' as const,
+  WebkitLineClamp: 2,
+  WebkitBoxOrient: 'vertical' as const,
+  overflow: 'hidden' as const,
+} as const;
+
+/**
+ * Price / cost / ext. body cell — right-aligned. Pair with align="right"
+ * on the TableCell and the no-decimal usd() helper
+ * (Math.ceil(n).toLocaleString('en-US',{style:'currency',currency:'USD',
+ * maximumFractionDigits:0})). Prices carry NO decimals and NO inline dots.
+ */
+export const priceCellSx = {
+  ...cellSx,
+  textAlign: 'right' as const,
+  verticalAlign: 'middle' as const,
+  py: 0.5,
 } as const;
 
 /**

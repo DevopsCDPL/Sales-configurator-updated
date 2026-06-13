@@ -236,39 +236,38 @@ Reference `TOAST_COLORS` from `designSystem.ts`. Toast definitions are consumed 
 Every data table in the configurator uses ONE locked format. Canonical
 reference: the "Auto-selected components" table in `ComponentsPanel.tsx` and
 the eBOM/mBOM tables in `BomViewer.tsx`. Tokens live in `designSystem.ts`
-(`STANDARD_TABLE`, `tableHeadCellSx`, `snoCellSx`, `mergedCatCellSx`, plus the
-existing `headSx`/`cellSx`).
+(`STANDARD_TABLE`, `tableHeadCellSx`, `snoCellSx`, `mergedCatCellSx`,
+`descClampSx`, `priceCellSx`, plus the existing `headSx`/`cellSx`).
 
-Rules — replicate exactly for any new table:
+Structural rules — replicate exactly for any new table:
 
-1. **Scroll wrapper.** Wrap the `<Table>` in a `Box` with
-   `{ maxHeight: '58vh', overflow: 'auto' }` (use `52vh` for per-section
-   sub-boxes). This keeps long tables in-page.
-2. **Sticky header.** `<Table size="small" stickyHeader>`. Every head
-   `TableCell` gets `tableHeadCellSx` — i.e. `headSx` + `whiteSpace: nowrap`
-   + `bgcolor: '#0B0B0D'` so the sticky header never bleeds the rows behind it.
-3. **Sentence-case headers.** "Catalog description", "Unit cost", "Where
-   used" — never ALL CAPS.
-4. **First column is S.No** (`snoCellSx`): width 40, muted `#64748B`,
-   `borderRight: 1px solid #1E2235`. Numbered continuously within the table
-   (within each section box for sectioned eBOM).
-5. **Category column is MERGED via `rowSpan`** (`mergedCatCellSx`): render the
-   cell only on the first row of each category group, with
-   `rowSpan = rows in that group`. Color `#A9B6C9`, `fontWeight 700`,
-   right divider, `verticalAlign: middle`. (Skip the merge only when a table
-   is genuinely by-part, e.g. mBOM — there S.No + standard styling is enough.)
-6. **Body cells.** `cellSx` + `verticalAlign: 'middle'` + `py: 0.5`.
-7. **Status & provenance** stay as outlined `StatusChip` / generator chip per
-   the provenance-vs-status rule above; never drop a backend field to fit.
+- **Scroll wrapper.** Wrap the `<Table>` in a `Box` with
+  `{ maxHeight: '58vh', overflow: 'auto' }` (use `52vh` for per-section
+  sub-boxes). This keeps long tables in-page.
+- **Sticky header.** `<Table size="small" stickyHeader>`. Every head
+  `TableCell` gets `tableHeadCellSx` — i.e. `headSx` + `whiteSpace: nowrap`
+  + `bgcolor: '#0B0B0D'` so the sticky header never bleeds the rows behind it.
+- **Sentence-case headers.** "Catalog description", "Unit cost", "Where
+  used" — never ALL CAPS.
+- **Body cells.** `cellSx` + `verticalAlign: 'middle'` + `py: 0.5`.
 
-### Segmented view toggle
+### The 6 refined alignment rules (LOCKED)
 
-When a table offers alternate views (e.g. eBOM vs mBOM), use a segmented
-control, NOT separate buttons — matching the catalog Source/Status toggles:
-
-- Container: `bgcolor #0B0B0D`, `border 1px solid #1E2235`,
-  `borderRadius 8px`, `display inline-flex`, `p 0.25`.
-- Each pill: `borderRadius 6px`, `height ~24`, `px 1.25`, `fontSize 11.5`.
-  Active = `bgcolor rgba(0,200,255,0.14)` / `color #00c8ff`.
-  Inactive = `transparent` / `#64748B`.
-- Labels are compact and descriptive ("eBOM · by section", "mBOM · by part").
+1. **S.No** (`snoCellSx`): width 40, muted `#64748B`, `borderRight`, and
+   **text-align CENTER** on header AND body (`align="center"` + `textAlign:
+   'center'`). Numbered continuously within the table (within each section box
+   for sectioned eBOM).
+2. **Category** column is MERGED via `rowSpan` (`mergedCatCellSx`): left,
+   vertical-center, right divider; render the cell only on the first row of
+   each group with `rowSpan = rows in that group`. Color `#A9B6C9`,
+   `fontWeight 700`. (Skip the merge for genuinely by-part tables, e.g. mBOM.)
+3. **Component / Description** column: left-aligned, vertical-center,
+   **max 2 lines** — wrap the text in a `Box` with `descClampSx`
+   (`display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical',
+   overflow:'hidden'`) and a Tooltip carrying the full text. WIDEN it: fixed
+   Component cols `width: 230` (`STANDARD_TABLE.componentColWidth`); flexible
+   BOM Description `minWidth: 260` (`STANDARD_TABLE.descMinWidth`).
+4. **All other data columns** (qty basis, unit, where-used…): left-aligned,
+   vertical-center.
+5. **Unit price / Unit cost / Ext.**: NO DECIMALS, rounded **UP** — `usd()` is
+   `Math.ceil(n).toLocale

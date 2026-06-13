@@ -41,7 +41,7 @@ const cellSx = { color: C.text, fontSize: 12, borderBottom: '1px solid ' + C.bor
 const headSx = { color: C.sub, fontSize: 10.5, fontWeight: 700, letterSpacing: 0.5, borderBottom: '1px solid ' + C.border, py: 0.7 };
 
 const usd = (n: number) =>
-  n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 });
+  Math.ceil(n).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
 
 export interface ComponentsPanelProps {
   board: FullBoard;
@@ -291,15 +291,14 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, view, onLinesC
                   <Table size="small" stickyHeader>
                     <TableHead>
                       <TableRow>
-                        <TableCell sx={{ ...headSx, width: 40, whiteSpace: 'nowrap', borderRight: '1px solid #1E2235', bgcolor: '#0B0B0D' }}>S.No</TableCell>
+                        <TableCell sx={{ ...headSx, width: 40, whiteSpace: 'nowrap', borderRight: '1px solid #1E2235', bgcolor: '#0B0B0D' }} align="center">S.No</TableCell>
                         <TableCell sx={{ ...headSx, width: 110, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Category</TableCell>
-                        <TableCell sx={{ ...headSx, width: 200, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Component</TableCell>
+                        <TableCell sx={{ ...headSx, width: 230, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Component</TableCell>
                         <TableCell sx={{ ...headSx, width: 96, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>SKU</TableCell>
                         <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Catalog description</TableCell>
                         <TableCell sx={{ ...headSx, width: 95, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Qty basis</TableCell>
                         <TableCell sx={{ ...headSx, width: 64, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Qty</TableCell>
                         <TableCell sx={{ ...headSx, width: 90, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }} align="right">Unit price</TableCell>
-                        <TableCell sx={{ ...headSx, width: 44, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }} align="center">Status</TableCell>
                         <TableCell sx={{ ...headSx, width: 80, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }} align="right">Actions</TableCell>
                       </TableRow>
                     </TableHead>
@@ -311,7 +310,7 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, view, onLinesC
                         return (
                           <TableRow key={l.id}>
                             {/* S.No */}
-                            <TableCell sx={{ ...cellSx, width: 40, color: C.sub, fontSize: 11.5, verticalAlign: 'middle', py: 0.5, borderRight: '1px solid #1E2235' }}>
+                            <TableCell align="center" sx={{ ...cellSx, width: 40, color: C.sub, fontSize: 11.5, textAlign: 'center', verticalAlign: 'middle', py: 0.5, borderRight: '1px solid #1E2235' }}>
                               {sno}
                             </TableCell>
                             {/* Category — rowSpan first row only */}
@@ -321,22 +320,39 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, view, onLinesC
                               </TableCell>
                             )}
                             {/* Component */}
-                            <TableCell sx={{ ...cellSx, width: 210, verticalAlign: 'middle', py: 0.5, color: C.text, fontSize: 12 }}>
-                              {l.meta?.ruleDescription ?? l.category}
+                            <TableCell sx={{ ...cellSx, width: 230, verticalAlign: 'middle', py: 0.5, color: C.text, fontSize: 12 }}>
+                              <Tooltip title={String(l.meta?.ruleDescription ?? l.category ?? '')} arrow>
+                                <Box sx={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                  {l.meta?.ruleDescription ?? l.category}
+                                </Box>
+                              </Tooltip>
                             </TableCell>
-                            {/* SKU */}
+                            {/* SKU + stacked source/status dots beneath */}
                             <TableCell sx={{ ...cellSx, width: 96, verticalAlign: 'middle', py: 0.5 }}>
                               {l.meta?.placeholder ? (
-                                <Chip label="No match" size="small"
-                                  sx={{ bgcolor: 'rgba(217,119,6,0.12)', color: '#FCD34D', fontSize: 9.5, height: 18 }} />
+                                <Stack spacing={0.4} alignItems="flex-start">
+                                  <Chip label="No match" size="small"
+                                    sx={{ bgcolor: 'rgba(217,119,6,0.12)', color: '#FCD34D', fontSize: 9.5, height: 18 }} />
+                                  <Tooltip title={statusLabel} arrow>
+                                    <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: statusColor, display: 'inline-block' }} />
+                                  </Tooltip>
+                                </Stack>
                               ) : (
-                                <Tooltip title={l.part_number ?? ''} arrow>
-                                  <Chip
-                                    label={compactSku(l.part_number)}
-                                    size="small"
-                                    sx={{ bgcolor: 'transparent', border: '1px solid #1E2235', color: '#A9B6C9', fontSize: 9.5, height: 18 }}
-                                  />
-                                </Tooltip>
+                                <Stack spacing={0.4} alignItems="flex-start">
+                                  <Tooltip title={l.part_number ?? ''} arrow>
+                                    <Chip
+                                      label={compactSku(l.part_number)}
+                                      size="small"
+                                      sx={{ bgcolor: 'transparent', border: '1px solid #1E2235', color: '#A9B6C9', fontSize: 9.5, height: 18 }}
+                                    />
+                                  </Tooltip>
+                                  <Stack direction="row" alignItems="center" spacing={0.5}>
+                                    <PriceSourceDot source={(l.meta as any)?.priceSource} />
+                                    <Tooltip title={statusLabel} arrow>
+                                      <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: statusColor, display: 'inline-block' }} />
+                                    </Tooltip>
+                                  </Stack>
+                                </Stack>
                               )}
                             </TableCell>
                             {/* Catalog description */}
@@ -371,23 +387,14 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, view, onLinesC
                               />
                             </TableCell>
                             {/* Unit price */}
-                            <TableCell sx={{ ...cellSx, width: 90, verticalAlign: 'middle', py: 0.5 }} align="right">
+                            <TableCell sx={{ ...cellSx, width: 90, verticalAlign: 'middle', py: 0.5, textAlign: 'right' }} align="right">
                               {unitCost > 0 ? (
-                                <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
-                                  <PriceSourceDot source={(l.meta as any)?.priceSource} />
-                                  {usd(unitCost)}
-                                </Box>
+                                usd(unitCost)
                               ) : (
                                 <Tooltip title="No quote received yet — raise an RFQ" arrow>
                                   <Typography sx={{ color: C.red, fontWeight: 800, fontSize: 12, display: 'inline' }}>RFQ $</Typography>
                                 </Tooltip>
                               )}
-                            </TableCell>
-                            {/* Status */}
-                            <TableCell sx={{ ...cellSx, width: 44, verticalAlign: 'middle', py: 0.5 }} align="center">
-                              <Tooltip title={statusLabel} arrow>
-                                <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: statusColor, boxShadow: '0 0 6px ' + statusColor, display: 'inline-block' }} />
-                              </Tooltip>
                             </TableCell>
                             {/* Actions */}
                             <TableCell sx={{ ...cellSx, width: 80, verticalAlign: 'middle', py: 0.5, whiteSpace: 'nowrap' }} align="right">
