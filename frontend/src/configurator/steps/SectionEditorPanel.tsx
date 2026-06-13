@@ -672,9 +672,22 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
                                   </Tooltip>
                                 </Stack>
                               </Stack>
-                              <Typography sx={{ color: C.text, fontSize: 11, mt: 0.25, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                {displayCase(l.name || l.part_number || '—')}
-                              </Typography>
+                              {(() => {
+                                const desig = String(l.meta?.designation ?? '').trim();
+                                const nm = String(l.name ?? '').trim();
+                                const pn = String(l.part_number ?? '').trim();
+                                // Real breaker name only when it isn't just the designation echoed back
+                                const realName = nm && nm !== desig ? nm : (pn && pn !== desig ? pn : '');
+                                return realName ? (
+                                  <Typography sx={{ color: C.text, fontSize: 11, mt: 0.25, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                    {displayCase(realName)}
+                                  </Typography>
+                                ) : (
+                                  <Typography sx={{ color: C.amber, fontSize: 10.5, mt: 0.25, fontStyle: 'italic', whiteSpace: 'nowrap' }}>
+                                    No breaker selected — Swap to assign
+                                  </Typography>
+                                );
+                              })()}
                               <Typography sx={{ color: C.sub, fontSize: 10 }}>
                                 {l.meta?.ratedA ?? '—'} A
                                 {l.meta?.interruptingKA ? ' / ' + l.meta.interruptingKA + ' kA' : ''}
