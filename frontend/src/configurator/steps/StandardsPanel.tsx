@@ -15,7 +15,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Box, Typography, Stack, Chip, Button, Alert, CircularProgress, TextField,
-  Table, TableHead, TableRow, TableCell, TableBody, MenuItem, Select,
+  Table, TableHead, TableRow, TableCell, TableBody, MenuItem, Select, ListSubheader,
 } from '@mui/material';
 import SaveRoundedIcon from '@mui/icons-material/SaveRounded';
 import UploadFileRoundedIcon from '@mui/icons-material/UploadFileRounded';
@@ -27,18 +27,35 @@ const C = {
   text: '#E2E8F0', sub: '#64748B', green: '#22C55E', amber: '#D97706', red: '#EF4444',
 };
 
-const TABLES: { key: string; label: string }[] = [
-  { key: 'costing_defaults', label: 'Costing defaults (rates, GM%, copper $/lb)' },
-  { key: 'component_rules', label: 'Component auto-rules (qty factors, conditions)' },
-  { key: 'neutral_bus_schedule', label: 'Neutral bus schedule' },
-  { key: 'bus_schedule', label: 'Bus schedule (A → bars)' },
-  { key: 'bus_support_spacing', label: 'Bus support spacing (SCCR)' },
-  { key: 'frame_library', label: 'Frame library' },
-  { key: 'voltage_systems', label: 'Voltage systems' },
-  { key: 'ratings_ladders', label: 'Ratings ladders' },
-  { key: 'motor_fla', label: 'Motor FLA (NEC 430.250)' },
-  { key: 'safety_items_map', label: 'Safety items map' },
-  { key: 'packing_settings', label: 'Packing constants (lineup packer)' },
+const TABLES: { key: string; label: string; group: string }[] = [
+  // Copper & bus
+  { key: 'copper_grades', label: 'Copper grades (grade → density)', group: 'Copper & bus' },
+  { key: 'copper_cost', label: 'Copper cost (COMEX, adders, plating)', group: 'Copper & bus' },
+  { key: 'copper_estimator', label: 'Copper estimator (fab, contingency, stub)', group: 'Copper & bus' },
+  { key: 'ground_bus', label: 'Ground bus (thickness × width)', group: 'Copper & bus' },
+  { key: 'bus_schedule', label: 'Bus schedule (A → bars)', group: 'Copper & bus' },
+  { key: 'neutral_bus_schedule', label: 'Neutral bus schedule', group: 'Copper & bus' },
+  { key: 'bus_support_spacing', label: 'Bus support spacing (SCCR)', group: 'Copper & bus' },
+  // Enclosure
+  { key: 'frame_library', label: 'Frame library', group: 'Enclosure' },
+  { key: 'enclosure_costing', label: 'Enclosure costing (model, steel, NEMA)', group: 'Enclosure' },
+  // Layout
+  { key: 'packing_settings', label: 'Packing constants (lineup packer)', group: 'Layout' },
+  // Load & ratings
+  { key: 'load_calc', label: 'Load calc (continuous, PF, motor)', group: 'Load & ratings' },
+  { key: 'ratings_ladders', label: 'Ratings ladders', group: 'Load & ratings' },
+  { key: 'voltage_systems', label: 'Voltage systems', group: 'Load & ratings' },
+  { key: 'motor_fla', label: 'Motor FLA (NEC 430.250)', group: 'Load & ratings' },
+  // Breaker rules
+  { key: 'breaker_rules', label: 'Breaker rules (%-rated, ACB/MCCB, SCCR basis)', group: 'Breaker rules' },
+  { key: 'component_rules', label: 'Component auto-rules (qty factors, conditions)', group: 'Breaker rules' },
+  // Terminations
+  { key: 'termination_factors', label: 'Termination factors (lugs/pole, joint kits)', group: 'Terminations' },
+  // Pricing & commercial
+  { key: 'costing_defaults', label: 'Costing defaults (rates, GM%, copper $/lb)', group: 'Pricing & commercial' },
+  { key: 'proposal_settings', label: 'Proposal settings (boards/block, orientation)', group: 'Pricing & commercial' },
+  // Safety
+  { key: 'safety_items_map', label: 'Safety items map', group: 'Safety' },
 ];
 
 const cellSx = { color: C.text, fontSize: 11.5, borderBottom: '1px solid ' + C.border, py: 0.4, px: 1 };
@@ -145,7 +162,13 @@ const StandardsPanel: React.FC = () => {
           size="small" value={tableKey} onChange={(e) => setTableKey(e.target.value)}
           sx={{ minWidth: 240, bgcolor: C.bg, color: C.text, fontSize: 13, '& fieldset': { borderColor: C.border } }}
         >
-          {TABLES.map((t) => <MenuItem key={t.key} value={t.key} sx={{ fontSize: 13 }}>{t.label}</MenuItem>)}
+          {TABLES.reduce<React.ReactNode[]>((acc, t, i) => {
+            if (i === 0 || TABLES[i - 1].group !== t.group) {
+              acc.push(<ListSubheader key={'h-' + t.group} sx={{ bgcolor: C.surface, color: C.blue, fontSize: 10.5, fontWeight: 700, letterSpacing: 0.4, lineHeight: '26px' }}>{t.group}</ListSubheader>);
+            }
+            acc.push(<MenuItem key={t.key} value={t.key} sx={{ fontSize: 13, pl: 2.5 }}>{t.label}</MenuItem>);
+            return acc;
+          }, [])}
         </Select>
         {table && (
           <Chip label={'v' + table.version} size="small" sx={{ bgcolor: 'rgba(0,200,255,0.12)', color: '#60A5FA', fontSize: 10.5, height: 20 }} />
