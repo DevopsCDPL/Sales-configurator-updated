@@ -10,11 +10,13 @@
 import React, { useMemo, useState } from 'react';
 import {
   Box, Typography, Stack, Chip, Button, Dialog, DialogTitle, DialogContent,
-  DialogActions, Table, TableHead, TableRow, TableCell, TableBody, Alert,
+  DialogActions, Table, TableHead, TableRow, TableCell, TableBody, Alert, Tooltip,
 } from '@mui/material';
 import SwapHorizRoundedIcon from '@mui/icons-material/SwapHorizRounded';
 import configuratorV2Service, { ComponentLineRow, CatalogCb } from '../../services/configuratorV2Service';
 import DesignSummaryCard from '../components/DesignSummaryCard';
+import PriceSourceDot from '../components/PriceSourceDot';
+import { displayCase, compactSku } from '../lib/displayCase';
 
 const C = {
   bg: '#000000', surface: '#0B0B0D', border: '#1E2235', blue: '#00c8ff',
@@ -29,7 +31,7 @@ const headSx = {
 };
 
 const usd = (n: number) =>
-  n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 });
+  Math.ceil(n).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
 
 export interface DeviceListPanelProps {
   lines: ComponentLineRow[];
@@ -71,6 +73,45 @@ const DeviceListPanel: React.FC<DeviceListPanelProps> = ({ lines, intake, catalo
       return '—';
     };
   }, [intake, deviceLines.length]);
+
+  /** Section-first ordering for the "Section Review" table:
+   *  group by sectionIndex (ascending); within a section, MAIN/M first,
+   *  then feeders F1,F2… numeric, then anything else by designation. */
+  const flatRows = useMemo(() => {
+    const desigRank = (l: ComponentLineRow): [number, number, string] => {
+      const d = String(l.meta?.designation ?? '');
+      const role = String(l.meta?.role ?? '').toUpperCase();
+      if (role === 'MAIN' || /^M\b/i.test(d)) return [0, 0, d];
+      const fm = d.match(/^F(\d+)$/i);
+      if (fm) return [1, Number(fm[1]), d];
+      return [2, 0, d];
+    };
+    const sorted = [...deviceLines].sort((a, b) => {
+      const sa = Number(a.meta?.sectionIndex ?? 9999);
+      const sb = Number(b.meta?.sectionIndex ?? 9999);
+      if (sa !== sb) return sa - sb;
+      const ra = desigRank(a);
+      const rb = desigRank(b);
+      if (ra[0] !== rb[0]) return ra[0] - rb[0];
+      if (ra[1] !== rb[1]) return ra[1] - rb[1];
+      return ra[2].localeCompare(rb[2]);
+    });
+    // Count devices per section for rowSpan
+    const counts = new Map<string, number>();
+    for (const l of sorted) {
+      const k = String(l.meta?.sectionIndex ?? '?');
+      counts.set(k, (counts.get(k) ?? 0) + 1);
+    }
+    let sno = 0;
+    let prevSection: string | null = null;
+    return sorted.map((l) => {
+      sno++;
+      const k = String(l.meta?.sectionIndex ?? '?');
+      const isFirstInSection = k !== prevSection;
+      prevSection = k;
+      return { l, sno, sectionKey: k, rowsInSection: counts.get(k) ?? 1, isFirstInSection };
+    });
+  }, [deviceLines]);
 
   const candidatesFor = (line: ComponentLineRow): CatalogCb[] => {
     if (!catalogCbs) return [];
@@ -134,66 +175,92 @@ const DeviceListPanel: React.FC<DeviceListPanelProps> = ({ lines, intake, catalo
         <Box
           sx={{
             flex: 1, minWidth: 0,
-            maxHeight: '62vh', overflow: 'auto',
+            maxHeight: '58vh', overflow: 'auto',
             bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px',
           }}
         >
           <Table size="small" stickyHeader>
             <TableHead>
               <TableRow>
-                <TableCell sx={headSx}>DESIG.</TableCell>
-                <TableCell sx={headSx}>ROLE</TableCell>
-                <TableCell sx={headSx}>CONNECTED LOAD</TableCell>
-                <TableCell sx={headSx}>DEVICE</TableCell>
-                <TableCell sx={headSx}>PART #</TableCell>
-                <TableCell sx={headSx}>SECTION</TableCell>
-                <TableCell sx={headSx}>POLES</TableCell>
-                <TableCell sx={headSx}>MOUNTING</TableCell>
-                <TableCell sx={headSx} align="right">RATING</TableCell>
-                <TableCell sx={headSx} align="right">COST</TableCell>
-                <TableCell sx={headSx}>PRICE</TableCell>
-                <TableCell sx={headSx} />
+                <TableCell sx={{ ...headSx, width: 40, whiteSpace: 'nowrap', borderRight: '1px solid ' + C.border }} align="center">S.No</TableCell>
+                <TableCell sx={{ ...headSx, width: 64, whiteSpace: 'nowrap', borderRight: '1px solid ' + C.border }}>Section</TableCell>
+                <TableCell sx={headSx}>Designation</TableCell>
+                <TableCell sx={headSx}>Role</TableCell>
+                <TableCell sx={headSx}>Connected load</TableCell>
+                <TableCell sx={headSx}>Part #</TableCell>
+                <TableCell sx={headSx}>Manufacturer</TableCell>
+                <TableCell sx={headSx}>Poles</TableCell>
+                <TableCell sx={headSx}>Mounting</TableCell>
+                <TableCell sx={headSx}>Rating</TableCell>
+                <TableCell sx={headSx} align="right">Cost</TableCell>
+                <TableCell sx={headSx} align="right">Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {deviceLines.map((l) => (
-                <TableRow key={l.id}>
-                  <TableCell sx={cellSx}>
-                    <Chip label={l.meta?.designation ?? '?'} size="small" sx={{ bgcolor: 'rgba(0,200,255,0.12)', color: '#60A5FA', fontWeight: 700, fontSize: 10.5, height: 20 }} />
-                  </TableCell>
-                  <TableCell sx={{ ...cellSx, color: C.sub }}>{l.meta?.role ?? '—'}</TableCell>
-                  <TableCell sx={cellSx}>{loadNameFor(l)}</TableCell>
-                  <TableCell sx={cellSx}>
-                    {l.name}
-                    {l.meta?.swapped && (
-                      <Chip label={'swapped (was ' + (l.meta?.swapped_from ?? '?') + ')'} size="small" sx={{ ml: 1, bgcolor: 'transparent', border: '1px solid ' + C.amber, color: C.amber, fontSize: 9, height: 16 }} />
+              {flatRows.map(({ l, sno, sectionKey, rowsInSection, isFirstInSection }) => {
+                const statusColor = l.price_status === 'FIRM' ? C.green : l.price_status === 'ESTIMATED' ? C.amber : C.red;
+                const statusLabel = l.price_status === 'FIRM' ? 'Firm price' : l.price_status === 'ESTIMATED' ? 'Estimated price' : 'No firm price — RFQ required';
+                return (
+                  <TableRow key={l.id}>
+                    {/* S.No */}
+                    <TableCell align="center" sx={{ ...cellSx, width: 40, color: C.sub, fontSize: 11.5, verticalAlign: 'middle', borderRight: '1px solid ' + C.border }}>
+                      {sno}
+                    </TableCell>
+                    {/* Section — merged rowSpan on first row of the group */}
+                    {isFirstInSection && (
+                      <TableCell rowSpan={rowsInSection} sx={{ ...cellSx, width: 64, color: '#A9B6C9', fontWeight: 700, verticalAlign: 'middle', borderRight: '1px solid ' + C.border }}>
+                        {'S' + sectionKey}
+                      </TableCell>
                     )}
-                  </TableCell>
-                  <TableCell sx={{ ...cellSx, color: C.sub }}>{l.part_number ?? '—'}</TableCell>
-                  <TableCell sx={cellSx}>{'S' + (l.meta?.sectionIndex ?? '?')}</TableCell>
-                  <TableCell sx={{ ...cellSx, color: C.sub }}>{String(l.meta?.poles ?? 3) + 'P'}</TableCell>
-                  <TableCell sx={{ ...cellSx, color: C.sub }}>{l.meta?.mounting ?? 'Fixed'}</TableCell>
-                  <TableCell sx={cellSx} align="right">{l.meta?.ratedA ?? '—'} A / {l.meta?.interruptingKA ?? '—'} kA</TableCell>
-                  <TableCell sx={cellSx} align="right">{Number(l.unit_cost) ? usd(Number(l.unit_cost)) : '—'}</TableCell>
-                  <TableCell sx={cellSx}>
-                    <Chip
-                      label={l.price_status === 'PENDING_RFQ' ? 'RFQ' : l.price_status}
-                      size="small"
-                      sx={{ bgcolor: 'transparent', border: '1px solid ' + (l.price_status === 'FIRM' ? C.green : C.amber), color: l.price_status === 'FIRM' ? C.green : C.amber, fontSize: 9.5, height: 18 }}
-                    />
-                  </TableCell>
-                  <TableCell sx={cellSx} align="right">
-                    <Button
-                      size="small" startIcon={<SwapHorizRoundedIcon sx={{ fontSize: 14 }} />}
-                      disabled={locked}
-                      onClick={() => { setSwapLine(l); setError(null); }}
-                      sx={{ color: C.blue, textTransform: 'none', fontSize: 11.5, border: '1px solid ' + C.border }}
-                    >
-                      Swap
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
+                    {/* Designation */}
+                    <TableCell sx={{ ...cellSx, verticalAlign: 'middle' }}>
+                      <Chip label={l.meta?.designation ?? '?'} size="small" sx={{ bgcolor: 'rgba(0,200,255,0.12)', color: '#60A5FA', fontWeight: 700, fontSize: 10.5, height: 20 }} />
+                      {l.meta?.swapped && (
+                        <Chip label={'swapped (was ' + (l.meta?.swapped_from ?? '?') + ')'} size="small" sx={{ ml: 1, bgcolor: 'transparent', border: '1px solid ' + C.amber, color: C.amber, fontSize: 9, height: 16 }} />
+                      )}
+                    </TableCell>
+                    {/* Role */}
+                    <TableCell sx={{ ...cellSx, color: C.sub, verticalAlign: 'middle' }}>{l.meta?.role ?? '—'}</TableCell>
+                    {/* Connected load */}
+                    <TableCell sx={{ ...cellSx, verticalAlign: 'middle' }}>{loadNameFor(l)}</TableCell>
+                    {/* Part # + stacked source/status dots beneath */}
+                    <TableCell sx={{ ...cellSx, verticalAlign: 'middle' }}>
+                      <Stack spacing={0.4} alignItems="flex-start">
+                        <Tooltip title={l.part_number ?? ''} arrow>
+                          <Box sx={{ color: C.text }}>{compactSku(l.part_number) || '—'}</Box>
+                        </Tooltip>
+                        <Stack direction="row" alignItems="center" spacing={0.5}>
+                          <PriceSourceDot source={(l.meta as any)?.priceSource} />
+                          <Tooltip title={statusLabel} arrow>
+                            <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: statusColor, display: 'inline-block' }} />
+                          </Tooltip>
+                        </Stack>
+                      </Stack>
+                    </TableCell>
+                    {/* Manufacturer */}
+                    <TableCell sx={{ ...cellSx, verticalAlign: 'middle' }}>{displayCase(l.meta?.manufacturer ?? '') || '—'}</TableCell>
+                    {/* Poles */}
+                    <TableCell sx={{ ...cellSx, color: C.sub, verticalAlign: 'middle' }}>{String(l.meta?.poles ?? 3) + 'P'}</TableCell>
+                    {/* Mounting */}
+                    <TableCell sx={{ ...cellSx, color: C.sub, verticalAlign: 'middle' }}>{l.meta?.mounting ?? 'Fixed'}</TableCell>
+                    {/* Rating — left */}
+                    <TableCell sx={{ ...cellSx, verticalAlign: 'middle' }}>{l.meta?.ratedA ?? '—'} A / {l.meta?.interruptingKA ?? '—'} kA</TableCell>
+                    {/* Cost — right, no decimals */}
+                    <TableCell sx={{ ...cellSx, verticalAlign: 'middle' }} align="right">{Number(l.unit_cost) ? usd(Number(l.unit_cost)) : '—'}</TableCell>
+                    {/* Actions */}
+                         <TableCell sx={{ ...cellSx, verticalAlign: 'middle' }} align="right">
+                      <Button
+                        size="small" startIcon={<SwapHorizRoundedIcon sx={{ fontSize: 14 }} />}
+                        disabled={locked}
+                        onClick={() => { setSwapLine(l); setError(null); }}
+                        sx={{ color: C.blue, textTransform: 'none', fontSize: 11.5, border: '1px solid ' + C.border }}
+                      >
+                        Swap
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </Box>
@@ -227,11 +294,11 @@ const DeviceListPanel: React.FC<DeviceListPanelProps> = ({ lines, intake, catalo
             <Table size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell sx={headSx}>MANUFACTURER</TableCell>
-                  <TableCell sx={headSx}>FRAME</TableCell>
-                  <TableCell sx={headSx} align="right">RATING</TableCell>
-                  <TableCell sx={headSx}>MOUNTING</TableCell>
-                  <TableCell sx={headSx} align="right">PRICE</TableCell>
+                  <TableCell sx={headSx}>Manufacturer</TableCell>
+                  <TableCell sx={headSx}>Frame</TableCell>
+                  <TableCell sx={headSx} align="right">Rating</TableCell>
+                  <TableCell sx={headSx}>Mounting</TableCell>
+                  <TableCell sx={headSx} align="right">Price</TableCell>
                   <TableCell sx={headSx} />
                 </TableRow>
               </TableHead>
