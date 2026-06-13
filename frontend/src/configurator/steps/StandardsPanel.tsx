@@ -21,6 +21,7 @@ import SaveRoundedIcon from '@mui/icons-material/SaveRounded';
 import UploadFileRoundedIcon from '@mui/icons-material/UploadFileRounded';
 import FileDownloadRoundedIcon from '@mui/icons-material/FileDownloadRounded';
 import configuratorV2Service, { StandardsTableRow } from '../../services/configuratorV2Service';
+import marketDataService, { CopperPrice } from '../../services/marketDataService';
 
 const C = {
   bg: '#000000', surface: '#0B0B0D', border: '#1E2235', blue: '#00c8ff',
@@ -73,6 +74,11 @@ const StandardsPanel: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const wbRef = useRef<HTMLInputElement>(null);
+  const [liveCopper, setLiveCopper] = useState<CopperPrice | null>(null);
+
+  useEffect(() => {
+    marketDataService.getCopperPrice().then(setLiveCopper).catch(() => setLiveCopper(null));
+  }, []);
 
   const load = useCallback(async (key: string) => {
     setLoading(true);
@@ -233,6 +239,64 @@ const StandardsPanel: React.FC = () => {
         <Alert severity="success" onClose={() => setInfo(null)} sx={{ mb: 1.5, bgcolor: 'rgba(34,197,94,0.08)', color: '#86EFAC', border: '1px solid ' + C.border, fontSize: 12 }}>
           {info}
         </Alert>
+      )}
+
+      {(tableKey === 'copper_cost' || tableKey === 'copper_grades') && (
+        <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', p: 1.5, mb: 1.5, display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'flex-start' }}>
+          <Box>
+            <Typography sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4 }}>COMEX COPPER (LIVE)</Typography>
+            <Typography sx={{ color: C.blue, fontWeight: 800, fontSize: 16 }}>
+              {liveCopper ? '$' + liveCopper.price_per_lb.toFixed(2) + '/lb' : '\u2014'}
+              {liveCopper?.fallback && <Box component="span" sx={{ color: C.amber, fontSize: 10, ml: 0.8, fontWeight: 600 }}>(fallback)</Box>}
+            </Typography>
+            {liveCopper?.source && <Typography sx={{ color: C.sub, fontSize: 9.5 }}>{liveCopper.source}</Typography>}
+          </Box>
+          {tableKey === 'copper_cost' && rows[0] && (() => {
+            const cc = rows[0] || {};
+            const base = cc.comex_source === 'manual' ? (Number(cc.manual_price_per_lb) || 0) : (liveCopper?.price_per_lb ?? Number(cc.manual_price_per_lb) ?? 0);
+            const delivered = base + (Number(cc.fabrication_adder_per_lb) || 0) + (Number(cc.plating_tin_adder_per_lb) || 0);
+            return (
+              <Box>
+                <Typography sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4 }}>DELIVERED $/LB (PREVIEW)</Typography>
+                <Typography sx={{ color: C.green, fontWeight: 800, fontSize: 16 }}>{'$' + delivered.toFixed(2) + '/lb'}</Typography>
+                <Typography sx={{ color: C.sub, fontSize: 9.5 }}>= base + fab adder + tin plating</Typography>
+                <Typography sx={{ color: C.sub, fontSize: 9.5 }}>
+                  {cc.comex_source === 'manual' ? 'base: manual ($' + (Number(cc.manual_price_per_lb) || 0).toFixed(2) + ')' : 'base: live COMEX'}
+                </Typography>
+              </Box>
+            );
+          })()}
+          {tableKey === 'copper_grades' && (
+            <Typography sx={{ color: C.sub, fontSize: 11, alignSelf: 'center', maxWidth: 360 }}>
+              Default grade's density feeds the copper estimator. Delivered $/lb is configured on the Copper cost table.
+            </Typography>
+          )}
+        </Box>
+      )}
+
+      {tableKey === 'enclosure_costing' && rows[0] && (
+        <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', p: 1.5, mb: 1.5 }}>
+          <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
+            <Typography sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4, mr: 0.5 }}>MODEL</Typography>
+            {(['fabricated', 'purchased'] as const).map((m) => {
+              const active = rows[0]?.model === m;
+              return (
+                <Button
+                  key={m} size="small" onClick={() => edit(0, 'model', m)}
+                  sx={{ textTransform: 'capitalize', fontSize: 12, fontWeight: 600, minWidth: 96,
+                    bgcolor: active ? C.blue : C.bg, color: active ? '#06151c' : C.text,
+                    border: '1px solid ' + (active ? C.blue : C.border),
+                    '&:hover': { bgcolor: active ? '#33d4ff' : C.surface, borderColor: C.blue } }}
+                >
+                  {m}
+                </Button>
+              );
+            })}
+          </Stack>
+          <Typography sx={{ color: C.sub, fontSize: 9.5, mt: 0.8 }}>
+            Fabricated = steel weight \u00d7 $/lb + fab hours. Purchased = vendor price per frame. (Other fields below apply to the chosen model.)
+          </Typography>
+        </Box>
       )}
 
       {loading ? (
