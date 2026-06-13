@@ -660,6 +660,16 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
                                       />
                                     </Tooltip>
                                   ) : null}
+                                  {(() => {
+                                    const ps = String(l.price_status ?? 'PENDING_RFQ');
+                                    const col = ps === 'FIRM' ? C.green : ps === 'ESTIMATED' ? C.amber : C.red;
+                                    const tip = ps === 'FIRM' ? 'Firm price' : ps === 'ESTIMATED' ? 'Estimated price' : 'No firm price — RFQ required';
+                                    return (
+                                      <Tooltip title={tip}>
+                                        <Box component="span" sx={{ display: 'inline-block', width: 7, height: 7, borderRadius: '50%', mr: 0.5, bgcolor: col, boxShadow: `0 0 5px ${col}`, verticalAlign: 'middle' }} />
+                                      </Tooltip>
+                                    );
+                                  })()}
                                 </Stack>
                                 <Stack direction="row" alignItems="center" spacing={0}>
                                   <Tooltip title="Move to previous section">
