@@ -68,8 +68,9 @@ export interface ComponentPickerDialogProps {
    * Context from the parent board, used for CIRCUIT BREAKER suitability filter.
    * sccrKA: board short-circuit rating in kA (null = unknown, skip kA filter).
    * remainingHeightIn: remaining usable height in the target section (null = unknown).
+   * voltageVLL: system line-to-line voltage (null = unknown, skip voltage filter).
    */
-  boardContext?: { sccrKA?: number | null; remainingHeightIn?: number | null };
+  boardContext?: { sccrKA?: number | null; remainingHeightIn?: number | null; voltageVLL?: number | null };
 }
 
 const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
@@ -157,6 +158,7 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
     if (!isCbMode || !suitableOnly) return results;
     const sccrKA = boardContext?.sccrKA ?? null;
     const remaining = boardContext?.remainingHeightIn ?? null;
+    const voltageVLL = boardContext?.voltageVLL ?? null;
     return results.filter((r) => {
       const sp: any = (r as any).specifications ?? {};
       // kA check: exclude only when BOTH values are known and item fails
@@ -167,6 +169,13 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
         ? Number((r as any).dims_h_in)
         : sp.height_in != null ? Number(sp.height_in) : null;
       if (remaining != null && itemH != null && itemH > remaining) return false;
+      // Voltage check: exclude only when BOTH are known and breaker rated voltage < system VLL
+      // (a 480V system cannot use a 240V-rated breaker; >= is fine; missing data passes)
+      if (voltageVLL != null && sp.voltageRating != null) {
+        const ratingStr = String(sp.voltageRating).replace(/[^0-9]/g, '');
+        const itemV = ratingStr ? Number(ratingStr) : null;
+        if (itemV != null && itemV < voltageVLL) return false;
+      }
       return true;
     });
   }, [results, isCbMode, suitableOnly, boardContext]);

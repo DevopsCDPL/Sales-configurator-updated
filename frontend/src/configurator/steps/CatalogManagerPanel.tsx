@@ -162,9 +162,11 @@ const CatalogManagerPanel: React.FC = () => {
   const [sourceFilter, setSourceFilter] = useState<string>('all');
   const sourceRows = React.useMemo(() => sourceFilter === 'all'
     ? rows
-    : rows.filter((r) => sourceFilter === 'none'
-        ? !((r as any).specifications?.priceSource)
-        : (r as any).specifications?.priceSource === sourceFilter), [rows, sourceFilter]);
+    : sourceFilter === 'vendor-unresolved'
+      ? rows.filter((r) => !!(r as any).specifications?.vendorUnresolved)
+      : rows.filter((r) => sourceFilter === 'none'
+          ? !((r as any).specifications?.priceSource)
+          : (r as any).specifications?.priceSource === sourceFilter), [rows, sourceFilter]);
   useEffect(() => { setFilteredRows(sourceRows); }, [sourceRows, category]);
   const isCb = (category || '').toUpperCase() === 'CIRCUIT BREAKER';
   const hasFilter = isCb || !!CATEGORY_FILTERS[category];
@@ -279,7 +281,7 @@ const CatalogManagerPanel: React.FC = () => {
     <Box sx={{ px: 3, pb: 4, pt: 2 }}>
       <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1.5 }} flexWrap="wrap" useFlexGap>
         <Box sx={{ mr: 1 }}>
-          <Typography sx={{ color: C.text, fontWeight: 700, fontSize: 15 }}>Component catalog</Typography>
+          <Typography sx={{ color: '#F0F6FF', fontWeight: 800, fontSize: 15 }}>Component catalog</Typography>
           <Typography sx={{ color: C.sub, fontSize: 12 }}>
             One source for every screen — prices, part numbers and labour-hour buckets, separated by category.
           </Typography>
@@ -310,10 +312,10 @@ const CatalogManagerPanel: React.FC = () => {
             setImporting(true); setError(null);
             try {
               const out = await configuratorV2Service.enrichBundled();
-              setInfo(`Scraped catalog synced \u2014 ${out.created} new, ${out.updated} enriched, ${out.offersAdded} vendor offers${out.errors ? `, ${out.errors} errors` : ''}.`);
+              setInfo(`Scraped catalog synced — ${out.created} new, ${out.updated} enriched, ${out.offersAdded} vendor offers${out.errors ? `, ${out.errors} errors` : ''}.`);
               await Promise.all([search(), loadCounts()]);
             } catch (e: any) {
-              setError(e?.response?.data?.error ?? 'Scrape sync failed \u2014 no bundled data yet?');
+              setError(e?.response?.data?.error ?? 'Scrape sync failed — no bundled data yet?');
             } finally { setImporting(false); }
           }}
           sx={{ color: C.text, textTransform: 'none', fontSize: 12.5, border: '1px solid ' + C.border, bgcolor: C.bg, '&:hover': { borderColor: C.blue } }}
@@ -385,7 +387,7 @@ const CatalogManagerPanel: React.FC = () => {
 
       <Stack direction="row" alignItems="center" spacing={0.75} sx={{ mb: 1 }}>
         <Typography sx={{ color: C.sub, fontSize: 11 }}>Source:</Typography>
-        {([['all','All',''],['vendor-import','TPS','#00c8ff'],['rfq','RFQ firm','#22C55E'],['web','Web','#D97706'],['manual','Manual','#94A3B8'],['none','Unmarked','#475569']] as [string,string,string][]).map(([val,label,dot]) => (
+        {([['all','All',''],['vendor-import','TPS','#00c8ff'],['rfq','RFQ firm','#22C55E'],['web','Web','#D97706'],['manual','Manual','#94A3B8'],['none','Unmarked','#475569'],['vendor-unresolved','Vendor?','#D97706']] as [string,string,string][]).map(([val,label,dot]) => (
           <Chip
             key={val}
             size="small"
@@ -468,6 +470,15 @@ const CatalogManagerPanel: React.FC = () => {
                     size="small"
                     sx={{ bgcolor: 'rgba(0,200,255,0.10)', color: '#00c8ff', fontSize: 9.5, height: 18, maxWidth: 120, '& .MuiChip-label': { px: 1 } }}
                   />
+                  {(r as any).specifications?.vendorUnresolved && (
+                    <Tooltip title="Vendor name from spreadsheet didn't match a vendor record — open Edit to assign">
+                      <Chip
+                        label="Vendor?"
+                        size="small"
+                        sx={{ bgcolor: 'rgba(217,119,6,0.12)', color: C.amber, border: '1px solid rgba(217,119,6,0.4)', fontSize: 9.5, height: 18, '& .MuiChip-label': { px: 1 } }}
+                      />
+                    </Tooltip>
+                  )}
                   <Box sx={{ flex: 1 }} />
                   <IconButton size="small" onClick={() => openEdit(r)} sx={{ color: C.sub, p: 0.4, '&:hover': { color: C.blue } }}><EditRoundedIcon sx={{ fontSize: 14 }} /></IconButton>
                   <IconButton size="small" onClick={() => openEdit(r, true)} sx={{ color: C.sub, p: 0.4, '&:hover': { color: C.blue } }}><ContentCopyRoundedIcon sx={{ fontSize: 13 }} /></IconButton>
@@ -649,11 +660,22 @@ const CatalogManagerPanel: React.FC = () => {
                     </TableCell>
                   ))}
                   <TableCell sx={cellSx}>
-                    <Chip
-                      label={(r as any).price_status === 'PENDING_RFQ' ? 'RFQ' : 'FIRM'}
-                      size="small"
-                      sx={{ bgcolor: 'transparent', border: '1px solid ' + ((r as any).price_status === 'PENDING_RFQ' ? C.amber : C.green), color: (r as any).price_status === 'PENDING_RFQ' ? C.amber : C.green, fontSize: 9, height: 17 }}
-                    />
+                    <Stack direction="row" spacing={0.5} alignItems="center">
+                      <Chip
+                        label={(r as any).price_status === 'PENDING_RFQ' ? 'RFQ' : 'FIRM'}
+                        size="small"
+                        sx={{ bgcolor: 'transparent', border: '1px solid ' + ((r as any).price_status === 'PENDING_RFQ' ? C.amber : C.green), color: (r as any).price_status === 'PENDING_RFQ' ? C.amber : C.green, fontSize: 9, height: 17 }}
+                      />
+                      {(r as any).specifications?.vendorUnresolved && (
+                        <Tooltip title="Vendor name from spreadsheet didn't match a vendor record — open Edit to assign">
+                          <Chip
+                            label="Vendor?"
+                            size="small"
+                            sx={{ bgcolor: 'rgba(217,119,6,0.12)', color: C.amber, border: '1px solid rgba(217,119,6,0.4)', fontSize: 9, height: 17, '& .MuiChip-label': { px: 0.8 } }}
+                          />
+                        </Tooltip>
+                      )}
+                    </Stack>
                   </TableCell>
                   <TableCell sx={{ ...cellSx, whiteSpace: 'nowrap' }} align="right">
                     <IconButton size="small" onClick={() => openEdit(r)} sx={{ color: C.sub, '&:hover': { color: C.blue } }}><EditRoundedIcon sx={{ fontSize: 15 }} /></IconButton>

@@ -38,6 +38,7 @@ const TABLES: { key: string; label: string }[] = [
   { key: 'ratings_ladders', label: 'Ratings ladders' },
   { key: 'motor_fla', label: 'Motor FLA (NEC 430.250)' },
   { key: 'safety_items_map', label: 'Safety items map' },
+  { key: 'packing_settings', label: 'Packing constants (lineup packer)' },
 ];
 
 const cellSx = { color: C.text, fontSize: 11.5, borderBottom: '1px solid ' + C.border, py: 0.4, px: 1 };
@@ -135,7 +136,7 @@ const StandardsPanel: React.FC = () => {
     <Box sx={{ px: 3, pb: 4, pt: 2 }}>
       <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 1.5 }} flexWrap="wrap" useFlexGap>
         <Box sx={{ mr: 1 }}>
-          <Typography sx={{ color: C.text, fontWeight: 700, fontSize: 15 }}>Engineering Standards</Typography>
+          <Typography sx={{ color: '#F0F6FF', fontWeight: 800, fontSize: 15 }}>Engineering standards</Typography>
           <Typography sx={{ color: C.sub, fontSize: 12 }}>
             Versioned tables that drive the engines. Saving creates a new version — nothing is overwritten.
           </Typography>

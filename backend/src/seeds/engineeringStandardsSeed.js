@@ -90,6 +90,15 @@ module.exports = {
     { hp: 200, v208: 528, v230: 480, v460: 240, v575: 192, seed: true, verified: false },
   ],
 
+  /** Packing constants used by the lineup packer (G24). Values are [SEED] until TPS engineering verifies. */
+  packing_settings: [
+    {
+      feederEnvelope_in: 9, mainEnvelope_in: 20, tieEnvelope_in: 20,
+      maxFillPct: 0.8, interdeviceClearance_in: 4,
+      seed: true, verified: false,
+    },
+  ],
+
   /** Safety rule → SKU mapping. partNumber null = ad-hoc BOM line until TPS maps. */
   safety_items_map: [
     { ruleId: 'R1', description: 'Ground bus 1/4 x 2 Cu full length + equipment ground lugs', partNumber: null, qtyFormula: 'per_board', seed: true, verified: false },

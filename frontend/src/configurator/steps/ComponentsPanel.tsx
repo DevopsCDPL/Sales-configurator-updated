@@ -25,7 +25,7 @@ import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 import SwapHorizRoundedIcon from '@mui/icons-material/SwapHorizRounded';
 import { configuratorService, ConfiguratorComponent } from '../../services/configuratorService';
-import configuratorV2Service, { FullBoard, ComponentLineRow } from '../../services/configuratorV2Service';
+import configuratorV2Service, { FullBoard, ComponentLineRow, BomRow } from '../../services/configuratorV2Service';
 import PriceSourceDot from '../components/PriceSourceDot';
 import { displayCase, compactSku } from '../lib/displayCase';
 import ComponentPickerDialog from '../components/ComponentPickerDialog';
@@ -66,6 +66,22 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, view, onLinesC
   // Builder (Schneider Part Number Decoder) dialog state
   const [builderOpen, setBuilderOpen] = useState(false);
   const [builderComponent, setBuilderComponent] = useState<ConfiguratorComponent | null>(null);
+
+  // Structural BOM card state (G27a)
+  const [bomRows, setBomRows] = useState<BomRow[] | null>(null);
+  const [bomLoading, setBomLoading] = useState(false);
+  const [bomError, setBomError] = useState(false);
+
+  // Lazily fetch BOM rows once when picks view mounts
+  useEffect(() => {
+    if (view !== 'picks') return;
+    setBomLoading(true);
+    configuratorV2Service.getBom(switchboardId)
+      .then((resp) => { setBomRows(resp.rows); setBomError(false); })
+      .catch(() => { setBomError(true); })
+      .finally(() => setBomLoading(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [switchboardId, view]);
 
   const sections = board.sections;
 
@@ -428,12 +444,64 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, view, onLinesC
                   </Typography>
                 </Box>
               </Box>
+
+              {/* Structural (computed at BOM) card — G27a */}
+              <Box sx={{ bgcolor: '#0B0B0D', border: '1px solid #1E2235', borderRadius: '10px', p: 1.5, mt: 1.5 }}>
+                <Typography sx={{ fontSize: 12, fontWeight: 800, color: '#F0F6FF', mb: 1 }}>
+                  Structural (computed at BOM)
+                </Typography>
+                {bomLoading ? (
+                  <Stack alignItems="center" sx={{ py: 1.5 }}><CircularProgress size={16} sx={{ color: C.blue }} /></Stack>
+                ) : bomError ? (
+                  <Typography sx={{ fontSize: 10.5, color: C.sub, fontStyle: 'italic' }}>
+                    Unavailable until design is saved
+                  </Typography>
+                ) : bomRows != null ? (() => {
+                  const bussingRows = bomRows.filter((r) => r.category === 'BUSSING');
+                  const copperRow = bomRows.find((r) => r.category === 'GEN-COPPER-EST');
+                  const glasticRow = bomRows.find((r) => r.category === 'GEN-GLASTIC');
+                  const jointRow = bomRows.find((r) => r.category === 'GEN-HW-JOINT');
+                  const fillerRow = bomRows.find((r) => r.category === 'GEN-FILLER');
+                  const busCount = bussingRows.reduce((s, r) => s + (Number(r.quantity) || 0), 0);
+                  return (
+                    <>
+                      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ py: 0.4, borderBottom: '1px solid rgba(30,34,53,0.6)' }}>
+                        <Typography sx={{ fontSize: 11, color: C.sub }}>Phase/neutral/ground bus</Typography>
+                        <Typography sx={{ fontSize: 12, fontWeight: 700, color: C.text }}>{busCount || '—'}</Typography>
+                      </Stack>
+                      {copperRow && (
+                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ py: 0.4, borderBottom: '1px solid rgba(30,34,53,0.6)' }}>
+                          <Typography sx={{ fontSize: 11, color: C.sub }}>Copper estimate</Typography>
+                          <Typography sx={{ fontSize: 12, fontWeight: 700, color: C.text }}>
+                            {Number(copperRow.copper_weight_lbs ?? 0).toFixed(1)} lb / {usd(Number(copperRow.unit_cost) * Number(copperRow.quantity))}
+                          </Typography>
+                        </Stack>
+                      )}
+                      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ py: 0.4, borderBottom: '1px solid rgba(30,34,53,0.6)' }}>
+                        <Typography sx={{ fontSize: 11, color: C.sub }}>Glastic supports</Typography>
+                        <Typography sx={{ fontSize: 12, fontWeight: 700, color: C.text }}>{glasticRow ? Number(glasticRow.quantity) : '—'}</Typography>
+                      </Stack>
+                      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ py: 0.4, borderBottom: '1px solid rgba(30,34,53,0.6)' }}>
+                        <Typography sx={{ fontSize: 11, color: C.sub }}>Joint kits</Typography>
+                        <Typography sx={{ fontSize: 12, fontWeight: 700, color: C.text }}>{jointRow ? Number(jointRow.quantity) : '—'}</Typography>
+                      </Stack>
+                      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ py: 0.4 }}>
+                        <Typography sx={{ fontSize: 11, color: C.sub }}>Fillers</Typography>
+                        <Typography sx={{ fontSize: 12, fontWeight: 700, color: C.text }}>{fillerRow ? Number(fillerRow.quantity) : '—'}</Typography>
+                      </Stack>
+                      <Typography sx={{ fontSize: 9.5, color: C.sub, mt: 0.75, lineHeight: 1.4 }}>
+                        Frames are the enclosure — picked in Section Design. Full detail in step 8 (Bill of Materials).
+                      </Typography>
+                    </>
+                  );
+                })() : null}
+              </Box>
             </Box>
           </Stack>
         );
       })()}
 
-      {/* ── Review view: Manual additions ── */}
+      {/* —— Review view: Manual additions —— */}
       {view === 'review' && (
         <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', mb: 2, overflow: 'hidden' }}>
           <Typography sx={{ color: '#CBD5E1', fontSize: 12.5, fontWeight: 700, px: 2, py: 1, borderBottom: '1px solid ' + C.border }}>
@@ -488,7 +556,7 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, view, onLinesC
         </Box>
       )}
 
-      {/* ── Shared picker dialog (swap + add + pickOnly) ── */}
+      {/* —— Shared picker dialog (swap + add + pickOnly) —— */}
       <ComponentPickerDialog
         open={pickerOpen}
         mode={pickerMode}
@@ -498,7 +566,7 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, view, onLinesC
         onPick={handlePick}
       />
 
-      {/* ── Schneider Part Number Decoder (builder) ── */}
+      {/* —— Schneider Part Number Decoder (builder) —— */}
       <CatalogNumberBuilderDialog
         open={builderOpen}
         component={builderComponent}

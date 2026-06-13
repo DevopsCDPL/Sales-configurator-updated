@@ -103,6 +103,15 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
 
   const sccrKA = Number(board.board.board_data?.shortCircuitRating) || null;
 
+  /** Derive VLL from voltageSystemCode stored in board intake (G12). */
+  const voltageVLL = useMemo((): number | null => {
+    const code = String(board.board.intake?.voltageSystemCode ?? board.board.board_data?.voltageSystemCode ?? '');
+    if (!code) return null;
+    // e.g. '480Y/277' -> 480, '208Y/120' -> 208, '600Y/347' -> 600, '240D' -> 240, '480D' -> 480
+    const m = code.match(/^(\d+)/);
+    return m ? Number(m[1]) : null;
+  }, [board.board.intake?.voltageSystemCode, board.board.board_data?.voltageSystemCode]);
+
   // Lazy-load the frame library from the engineering standards table.
   const loadFrames = useCallback(async () => {
     if (frames) return;
@@ -358,9 +367,9 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
     const devices = devicesBySection.get(pickerSection.id) ?? [];
     const used = devices.reduce((a, l) => a + (deviceHeightIn(l) ?? 0), 0);
     const remaining = usable != null ? usable - used : null;
-    return { sccrKA: sccrKA ?? null, remainingHeightIn: remaining };
+    return { sccrKA: sccrKA ?? null, remainingHeightIn: remaining, voltageVLL };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pickerSection, devicesBySection, frames, sccrKA]);
+  }, [pickerSection, devicesBySection, frames, sccrKA, voltageVLL]);
 
   // boardContext for swap picker
   const swapBoardContext = useMemo(() => {
@@ -370,16 +379,16 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
       const devs = devicesBySection.get(sec.id) ?? [];
       if (devs.some((d) => d.id === swapLine.id)) { swapSec = sec; break; }
     }
-    if (!swapSec) return { sccrKA: sccrKA ?? null, remainingHeightIn: null };
+    if (!swapSec) return { sccrKA: sccrKA ?? null, remainingHeightIn: null, voltageVLL };
     const frame = frameFor(swapSec);
     const usable = Number(frame?.usableDeviceHeight_in) || null;
     const devices = devicesBySection.get(swapSec.id) ?? [];
     const used = devices.reduce((a, l) => a + (deviceHeightIn(l) ?? 0), 0);
     const outgoingH = deviceHeightIn(swapLine) ?? 0;
     const remaining = usable != null ? usable - used + outgoingH : null;
-    return { sccrKA: sccrKA ?? null, remainingHeightIn: remaining };
+    return { sccrKA: sccrKA ?? null, remainingHeightIn: remaining, voltageVLL };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [swapLine, sections, devicesBySection, frames, sccrKA]);
+  }, [swapLine, sections, devicesBySection, frames, sccrKA, voltageVLL]);
 
   return (
     <Box sx={{ px: 3, pt: 2, pb: 1 }}>
