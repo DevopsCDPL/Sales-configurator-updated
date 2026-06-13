@@ -16,7 +16,7 @@
  * No 'Generate Catalog No' button — that belongs to the part-number builder.
  * This is a per-category filter slot; other categories get their own later.
  */
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { Box, MenuItem, TextField, Typography, Button, Stack } from '@mui/material';
 
 const C = {
@@ -60,9 +60,43 @@ type Filters = Record<string, string>;
 const EMPTY: Filters = FIELDS.reduce((a, f) => { a[f.key] = ''; return a; }, {} as Filters);
 
 const specOf = (item: any) => (item && item.specifications) || {};
-const val = (item: any, key: string): string => {
+
+/**
+ * Derive name-encoded spec fields for legacy breakers whose data lives in the
+ * NAME (e.g. "1200A-1600A 3P 42kA LSIG - Power") rather than spec fields. Only
+ * the keys below are derivable; spec values always win over derived ones.
+ */
+const deriveFromName = (name: string): Record<string, string> => {
+  const n = String(name || '');
+  const out: Record<string, string> = {};
+
+  const prot = n.match(/\b(LSIG|LSI|LSG|LI|TMA|TMF)\b/i);
+  if (prot) out.protectionFunctions = prot[1].toUpperCase();
+
+  if (/\b(TMA|TMF)\b/i.test(n)) out.tripUnitType = 'Thermal-magnetic';
+  else if (/\b(LSIG|LSI|LSG|LI|Power|Dip)\b/i.test(n)) out.tripUnitType = 'Electronic';
+
+  const mount = n.match(/\b(Drawout|Fixed|EO|MO|Cradle)\b/i);
+  if (mount) {
+    const t = mount[1];
+    out.mounting = t.charAt(0).toUpperCase() + t.slice(1).toLowerCase();
+  }
+
+  const app = n.match(/\b(Power|Feeder|Main|Distribution)\b/i);
+  if (app) out.applicationType = app[1].charAt(0).toUpperCase() + app[1].slice(1).toLowerCase();
+
+  const cls = n.match(/\b(ACB|MCCB|ICCB|MCB)\b/i);
+  if (cls) out.deviceClass = cls[1].toUpperCase();
+
+  return out;
+};
+
+/** Spec wins; fall back to name-derived value when spec is empty. */
+const valWith = (item: any, key: string, derived?: Record<string, string>): string => {
   const v = specOf(item)[key];
-  return v == null || v === '' ? '' : String(v);
+  if (v != null && v !== '') return String(v);
+  const d = derived && derived[key];
+  return d == null || d === '' ? '' : String(d);
 };
 
 /** Numeric-aware sort so 100/630/800 don't sort as strings. */
@@ -86,12 +120,24 @@ const CbFilterPanel: React.FC<CbFilterPanelProps> = ({ items, onFiltered }) => {
   // Reset when the source list identity changes (category switch / new search).
   useEffect(() => { setFilters(EMPTY); }, [items]);
 
+  // Per-item name-derived spec cache (legacy breakers encode data in the name).
+  const derivedByItem = useMemo(() => {
+    const m = new Map<any, Record<string, string>>();
+    for (const item of items) m.set(item, deriveFromName(item && item.name));
+    return m;
+  }, [items]);
+
+  const val = useCallback(
+    (item: any, key: string): string => valWith(item, key, derivedByItem.get(item)),
+    [derivedByItem]
+  );
+
   /** Items passing every selected filter. */
   const filtered = useMemo(() => {
     return items.filter((item) =>
       FIELDS.every((f) => !filters[f.key] || val(item, f.key) === filters[f.key])
     );
-  }, [items, filters]);
+  }, [items, filters, val]);
 
   // Push filtered set up to parent.
   useEffect(() => { onFiltered(filtered); }, [filtered, onFiltered]);
@@ -117,7 +163,7 @@ const CbFilterPanel: React.FC<CbFilterPanelProps> = ({ items, onFiltered }) => {
       out[f.key] = sortOpts(Array.from(set));
     }
     return out;
-  }, [items, filters]);
+  }, [items, filters, val]);
 
   const handleChange = (key: string, value: string) => {
     setFilters((prev) => {
@@ -174,7 +220,8 @@ const CbFilterPanel: React.FC<CbFilterPanelProps> = ({ items, onFiltered }) => {
       >
         {FIELDS.map((f) => {
           const opts = optionSets[f.key] || [];
-          const disabled = opts.length === 0 && !filters[f.key];
+          // Hide filters with no options AND no active selection — no frozen dropdowns.
+          if (opts.length === 0 && !filters[f.key]) return null;
           return (
             <Box key={f.key} sx={{ minWidth: 0 }}>
               <TextField
@@ -182,7 +229,6 @@ const CbFilterPanel: React.FC<CbFilterPanelProps> = ({ items, onFiltered }) => {
                 size="small"
                 label={f.label}
                 value={filters[f.key]}
-                disabled={disabled}
                 onChange={(e) => handleChange(f.key, e.target.value)}
                 SelectProps={{ MenuProps: menuProps }}
                 sx={{

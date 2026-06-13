@@ -1118,6 +1118,9 @@ router.post('/switchboards/:id/apply-proposal', wrap(async (req, res) => {
             mounting: d.mounting,
             interruptingKA: d.interruptingKA,
             sectionIndex: sec.sectionIndex,
+            deviceClass: d.deviceClass ?? null,
+            manufacturer: d.manufacturer ?? null,
+            priceSource: d.priceSource ?? null,
           },
           company_id: req.companyId ?? null,
         }, { transaction: t });

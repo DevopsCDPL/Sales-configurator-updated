@@ -28,6 +28,7 @@ import { ConfiguratorComponent } from '../../services/configuratorService';
 import ComponentPickerDialog from '../components/ComponentPickerDialog';
 import CatalogNumberBuilderDialog from '../components/CatalogNumberBuilderDialog';
 import DesignSummaryCard from '../components/DesignSummaryCard';
+import PriceSourceDot from '../components/PriceSourceDot';
 import { displayCase } from '../lib/displayCase';
 import { DEVICE_ENVELOPE_IN } from '../lib/lineup-proposal';
 
@@ -351,6 +352,8 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
           interruptingKA: Number(sp.interruptingKA) || null,
           frameModel: sp.frameModel ?? null,
           manufacturer: sp.manufacturer ?? null,
+          deviceClass: (c as any).specifications?.deviceClass ?? null,
+          priceSource: (c as any).specifications?.priceSource ?? null,
           swapped: true,
           swapped_from: line.part_number ?? null,
         },
@@ -635,6 +638,22 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
                                       sx={{ bgcolor: 'rgba(0,200,255,0.12)', color: '#60A5FA', fontWeight: 700, fontSize: 10, height: 18, cursor: locked ? 'default' : 'pointer' }}
                                     />
                                   )}
+                                  <PriceSourceDot source={l.meta?.priceSource} />
+                                  {l.meta?.catalogNumber ? (
+                                    <Tooltip title="Configured via part-number decoder">
+                                      <Box
+                                        component="span"
+                                        sx={{
+                                          display: 'inline-block',
+                                          width: 9,
+                                          height: 9,
+                                          border: '1px solid ' + C.blue,
+                                          borderRadius: '2px',
+                                          verticalAlign: 'middle',
+                                        }}
+                                      />
+                                    </Tooltip>
+                                  ) : null}
                                 </Stack>
                                 <Stack direction="row" alignItems="center" spacing={0}>
                                   <Tooltip title="Move to previous section">
@@ -688,7 +707,15 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
                                   </Typography>
                                 );
                               })()}
-                              <Typography sx={{ color: C.sub, fontSize: 10 }}>
+                              {(() => {
+                                const cls = displayCase(String(l.meta?.deviceClass || ''));
+                                const mfr = String(l.meta?.manufacturer || '').trim();
+                                const lineA = [cls, mfr].filter(Boolean).join(' · ');
+                                return lineA ? (
+                                  <Typography sx={{ color: C.sub, fontSize: 10 }}>{lineA}</Typography>
+                                ) : null;
+                              })()}
+                              <Typography sx={{ color: C.sub, fontSize: 10.5 }}>
                                 {l.meta?.ratedA ?? '—'} A
                                 {l.meta?.interruptingKA ? ' / ' + l.meta.interruptingKA + ' kA' : ''}
                                 {' · '}{l.meta?.role ?? role}
