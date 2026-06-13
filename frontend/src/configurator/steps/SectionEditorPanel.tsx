@@ -40,6 +40,8 @@ const MAX_SECTIONS = 10;
 /** Device height fallback (inches) by role — shared [SEED] envelopes with the lineup packer. */
 const ACB_FALLBACK_H = DEVICE_ENVELOPE_IN.MAIN;
 const FEEDER_FALLBACK_H = DEVICE_ENVELOPE_IN.FEEDER;
+const CLEARANCE_IN = 4;       // [SEED] inter-device clearance — same as packer
+const FILL_LIMIT = 0.8;       // [SEED] max fill — same as packer (wireways, thermal, spares)
 
 interface FrameRow {
   frameCode: string;
@@ -180,12 +182,13 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
     const usable = Number(frame?.usableDeviceHeight_in) || 0;
     const heights = devices.map(deviceHeightIn);
     const haveDims = heights.every((h) => h != null) && heights.length > 0;
-    const usedIn = heights.reduce((a: number, h) => a + (h ?? 0), 0);
+    const usedIn = heights.reduce((a: number, h) => a + (h ?? 0) + CLEARANCE_IN, 0);
     if (!usable || !haveDims) {
       return { hasBar: false, usedIn, usable, pct: 0, overflow: false };
     }
     const pct = Math.min(100, Math.round((usedIn / usable) * 100));
-    return { hasBar: true, usedIn, usable, pct, overflow: usedIn > usable };
+    // overflow = beyond the 80% engineering fill limit (packer-consistent), hard overflow beyond 100%
+    return { hasBar: true, usedIn, usable, pct, overflow: usedIn > FILL_LIMIT * usable };
   };
 
   /** Would adding `extraIn` to target section exceed its usable height? */
@@ -193,7 +196,7 @@ const SectionEditorPanel: React.FC<SectionEditorPanelProps> = ({ board, locked, 
     const frame = frameFor(sec);
     const usable = Number(frame?.usableDeviceHeight_in) || 0;
     if (!usable) return false;
-    const used = (devicesBySection.get(sec.id) ?? []).reduce((a, l) => a + (deviceHeightIn(l) ?? 0), 0);
+    const used = (devicesBySection.get(sec.id) ?? []).reduce((a, l) => a + (deviceHeightIn(l) ?? 0) + CLEARANCE_IN, 0);
     return used + extraIn > usable;
   };
 
