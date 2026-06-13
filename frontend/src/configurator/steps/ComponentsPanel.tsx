@@ -218,7 +218,7 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, view, onLinesC
   };
 
   return (
-    <Box sx={{ px: 3, pb: 4 }}>
+    <Box sx={{ px: 3, pt: 1, pb: 4 }}>
       {error && (
         <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 1.5, bgcolor: 'rgba(239,68,68,0.08)', color: '#FCA5A5', border: '1px solid ' + C.border, fontSize: 12 }}>
           {error}
@@ -284,7 +284,7 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, view, onLinesC
                   <Table size="small">
                     <TableHead>
                       <TableRow>
-                        <TableCell sx={{ ...headSx, width: 40, whiteSpace: 'nowrap' }}>S.No</TableCell>
+                        <TableCell sx={{ ...headSx, width: 40, whiteSpace: 'nowrap', borderRight: '1px solid #1E2235' }}>S.No</TableCell>
                         <TableCell sx={{ ...headSx, width: 110, whiteSpace: 'nowrap' }}>Category</TableCell>
                         <TableCell sx={{ ...headSx, width: 210, whiteSpace: 'nowrap' }}>Component</TableCell>
                         <TableCell sx={{ ...headSx, whiteSpace: 'nowrap' }}>Catalog item (SKU)</TableCell>
@@ -292,7 +292,7 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, view, onLinesC
                         <TableCell sx={{ ...headSx, width: 64, whiteSpace: 'nowrap' }}>Qty</TableCell>
                         <TableCell sx={{ ...headSx, width: 90, whiteSpace: 'nowrap' }} align="right">Unit price</TableCell>
                         <TableCell sx={{ ...headSx, width: 44, whiteSpace: 'nowrap' }} align="center">Status</TableCell>
-                        <TableCell sx={{ ...headSx, width: 80, whiteSpace: 'nowrap' }} />
+                        <TableCell sx={{ ...headSx, width: 80, whiteSpace: 'nowrap' }} align="right">Actions</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -303,7 +303,7 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, view, onLinesC
                         return (
                           <TableRow key={l.id}>
                             {/* S.No */}
-                            <TableCell sx={{ ...cellSx, width: 40, color: C.sub, fontSize: 11.5, verticalAlign: 'middle', py: 0.5 }}>
+                            <TableCell sx={{ ...cellSx, width: 40, color: C.sub, fontSize: 11.5, verticalAlign: 'middle', py: 0.5, borderRight: '1px solid #1E2235' }}>
                               {sno}
                             </TableCell>
                             {/* Category — rowSpan first row only */}
@@ -320,11 +320,19 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, view, onLinesC
                             <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5 }}>
                               {l.meta?.placeholder ? (
                                 <Box>
-                                  <Chip label="No catalog match" size="small"
-                                    sx={{ bgcolor: 'rgba(217,119,6,0.12)', color: '#FCD34D', fontSize: 9.5, height: 18 }} />
-                                  <Typography sx={{ color: C.sub, fontSize: 10.5, fontStyle: 'italic', mt: 0.2 }}>
-                                    add to catalog or swap
-                                  </Typography>
+                                  <Stack direction="row" alignItems="center" gap={0.75} sx={{ mb: 0.25 }}>
+                                    <Chip label="No catalog match" size="small"
+                                      sx={{ bgcolor: 'rgba(217,119,6,0.12)', color: '#FCD34D', fontSize: 9.5, height: 18, flexShrink: 0 }} />
+                                    <Typography sx={{ color: '#8E9AAD', fontSize: 10.5, fontStyle: 'italic' }}>
+                                      add to catalog or swap
+                                    </Typography>
+                                  </Stack>
+                                  {(l.meta?.ruleDescription != null || l.meta?.qtyFormula != null) ? (
+                                    <Typography sx={{ color: '#8E9AAD', fontSize: 10.5, lineHeight: 1.3 }}>
+                                      {String(l.meta?.ruleDescription ?? '')}
+                                      {l.meta?.qtyFormula ? ' (' + String(l.meta.qtyFormula) + ')' : ''}
+                                    </Typography>
+                                  ) : null}
                                 </Box>
                               ) : (
                                 <Stack direction="row" gap={0.75} alignItems="center" sx={{ minWidth: 0 }}>
