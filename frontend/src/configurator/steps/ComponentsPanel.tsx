@@ -202,30 +202,26 @@ const ComponentsPanel: React.FC<ComponentsPanelProps> = ({ board, onLinesChanged
     [lines]
   );
 
-  // Merged groups: rule (engine) lines grouped by meta.group, with manual
-  // (source==='user') lines folded into the matching category group (after the
-  // engine rows). Manual lines whose category has no rule group get their own
-  // group keyed by category.
+  // Merged groups keyed by CATALOG CATEGORY (line.category), normalized, for
+  // BOTH engine and manual lines — so a manual "ENCLOSURE" folds into the same
+  // group as the engine enclosure rows (category-based review). Order: engine
+  // lines establish the first-seen category order; manual lines join their
+  // existing category (after the engine rows within it); a manual line in a
+  // category not yet present appends as a NEW group at the bottom.
   const ruleGroups = useMemo(() => {
     const ruleLines = lines.filter((l) => l.source === 'rule');
     const g = new Map<string, ComponentLineRow[]>();
     const order: string[] = [];
+    const catKey = (l: ComponentLineRow) => String(l.category ?? 'Other').toUpperCase().trim() || 'OTHER';
     const push = (k: string, l: ComponentLineRow) => {
       if (!g.has(k)) { g.set(k, []); order.push(k); }
       g.get(k)!.push(l);
     };
-    for (const l of ruleLines) push(String(l.meta?.group ?? 'Other'), l);
-    // Fold manual lines: match an existing group by group-name or category.
-    for (const l of userLines) {
-      const cat = String(l.meta?.group ?? l.category ?? 'Other');
-      let key = cat;
-      if (!g.has(key)) {
-        // try matching an existing group whose label equals this category
-        const match = order.find((k) => k.toLowerCase() === cat.toLowerCase());
-        if (match) key = match;
-      }
-      push(key, l);
-    }
+    // Engine lines first — they define the stable top-to-bottom category order.
+    for (const l of ruleLines) push(catKey(l), l);
+    // Manual lines fold into their catalog category (existing → after engine
+    // rows; new category → appended as a new group at the bottom).
+    for (const l of userLines) push(catKey(l), l);
     return order.map((k) => [k, g.get(k)!] as [string, ComponentLineRow[]]);
   }, [lines, userLines]);
 

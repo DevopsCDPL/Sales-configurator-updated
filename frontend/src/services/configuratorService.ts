@@ -165,6 +165,12 @@ export const configuratorService = {
     return res.data.data ?? [];
   },
 
+  /** Categories that are NOT manually addable (computed at BOM / placed elsewhere). */
+  async nonAddableCategories(): Promise<string[]> {
+    const res = await api.get<ApiResponse<{ categories: string[] }>>(`${ROOT}/catalog/non-addable-categories`);
+    return res.data.data?.categories ?? [];
+  },
+
   /* ── Categories ─────────────────────────────────────────── */
   async listCategories(): Promise<ConfiguratorCategory[]> {
     const res = await api.get<ApiResponse<ConfiguratorCategory[]>>(`${ROOT}/categories`);

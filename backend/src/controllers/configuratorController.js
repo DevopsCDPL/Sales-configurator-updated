@@ -156,6 +156,19 @@ const componentCategoryCounts = handle(async (req, res) => {
   ok(res, rows.map((r) => ({ category: r.category, count: Number(r.count) })));
 });
 
+// Source of truth for categories that are NOT manually addable in the picker.
+// These are computed at BOM time (CU raw copper + GLASTIC bus supports come out
+// of the copper estimator / BOM generators), are not discrete bought-out parts
+// (LABOR), or are placed via Section Design (CIRCUIT BREAKER). Adding them in
+// the picker would double-count. ANY category not in this list is addable, so
+// new user categories appear automatically. Future: this could become a DB flag
+// per category; for now this constant is the single source of truth.
+const NON_ADDABLE_CATEGORIES = ['LABOR', 'CU', 'GLASTIC', 'CIRCUIT BREAKER'];
+
+const nonAddableCategories = handle(async (req, res) => {
+  ok(res, { categories: NON_ADDABLE_CATEGORIES });
+});
+
 // ── Categories ──────────────────────────────────────────────────────────────
 
 const listCategories = handle(async (req, res) => {
@@ -428,7 +441,7 @@ module.exports = {
 
   // components
   listComponents, getComponent, createComponent, updateComponent, deleteComponent,
-  bulkCreateComponents, componentCategoryCounts,
+  bulkCreateComponents, componentCategoryCounts, nonAddableCategories,
   // categories
   listCategories, upsertCategory, rebuildCategories,
   // configurations

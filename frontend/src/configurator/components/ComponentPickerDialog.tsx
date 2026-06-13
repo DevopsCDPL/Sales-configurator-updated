@@ -32,8 +32,12 @@ const C = {
   text: '#E2E8F0', sub: '#64748B', green: '#22C55E', amber: '#D97706', red: '#EF4444',
 };
 
-/** Engine-managed categories excluded from add mode */
-const EXCLUDED = new Set(['CIRCUIT BREAKER']);
+/**
+ * Fallback non-addable (engine/computed) categories used when the backend
+ * source-of-truth fetch fails. Live list comes from
+ * configuratorService.nonAddableCategories() (backend NON_ADDABLE_CATEGORIES).
+ */
+const EXCLUDED_FALLBACK = ['CIRCUIT BREAKER', 'LABOR', 'CU', 'GLASTIC'];
 
 const cellSx = { color: C.text, fontSize: 12, borderBottom: '1px solid ' + C.border, py: 0.6 };
 const headSx = { color: C.sub, fontSize: 10.5, fontWeight: 700, letterSpacing: 0.5, borderBottom: '1px solid ' + C.border, py: 0.7, whiteSpace: 'nowrap' };
@@ -90,16 +94,30 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
   const [suitableOnly, setSuitableOnly] = useState(true);
   // CB filter panel output
   const [cbFiltered, setCbFiltered] = useState<ConfiguratorComponent[]>([]);
+  // Non-addable (engine/computed) categories — data-driven from the backend
+  // source of truth; falls back to a static list if the fetch fails.
+  const [excluded, setExcluded] = useState<Set<string>>(
+    () => new Set(EXCLUDED_FALLBACK)
+  );
+
+  // Fetch the non-addable category list once (used only to filter add mode).
+  useEffect(() => {
+    configuratorService.nonAddableCategories()
+      .then((cats) => setExcluded(new Set(
+        (cats && cats.length ? cats : EXCLUDED_FALLBACK).map((c) => c.toUpperCase())
+      )))
+      .catch(() => setExcluded(new Set(EXCLUDED_FALLBACK)));
+  }, []);
 
   // Load category counts (add mode only)
   useEffect(() => {
     if (mode !== 'add') return;
     configuratorService.componentCategoryCounts()
       .then((rows) => setCategories(
-        (rows ?? []).filter((r) => !EXCLUDED.has((r.category || '').toUpperCase()) && r.count > 0)
+        (rows ?? []).filter((r) => !excluded.has((r.category || '').toUpperCase()) && r.count > 0)
       ))
       .catch(() => setCategories([]));
-  }, [mode]);
+  }, [mode, excluded]);
 
   // Active category
   const addLocked = mode === 'add' && !!lockedCategory;
@@ -115,7 +133,7 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
       if (qStr.trim()) params.q = qStr.trim();
       let rows = await configuratorService.listComponents(params);
       if (mode === 'add' && !lockedCategory) {
-        rows = rows.filter((r) => !EXCLUDED.has((r.category || '').toUpperCase()));
+        rows = rows.filter((r) => !excluded.has((r.category || '').toUpperCase()));
       }
       if (mode === 'swap') {
         rows.sort((a, b) => {
@@ -133,7 +151,7 @@ const ComponentPickerDialog: React.FC<ComponentPickerDialogProps> = ({
     } finally {
       setLoading(false);
     }
-  }, [mode, lockedCategory]);
+  }, [mode, lockedCategory, excluded]);
 
   // Auto-search on open and when category changes
   useEffect(() => {

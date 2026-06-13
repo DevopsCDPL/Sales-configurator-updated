@@ -30,6 +30,7 @@ router.use(tenantScope);
 // ── Components ──────────────────────────────────────────────────────────────
 router.get('/components', c.listComponents);
 router.get('/components/stats/category-counts', c.componentCategoryCounts);
+router.get('/catalog/non-addable-categories', c.nonAddableCategories);
 // Convenience alias — path-style category filter (frontend configurator consumer)
 router.get('/components/category/:category', (req, res, next) => {
   req.query.category = req.params.category;
