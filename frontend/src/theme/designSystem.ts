@@ -299,6 +299,69 @@ export const cellSx = {
   py: 0.55,
 } as const;
 
+// ---------------------------------------------------------------------------
+// 6a. LOCKED STANDARD DATA TABLE
+// ---------------------------------------------------------------------------
+
+/**
+ * LOCKED standard table format (S.No + merged Category + sticky header + scroll).
+ * Reuse for ALL data tables. Canonical reference: ComponentsPanel.tsx
+ * "Auto-selected components" table and BomViewer.tsx eBOM/mBOM tables.
+ *
+ * Conventions:
+ *   - Wrap the table in a scroll Box: { maxHeight: '58vh', overflow: 'auto' }
+ *     (52vh is acceptable for per-section boxes).
+ *   - <Table size="small" stickyHeader>.
+ *   - Header cells: tableHeadCellSx (grey, sentence-case, nowrap, bgcolor #0B0B0D
+ *     so the sticky header never bleeds). Headers are SENTENCE case
+ *     ("Catalog description"), never ALL CAPS.
+ *   - First column is S.No (snoCellSx): width 40, sub color, right border.
+ *   - Category column is MERGED via rowSpan (mergedCatCellSx): only the first
+ *     row of each category group renders the cell.
+ *   - Body cells: cellSx with verticalAlign 'middle' and py 0.5.
+ */
+export const STANDARD_TABLE = {
+  scrollBoxSx: { maxHeight: '58vh', overflow: 'auto' as const },
+  scrollBoxSectionSx: { maxHeight: '52vh', overflow: 'auto' as const },
+  snoColWidth: 40,
+} as const;
+
+/**
+ * Standard table HEAD cell — headSx + sticky-safe bgcolor + nowrap.
+ * Spread into every TableCell inside the TableHead row.
+ */
+export const tableHeadCellSx = {
+  ...headSx,
+  whiteSpace: 'nowrap' as const,
+  bgcolor: COLORS.surface,
+} as const;
+
+/**
+ * Standard S.No body cell (first column). Width 40, muted, right divider.
+ */
+export const snoCellSx = {
+  ...cellSx,
+  width: STANDARD_TABLE.snoColWidth,
+  color: COLORS.sub,
+  fontSize: FONT_SIZE.sm,
+  verticalAlign: 'middle' as const,
+  py: 0.5,
+  borderRight: '1px solid ' + COLORS.border,
+} as const;
+
+/**
+ * Standard MERGED Category body cell (rendered with rowSpan on the first row
+ * of each category group). Warmer label color, bold, right divider.
+ */
+export const mergedCatCellSx = {
+  ...cellSx,
+  color: COLORS.meta,
+  fontWeight: 700,
+  fontSize: FONT_SIZE.filterLabel,
+  verticalAlign: 'middle' as const,
+  borderRight: '1px solid ' + COLORS.border,
+} as const;
+
 /**
  * Component catalog card (black background, raised border, hover glow).
  * Spread into the wrapping Box `sx`.

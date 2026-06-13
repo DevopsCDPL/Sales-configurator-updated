@@ -125,7 +125,7 @@ const BomViewer: React.FC<BomViewerProps> = ({ switchboardId }) => {
           {[
             ['Main bus', copper.mainBusLbs], ['Neutral', copper.neutralLbs], ['Ground', copper.groundLbs],
             ['Risers', copper.riserLbs], ['Device stubs', copper.stubLbs], ['Raw', copper.rawLbs],
-            ['× fab factor', copper.estimatedLbs],
+            ['x fab factor', copper.estimatedLbs],
           ].map(([k, v]) => (
             <Box key={String(k)}>
               <Typography sx={{ color: C.sub, fontSize: 10.5 }}>{k}</Typography>
@@ -142,109 +142,133 @@ const BomViewer: React.FC<BomViewerProps> = ({ switchboardId }) => {
         ))}
       </Box>
 
-      {/* eBOM / mBOM toggle */}
-      <Stack direction="row" spacing={1} sx={{ mb: 1.5 }}>
-        {(['ebom', 'mbom'] as const).map((v) => (
-          <Button
-            key={v}
-            size="small"
-            onClick={() => setView(v)}
-            sx={{
-              textTransform: 'none', fontSize: 12, px: 1.5,
-              color: view === v ? '#06151c' : C.sub,
-              bgcolor: view === v ? C.blue : 'transparent',
-              border: '1px solid ' + (view === v ? C.blue : C.border),
-              '&:hover': { bgcolor: view === v ? '#33d4ff' : 'rgba(255,255,255,0.04)' },
-            }}
-          >
-            {v === 'ebom' ? 'eBOM — by section' : 'mBOM — by part (where-used)'}
-          </Button>
-        ))}
+      {/* eBOM / mBOM toggle — segmented control (matches catalog Source/Status toggles) */}
+      <Stack direction="row" sx={{ mb: 1.5 }}>
+        <Box sx={{ display: 'inline-flex', bgcolor: '#0B0B0D', border: '1px solid ' + C.border, borderRadius: '8px', p: 0.25 }}>
+          {(['ebom', 'mbom'] as const).map((v) => (
+            <Box
+              key={v}
+              onClick={() => setView(v)}
+              sx={{
+                cursor: 'pointer', userSelect: 'none', fontSize: 11.5, fontWeight: 600,
+                px: 1.25, height: 24, display: 'inline-flex', alignItems: 'center',
+                borderRadius: '6px', whiteSpace: 'nowrap',
+                color: view === v ? C.blue : C.sub,
+                bgcolor: view === v ? 'rgba(0,200,255,0.14)' : 'transparent',
+                transition: 'background-color .12s, color .12s',
+              }}
+            >
+              {v === 'ebom' ? 'eBOM · by section' : 'mBOM · by part'}
+            </Box>
+          ))}
+        </Box>
       </Stack>
 
       {view === 'ebom' ? (
-        Object.entries(bom.ebom).map(([secName, cats]) => (
-          <Box key={secName} sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', mb: 1.5, overflow: 'hidden' }}>
-            <Typography sx={{ color: '#CBD5E1', fontSize: 12.5, fontWeight: 700, px: 2, py: 1, borderBottom: '1px solid ' + C.border }}>
-              {secName}
-            </Typography>
-            <Table size="small">
+        Object.entries(bom.ebom).map(([secName, cats]) => {
+          // Flatten this section's categories into rows with continuous S.No
+          // and merged-Category rowSpan metadata (first row of each cat group renders the cell).
+          const flat: { r: BomRow; cat: string; rowsInGroup: number; isFirstInGroup: boolean; sno: number }[] = [];
+          let sno = 0;
+          Object.entries(cats).forEach(([cat, rows]) => {
+            (rows as BomRow[]).forEach((r, i) => {
+              sno += 1;
+              flat.push({ r, cat, rowsInGroup: (rows as BomRow[]).length, isFirstInGroup: i === 0, sno });
+            });
+          });
+          return (
+            <Box key={secName} sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', mb: 1.5, overflow: 'hidden' }}>
+              <Typography sx={{ color: '#CBD5E1', fontSize: 12.5, fontWeight: 700, px: 2, py: 1, borderBottom: '1px solid ' + C.border }}>
+                {secName}
+              </Typography>
+              <Box sx={{ maxHeight: '52vh', overflow: 'auto' }}>
+                <Table size="small" stickyHeader>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ ...headSx, width: 40, whiteSpace: 'nowrap', borderRight: '1px solid #1E2235', bgcolor: '#0B0B0D' }}>S.No</TableCell>
+                      <TableCell sx={{ ...headSx, width: 130, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Category</TableCell>
+                      <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Description</TableCell>
+                      <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Part #</TableCell>
+                      <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }} align="right">Qty</TableCell>
+                      <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Unit</TableCell>
+                      <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }} align="right">Unit cost</TableCell>
+                      <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }} align="right">Ext.</TableCell>
+                      <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Price</TableCell>
+                      <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Source</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {flat.map(({ r, cat, rowsInGroup, isFirstInGroup, sno: n }, idx) => (
+                      <TableRow key={cat + idx}>
+                        <TableCell sx={{ ...cellSx, width: 40, color: C.sub, fontSize: 11.5, verticalAlign: 'middle', py: 0.5, borderRight: '1px solid #1E2235' }}>{n}</TableCell>
+                        {isFirstInGroup && (
+                          <TableCell rowSpan={rowsInGroup} sx={{ ...cellSx, width: 130, color: '#A9B6C9', fontWeight: 700, fontSize: 11, verticalAlign: 'middle', borderRight: '1px solid #1E2235' }}>
+                            {cat}
+                          </TableCell>
+                        )}
+                        <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5 }}>
+                          {r.description}
+                          {r.copper_weight_lbs ? (
+                            <Typography component="span" sx={{ color: C.sub, fontSize: 11 }}> · {r.copper_weight_lbs} lb Cu</Typography>
+                          ) : null}
+                        </TableCell>
+                        <TableCell sx={{ ...cellSx, color: C.sub, verticalAlign: 'middle', py: 0.5 }}>{r.part_number ?? '—'}</TableCell>
+                        <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5 }} align="right">{r.quantity}</TableCell>
+                        <TableCell sx={{ ...cellSx, color: C.sub, verticalAlign: 'middle', py: 0.5 }}>{r.unit}</TableCell>
+                        <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5 }} align="right">{r.unit_cost ? usd(r.unit_cost) : '—'}</TableCell>
+                        <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5 }} align="right">{r.unit_cost ? usd(r.unit_cost * r.quantity) : '—'}</TableCell>
+                        <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5 }}><StatusChip status={r.price_status} /></TableCell>
+                        <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5 }}>
+                          {r.source === 'generator' ? (
+                            <Tooltip title={'Auto-generated (' + (r.generator_id ?? '') + ') — recomputed from the design, cannot drift'}>
+                              <Chip label={r.generator_id ?? 'GEN'} size="small" sx={{ bgcolor: 'rgba(0,200,255,0.12)', color: '#60A5FA', fontSize: 9.5, height: 18 }} />
+                            </Tooltip>
+                          ) : (
+                            <Typography sx={{ color: C.sub, fontSize: 11 }}>{r.source}</Typography>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Box>
+            </Box>
+          );
+        })
+      ) : (
+        <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', overflow: 'hidden' }}>
+          <Box sx={{ maxHeight: '58vh', overflow: 'auto' }}>
+            <Table size="small" stickyHeader>
               <TableHead>
                 <TableRow>
-                  <TableCell sx={headSx}>CATEGORY</TableCell>
-                  <TableCell sx={headSx}>DESCRIPTION</TableCell>
-                  <TableCell sx={headSx}>PART #</TableCell>
-                  <TableCell sx={headSx} align="right">QTY</TableCell>
-                  <TableCell sx={headSx}>UNIT</TableCell>
-                  <TableCell sx={headSx} align="right">UNIT COST</TableCell>
-                  <TableCell sx={headSx} align="right">EXT.</TableCell>
-                  <TableCell sx={headSx}>PRICE</TableCell>
-                  <TableCell sx={headSx}>SOURCE</TableCell>
+                  <TableCell sx={{ ...headSx, width: 40, whiteSpace: 'nowrap', borderRight: '1px solid #1E2235', bgcolor: '#0B0B0D' }}>S.No</TableCell>
+                  <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Part #</TableCell>
+                  <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Category</TableCell>
+                  <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Description</TableCell>
+                  <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }} align="right">Total qty</TableCell>
+                  <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Unit</TableCell>
+                  <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }} align="right">Unit cost</TableCell>
+                  <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Price</TableCell>
+                  <TableCell sx={{ ...headSx, whiteSpace: 'nowrap', bgcolor: '#0B0B0D' }}>Where used</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {Object.entries(cats).flatMap(([cat, rows]) =>
-                  rows.map((r: BomRow, i: number) => (
-                    <TableRow key={cat + i}>
-                      <TableCell sx={{ ...cellSx, color: C.sub }}>{cat}</TableCell>
-                      <TableCell sx={cellSx}>
-                        {r.description}
-                        {r.copper_weight_lbs ? (
-                          <Typography component="span" sx={{ color: C.sub, fontSize: 11 }}> · {r.copper_weight_lbs} lb Cu</Typography>
-                        ) : null}
-                      </TableCell>
-                      <TableCell sx={{ ...cellSx, color: C.sub }}>{r.part_number ?? '—'}</TableCell>
-                      <TableCell sx={cellSx} align="right">{r.quantity}</TableCell>
-                      <TableCell sx={{ ...cellSx, color: C.sub }}>{r.unit}</TableCell>
-                      <TableCell sx={cellSx} align="right">{r.unit_cost ? usd(r.unit_cost) : '—'}</TableCell>
-                      <TableCell sx={cellSx} align="right">{r.unit_cost ? usd(r.unit_cost * r.quantity) : '—'}</TableCell>
-                      <TableCell sx={cellSx}><StatusChip status={r.price_status} /></TableCell>
-                      <TableCell sx={cellSx}>
-                        {r.source === 'generator' ? (
-                          <Tooltip title={'Auto-generated (' + (r.generator_id ?? '') + ') — recomputed from the design, cannot drift'}>
-                            <Chip label={r.generator_id ?? 'GEN'} size="small" sx={{ bgcolor: 'rgba(0,200,255,0.12)', color: '#60A5FA', fontSize: 9.5, height: 18 }} />
-                          </Tooltip>
-                        ) : (
-                          <Typography sx={{ color: C.sub, fontSize: 11 }}>{r.source}</Typography>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
+                {bom.mbom.map((m, i) => (
+                  <TableRow key={i}>
+                    <TableCell sx={{ ...cellSx, width: 40, color: C.sub, fontSize: 11.5, verticalAlign: 'middle', py: 0.5, borderRight: '1px solid #1E2235' }}>{i + 1}</TableCell>
+                    <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5 }}>{m.part_number ?? '—'}</TableCell>
+                    <TableCell sx={{ ...cellSx, color: C.sub, verticalAlign: 'middle', py: 0.5 }}>{m.category}</TableCell>
+                    <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5 }}>{m.description}</TableCell>
+                    <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5 }} align="right">{m.quantity}</TableCell>
+                    <TableCell sx={{ ...cellSx, color: C.sub, verticalAlign: 'middle', py: 0.5 }}>{m.unit}</TableCell>
+                    <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5 }} align="right">{m.unit_cost ? usd(m.unit_cost) : '—'}</TableCell>
+                    <TableCell sx={{ ...cellSx, verticalAlign: 'middle', py: 0.5 }}><StatusChip status={m.price_status} /></TableCell>
+                    <TableCell sx={{ ...cellSx, color: C.sub, fontSize: 11, verticalAlign: 'middle', py: 0.5 }}>{[...new Set(m.whereUsed)].join(', ')}</TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </Box>
-        ))
-      ) : (
-        <Box sx={{ bgcolor: C.bg, border: '1px solid ' + C.border, borderRadius: '10px', overflow: 'hidden' }}>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell sx={headSx}>PART #</TableCell>
-                <TableCell sx={headSx}>CATEGORY</TableCell>
-                <TableCell sx={headSx}>DESCRIPTION</TableCell>
-                <TableCell sx={headSx} align="right">TOTAL QTY</TableCell>
-                <TableCell sx={headSx}>UNIT</TableCell>
-                <TableCell sx={headSx} align="right">UNIT COST</TableCell>
-                <TableCell sx={headSx}>PRICE</TableCell>
-                <TableCell sx={headSx}>WHERE USED</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {bom.mbom.map((m, i) => (
-                <TableRow key={i}>
-                  <TableCell sx={cellSx}>{m.part_number ?? '—'}</TableCell>
-                  <TableCell sx={{ ...cellSx, color: C.sub }}>{m.category}</TableCell>
-                  <TableCell sx={cellSx}>{m.description}</TableCell>
-                  <TableCell sx={cellSx} align="right">{m.quantity}</TableCell>
-                  <TableCell sx={{ ...cellSx, color: C.sub }}>{m.unit}</TableCell>
-                  <TableCell sx={cellSx} align="right">{m.unit_cost ? usd(m.unit_cost) : '—'}</TableCell>
-                  <TableCell sx={cellSx}><StatusChip status={m.price_status} /></TableCell>
-                  <TableCell sx={{ ...cellSx, color: C.sub, fontSize: 11 }}>{[...new Set(m.whereUsed)].join(', ')}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
         </Box>
       )}
     </Box>

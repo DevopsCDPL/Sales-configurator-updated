@@ -230,3 +230,45 @@ Reference `TOAST_COLORS` from `designSystem.ts`. Toast definitions are consumed 
 9. **Adding a new token.** Update `designSystem.ts` and this document together in the same commit. Add the value to the correct section; do not create ad-hoc palette extensions inside components.
 
 10. **TypeScript.** The token module is `as const` typed. Use `COLORS.xxx` references so typos are caught at compile time.
+
+## Standard data table (LOCKED)
+
+Every data table in the configurator uses ONE locked format. Canonical
+reference: the "Auto-selected components" table in `ComponentsPanel.tsx` and
+the eBOM/mBOM tables in `BomViewer.tsx`. Tokens live in `designSystem.ts`
+(`STANDARD_TABLE`, `tableHeadCellSx`, `snoCellSx`, `mergedCatCellSx`, plus the
+existing `headSx`/`cellSx`).
+
+Rules — replicate exactly for any new table:
+
+1. **Scroll wrapper.** Wrap the `<Table>` in a `Box` with
+   `{ maxHeight: '58vh', overflow: 'auto' }` (use `52vh` for per-section
+   sub-boxes). This keeps long tables in-page.
+2. **Sticky header.** `<Table size="small" stickyHeader>`. Every head
+   `TableCell` gets `tableHeadCellSx` — i.e. `headSx` + `whiteSpace: nowrap`
+   + `bgcolor: '#0B0B0D'` so the sticky header never bleeds the rows behind it.
+3. **Sentence-case headers.** "Catalog description", "Unit cost", "Where
+   used" — never ALL CAPS.
+4. **First column is S.No** (`snoCellSx`): width 40, muted `#64748B`,
+   `borderRight: 1px solid #1E2235`. Numbered continuously within the table
+   (within each section box for sectioned eBOM).
+5. **Category column is MERGED via `rowSpan`** (`mergedCatCellSx`): render the
+   cell only on the first row of each category group, with
+   `rowSpan = rows in that group`. Color `#A9B6C9`, `fontWeight 700`,
+   right divider, `verticalAlign: middle`. (Skip the merge only when a table
+   is genuinely by-part, e.g. mBOM — there S.No + standard styling is enough.)
+6. **Body cells.** `cellSx` + `verticalAlign: 'middle'` + `py: 0.5`.
+7. **Status & provenance** stay as outlined `StatusChip` / generator chip per
+   the provenance-vs-status rule above; never drop a backend field to fit.
+
+### Segmented view toggle
+
+When a table offers alternate views (e.g. eBOM vs mBOM), use a segmented
+control, NOT separate buttons — matching the catalog Source/Status toggles:
+
+- Container: `bgcolor #0B0B0D`, `border 1px solid #1E2235`,
+  `borderRadius 8px`, `display inline-flex`, `p 0.25`.
+- Each pill: `borderRadius 6px`, `height ~24`, `px 1.25`, `fontSize 11.5`.
+  Active = `bgcolor rgba(0,200,255,0.14)` / `color #00c8ff`.
+  Inactive = `transparent` / `#64748B`.
+- Labels are compact and descriptive ("eBOM · by section", "mBOM · by part").
