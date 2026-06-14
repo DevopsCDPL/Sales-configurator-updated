@@ -266,7 +266,9 @@ const CapacityPlanningPage: React.FC = () => {
     finally { setPlanning(false); }
   };
 
-  const hasAll = teams.length > 0 && workers.length > 0 && machines.length > 0;
+  // Planner needs at least one team + one operator; machines/work centers are
+  // optional in v1 (informational — used for equipment gating in P3).
+  const hasAll = teams.length > 0 && workers.length > 0;
 
   if (!isAdmin) {
     return (
@@ -342,8 +344,8 @@ const CapacityPlanningPage: React.FC = () => {
             <Box sx={{ display: 'flex', gap: 1.25, alignItems: 'flex-start' }}>
               <Box sx={{ width: 9, height: 9, borderRadius: '50%', bgcolor: C.amber, mt: '5px', boxShadow: `0 0 6px ${C.amber}` }} />
               <Typography sx={{ color: C.sub, fontSize: '0.84rem', lineHeight: 1.4 }}>
-                Add at least one team, one operator and one machine / work center to get started.
-                The planner stays inert until your capacity setup is complete.
+Add at least one team and one operator to start planning.
+                Machines / work centers are optional (they sharpen scheduling later).
               </Typography>
             </Box>
           )}
