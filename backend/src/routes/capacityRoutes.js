@@ -22,6 +22,7 @@ const { authenticate } = require('../middleware/auth');
 const { requireResource } = require('../middleware/departments');
 const { tenantScope } = require('../middleware/tenantScope');
 const models = require('../models');
+const { planTasks } = require('../services/configurator/capacityPlanner');
 
 router.use(authenticate);
 router.use(tenantScope);
@@ -330,6 +331,32 @@ router.post('/notifications/read-all', async (req, res) => {
     await models.AppNotification.update({ read_at: new Date() }, { where: companyWhere(req, { user_id: req.user.id, read_at: null }) });
     return res.json({ success: true });
   } catch (err) { return res.status(500).json({ success: false, message: err.message }); }
+});
+
+// ── P2: deterministic auto-planner (forward-scheduler) ───────────────
+router.post('/plan', async (req, res) => {
+  try {
+    const where = companyWhere(req);
+    if (req.body && req.body.board_id) where.board_id = req.body.board_id;
+    const tasks = await models.WorkTask.findAll({ where, order: [['board_id', 'ASC'], ['seq', 'ASC']] });
+    const operators = await models.CapacityWorker.findAll({ where: companyWhere(req) });
+    const machines = await models.CapacityMachine.findAll({ where: companyWhere(req) });
+    const plan = planTasks(
+      tasks.map((t) => t.toJSON()),
+      operators.map((o) => o.toJSON()),
+      machines.map((m) => m.toJSON()),
+      { startDate: req.body && req.body.startDate },
+    );
+    if (req.body && req.body.persist) {
+      for (const st of plan.tasks) {
+        // eslint-disable-next-line no-await-in-loop
+        await models.WorkTask.update({ est_start: st.est_start, est_finish: st.est_finish }, { where: companyWhere(req, { id: st.id }) });
+      }
+    }
+    res.json({ success: true, data: plan });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
 });
 
 module.exports = router;

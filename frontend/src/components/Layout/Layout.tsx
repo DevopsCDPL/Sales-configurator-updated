@@ -270,8 +270,25 @@ const Layout: React.FC = () => {
     try {
       const res = await api.get('/audit-logs', { params: { page: 1, limit: 8 } });
       const logs = res.data?.logs || res.data?.data || (Array.isArray(res.data) ? res.data : []);
-      setNotifications(logs.slice(0, 8));
-      setUnreadCount(Math.min(logs.length, 8));
+      // Merge in capacity in-app notifications (task assignments etc.). Optional —
+      // degrades silently if the user lacks the capacity resource.
+      let capItems: any[] = [];
+      let capUnread = 0;
+      try {
+        const capRes = await api.get('/capacity/notifications');
+        const capData = capRes.data?.data || {};
+        capUnread = capData.unread || 0;
+        capItems = (capData.items || []).filter((n: any) => !n.read_at).map((n: any) => ({
+          id: 'cap-' + n.id,
+          action: n.title,
+          entity_name: n.body || 'Task update',
+          created_at: n.created_at || n.createdAt,
+          _capacity: true,
+        }));
+      } catch { /* capacity notifications are optional */ }
+      const merged = [...capItems, ...logs].slice(0, 8);
+      setNotifications(merged);
+      setUnreadCount(capUnread + Math.min(logs.length, 8));
     } catch {
       setNotifications([]);
     } finally {

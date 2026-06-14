@@ -14,6 +14,7 @@ import {
   listMachines, createMachine, deleteMachine,
   listTasks, createTask, checkInTask, checkOutTask, listMyTasks,
   listNotifications, markNotificationRead, markAllNotificationsRead,
+  runPlan, PlanResult, PlanScheduledTask,
   CapacityTeam, CapacityWorker, CapacityMachine, WorkTask, AppNotificationRow,
 } from '../services/capacityService';
 
@@ -112,6 +113,8 @@ const CapacityPlanningPage: React.FC = () => {
   const [notifUnread, setNotifUnread] = useState(0);
   const [taskForm, setTaskForm] = useState({ title: '', department: DEPARTMENTS[0], assignee: '', est_hours: '', board_id: '' });
   const [users, setUsers] = useState<UserRecord[]>([]);
+  const [plan, setPlan] = useState<PlanResult | null>(null);
+  const [planning, setPlanning] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -256,6 +259,13 @@ const CapacityPlanningPage: React.FC = () => {
     } catch (e: any) { setError(e?.response?.data?.message || 'Could not open chat.'); }
   };
 
+  const handleRunPlan = async () => {
+    setPlanning(true);
+    try { setPlan(await runPlan({ persist: true })); }
+    catch (e: any) { setError(e?.response?.data?.message || 'Planning failed.'); }
+    finally { setPlanning(false); }
+  };
+
   const hasAll = teams.length > 0 && workers.length > 0 && machines.length > 0;
 
   if (!isAdmin) {
@@ -290,12 +300,43 @@ const CapacityPlanningPage: React.FC = () => {
       <Box sx={{ mb: 2.5 }}>
         <Card title="Planner">
           {hasAll ? (
-            <Box sx={{ display: 'flex', gap: 1.25, alignItems: 'flex-start' }}>
-              <Box sx={{ width: 9, height: 9, borderRadius: '50%', bgcolor: C.green, mt: '5px', boxShadow: `0 0 6px ${C.green}` }} />
-              <Typography sx={{ color: C.text, fontSize: '0.84rem', lineHeight: 1.4 }}>
-                Capacity data ready — auto-planner activates after the workflow questions are answered
-                (see docs/capacity-traveler-design.md).
-              </Typography>
+            <Box>
+              <Box sx={{ display: 'flex', gap: 1.25, alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+                <Box sx={{ display: 'flex', gap: 1.25, alignItems: 'flex-start' }}>
+                  <Box sx={{ width: 9, height: 9, borderRadius: '50%', bgcolor: C.green, mt: '5px', boxShadow: `0 0 6px ${C.green}` }} />
+                  <Typography sx={{ color: C.text, fontSize: '0.84rem', lineHeight: 1.4 }}>
+                    Capacity data ready. Run the deterministic planner to schedule open tasks (defaults: 8h/day, Mon–Fri).
+                  </Typography>
+                </Box>
+                <Button size="small" variant="outlined" onClick={handleRunPlan} disabled={planning}
+                  sx={{ color: C.blue, borderColor: C.border, textTransform: 'none', fontSize: '0.78rem' }}>
+                  {planning ? 'Planning…' : 'Run plan'}
+                </Button>
+              </Box>
+              {plan && (
+                <Box sx={{ mt: 1.5, pt: 1.5, borderTop: `1px solid ${C.border}` }}>
+                  <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap', mb: 1 }}>
+                    <Box>
+                      <Typography sx={{ color: C.sub, fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Delivery (est.)</Typography>
+                      <Typography sx={{ color: C.green, fontSize: '1rem', fontWeight: 800 }}>{plan.deliveryDate ? new Date(plan.deliveryDate).toLocaleDateString() : '—'}</Typography>
+                    </Box>
+                    <Box>
+                      <Typography sx={{ color: C.sub, fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Bottleneck</Typography>
+                      <Typography sx={{ color: C.amber, fontSize: '1rem', fontWeight: 800 }}>{plan.bottleneck ? displayCase(plan.bottleneck) : '—'}</Typography>
+                    </Box>
+                    <Box>
+                      <Typography sx={{ color: C.sub, fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Tasks scheduled</Typography>
+                      <Typography sx={{ color: C.text, fontSize: '1rem', fontWeight: 800 }}>{plan.tasks.length}</Typography>
+                    </Box>
+                  </Box>
+                  <Typography sx={{ color: C.sub, fontSize: '0.72rem' }}>
+                    Dept load (days): {Object.entries(plan.deptLoadDays).map(([d, n]) => `${displayCase(d)} ${n}`).join('  ·  ') || '—'}
+                  </Typography>
+                  <Typography sx={{ color: C.sub, fontSize: '0.68rem', mt: 0.5, fontStyle: 'italic' }}>
+                    {plan.assumptions?.note}
+                  </Typography>
+                </Box>
+              )}
             </Box>
           ) : (
             <Box sx={{ display: 'flex', gap: 1.25, alignItems: 'flex-start' }}>
@@ -326,6 +367,7 @@ const CapacityPlanningPage: React.FC = () => {
         <Tab label={`Tasks (${tasks.length})`} />
         <Tab label={`My work (${myTasks.length})`} />
         <Tab label={`Notifications${notifUnread ? ` (${notifUnread})` : ''}`} />
+        <Tab label="Schedule" />
       </Tabs>
 
       {loading ? (
@@ -645,6 +687,54 @@ const CapacityPlanningPage: React.FC = () => {
                   </Box>
                 ))
               )}
+            </Card>
+          )}
+
+          {/* ── Schedule (Gantt) ── */}
+          {tab === 6 && (
+            <Card>
+              {(!plan || !plan.tasks.length) ? (
+                <Typography sx={{ color: C.sub, fontSize: '0.82rem' }}>
+                  Run the planner (the &ldquo;Run plan&rdquo; button in the Planner card above) to generate the schedule.
+                </Typography>
+              ) : (() => {
+                const P = plan;
+                const starts = P.tasks.map((t) => new Date(t.est_start).getTime());
+                const ends = P.tasks.map((t) => new Date(t.est_finish).getTime());
+                const min = Math.min(...starts);
+                const max = Math.max(...ends);
+                const span = Math.max(1, max - min);
+                const pct = (ms: number) => ((ms - min) / span) * 100;
+                const deptColor = (d: string) => (({ manufacturing: '#3B82F6', assembly: '#22C55E', procurement: '#A855F7', quality: '#D97706', packing: '#06B6D4', logistics: '#EC4899', outsourcing: '#94A3B8', commissioning: '#10B981' }) as Record<string, string>)[d] || C.blue;
+                const fmt = (iso: string) => new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                const boards: Record<string, PlanScheduledTask[]> = {};
+                P.tasks.forEach((t) => { const b = t.board_id || '_'; (boards[b] = boards[b] || []).push(t); });
+                return (
+                  <Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                      <Typography sx={{ color: C.sub, fontSize: '0.72rem' }}>{fmt(new Date(min).toISOString())}</Typography>
+                      <Typography sx={{ color: C.green, fontSize: '0.72rem', fontWeight: 700 }}>Delivery: {P.deliveryDate ? fmt(P.deliveryDate) : '—'}</Typography>
+                    </Box>
+                    {Object.keys(boards).map((b) => (
+                      <Box key={b} sx={{ mb: 1.5 }}>
+                        <Typography sx={{ color: C.title, fontSize: '0.74rem', fontWeight: 700, mb: 0.5 }}>{b === '_' ? 'Unassigned board' : `Board ${b.slice(0, 8)}`}</Typography>
+                        {boards[b].map((t) => (
+                          <Box key={t.id} sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.4 }}>
+                            <Box sx={{ width: 160, flexShrink: 0 }}>
+                              <Typography sx={{ color: C.text, fontSize: '0.74rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t.title}</Typography>
+                              <Typography sx={{ color: C.sub, fontSize: '0.62rem' }}>{displayCase(t.department)} · {t.days}d</Typography>
+                            </Box>
+                            <Box sx={{ position: 'relative', flex: 1, height: 18, bgcolor: 'rgba(255,255,255,0.03)', borderRadius: '4px' }}>
+                              <Box title={`${fmt(t.est_start)} → ${fmt(t.est_finish)}`}
+                                sx={{ position: 'absolute', top: 2, bottom: 2, left: `${pct(new Date(t.est_start).getTime())}%`, width: `${Math.max(2, pct(new Date(t.est_finish).getTime()) - pct(new Date(t.est_start).getTime()))}%`, bgcolor: deptColor(t.department), borderRadius: '3px', minWidth: 6 }} />
+                            </Box>
+                          </Box>
+                        ))}
+                      </Box>
+                    ))}
+                  </Box>
+                );
+              })()}
             </Card>
           )}
 

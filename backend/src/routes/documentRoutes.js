@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const documentController = require('../controllers/documentController');
+const { createDocumentSnapshot } = require('../services/documentDataMapper/documentSnapshotService');
 const { authenticate, authorize } = require('../middleware/auth');
 const multer = require('multer');
 const path = require('path');
@@ -27,6 +28,18 @@ router.use(tenantScope);
 
 // Get documents by project ID
 router.get('/project/:projectId', documentController.getByProjectId);
+
+// Structured document data via the DocumentDataMapper (single source of truth).
+// documentType: work_order | production | coc | invoice | rfq | vendor_po
+router.get('/data/:documentType/:projectId', async (req, res) => {
+  try {
+    const snap = await createDocumentSnapshot(req.params.projectId, req.params.documentType);
+    if (!snap) return res.status(404).json({ success: false, message: 'No data for that document type / project.' });
+    res.json({ success: true, data: snap });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
 
 // Get document by ID
 router.get('/:id', documentController.getById);

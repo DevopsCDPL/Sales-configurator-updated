@@ -198,3 +198,23 @@ export async function markNotificationRead(id: string): Promise<void> {
 export async function markAllNotificationsRead(): Promise<void> {
   await api.post('/capacity/notifications/read-all', {});
 }
+
+/* ── P2: deterministic auto-planner ─────────────────────────────────── */
+export interface PlanScheduledTask {
+  id: string; board_id: string | null; title: string; department: string;
+  seq: number; est_hours: number; days: number; est_start: string; est_finish: string;
+}
+export interface PlanResult {
+  startDate: string;
+  tasks: PlanScheduledTask[];
+  deptCapacityHours: Record<string, number>;
+  machineCapacityPerDay: Record<string, number>;
+  deptLoadDays: Record<string, number>;
+  bottleneck: string | null;
+  deliveryDate: string | null;
+  assumptions: Record<string, any>;
+}
+export async function runPlan(body?: { board_id?: string; persist?: boolean; startDate?: string }): Promise<PlanResult> {
+  const res = await api.post('/capacity/plan', body || {});
+  return res.data.data;
+}
