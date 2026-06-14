@@ -112,3 +112,87 @@ export async function createMachine(input: CreateMachineInput): Promise<Capacity
 export async function deleteMachine(id: string): Promise<void> {
   await api.delete(`/capacity/machines/${id}`);
 }
+
+/* ── P1: tasks, check-in/out, notifications ─────────────────────────
+ * Live against the P1 backend (manual task lifecycle + in-app bell).
+ */
+export interface WorkTask {
+  id: string;
+  work_order_id?: string | null;
+  board_id?: string | null;
+  department: string;
+  seq: number;
+  title: string;
+  status: string;
+  assignee_user_id?: string | null;
+  machine_id?: string | null;
+  est_hours?: number | null;
+  started_at?: string | null;
+  finished_at?: string | null;
+  quality_gate?: boolean;
+  meta?: Record<string, any>;
+  company_id?: string | null;
+}
+
+export interface AppNotificationRow {
+  id: string;
+  title: string;
+  body: string;
+  read_at?: string | null;
+  entity?: Record<string, any> | null;
+}
+
+export interface CreateTaskInput {
+  title: string;
+  department: string;
+  board_id?: string | null;
+  work_order_id?: string | null;
+  assignee_user_id?: string | null;
+  machine_id?: string | null;
+  est_hours?: number | null;
+  seq?: number;
+  quality_gate?: boolean;
+}
+
+export async function listTasks(params?: { board_id?: string; status?: string; assignee_user_id?: string }): Promise<WorkTask[]> {
+  const res = await api.get('/capacity/tasks', { params: params || {} });
+  return res.data.data;
+}
+
+export async function createTask(input: CreateTaskInput): Promise<WorkTask> {
+  const res = await api.post('/capacity/tasks', input);
+  return res.data.data;
+}
+
+export async function updateTask(id: string, patch: Partial<CreateTaskInput> & { status?: string }): Promise<WorkTask> {
+  const res = await api.patch(`/capacity/tasks/${id}`, patch);
+  return res.data.data;
+}
+
+export async function checkInTask(id: string): Promise<WorkTask> {
+  const res = await api.post(`/capacity/tasks/${id}/check-in`, {});
+  return res.data.data;
+}
+
+export async function checkOutTask(id: string, body?: { status?: string; note?: string }): Promise<WorkTask> {
+  const res = await api.post(`/capacity/tasks/${id}/check-out`, body || {});
+  return res.data.data;
+}
+
+export async function listMyTasks(): Promise<WorkTask[]> {
+  const res = await api.get('/capacity/my-tasks');
+  return res.data.data;
+}
+
+export async function listNotifications(): Promise<{ items: AppNotificationRow[]; unread: number }> {
+  const res = await api.get('/capacity/notifications');
+  return res.data.data;
+}
+
+export async function markNotificationRead(id: string): Promise<void> {
+  await api.post(`/capacity/notifications/${id}/read`, {});
+}
+
+export async function markAllNotificationsRead(): Promise<void> {
+  await api.post('/capacity/notifications/read-all', {});
+}

@@ -9,7 +9,9 @@ import {
   listTeams, createTeam, deleteTeam,
   listWorkers, createWorker, deleteWorker,
   listMachines, createMachine, deleteMachine,
-  CapacityTeam, CapacityWorker, CapacityMachine,
+  listTasks, createTask, checkInTask, checkOutTask, listMyTasks,
+  listNotifications, markNotificationRead, markAllNotificationsRead,
+  CapacityTeam, CapacityWorker, CapacityMachine, WorkTask, AppNotificationRow,
 } from '../services/capacityService';
 
 /* ── Palette (shared with Overwatch) ────────────────────── */
@@ -88,12 +90,17 @@ const CapacityPlanningPage: React.FC = () => {
   const [teamForm, setTeamForm] = useState({ name: '', department: DEPARTMENTS[0] });
   const [workerForm, setWorkerForm] = useState({ display_name: '', team_id: '', skills: '', hours_per_day: 8 });
   const [machineForm, setMachineForm] = useState({ name: '', type: MACHINE_TYPES[0], capacity_per_day: 8 });
+  const [tasks, setTasks] = useState<WorkTask[]>([]);
+  const [myTasks, setMyTasks] = useState<WorkTask[]>([]);
+  const [notifications, setNotifications] = useState<AppNotificationRow[]>([]);
+  const [notifUnread, setNotifUnread] = useState(0);
+  const [taskForm, setTaskForm] = useState({ title: '', department: DEPARTMENTS[0], assignee_user_id: '', est_hours: '', board_id: '' });
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [t, w, m] = await Promise.all([listTeams(), listWorkers(), listMachines()]);
-      setTeams(t); setWorkers(w); setMachines(m);
+      const [t, w, m, tk, mt, nf] = await Promise.all([listTeams(), listWorkers(), listMachines(), listTasks(), listMyTasks(), listNotifications()]);
+      setTeams(t); setWorkers(w); setMachines(m); setTasks(tk); setMyTasks(mt); setNotifications(nf.items); setNotifUnread(nf.unread);
       setError(null);
     } catch (e: any) {
       setError(e?.response?.data?.message || e?.message || 'Failed to load capacity data.');
@@ -165,6 +172,53 @@ const CapacityPlanningPage: React.FC = () => {
     }
   };
 
+  const reloadTasks = async () => {
+    try {
+      const [tk, mt, nf] = await Promise.all([listTasks(), listMyTasks(), listNotifications()]);
+      setTasks(tk); setMyTasks(mt); setNotifications(nf.items); setNotifUnread(nf.unread);
+    } catch (e: any) { setError(e?.response?.data?.message || 'Failed to refresh tasks.'); }
+  };
+  const handleAddTask = async () => {
+    if (!taskForm.title.trim()) return;
+    setSaving(true);
+    try {
+      await createTask({
+        title: taskForm.title.trim(),
+        department: taskForm.department,
+        assignee_user_id: taskForm.assignee_user_id || null,
+        est_hours: taskForm.est_hours ? Number(taskForm.est_hours) : null,
+        board_id: taskForm.board_id.trim() || null,
+      });
+      setTaskForm({ title: '', department: DEPARTMENTS[0], assignee_user_id: '', est_hours: '', board_id: '' });
+      await reloadTasks();
+    } catch (e: any) { setError(e?.response?.data?.message || 'Failed to add task.'); }
+    finally { setSaving(false); }
+  };
+  const handleCheckIn = async (id: string) => {
+    try { await checkInTask(id); await reloadTasks(); }
+    catch (e: any) { setError(e?.response?.data?.message || 'Check-in failed.'); }
+  };
+  const handleCheckOut = async (id: string, status = 'done') => {
+    try { await checkOutTask(id, { status }); await reloadTasks(); }
+    catch (e: any) { setError(e?.response?.data?.message || 'Check-out failed.'); }
+  };
+  const handleMarkRead = async (id: string) => {
+    try { await markNotificationRead(id); await reloadTasks(); }
+    catch (e: any) { setError(e?.response?.data?.message || 'Failed.'); }
+  };
+  const handleMarkAllRead = async () => {
+    try { await markAllNotificationsRead(); await reloadTasks(); }
+    catch (e: any) { setError(e?.response?.data?.message || 'Failed.'); }
+  };
+  const assigneeName = (uid?: string | null) => {
+    if (!uid) return '\u2014';
+    if (uid === user?.id) return 'Me';
+    const w = workers.find((x) => x.user_id === uid);
+    return w?.display_name || uid.slice(0, 8);
+  };
+  const statusColor = (st: string) => (({ pending: '#64748B', assigned: '#00c8ff', in_progress: '#D97706', done: '#22C55E' }) as Record<string, string>)[st] || '#64748B';
+  const miniBtnSx = { textTransform: 'none', fontSize: '0.72rem', color: C.blue, minWidth: 0, px: 1 } as const;
+
   const hasAll = teams.length > 0 && workers.length > 0 && machines.length > 0;
 
   if (!isAdmin) {
@@ -232,6 +286,9 @@ const CapacityPlanningPage: React.FC = () => {
         <Tab label={`Teams (${teams.length})`} />
         <Tab label={`Workers (${workers.length})`} />
         <Tab label={`Machines / work centers (${machines.length})`} />
+        <Tab label={`Tasks (${tasks.length})`} />
+        <Tab label={`My work (${myTasks.length})`} />
+        <Tab label={`Notifications${notifUnread ? ` (${notifUnread})` : ''}`} />
       </Tabs>
 
       {loading ? (
@@ -404,6 +461,134 @@ const CapacityPlanningPage: React.FC = () => {
               )}
             </Card>
           )}
+
+          {/* ── Tasks ── */}
+          {tab === 3 && (
+            <Card>
+              <Grid container spacing={1.5} sx={{ mb: 2 }} alignItems="flex-end">
+                <Grid item xs={12} sm={3}>
+                  <TextField fullWidth size="small" label="Task title" sx={fieldSx}
+                    value={taskForm.title} onChange={(e) => setTaskForm({ ...taskForm, title: e.target.value })} />
+                </Grid>
+                <Grid item xs={6} sm={2}>
+                  <TextField fullWidth select size="small" label="Department" sx={fieldSx}
+                    value={taskForm.department} onChange={(e) => setTaskForm({ ...taskForm, department: e.target.value })}>
+                    {DEPARTMENTS.map((d) => <MenuItem key={d} value={d}>{displayCase(d)}</MenuItem>)}
+                  </TextField>
+                </Grid>
+                <Grid item xs={6} sm={3}>
+                  <TextField fullWidth select size="small" label="Assignee" sx={fieldSx}
+                    value={taskForm.assignee_user_id} onChange={(e) => setTaskForm({ ...taskForm, assignee_user_id: e.target.value })}>
+                    <MenuItem value="">— Unassigned —</MenuItem>
+                    {user?.id ? <MenuItem value={user.id}>Me</MenuItem> : null}
+                    {workers.filter((w) => w.user_id && w.user_id !== user?.id).map((w) => (
+                      <MenuItem key={w.id} value={w.user_id as string}>{w.display_name || 'Worker'}</MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+                <Grid item xs={6} sm={2}>
+                  <TextField fullWidth size="small" label="Est. hours" type="number" sx={fieldSx}
+                    value={taskForm.est_hours} onChange={(e) => setTaskForm({ ...taskForm, est_hours: e.target.value })} />
+                </Grid>
+                <Grid item xs={6} sm={2}>
+                  <Button fullWidth startIcon={<AddIcon />} disabled={saving || !taskForm.title.trim()}
+                    onClick={handleAddTask} sx={addBtnSx}>Add task</Button>
+                </Grid>
+              </Grid>
+              {tasks.length === 0 ? (
+                <Typography sx={{ color: C.sub, fontSize: '0.82rem' }}>No tasks yet.</Typography>
+              ) : (
+                <Table size="small" sx={tableSx}>
+                  <TableHead><TableRow>
+                    <TableCell sx={headCellSx}>Title</TableCell>
+                    <TableCell sx={headCellSx}>Department</TableCell>
+                    <TableCell sx={headCellSx}>Assignee</TableCell>
+                    <TableCell sx={headCellSx}>Status</TableCell>
+                    <TableCell sx={headCellSx} align="right">Action</TableCell>
+                  </TableRow></TableHead>
+                  <TableBody>
+                    {tasks.map((t) => (
+                      <TableRow key={t.id}>
+                        <TableCell>{t.title}</TableCell>
+                        <TableCell><Chip label={displayCase(t.department)} size="small"
+                          sx={{ height: 18, fontSize: '0.65rem', bgcolor: 'rgba(0,200,255,0.08)', color: C.blue, fontWeight: 700 }} /></TableCell>
+                        <TableCell>{assigneeName(t.assignee_user_id)}</TableCell>
+                        <TableCell><Chip label={displayCase(t.status)} size="small"
+                          sx={{ height: 18, fontSize: '0.65rem', bgcolor: 'rgba(255,255,255,0.06)', color: statusColor(t.status), fontWeight: 700 }} /></TableCell>
+                        <TableCell align="right">
+                          {(t.status === 'pending' || t.status === 'assigned') && (
+                            <Button size="small" onClick={() => handleCheckIn(t.id)} sx={miniBtnSx}>Check in</Button>
+                          )}
+                          {t.status === 'in_progress' && (
+                            <Button size="small" onClick={() => handleCheckOut(t.id)} sx={miniBtnSx}>Check out</Button>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </Card>
+          )}
+
+          {/* ── My work ── */}
+          {tab === 4 && (
+            <Card>
+              {myTasks.length === 0 ? (
+                <Typography sx={{ color: C.sub, fontSize: '0.82rem' }}>No tasks assigned to you.</Typography>
+              ) : (
+                <Table size="small" sx={tableSx}>
+                  <TableHead><TableRow>
+                    <TableCell sx={headCellSx}>Title</TableCell>
+                    <TableCell sx={headCellSx}>Department</TableCell>
+                    <TableCell sx={headCellSx}>Status</TableCell>
+                    <TableCell sx={headCellSx} align="right">Action</TableCell>
+                  </TableRow></TableHead>
+                  <TableBody>
+                    {myTasks.map((t) => (
+                      <TableRow key={t.id}>
+                        <TableCell>{t.title}</TableCell>
+                        <TableCell>{displayCase(t.department)}</TableCell>
+                        <TableCell><Chip label={displayCase(t.status)} size="small"
+                          sx={{ height: 18, fontSize: '0.65rem', bgcolor: 'rgba(255,255,255,0.06)', color: statusColor(t.status), fontWeight: 700 }} /></TableCell>
+                        <TableCell align="right">
+                          {(t.status === 'pending' || t.status === 'assigned') && (
+                            <Button size="small" onClick={() => handleCheckIn(t.id)} sx={miniBtnSx}>Check in</Button>
+                          )}
+                          {t.status === 'in_progress' && (
+                            <Button size="small" onClick={() => handleCheckOut(t.id)} sx={miniBtnSx}>Check out</Button>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </Card>
+          )}
+
+          {/* ── Notifications ── */}
+          {tab === 5 && (
+            <Card>
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
+                <Button size="small" disabled={!notifUnread} onClick={handleMarkAllRead} sx={miniBtnSx}>Mark all read</Button>
+              </Box>
+              {notifications.length === 0 ? (
+                <Typography sx={{ color: C.sub, fontSize: '0.82rem' }}>No notifications.</Typography>
+              ) : (
+                notifications.map((n) => (
+                  <Box key={n.id} sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 1, py: 1, borderBottom: `1px solid ${C.border}` }}>
+                    <Box>
+                      <Typography sx={{ color: n.read_at ? C.sub : C.title, fontSize: '0.84rem', fontWeight: n.read_at ? 500 : 700 }}>{n.title}</Typography>
+                      {n.body ? <Typography sx={{ color: C.sub, fontSize: '0.76rem' }}>{n.body}</Typography> : null}
+                    </Box>
+                    {!n.read_at && <Button size="small" onClick={() => handleMarkRead(n.id)} sx={miniBtnSx}>Mark read</Button>}
+                  </Box>
+                ))
+              )}
+            </Card>
+          )}
+
         </>
       )}
     </Box>
