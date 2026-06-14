@@ -77,7 +77,7 @@ async function compileBoardBom(switchboardId, { copperPricePerLb = null } = {}) 
     Number(copperPricePerLb) ||
     Number(bd.copperPricePerLb) ||
     Number(defaults.copper_price_per_lb) ||
-    Number(process.env.COPPER_PRICE_PER_LB) || 5.5;
+    Number(process.env.COPPER_PRICE_PER_LB) || 9.2; // matches seed/costingDefaults default
 
   const devices = lines
     .filter((l) => (l.category || '').toUpperCase() === 'CIRCUIT BREAKER')

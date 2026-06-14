@@ -76,6 +76,8 @@ export interface StandardsSet {
   defaultSccr_kA?: number;
   copperGrades?: { grade: string; density_lb_in3: number; isDefault?: boolean }[];
   copperEstimator?: { fabFactor: number; contingencyPct: number; stubLenIn: number };
+  busDensityLimit?: { Cu: number; Al: number };
+  breakerRules?: { defaultPctRated: number; acbThreshold_A: number; mccbMax_A: number; sccrBasis: string; drawoutMains: boolean };
 }
 
 export const DEFAULT_STANDARDS: StandardsSet = {
@@ -143,6 +145,8 @@ export const DEFAULT_STANDARDS: StandardsSet = {
   defaultSccr_kA: 65,
   copperGrades: [{ grade: 'C110 ETP', density_lb_in3: 0.323, isDefault: true }, { grade: 'C101 OFE', density_lb_in3: 0.323 }, { grade: 'Aluminium 6101', density_lb_in3: 0.098 }],
   copperEstimator: { fabFactor: 1.15, contingencyPct: 10, stubLenIn: 24 },
+  busDensityLimit: { Cu: 1000, Al: 750 },
+  breakerRules: { defaultPctRated: 80, acbThreshold_A: 1600, mccbMax_A: 1200, sccrBasis: 'fully', drawoutMains: true },
 };
 
 /** Next ladder value ≥ x (null if x exceeds the ladder). */
@@ -179,9 +183,10 @@ export function motorFla(std: StandardsSet, hp: number, vLL: number): number | n
 }
 
 /** Density sanity rule — Phase B §5.1. */
-export function busDensityOk(row: BusScheduleRow): boolean {
+export function busDensityOk(row: BusScheduleRow, std: StandardsSet = DEFAULT_STANDARDS): boolean {
   const area = row.barsPerPhase * row.barThk_in * row.barW_in;
   const density = row.ratingA / area;
-  const limit = row.material === 'Cu' ? 1000 : 750; // [SEED]
+  const lim = std.busDensityLimit ?? { Cu: 1000, Al: 750 };
+  const limit = row.material === 'Cu' ? lim.Cu : lim.Al;
   return density <= limit;
 }

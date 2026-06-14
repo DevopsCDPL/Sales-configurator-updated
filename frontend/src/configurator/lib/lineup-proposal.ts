@@ -148,6 +148,26 @@ function pickCheapest(cands: CandidateDevice[]): CandidateDevice | null {
     || a.ratedA - b.ratedA)[0];                               // smallest adequate frame
 }
 
+/**
+ * Apply the breaker_rules standard (tenant-editable via std.breakerRules):
+ * a device at/above acbThreshold_A must be ACB/ICCB; above mccbMax_A must not
+ * be MCCB. Returns the compliant subset, or falls back to the full set with a
+ * warning if the catalog has nothing compliant (never hard-fails the proposal).
+ */
+function applyBreakerRules(cands: CandidateDevice[], requiredA: number, std: StandardsSet): { kept: CandidateDevice[]; note?: string } {
+  const br = std.breakerRules;
+  if (!br || !cands.length) return { kept: cands };
+  if (requiredA >= br.acbThreshold_A) {
+    const acb = cands.filter((c) => c.deviceClass === 'ACB' || c.deviceClass === 'ICCB');
+    return acb.length ? { kept: acb } : { kept: cands, note: `${requiredA}A is at/above the ${br.acbThreshold_A}A ACB threshold but the catalog has no ACB - verify` };
+  }
+  if (requiredA > br.mccbMax_A) {
+    const nonMccb = cands.filter((c) => c.deviceClass !== 'MCCB');
+    return nonMccb.length ? { kept: nonMccb } : { kept: cands, note: `${requiredA}A exceeds the MCCB max of ${br.mccbMax_A}A - verify breaker class` };
+  }
+  return { kept: cands };
+}
+
 export function proposeLineup(
   std: StandardsSet,
   intake: IntakeInput,
@@ -209,13 +229,15 @@ export function proposeLineup(
         role: 'FEEDER', designCurrentA: res.designCurrentA, adjustedCurrentA: res.adjustedCurrentA,
         voltageVLL: vs.vLL, sccrKA, poles: row.poles ?? 3,
       });
-      const picked = pickCheapest(cands);
+      const { kept: ruleCands, note: ruleNote } = applyBreakerRules(cands, res.designCurrentA, std);
+      const picked = pickCheapest(ruleCands);
       const w: string[] = [...res.warnings];
+      if (ruleNote) w.push(ruleNote);
       if (!picked) w.push('No valid breaker candidate found for this feeder');
       else if (picked.priceStatus !== 'FIRM') w.push(`Selected device price is ${picked.priceStatus}`);
       feederDevices.push({
         designation, feederRowId: row.rowId, role: 'FEEDER', device: picked,
-        alternatives: cands.filter((c) => c !== picked).slice(0, 5),
+        alternatives: ruleCands.filter((c) => c !== picked).slice(0, 5),
         designCurrentA: res.designCurrentA, recommendedRatingA: res.recommendedRatingA, warnings: w,
       });
     }
@@ -232,8 +254,10 @@ export function proposeLineup(
     const cands = opts.candidateProvider({
       role, designCurrentA: requiredA, adjustedCurrentA: requiredA, voltageVLL: vs.vLL, sccrKA, poles: 3,
     });
-    const picked = pickCheapest(cands);
+    const { kept: ruleCands, note: ruleNote } = applyBreakerRules(cands, requiredA, std);
+    const picked = pickCheapest(ruleCands);
     const w: string[] = [];
+    if (ruleNote) w.push(ruleNote);
     if (!picked) w.push(`No valid ${role} device candidate found`);
     return { designation, feederRowId: null, role, device: picked, alternatives: cands.filter((c) => c !== picked).slice(0, 5), designCurrentA: requiredA, recommendedRatingA: nextLadder(std.deviceLadder_A, requiredA), warnings: w };
   };

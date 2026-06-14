@@ -471,6 +471,49 @@ router.put('/engineering-standards/:tableKey', wrap(async (req, res) => {
 // Engineering-standards seed status (Phase 4): which standards are still
 // unverified seed defaults vs tenant-confirmed. scope=cost (default) limits
 // to keys that feed BOM/quote/proposal math; scope=all = every known table.
+// Live-preview standards set (Standards 2c): assemble the cost/engineering
+// values the Designer preview engines read, tenant-or-seed, in the frontend
+// StandardsSet shape. Frontend merges this over DEFAULT_STANDARDS.
+router.get('/standards-set', wrap(async (req, res) => {
+  const cid = req.companyId ?? null;
+  const first = (rows) => (Array.isArray(rows) && rows.length ? rows[0] : {});
+  const ce = first(await standardsService.getStandard('copper_estimator', cid));
+  const lc = first(await standardsService.getStandard('load_calc', cid));
+  const pk = first(await standardsService.getStandard('packing_settings', cid));
+  const cg = await standardsService.getStandard('copper_grades', cid);
+  const br = first(await standardsService.getStandard('breaker_rules', cid));
+  res.json({
+    breakerRules: {
+      defaultPctRated: Number(br.default_pct_rated) || 80,
+      acbThreshold_A: Number(br.acb_threshold_A) || 1600,
+      mccbMax_A: Number(br.mccb_max_A) || 1200,
+      sccrBasis: br.sccr_basis || 'fully',
+      drawoutMains: br.drawout_mains !== undefined ? !!br.drawout_mains : true,
+    },
+    copperEstimator: {
+      fabFactor: Number(ce.fab_factor) || 1.15,
+      contingencyPct: Number(ce.contingency_pct) || 10,
+      stubLenIn: Number(ce.stub_len_in) || 24,
+    },
+    loadCalc: {
+      continuousFactor: Number(lc.continuous_factor) || 1.25,
+      defaultPowerFactor: Number(lc.default_power_factor) || 0.85,
+      motorFactor: Number(lc.motor_factor) || 1.25,
+    },
+    packing: {
+      feederEnvelope_in: Number(pk.feederEnvelope_in) || 9,
+      mainEnvelope_in: Number(pk.mainEnvelope_in) || 20,
+      tieEnvelope_in: Number(pk.tieEnvelope_in) || 20,
+      maxFillPct: Number(pk.maxFillPct) || 0.8,
+      interdeviceClearance_in: Number(pk.interdeviceClearance_in) || 4,
+      mainDedicatedPct: Number(pk.mainDedicatedPct) || 0.5,
+    },
+    copperGrades: Array.isArray(cg) && cg.length
+      ? cg.map((g) => ({ grade: g.grade, density_lb_in3: Number(g.density_lb_in3), isDefault: !!g.isDefault }))
+      : undefined,
+  });
+}));
+
 router.get('/engineering-standards-seed-status', wrap(async (req, res) => {
   const scope = req.query.scope === 'all' ? 'all' : 'cost';
   const keys = scope === 'all' ? null : standardsService.costAffectingKeys();

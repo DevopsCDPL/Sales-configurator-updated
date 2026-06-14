@@ -14,6 +14,7 @@ import { DEVICE_ENVELOPE_IN } from '../lib/lineup-proposal';
 import { Box, Typography, Stack, Chip, Button, Alert, CircularProgress, Snackbar, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
 import SwitchboardCardsScreen, { SwitchboardCardData } from './SwitchboardCardsScreen';
 import IntakeStep from './IntakeStep';
+import { DEFAULT_STANDARDS, StandardsSet } from '../lib/us-standards';
 import BomViewer from './BomViewer';
 import QuotePanel from './QuotePanel';
 import DrawingsPanel from './DrawingsPanel';
@@ -159,6 +160,7 @@ const V2PreviewStep: React.FC = () => {
   const [catalogCbs, setCatalogCbs] = useState<CatalogCb[] | null>(null);
   const [catalogStatus, setCatalogStatus] = useState<{ count: number; withPrice: number } | null>(null);
   const [importing, setImporting] = useState(false);
+  const [standards, setStandards] = useState<StandardsSet>(DEFAULT_STANDARDS);
 
   const provider = useMemo(() => {
     if (catalogCbs && catalogCbs.length > 0) {
@@ -173,6 +175,14 @@ const V2PreviewStep: React.FC = () => {
       setCatalogStatus(status);
       if (status.count > 0) setCatalogCbs(await configuratorV2Service.catalogCbs());
     } catch { /* fall back to bundled silently */ }
+  }, []);
+
+  useEffect(() => {
+    // Standards 2c: populate the live preview with the tenant's standards
+    // (merged over seed defaults). Backend remains authoritative on save.
+    configuratorV2Service.getStandardsSet()
+      .then((p) => setStandards((prev) => ({ ...prev, ...(p || {}) })))
+      .catch(() => { /* keep defaults */ });
   }, []);
 
   const importCatalog = async () => {
@@ -467,6 +477,7 @@ const V2PreviewStep: React.FC = () => {
               key={openBoard.board.id}
               initial={(openBoard.board.intake as Partial<IntakeInput>) ?? undefined}
               candidateProvider={provider}
+              standards={standards}
               onSaveIntake={saveIntake}
               onAcceptProposal={acceptProposal}
             />

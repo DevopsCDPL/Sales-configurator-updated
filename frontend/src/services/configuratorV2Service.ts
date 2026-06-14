@@ -482,6 +482,11 @@ export const configuratorV2Service = {
     return res.data;
   },
 
+  async getStandardsSet(): Promise<Record<string, any>> {
+    const res = await api.get<Record<string, any>>(`${ROOT}/standards-set`);
+    return res.data;
+  },
+
 
   async confirmOrder(quotationId: string): Promise<{ ok: boolean; results: Record<string, any>; stepErrors: [string, string][] }> {
     const res = await api.post(`${ROOT}/handoff/order-confirm`, { quotationId });
