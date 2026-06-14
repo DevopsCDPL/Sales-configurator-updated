@@ -37,6 +37,7 @@ import {
   Shield as ShieldIcon,
   Radar as RadarIcon,
   Engineering as EngineeringIcon,
+  Checklist as MyWorkIcon,
   Logout as LogoutIcon,
   Person as PersonIcon,
   Notifications as NotificationsIcon,
@@ -539,6 +540,7 @@ const Layout: React.FC = () => {
           {renderSectionLabel('Operations', c)}
           <List disablePadding>
             {renderNavItem(<DashboardIcon />, 'Dashboard', '/', c)}
+            {renderNavItem(<MyWorkIcon />, 'My Work', '/my-work', c)}
             {isAdminPlus && renderNavItem(<RadarIcon />, 'Overwatch', '/overwatch', c)}
             {isAdminPlus && renderNavItem(<EngineeringIcon />, 'Capacity', '/capacity', c)}
             {renderNavItem(<FolderIcon />, 'Projects', '/projects', c)}
