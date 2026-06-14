@@ -1,24 +1,19 @@
-/**
- * Production Data Mapper
- *
- * Provides structured Production data for document generation.
- *
- * FUTURE DESIGN NOTE:
- * This mapper will become the single source of truth for Production document
- * data in Forge i-DAS. Production traveller documents should call
- * getProductionData() instead of directly reading from production modules.
- */
+'use strict';
+const db = require('../../models');
+const { num, arr } = require('./_mapperUtil');
 
-/**
- * Get structured Production data for a given project.
- *
- * @param {string} projectId
- * @returns {Promise<import('./documentDataTypes').ProductionData | null>}
- */
+/** @returns {Promise<import('./documentDataTypes').ProductionData | null>} */
 async function getProductionData(projectId) {
-  // TODO: Implement data aggregation from production and work order modules
-  // For now, return null as a placeholder — not connected to any module.
-  return null;
+  if (!projectId) return null;
+  const wo = await db.WorkOrder.findOne({ where: { project_id: projectId }, order: [['created_at', 'DESC']] }).catch(() => null);
+  if (!wo) return null;
+  const ops = arr(wo.operations);
+  return {
+    productionTravellerId: wo.production_traveler_number || '',
+    machine: '',
+    operator: '',
+    sawCutOrBarFeed: '',
+    items: ops.map((o) => ({ operation: o.operation || o.name || o.description || '', quantity: num(o.quantity, 1), status: o.status || '' })),
+  };
 }
-
 module.exports = { getProductionData };

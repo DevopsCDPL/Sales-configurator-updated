@@ -135,6 +135,7 @@ export interface BomResponse {
     copperEstLbs: number;
     laborHours: Record<string, number>;
   };
+  seedStandards?: string[];
 }
 
 
@@ -476,6 +477,11 @@ export const configuratorV2Service = {
     return res.data;
   },
 
+  async getStandardsSeedStatus(scope: 'cost' | 'all' = 'cost'): Promise<StandardsSeedStatus> {
+    const res = await api.get<StandardsSeedStatus>(`${ROOT}/engineering-standards-seed-status`, { params: { scope } });
+    return res.data;
+  },
+
 
   async confirmOrder(quotationId: string): Promise<{ ok: boolean; results: Record<string, any>; stepErrors: [string, string][] }> {
     const res = await api.post(`${ROOT}/handoff/order-confirm`, { quotationId });
@@ -699,3 +705,12 @@ export const configuratorV2Service = {
 };
 
 export default configuratorV2Service;
+
+export interface StandardsSeedStatus {
+  scope: string;
+  known: string[];
+  seedKeys: string[];
+  tenantKeys: string[];
+  globalKeys: string[];
+  verified: boolean;
+}

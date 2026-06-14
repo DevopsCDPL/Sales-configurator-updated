@@ -10,7 +10,7 @@
 const models = require('../../models');
 const { compileBomV2 } = require('./bomEngineV2');
 const { estimateCopper } = require('./copperEstimator');
-const { getStandard, firstRow } = require('./standardsService');
+const { getStandard, getStandardMeta, firstRow } = require('./standardsService');
 const { getCostingDefaults } = require('./costingDefaults');
 
 async function stdRows(tableKey) {
@@ -87,10 +87,16 @@ async function compileBoardBom(switchboardId, { copperPricePerLb = null } = {}) 
       sectionIndex: Number(l.meta?.sectionIndex) || 1,
     }));
 
-  const copperEstStd = firstRow(await getStandard('copper_estimator'));
-  const groundStd    = firstRow(await getStandard('ground_bus'));
-  const gradeRows    = await getStandard('copper_grades');
-  const termStd      = firstRow(await getStandard('termination_factors'));
+  // Phase 4b — read with provenance so generated (copper/ground/termination)
+  // rows can be flagged when they rest on an unverified seed standard.
+  const _provKeys = ['copper_estimator', 'ground_bus', 'copper_grades', 'termination_factors'];
+  const _prov = {};
+  for (const k of _provKeys) { _prov[k] = await getStandardMeta(k); } // eslint-disable-line no-await-in-loop
+  const seedStandards = _provKeys.filter((k) => _prov[k] && _prov[k].source === 'seed');
+  const copperEstStd = firstRow(_prov.copper_estimator.rows);
+  const groundStd    = firstRow(_prov.ground_bus.rows);
+  const gradeRows    = _prov.copper_grades.rows;
+  const termStd      = firstRow(_prov.termination_factors.rows);
 
   const isAl = bd.busMaterial === 'Aluminium';
   const gradeRow = isAl
@@ -132,7 +138,8 @@ async function compileBoardBom(switchboardId, { copperPricePerLb = null } = {}) 
     copper.estimatedLbs > 0 ? copper : null
   );
 
-  return { board, sections, lines, copper, copperPricePerLb: pricePerLb, bom };
+  if (bom && typeof bom === 'object') bom.seedStandards = seedStandards;
+  return { board, sections, lines, copper, copperPricePerLb: pricePerLb, bom, seedStandards };
 }
 
 module.exports = { compileBoardBom, stdRows };

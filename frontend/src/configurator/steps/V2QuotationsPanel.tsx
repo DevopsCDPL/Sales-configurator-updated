@@ -22,6 +22,7 @@ import PictureAsPdfRoundedIcon from '@mui/icons-material/PictureAsPdfRounded';
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 import { configuratorService } from '../../services/configuratorService';
 import configuratorV2Service, { ChangeOrderRow, QuoteRevisionRow, SwitchboardRow } from '../../services/configuratorV2Service';
+import SeedStandardsBanner from './SeedStandardsBanner';
 
 const C = {
   bg: '#000000', surface: '#0B0B0D', border: '#1E2235', blue: '#00c8ff',
@@ -186,6 +187,7 @@ const V2QuotationsPanel: React.FC<{ projectId: string; onChanged?: () => void }>
 
   return (
     <Box sx={{ mb: 2.5 }}>
+      <SeedStandardsBanner />
       <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
         <Typography sx={{ color: C.text, fontWeight: 700, fontSize: 14.5 }}>
           Designer quotations

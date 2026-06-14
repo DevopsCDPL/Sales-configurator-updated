@@ -2,11 +2,11 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box, Typography, Grid, Chip, Table, TableHead, TableRow, TableCell,
-  TableBody, IconButton, Tooltip, CircularProgress,
+  TableBody, IconButton, Tooltip, CircularProgress, Button,
 } from '@mui/material';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
-import { overwatchSummary, OverwatchSummary } from '../services/overwatchService';
+import { overwatchSummary, OverwatchSummary, overwatchNarrative, OverwatchNarrative, overwatchLlmStatus } from '../services/overwatchService';
 
 /* ── Palette (Overwatch spec) ───────────────────────────── */
 const C = {
@@ -96,6 +96,9 @@ const OverwatchPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshedAt, setRefreshedAt] = useState<Date | null>(null);
+  const [narrative, setNarrative] = useState<OverwatchNarrative | null>(null);
+  const [narrativeLoading, setNarrativeLoading] = useState(false);
+  const [llmEnabled, setLlmEnabled] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const isAdmin = user?.role === 'main_admin' || user?.role === 'admin';
@@ -119,6 +122,23 @@ const OverwatchPage: React.FC = () => {
     timerRef.current = setInterval(load, 60000);
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [isAdmin, load]);
+
+  const runNarrative = useCallback(async () => {
+    if (!data) return;
+    setNarrativeLoading(true);
+    try {
+      setNarrative(await overwatchNarrative(data));
+    } catch (e: any) {
+      setNarrative({ enabled: true, error: e?.response?.data?.message || e?.message || 'AI briefing failed' });
+    } finally {
+      setNarrativeLoading(false);
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+    overwatchLlmStatus().then((st) => setLlmEnabled(!!st.enabled)).catch(() => setLlmEnabled(false));
+  }, [isAdmin]);
 
   if (!isAdmin) {
     return (
@@ -146,6 +166,15 @@ const OverwatchPage: React.FC = () => {
               Refreshed {refreshedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </Typography>
           )}
+          <Button
+            onClick={runNarrative}
+            disabled={!data || narrativeLoading}
+            size="small"
+            variant="outlined"
+            sx={{ color: C.blue, borderColor: C.border, textTransform: 'none', fontSize: '0.75rem' }}
+          >
+            {narrativeLoading ? 'Generating…' : (llmEnabled ? 'AI briefing' : 'AI briefing (set key)')}
+          </Button>
           <Tooltip title="Refresh">
             <IconButton onClick={load} size="small" sx={{ color: C.sub, '&:hover': { color: C.blue } }}>
               <RefreshIcon fontSize="small" />
@@ -153,6 +182,21 @@ const OverwatchPage: React.FC = () => {
           </Tooltip>
         </Box>
       </Box>
+
+      {narrative && (
+        <Box sx={{ bgcolor: C.surface, border: `1px solid ${C.border}`, borderRadius: '12px', p: 2, mb: 2.5 }}>
+          <Typography sx={{ color: C.title, fontWeight: 800, fontSize: '0.9rem', mb: 1 }}>
+            AI briefing{narrative.model ? ` · ${narrative.model}` : ''}
+          </Typography>
+          {narrative.enabled === false ? (
+            <Typography sx={{ color: C.sub, fontSize: '0.8rem' }}>{narrative.reason || 'AI briefing is not configured.'}</Typography>
+          ) : narrative.error ? (
+            <Typography sx={{ color: C.red, fontSize: '0.8rem' }}>{narrative.error}{narrative.detail ? ` — ${narrative.detail}` : ''}</Typography>
+          ) : (
+            <Typography component="pre" sx={{ color: C.title, fontWeight: 400, fontSize: '0.82rem', whiteSpace: 'pre-wrap', fontFamily: 'inherit', m: 0 }}>{narrative.briefing}</Typography>
+          )}
+        </Box>
+      )}
 
       {loading && !data ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>

@@ -75,3 +75,24 @@ export async function overwatchSummary(): Promise<OverwatchSummary> {
   const response = await api.get('/overwatch/summary');
   return response.data.data;
 }
+
+
+export interface OverwatchNarrative {
+  enabled: boolean;
+  briefing?: string;
+  model?: string;
+  error?: string;
+  reason?: string;
+  detail?: string;
+  generatedAt?: string;
+}
+
+export async function overwatchLlmStatus(): Promise<{ enabled: boolean }> {
+  const response = await api.get('/overwatch/llm-status');
+  return response.data.data;
+}
+
+export async function overwatchNarrative(summary: OverwatchSummary): Promise<OverwatchNarrative> {
+  const response = await api.post('/overwatch/narrative', { summary });
+  return response.data.data;
+}

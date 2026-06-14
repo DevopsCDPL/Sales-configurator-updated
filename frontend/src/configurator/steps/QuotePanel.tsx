@@ -23,6 +23,7 @@ import configuratorV2Service, {
   QuotePreviewResponse, QuoteRevisionRow, LaborAdjustment,
 } from '../../services/configuratorV2Service';
 import QuoteCharts from './QuoteCharts';
+import SeedStandardsBanner from './SeedStandardsBanner';
 
 const C = {
   bg: '#000000', surface: '#0B0B0D', border: '#1E2235', blue: '#00c8ff',
@@ -68,6 +69,7 @@ const QuotePanel: React.FC<QuotePanelProps> = ({ switchboardId }) => {
   const [issuing, setIssuing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [issued, setIssued] = useState<string | null>(null);
+  const [seedKeys, setSeedKeys] = useState<string[]>([]);
   const [expandedLines, setExpandedLines] = useState<Record<string, boolean>>({});
   const [savingLine, setSavingLine] = useState<string | null>(null);
 
@@ -121,6 +123,10 @@ const QuotePanel: React.FC<QuotePanelProps> = ({ switchboardId }) => {
   };
 
   const issue = async () => {
+    if (seedKeys.length && !window.confirm(
+      seedKeys.length + ' engineering-standards value(s) are still unverified seed defaults. '
+      + 'Issue this quotation anyway? Confirm them on the Standards page for a fully verified quote.'
+    )) return;
     setIssuing(true);
     setError(null);
     try {
@@ -166,6 +172,7 @@ const QuotePanel: React.FC<QuotePanelProps> = ({ switchboardId }) => {
 
   return (
     <Box sx={{ px: 3, pb: 4 }}>
+      <SeedStandardsBanner onLoaded={(s) => setSeedKeys(s.seedKeys)} />
       {error && (
         <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 2, bgcolor: 'rgba(239,68,68,0.08)', color: '#FCA5A5', border: '1px solid ' + C.border, fontSize: 12 }}>
           {error}

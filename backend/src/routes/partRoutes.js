@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { authenticate, authorize } = require('../middleware/auth');
 const { tenantScope } = require('../middleware/tenantScope');
+const { requireResource } = require('../middleware/departments');
 const partController = require('../controllers/partController');
 const multer = require('multer');
 const path = require('path');
@@ -27,6 +28,7 @@ const drawingUpload = multer({
 
 router.use(authenticate);
 router.use(tenantScope);
+router.use(requireResource('catalog'));
 
 // Lookup endpoints (static material/form data — no DB needed)
 router.get('/lookup/categories', partController.getMaterialCategories);

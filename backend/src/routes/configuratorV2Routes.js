@@ -21,6 +21,7 @@ const { Op } = require('sequelize');
 const router = express.Router();
 const { authenticate } = require('../middleware/auth');
 const { tenantScope } = require('../middleware/tenantScope');
+const { requireResource } = require('../middleware/departments');
 const models = require('../models');
 const { sequelize } = models;
 const swJobs = require('../services/configurator/swJobsService');
@@ -90,6 +91,7 @@ router.post('/agent/:jobId/fail', authenticate, wrap(async (req, res) => {
 /* ─────────────────────────── UI endpoints ───────────────────────────── */
 router.use(authenticate);
 router.use(tenantScope);
+router.use(requireResource('configurator'));
 
 // Switchboards
 router.get('/configurations/:configId/switchboards', wrap(async (req, res) => {
@@ -464,6 +466,16 @@ router.put('/engineering-standards/:tableKey', wrap(async (req, res) => {
     company_id: req.companyId ?? null,
   });
   res.status(201).json(row);
+}));
+
+// Engineering-standards seed status (Phase 4): which standards are still
+// unverified seed defaults vs tenant-confirmed. scope=cost (default) limits
+// to keys that feed BOM/quote/proposal math; scope=all = every known table.
+router.get('/engineering-standards-seed-status', wrap(async (req, res) => {
+  const scope = req.query.scope === 'all' ? 'all' : 'cost';
+  const keys = scope === 'all' ? null : standardsService.costAffectingKeys();
+  const status = await standardsService.seedStatus(req.companyId ?? null, keys);
+  res.json({ scope, ...status });
 }));
 
 // Completeness check

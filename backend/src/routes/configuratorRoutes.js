@@ -20,12 +20,14 @@ const express = require('express');
 const router = express.Router();
 const { authenticate } = require('../middleware/auth');
 const { tenantScope } = require('../middleware/tenantScope');
+const { requireResource } = require('../middleware/departments');
 const { body, param } = require('express-validator');
 const { validate } = require('../middleware/validate');
 const c = require('../controllers/configuratorController');
 
 router.use(authenticate);
 router.use(tenantScope);
+router.use(requireResource('configurator'));
 
 // ── Components ──────────────────────────────────────────────────────────────
 router.get('/components', c.listComponents);

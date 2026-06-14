@@ -203,4 +203,133 @@ router.delete('/machines/:id', async (req, res) => {
   }
 });
 
+// ── P1: task lifecycle helpers ───────────────────────────────────────
+async function logEvent(taskId, userId, event, extra, companyId) {
+  try {
+    await models.TaskEvent.create({
+      task_id: taskId, user_id: userId || null, at: new Date(),
+      meta: Object.assign({ event }, extra || {}), company_id: companyId || null,
+    });
+  } catch (e) { /* non-fatal */ }
+}
+async function notify(userId, title, body, entity, companyId) {
+  if (!userId) return;
+  try {
+    await models.AppNotification.create({
+      user_id: userId, title, body: body || '', read_at: null,
+      entity: entity || null, company_id: companyId || null,
+    });
+  } catch (e) { /* non-fatal */ }
+}
+
+// ── P1: create / assign / check-in / check-out ───────────────────────
+router.post('/tasks', async (req, res) => {
+  try {
+    const b = req.body || {};
+    if (!b.title || !b.department) return res.status(400).json({ success: false, message: 'title and department are required' });
+    const companyId = req.user && req.user.company_id ? req.user.company_id : null;
+    const task = await models.WorkTask.create({
+      work_order_id: b.work_order_id || null,
+      board_id: b.board_id || null,
+      department: b.department,
+      seq: Number(b.seq) || 0,
+      title: b.title,
+      status: b.assignee_user_id ? 'assigned' : 'pending',
+      assignee_user_id: b.assignee_user_id || null,
+      machine_id: b.machine_id || null,
+      est_hours: b.est_hours != null ? Number(b.est_hours) : null,
+      quality_gate: !!b.quality_gate,
+      meta: b.meta || {},
+      company_id: companyId,
+    });
+    await logEvent(task.id, req.user && req.user.id, 'created', { assignee: b.assignee_user_id || null }, companyId);
+    if (b.assignee_user_id) await notify(b.assignee_user_id, 'Task assigned: ' + b.title, 'You have been assigned a ' + b.department + ' task.', { task_id: task.id, board_id: b.board_id || null }, companyId);
+    return res.status(201).json({ success: true, data: task });
+  } catch (err) { return res.status(500).json({ success: false, message: err.message }); }
+});
+
+router.patch('/tasks/:id', async (req, res) => {
+  try {
+    const task = await models.WorkTask.findOne({ where: companyWhere(req, { id: req.params.id }) });
+    if (!task) return res.status(404).json({ success: false, message: 'task not found' });
+    const b = req.body || {};
+    const prevAssignee = task.assignee_user_id;
+    const patch = {};
+    ['title', 'department', 'status', 'machine_id', 'quality_gate'].forEach((k) => { if (b[k] !== undefined) patch[k] = b[k]; });
+    if (b.seq !== undefined) patch.seq = Number(b.seq) || 0;
+    if (b.est_hours !== undefined) patch.est_hours = b.est_hours != null ? Number(b.est_hours) : null;
+    if (b.assignee_user_id !== undefined) {
+      patch.assignee_user_id = b.assignee_user_id || null;
+      if (b.assignee_user_id && patch.status === undefined && task.status === 'pending') patch.status = 'assigned';
+    }
+    await task.update(patch);
+    await logEvent(task.id, req.user && req.user.id, 'updated', patch, task.company_id);
+    if (b.assignee_user_id !== undefined && b.assignee_user_id && b.assignee_user_id !== prevAssignee) {
+      await notify(b.assignee_user_id, 'Task assigned: ' + task.title, 'You have been assigned a ' + task.department + ' task.', { task_id: task.id, board_id: task.board_id }, task.company_id);
+    }
+    return res.json({ success: true, data: task });
+  } catch (err) { return res.status(500).json({ success: false, message: err.message }); }
+});
+
+router.post('/tasks/:id/check-in', async (req, res) => {
+  try {
+    const task = await models.WorkTask.findOne({ where: companyWhere(req, { id: req.params.id }) });
+    if (!task) return res.status(404).json({ success: false, message: 'task not found' });
+    await task.update({ status: 'in_progress', started_at: task.started_at || new Date() });
+    await logEvent(task.id, req.user && req.user.id, 'check_in', null, task.company_id);
+    return res.json({ success: true, data: task });
+  } catch (err) { return res.status(500).json({ success: false, message: err.message }); }
+});
+
+router.post('/tasks/:id/check-out', async (req, res) => {
+  try {
+    const task = await models.WorkTask.findOne({ where: companyWhere(req, { id: req.params.id }) });
+    if (!task) return res.status(404).json({ success: false, message: 'task not found' });
+    const status = req.body && req.body.status ? req.body.status : 'done';
+    await task.update({ status, finished_at: new Date() });
+    await logEvent(task.id, req.user && req.user.id, 'check_out', { status, note: (req.body && req.body.note) || null }, task.company_id);
+    return res.json({ success: true, data: task });
+  } catch (err) { return res.status(500).json({ success: false, message: err.message }); }
+});
+
+router.get('/my-tasks', async (req, res) => {
+  try {
+    const rows = await models.WorkTask.findAll({ where: companyWhere(req, { assignee_user_id: req.user.id }), order: [['status', 'ASC'], ['seq', 'ASC']] });
+    return res.json({ success: true, data: rows });
+  } catch (err) { return res.status(500).json({ success: false, message: err.message }); }
+});
+
+router.get('/tasks/:id/events', async (req, res) => {
+  try {
+    const rows = await models.TaskEvent.findAll({ where: companyWhere(req, { task_id: req.params.id }), order: [['at', 'ASC']] });
+    return res.json({ success: true, data: rows });
+  } catch (err) { return res.status(500).json({ success: false, message: err.message }); }
+});
+
+// ── P1: in-app notifications (channel-agnostic; in-app bell for v1) ───
+router.get('/notifications', async (req, res) => {
+  try {
+    const rows = await models.AppNotification.findAll({ where: companyWhere(req, { user_id: req.user.id }), limit: 200 });
+    rows.sort((a, b) => (a.read_at ? 1 : 0) - (b.read_at ? 1 : 0));
+    const unread = rows.filter((r) => !r.read_at).length;
+    return res.json({ success: true, data: { items: rows, unread } });
+  } catch (err) { return res.status(500).json({ success: false, message: err.message }); }
+});
+
+router.post('/notifications/:id/read', async (req, res) => {
+  try {
+    const row = await models.AppNotification.findOne({ where: companyWhere(req, { id: req.params.id, user_id: req.user.id }) });
+    if (!row) return res.status(404).json({ success: false, message: 'not found' });
+    await row.update({ read_at: new Date() });
+    return res.json({ success: true, data: row });
+  } catch (err) { return res.status(500).json({ success: false, message: err.message }); }
+});
+
+router.post('/notifications/read-all', async (req, res) => {
+  try {
+    await models.AppNotification.update({ read_at: new Date() }, { where: companyWhere(req, { user_id: req.user.id, read_at: null }) });
+    return res.json({ success: true });
+  } catch (err) { return res.status(500).json({ success: false, message: err.message }); }
+});
+
 module.exports = router;

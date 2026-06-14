@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 import configuratorV2Service, { BomResponse, BomRow } from '../../services/configuratorV2Service';
+import SeedStandardsBanner from './SeedStandardsBanner';
 
 const C = {
   bg: '#000000', surface: '#0B0B0D', border: '#1E2235', blue: '#00c8ff',
@@ -183,6 +184,14 @@ const BomViewer: React.FC<BomViewerProps> = ({ switchboardId }) => {
 
   return (
     <Box sx={{ px: 3, pb: 4 }}>
+      <SeedStandardsBanner />
+      {!!(bom.seedStandards && bom.seedStandards.length) && (
+        <Typography sx={{ color: C.amber, fontSize: 11, mb: 1.5, mt: -0.5 }}>
+          Generated rows on unverified seed standards: {bom.seedStandards.map((k) => (
+            { copper_estimator: 'copper estimate', ground_bus: 'ground bus', copper_grades: 'copper density', termination_factors: 'terminations' } as Record<string, string>
+          )[k] ?? k).join(', ')}.
+        </Typography>
+      )}
       <Stack direction="row" spacing={1.5} alignItems="flex-start">
         {/* LEFT — consolidated board BOM table */}
         <Box sx={{ flex: 1, minWidth: 0 }}>

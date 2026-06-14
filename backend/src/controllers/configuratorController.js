@@ -388,7 +388,17 @@ const getCopperPrice = handle(async (req, res) => {
     return ok(res, snap);
   }
   const live = await marketDataService.getCopperPrice({ companyId: req.user.company_id });
-  ok(res, live);
+  // Normalize to the frontend CopperPrice contract: the service returns `price`,
+  // while the snapshot path returns `price_per_lb`. Without this the live COMEX
+  // widget reads price_per_lb=undefined and crashes on .toFixed.
+  ok(res, {
+    price_per_lb: Number(live?.price) || 0,
+    currency: live?.currency || 'USD',
+    source: live?.source ?? null,
+    fetched_at: live?.asOf,
+    cached: false,
+    fallback: /demo|fallback/i.test(String(live?.source || '')),
+  });
 });
 
 // ── Drawing generation proxy ───────────────────────────────────────────────

@@ -20,6 +20,7 @@ const { Op } = require('sequelize');
 const { authenticate, authorize } = require('../middleware/auth');
 const { tenantScope } = require('../middleware/tenantScope');
 const db = require('../models');
+const overwatchLlm = require('../services/overwatchLlmService');
 
 router.use(authenticate);
 router.use(tenantScope);
@@ -376,6 +377,18 @@ router.get('/summary', async (req, res) => {
   }
 
   return res.json({ success: true, data: summary });
+});
+
+// ── LLM briefing (Item 3) — optional AI narrative; disabled-safe when no key ──
+router.get('/llm-status', (req, res) => {
+  res.json({ success: true, data: { enabled: overwatchLlm.isEnabled() } });
+});
+
+router.post('/narrative', async (req, res) => {
+  const summary = req.body && req.body.summary ? req.body.summary : null;
+  if (!summary) return res.status(400).json({ success: false, message: 'summary required in body' });
+  const out = await overwatchLlm.generateBriefing(summary);
+  res.json({ success: true, data: out });
 });
 
 module.exports = router;

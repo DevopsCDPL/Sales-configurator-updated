@@ -270,4 +270,28 @@ Structural rules — replicate exactly for any new table:
 4. **All other data columns** (qty basis, unit, where-used…): left-aligned,
    vertical-center.
 5. **Unit price / Unit cost / Ext.**: NO DECIMALS, rounded **UP** — `usd()` is
-   `Math.ceil(n).toLocale
+   `Math.ceil(n).toLocaleString('en-US',{style:'currency',currency:'USD',
+   maximumFractionDigits:0})` — and **RIGHT-aligned** (`priceCellSx` +
+   `align="right"`). No inline dots in price cells; the number stays clean.
+6. **Dots stacked UNDER the SKU / Part# code.** In the code column, render the
+   code chip on top and, stacked directly BELOW it, the **provenance dot**
+   (`<PriceSourceDot source={priceSource}/>` — TPS/RFQ/web/manual) and the
+   **price-status dot** (FIRM green / ESTIMATED amber / PENDING_RFQ red, 7px,
+   tooltip). Because status now lives under the code, there is **NO standalone
+   Status column** — remove it (Components net columns: S.No · Category ·
+   Component · SKU(+dots) · Catalog description · Qty basis · Qty · Unit price ·
+   Actions). The BOM eBOM **Source** column (rule / `GEN-…` chip) is *distinct*
+   from provenance — it is the row's generator/origin, not price firmness — so
+   keep it. Never drop a backend field to fit.
+
+### Segmented view toggle
+
+When a table offers alternate views (e.g. eBOM vs mBOM), use a segmented
+control, NOT separate buttons — matching the catalog Source/Status toggles:
+
+- Container: `bgcolor #0B0B0D`, `border 1px solid #1E2235`,
+  `borderRadius 8px`, `display inline-flex`, `p 0.25`.
+- Each pill: `borderRadius 6px`, `height ~24`, `px 1.25`, `fontSize 11.5`.
+  Active = `bgcolor rgba(0,200,255,0.14)` / `color #00c8ff`.
+  Inactive = `transparent` / `#64748B`.
+- Labels are compact and descriptive ("eBOM · by section", "mBOM · by part").

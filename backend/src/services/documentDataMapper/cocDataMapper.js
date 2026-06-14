@@ -1,24 +1,26 @@
-/**
- * COC (Certificate of Conformance) Data Mapper
- *
- * Provides structured COC data for document generation.
- *
- * FUTURE DESIGN NOTE:
- * This mapper will become the single source of truth for COC document data
- * in Forge i-DAS. COC PDFs should call getCOCData() instead of directly
- * reading from quality or production modules.
- */
+'use strict';
+const db = require('../../models');
+const { num } = require('./_mapperUtil');
 
-/**
- * Get structured COC data for a given project.
- *
- * @param {string} projectId
- * @returns {Promise<import('./documentDataTypes').COCData | null>}
- */
+/** @returns {Promise<import('./documentDataTypes').COCData | null>} */
 async function getCOCData(projectId) {
-  // TODO: Implement data aggregation from quality and production modules
-  // For now, return null as a placeholder — not connected to any module.
-  return null;
+  if (!projectId) return null;
+  const project = await db.Project.findByPk(projectId);
+  if (!project) return null;
+  const qr = await db.QualityRecord.findOne({ where: { project_id: projectId }, order: [['created_at', 'DESC']] }).catch(() => null);
+  const wo = await db.WorkOrder.findOne({ where: { project_id: projectId }, order: [['created_at', 'DESC']] }).catch(() => null);
+  let serials = [];
+  const idj = qr && qr.inspection_data_json;
+  if (idj && Array.isArray(idj.serialNumbers)) serials = idj.serialNumbers;
+  else if (idj && Array.isArray(idj.serials)) serials = idj.serials;
+  return {
+    cocNumber: qr ? ('COC-' + String(qr.id).slice(0, 8)) : '',
+    productionId: (wo && wo.production_traveler_number) || '',
+    productDescription: project.project_name || '',
+    revision: project.revision || project.selected_revision || '',
+    quantity: num(project.quantity, 1),
+    serialNumbers: serials.map(String),
+    materialHeatNumber: project.heat_number || '',
+  };
 }
-
 module.exports = { getCOCData };

@@ -3,10 +3,12 @@ const router = express.Router();
 const workOrderController = require('../controllers/workOrderController');
 const { authenticate, authorize } = require('../middleware/auth');
 const { tenantScope } = require('../middleware/tenantScope');
+const { requireResource } = require('../middleware/departments');
 
 // All routes require authentication + tenant scoping
 router.use(authenticate);
 router.use(tenantScope);
+router.use(requireResource('workorders'));
 
 // Create a new work order
 router.post('/', workOrderController.createWorkOrder);

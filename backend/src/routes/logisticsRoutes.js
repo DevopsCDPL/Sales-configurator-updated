@@ -3,6 +3,7 @@ const router = express.Router();
 const logisticsController = require('../controllers/logisticsController');
 const { authenticate, authorize } = require('../middleware/auth');
 const { tenantScope } = require('../middleware/tenantScope');
+const { requireResource } = require('../middleware/departments');
 const multer = require('multer');
 const path = require('path');
 
@@ -20,6 +21,7 @@ const upload = multer({
 // All routes require authentication
 router.use(authenticate);
 router.use(tenantScope);
+router.use(requireResource('logistics'));
 
 // get carriers
 router.get('/carriers', logisticsController.getCarriers);

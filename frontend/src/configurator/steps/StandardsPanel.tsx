@@ -246,19 +246,20 @@ const StandardsPanel: React.FC = () => {
           <Box>
             <Typography sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4 }}>COMEX COPPER (LIVE)</Typography>
             <Typography sx={{ color: C.blue, fontWeight: 800, fontSize: 16 }}>
-              {liveCopper ? '$' + liveCopper.price_per_lb.toFixed(2) + '/lb' : '\u2014'}
+              {Number.isFinite(Number(liveCopper?.price_per_lb)) ? '$' + Number(liveCopper?.price_per_lb).toFixed(2) + '/lb' : '\u2014'}
               {liveCopper?.fallback && <Box component="span" sx={{ color: C.amber, fontSize: 10, ml: 0.8, fontWeight: 600 }}>(fallback)</Box>}
             </Typography>
             {liveCopper?.source && <Typography sx={{ color: C.sub, fontSize: 9.5 }}>{liveCopper.source}</Typography>}
           </Box>
           {tableKey === 'copper_cost' && rows[0] && (() => {
             const cc = rows[0] || {};
-            const base = cc.comex_source === 'manual' ? (Number(cc.manual_price_per_lb) || 0) : (liveCopper?.price_per_lb ?? Number(cc.manual_price_per_lb) ?? 0);
+            const liveLb = Number(liveCopper?.price_per_lb);
+            const base = cc.comex_source === 'manual' ? (Number(cc.manual_price_per_lb) || 0) : (Number.isFinite(liveLb) ? liveLb : (Number(cc.manual_price_per_lb) || 0));
             const delivered = base + (Number(cc.fabrication_adder_per_lb) || 0) + (Number(cc.plating_tin_adder_per_lb) || 0);
             return (
               <Box>
                 <Typography sx={{ color: C.sub, fontSize: 10, fontWeight: 700, letterSpacing: 0.4 }}>DELIVERED $/LB (PREVIEW)</Typography>
-                <Typography sx={{ color: C.green, fontWeight: 800, fontSize: 16 }}>{'$' + delivered.toFixed(2) + '/lb'}</Typography>
+                <Typography sx={{ color: C.green, fontWeight: 800, fontSize: 16 }}>{'$' + (Number(delivered) || 0).toFixed(2) + '/lb'}</Typography>
                 <Typography sx={{ color: C.sub, fontSize: 9.5 }}>= base + fab adder + tin plating</Typography>
                 <Typography sx={{ color: C.sub, fontSize: 9.5 }}>
                   {cc.comex_source === 'manual' ? 'base: manual ($' + (Number(cc.manual_price_per_lb) || 0).toFixed(2) + ')' : 'base: live COMEX'}
