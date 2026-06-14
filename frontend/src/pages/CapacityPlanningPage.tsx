@@ -5,6 +5,7 @@ import {
 } from '@mui/material';
 import { Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
+import { userManagementService, UserRecord } from '../services/userManagementService';
 import {
   listTeams, createTeam, deleteTeam,
   listWorkers, createWorker, deleteWorker,
@@ -95,12 +96,13 @@ const CapacityPlanningPage: React.FC = () => {
   const [notifications, setNotifications] = useState<AppNotificationRow[]>([]);
   const [notifUnread, setNotifUnread] = useState(0);
   const [taskForm, setTaskForm] = useState({ title: '', department: DEPARTMENTS[0], assignee: '', est_hours: '', board_id: '' });
+  const [users, setUsers] = useState<UserRecord[]>([]);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [t, w, m, tk, mt, nf] = await Promise.all([listTeams(), listWorkers(), listMachines(), listTasks(), listMyTasks(), listNotifications()]);
-      setTeams(t); setWorkers(w); setMachines(m); setTasks(tk); setMyTasks(mt); setNotifications(nf.items); setNotifUnread(nf.unread);
+      const [t, w, m, tk, mt, nf, us] = await Promise.all([listTeams(), listWorkers(), listMachines(), listTasks(), listMyTasks(), listNotifications(), userManagementService.getAll().catch(() => [] as UserRecord[])]);
+      setTeams(t); setWorkers(w); setMachines(m); setTasks(tk); setMyTasks(mt); setNotifications(nf.items); setNotifUnread(nf.unread); setUsers(us);
       setError(null);
     } catch (e: any) {
       setError(e?.response?.data?.message || e?.message || 'Failed to load capacity data.');
@@ -182,12 +184,12 @@ const CapacityPlanningPage: React.FC = () => {
     if (!taskForm.title.trim()) return;
     setSaving(true);
     try {
-      const aw = workers.find((x) => x.id === taskForm.assignee);
+      const au = users.find((x) => x.id === taskForm.assignee);
       await createTask({
         title: taskForm.title.trim(),
         department: taskForm.department,
-        assignee_user_id: aw?.user_id || null,
-        meta: aw ? { worker_id: aw.id, worker_name: aw.display_name } : {},
+        assignee_user_id: au?.id || null,
+        meta: au ? { worker_name: au.name } : {},
         est_hours: taskForm.est_hours ? Number(taskForm.est_hours) : null,
         board_id: taskForm.board_id.trim() || null,
       });
@@ -213,15 +215,17 @@ const CapacityPlanningPage: React.FC = () => {
     catch (e: any) { setError(e?.response?.data?.message || 'Failed.'); }
   };
   const assigneeName = (t: WorkTask) => {
+    const uid = t.assignee_user_id;
+    if (uid) {
+      const u = users.find((x) => x.id === uid);
+      if (u) return u.name;
+      if (uid === user?.id) return 'Me';
+    }
     const wn = t.meta ? (t.meta as Record<string, any>).worker_name : null;
     if (wn) return String(wn);
-    const uid = t.assignee_user_id;
-    if (!uid) return '\u2014';
-    if (uid === user?.id) return 'Me';
-    const w = workers.find((x) => x.user_id === uid);
-    return w?.display_name || uid.slice(0, 8);
+    return uid ? uid.slice(0, 8) : '\u2014';
   };
-  const statusColor = (st: string) => (({ pending: '#64748B', assigned: '#00c8ff', in_progress: '#D97706', done: '#22C55E' }) as Record<string, string>)[st] || '#64748B';
+  const statusColor = (st: string) => (({ pending: '#64748B', ready: '#00c8ff', checked_in: '#D97706', done: '#22C55E', quality_hold: '#EF4444' }) as Record<string, string>)[st] || '#64748B';
   const miniBtnSx = { textTransform: 'none', fontSize: '0.72rem', color: C.blue, minWidth: 0, px: 1 } as const;
 
   const hasAll = teams.length > 0 && workers.length > 0 && machines.length > 0;
@@ -482,12 +486,12 @@ const CapacityPlanningPage: React.FC = () => {
                   </TextField>
                 </Grid>
                 <Grid item xs={6} sm={3}>
-                  <TextField fullWidth select size="small" label="Assignee (worker)" sx={fieldSx}
+                  <TextField fullWidth select size="small" label="Assignee (user)" sx={fieldSx}
                     value={taskForm.assignee} onChange={(e) => setTaskForm({ ...taskForm, assignee: e.target.value })}>
                     <MenuItem value="">— Unassigned —</MenuItem>
-                    {workers.length === 0 ? <MenuItem value="" disabled>Add a worker first (Workers tab)</MenuItem> : null}
-                    {workers.map((w) => (
-                      <MenuItem key={w.id} value={w.id}>{w.display_name || 'Worker'}</MenuItem>
+                    {users.length === 0 ? <MenuItem value="" disabled>Add a user first (Settings → Users)</MenuItem> : null}
+                    {users.map((u) => (
+                      <MenuItem key={u.id} value={u.id}>{u.name} ({u.email})</MenuItem>
                     ))}
                   </TextField>
                 </Grid>
@@ -521,10 +525,10 @@ const CapacityPlanningPage: React.FC = () => {
                         <TableCell><Chip label={displayCase(t.status)} size="small"
                           sx={{ height: 18, fontSize: '0.65rem', bgcolor: 'rgba(255,255,255,0.06)', color: statusColor(t.status), fontWeight: 700 }} /></TableCell>
                         <TableCell align="right">
-                          {(t.status === 'pending' || t.status === 'assigned') && (
+                          {(t.status === 'pending' || t.status === 'ready') && (
                             <Button size="small" onClick={() => handleCheckIn(t.id)} sx={miniBtnSx}>Check in</Button>
                           )}
-                          {t.status === 'in_progress' && (
+                          {t.status === 'checked_in' && (
                             <Button size="small" onClick={() => handleCheckOut(t.id)} sx={miniBtnSx}>Check out</Button>
                           )}
                         </TableCell>
@@ -557,10 +561,10 @@ const CapacityPlanningPage: React.FC = () => {
                         <TableCell><Chip label={displayCase(t.status)} size="small"
                           sx={{ height: 18, fontSize: '0.65rem', bgcolor: 'rgba(255,255,255,0.06)', color: statusColor(t.status), fontWeight: 700 }} /></TableCell>
                         <TableCell align="right">
-                          {(t.status === 'pending' || t.status === 'assigned') && (
+                          {(t.status === 'pending' || t.status === 'ready') && (
                             <Button size="small" onClick={() => handleCheckIn(t.id)} sx={miniBtnSx}>Check in</Button>
                           )}
-                          {t.status === 'in_progress' && (
+                          {t.status === 'checked_in' && (
                             <Button size="small" onClick={() => handleCheckOut(t.id)} sx={miniBtnSx}>Check out</Button>
                           )}
                         </TableCell>

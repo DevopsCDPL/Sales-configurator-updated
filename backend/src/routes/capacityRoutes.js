@@ -234,7 +234,7 @@ router.post('/tasks', async (req, res) => {
       department: b.department,
       seq: Number(b.seq) || 0,
       title: b.title,
-      status: b.assignee_user_id ? 'assigned' : 'pending',
+      status: b.assignee_user_id ? 'ready' : 'pending',
       assignee_user_id: b.assignee_user_id || null,
       machine_id: b.machine_id || null,
       est_hours: b.est_hours != null ? Number(b.est_hours) : null,
@@ -260,7 +260,7 @@ router.patch('/tasks/:id', async (req, res) => {
     if (b.est_hours !== undefined) patch.est_hours = b.est_hours != null ? Number(b.est_hours) : null;
     if (b.assignee_user_id !== undefined) {
       patch.assignee_user_id = b.assignee_user_id || null;
-      if (b.assignee_user_id && patch.status === undefined && task.status === 'pending') patch.status = 'assigned';
+      if (b.assignee_user_id && patch.status === undefined && task.status === 'pending') patch.status = 'ready';
     }
     await task.update(patch);
     await logEvent(task.id, req.user && req.user.id, 'updated', patch, task.company_id);
@@ -275,7 +275,7 @@ router.post('/tasks/:id/check-in', async (req, res) => {
   try {
     const task = await models.WorkTask.findOne({ where: companyWhere(req, { id: req.params.id }) });
     if (!task) return res.status(404).json({ success: false, message: 'task not found' });
-    await task.update({ status: 'in_progress', started_at: task.started_at || new Date() });
+    await task.update({ status: 'checked_in', started_at: task.started_at || new Date() });
     await logEvent(task.id, req.user && req.user.id, 'check_in', null, task.company_id);
     return res.json({ success: true, data: task });
   } catch (err) { return res.status(500).json({ success: false, message: err.message }); }
