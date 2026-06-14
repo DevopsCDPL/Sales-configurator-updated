@@ -89,7 +89,7 @@ const CapacityPlanningPage: React.FC = () => {
 
   // Form state
   const [teamForm, setTeamForm] = useState({ name: '', department: DEPARTMENTS[0] });
-  const [workerForm, setWorkerForm] = useState({ display_name: '', team_id: '', skills: '', hours_per_day: 8 });
+  const [workerForm, setWorkerForm] = useState({ user_id: '', team_id: '', skills: '', hours_per_day: 8 });
   const [machineForm, setMachineForm] = useState({ name: '', type: MACHINE_TYPES[0], capacity_per_day: 8 });
   const [tasks, setTasks] = useState<WorkTask[]>([]);
   const [myTasks, setMyTasks] = useState<WorkTask[]>([]);
@@ -128,19 +128,21 @@ const CapacityPlanningPage: React.FC = () => {
   };
 
   const handleAddWorker = async () => {
-    if (!workerForm.display_name.trim()) return;
+    const wu = users.find((x) => x.id === workerForm.user_id);
+    if (!wu) { setError('Pick a user for the team member.'); return; }
     const team = teams.find((t) => t.id === workerForm.team_id);
-    if (!team) { setError('Pick a team for the worker first.'); return; }
+    if (!team) { setError('Pick a team for the member first.'); return; }
     setSaving(true);
     try {
       await createWorker({
-        display_name: workerForm.display_name.trim(),
+        user_id: wu.id,
+        display_name: wu.name,
         department: team.department,
         team_id: team.id,
         skills: workerForm.skills.split(',').map((s) => s.trim()).filter(Boolean),
         hours_per_day: Number(workerForm.hours_per_day) || 8,
       });
-      setWorkerForm({ display_name: '', team_id: '', skills: '', hours_per_day: 8 });
+      setWorkerForm({ user_id: '', team_id: '', skills: '', hours_per_day: 8 });
       await load();
     } catch (e: any) {
       setError(e?.response?.data?.message || 'Failed to add worker.');
@@ -363,8 +365,13 @@ const CapacityPlanningPage: React.FC = () => {
               )}
               <Grid container spacing={1.5} sx={{ mb: 2 }} alignItems="flex-end">
                 <Grid item xs={12} sm={3}>
-                  <TextField fullWidth size="small" label="Worker name" sx={fieldSx}
-                    value={workerForm.display_name} onChange={(e) => setWorkerForm({ ...workerForm, display_name: e.target.value })} />
+                  <TextField fullWidth select size="small" label="Team member (user)" sx={fieldSx}
+                    value={workerForm.user_id} onChange={(e) => setWorkerForm({ ...workerForm, user_id: e.target.value })}>
+                    {users.length === 0 ? <MenuItem value="" disabled>Add a user first (Settings → Users)</MenuItem> : null}
+                    {users.filter((u) => !workers.some((w) => w.user_id === u.id)).map((u) => (
+                      <MenuItem key={u.id} value={u.id}>{u.name} ({u.email})</MenuItem>
+                    ))}
+                  </TextField>
                 </Grid>
                 <Grid item xs={12} sm={3}>
                   <TextField fullWidth select size="small" label="Team" sx={fieldSx}
@@ -381,7 +388,7 @@ const CapacityPlanningPage: React.FC = () => {
                     value={workerForm.hours_per_day} onChange={(e) => setWorkerForm({ ...workerForm, hours_per_day: Number(e.target.value) })} />
                 </Grid>
                 <Grid item xs={6} sm={1.5}>
-                  <Button fullWidth startIcon={<AddIcon />} disabled={saving || !workerForm.display_name.trim() || !workerForm.team_id}
+                  <Button fullWidth startIcon={<AddIcon />} disabled={saving || !workerForm.user_id || !workerForm.team_id}
                     onClick={handleAddWorker} sx={addBtnSx}>Add</Button>
                 </Grid>
               </Grid>

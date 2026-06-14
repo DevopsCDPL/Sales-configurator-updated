@@ -54,6 +54,7 @@ export interface CreateTeamInput {
 }
 
 export interface CreateWorkerInput {
+  user_id?: string | null;
   display_name: string;
   department: string;
   team_id?: string | null;
