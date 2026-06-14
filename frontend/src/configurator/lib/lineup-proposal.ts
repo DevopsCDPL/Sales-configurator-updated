@@ -324,6 +324,16 @@ export function proposeLineup(
   }));
 
   // NEMA suggestion (AP-03/AP-07)
+  // R5 (NEC 240.87) + R6 (NEC 230.95) - code validations carried over from V1's
+  // safety-rules. R11 (corrosive/marine -> NEMA 4X) is already handled below.
+  const allDevices = [...feederDevices, ...mains, ...ties];
+  if (allDevices.some((d) => (d.designCurrentA ?? 0) >= 1200)) {
+    warnings.push('R5: device(s) at/above 1200 A require arc-energy reduction (ERMS/ZSI) per NEC 240.87 - verify the trip unit.');
+  }
+  if (intake.serviceEntrance && vs.vLN === 277 && mains.some((m) => (m.designCurrentA ?? 0) >= 1000)) {
+    warnings.push('R6: service disconnect at/above 1000 A on 480Y/277 requires ground-fault protection (GFP) per NEC 230.95 - verify provision.');
+  }
+
   let nemaSuggestion = '1';
   if (intake.specialEnvironment === 'Corrosive' || intake.specialEnvironment === 'Marine') nemaSuggestion = '4X';
   else if (intake.environment === 'Outdoor') nemaSuggestion = '3R';
