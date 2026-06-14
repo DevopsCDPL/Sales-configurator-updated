@@ -94,7 +94,7 @@ const CapacityPlanningPage: React.FC = () => {
   const [myTasks, setMyTasks] = useState<WorkTask[]>([]);
   const [notifications, setNotifications] = useState<AppNotificationRow[]>([]);
   const [notifUnread, setNotifUnread] = useState(0);
-  const [taskForm, setTaskForm] = useState({ title: '', department: DEPARTMENTS[0], assignee_user_id: '', est_hours: '', board_id: '' });
+  const [taskForm, setTaskForm] = useState({ title: '', department: DEPARTMENTS[0], assignee: '', est_hours: '', board_id: '' });
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -182,14 +182,16 @@ const CapacityPlanningPage: React.FC = () => {
     if (!taskForm.title.trim()) return;
     setSaving(true);
     try {
+      const aw = workers.find((x) => x.id === taskForm.assignee);
       await createTask({
         title: taskForm.title.trim(),
         department: taskForm.department,
-        assignee_user_id: taskForm.assignee_user_id || null,
+        assignee_user_id: aw?.user_id || null,
+        meta: aw ? { worker_id: aw.id, worker_name: aw.display_name } : {},
         est_hours: taskForm.est_hours ? Number(taskForm.est_hours) : null,
         board_id: taskForm.board_id.trim() || null,
       });
-      setTaskForm({ title: '', department: DEPARTMENTS[0], assignee_user_id: '', est_hours: '', board_id: '' });
+      setTaskForm({ title: '', department: DEPARTMENTS[0], assignee: '', est_hours: '', board_id: '' });
       await reloadTasks();
     } catch (e: any) { setError(e?.response?.data?.message || 'Failed to add task.'); }
     finally { setSaving(false); }
@@ -210,7 +212,10 @@ const CapacityPlanningPage: React.FC = () => {
     try { await markAllNotificationsRead(); await reloadTasks(); }
     catch (e: any) { setError(e?.response?.data?.message || 'Failed.'); }
   };
-  const assigneeName = (uid?: string | null) => {
+  const assigneeName = (t: WorkTask) => {
+    const wn = t.meta ? (t.meta as Record<string, any>).worker_name : null;
+    if (wn) return String(wn);
+    const uid = t.assignee_user_id;
     if (!uid) return '\u2014';
     if (uid === user?.id) return 'Me';
     const w = workers.find((x) => x.user_id === uid);
@@ -477,12 +482,12 @@ const CapacityPlanningPage: React.FC = () => {
                   </TextField>
                 </Grid>
                 <Grid item xs={6} sm={3}>
-                  <TextField fullWidth select size="small" label="Assignee" sx={fieldSx}
-                    value={taskForm.assignee_user_id} onChange={(e) => setTaskForm({ ...taskForm, assignee_user_id: e.target.value })}>
+                  <TextField fullWidth select size="small" label="Assignee (worker)" sx={fieldSx}
+                    value={taskForm.assignee} onChange={(e) => setTaskForm({ ...taskForm, assignee: e.target.value })}>
                     <MenuItem value="">— Unassigned —</MenuItem>
-                    {user?.id ? <MenuItem value={user.id}>Me</MenuItem> : null}
-                    {workers.filter((w) => w.user_id && w.user_id !== user?.id).map((w) => (
-                      <MenuItem key={w.id} value={w.user_id as string}>{w.display_name || 'Worker'}</MenuItem>
+                    {workers.length === 0 ? <MenuItem value="" disabled>Add a worker first (Workers tab)</MenuItem> : null}
+                    {workers.map((w) => (
+                      <MenuItem key={w.id} value={w.id}>{w.display_name || 'Worker'}</MenuItem>
                     ))}
                   </TextField>
                 </Grid>
@@ -512,7 +517,7 @@ const CapacityPlanningPage: React.FC = () => {
                         <TableCell>{t.title}</TableCell>
                         <TableCell><Chip label={displayCase(t.department)} size="small"
                           sx={{ height: 18, fontSize: '0.65rem', bgcolor: 'rgba(0,200,255,0.08)', color: C.blue, fontWeight: 700 }} /></TableCell>
-                        <TableCell>{assigneeName(t.assignee_user_id)}</TableCell>
+                        <TableCell>{assigneeName(t)}</TableCell>
                         <TableCell><Chip label={displayCase(t.status)} size="small"
                           sx={{ height: 18, fontSize: '0.65rem', bgcolor: 'rgba(255,255,255,0.06)', color: statusColor(t.status), fontWeight: 700 }} /></TableCell>
                         <TableCell align="right">

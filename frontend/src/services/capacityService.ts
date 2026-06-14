@@ -152,6 +152,7 @@ export interface CreateTaskInput {
   est_hours?: number | null;
   seq?: number;
   quality_gate?: boolean;
+  meta?: Record<string, any>;
 }
 
 export async function listTasks(params?: { board_id?: string; status?: string; assignee_user_id?: string }): Promise<WorkTask[]> {
