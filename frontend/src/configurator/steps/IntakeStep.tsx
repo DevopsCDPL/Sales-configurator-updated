@@ -56,6 +56,7 @@ export default function IntakeStep(props: IntakeStepProps) {
     sourceScheme: props.initial?.sourceScheme ?? 'SINGLE',
     environment: props.initial?.environment ?? 'Indoor',
     specialEnvironment: props.initial?.specialEnvironment ?? 'None',
+    busMaterial: (props.initial?.busMaterial as any) ?? 'Copper',
     totalLoadHint: props.initial?.totalLoadHint ?? null,
     spdRequired: props.initial?.spdRequired ?? 'none',
     meteringScheme: props.initial?.meteringScheme ?? 'none',
@@ -214,6 +215,12 @@ export default function IntakeStep(props: IntakeStepProps) {
           <Field label="Special Environment">
             <Select size="small" value={intake.specialEnvironment} onChange={(e) => patch({ specialEnvironment: e.target.value as any })} sx={input} fullWidth>
               {['None', 'Corrosive', 'Marine', 'Dusty'].map((x) => <MenuItem key={x} value={x} sx={{ fontSize: 13 }}>{x}</MenuItem>)}
+            </Select>
+          </Field>
+          <Field label="Bus Material">
+            <Select size="small" value={intake.busMaterial ?? 'Copper'} onChange={(e) => patch({ busMaterial: e.target.value as any })} sx={input} fullWidth>
+              <MenuItem value="Copper" sx={{ fontSize: 13 }}>Copper (Cu)</MenuItem>
+              <MenuItem value="Aluminium" sx={{ fontSize: 13 }}>Aluminium (Al)</MenuItem>
             </Select>
           </Field>
         </Box>

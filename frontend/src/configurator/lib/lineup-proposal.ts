@@ -32,6 +32,7 @@ export interface IntakeInput {
   sourceCount?: number; // MULTI_SOURCE only
   environment: 'Indoor' | 'Outdoor';
   specialEnvironment: 'None' | 'Corrosive' | 'Marine' | 'Dusty';
+  busMaterial?: 'Copper' | 'Aluminium';   // customer preference; drives copper vs aluminium density/cost
   totalLoadHint?: number | null; // amps
   /* Design-driven provisions — auto-select SPD / metering / camlock / ATS.
    * All default to off so existing boards regenerate unchanged. */
@@ -95,6 +96,7 @@ export interface LineupProposal {
     sccrAssumed: boolean;
     nemaSuggestion: string;
     neutralPct: number;
+    busMaterial: string;
   };
   totalFeederLoadA: number;
   sections: ProposedSection[];
@@ -181,7 +183,7 @@ export function proposeLineup(
   if (!vs) {
     return {
       ok: false, errors: [`Unknown voltage system ${intake.voltageSystemCode}`], warnings,
-      boardPatch: { voltageSystemCode: intake.voltageSystemCode, mainBusRatingA: null, sccrKA: 0, sccrAssumed: false, nemaSuggestion: '1', neutralPct: 100 },
+      boardPatch: { voltageSystemCode: intake.voltageSystemCode, mainBusRatingA: null, sccrKA: 0, sccrAssumed: false, nemaSuggestion: '1', neutralPct: 100, busMaterial: intake.busMaterial ?? 'Copper' },
       totalFeederLoadA: 0, sections: [], unplaced: [],
     };
   }
@@ -350,6 +352,7 @@ export function proposeLineup(
       sccrAssumed,
       nemaSuggestion,
       neutralPct: busScheduleFor(std, mainBusRatingA ?? 0)?.neutralPct ?? 100,
+      busMaterial: intake.busMaterial ?? 'Copper',
     },
     totalFeederLoadA: Math.round(totalFeederLoadA * 10) / 10,
     sections,

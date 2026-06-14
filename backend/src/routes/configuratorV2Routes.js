@@ -1144,6 +1144,7 @@ router.post('/switchboards/:id/apply-proposal', wrap(async (req, res) => {
     if (boardPatch.sccrAssumed != null) bd.sccrAssumed = boardPatch.sccrAssumed;
     if (boardPatch.nemaSuggestion != null) bd.nemaType = bd.nemaType || boardPatch.nemaSuggestion;
     if (boardPatch.neutralPct != null) bd.neutralRating = boardPatch.neutralPct;
+    if (boardPatch.busMaterial != null) bd.busMaterial = boardPatch.busMaterial;
     if (boardPatch.totalFeederLoadA != null) bd.totalFeederLoadA = boardPatch.totalFeederLoadA;
     if (boardPatch.sldTopology != null) bd.sldTopology = boardPatch.sldTopology;
     await board.update(
