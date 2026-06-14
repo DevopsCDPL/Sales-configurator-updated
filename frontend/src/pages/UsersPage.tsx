@@ -727,7 +727,7 @@ const UsersPage: React.FC = () => {
             <CloseIcon fontSize="small" />
           </IconButton>
         </DialogTitle>
-        <DialogContent sx={{ px: 3.5, pt: 2.5, pb: 1 }}>
+        <DialogContent sx={{ px: 3.5, pb: 1, pt: '24px !important' }}>
           {dialogError && (
             <Alert severity="error" sx={{ mb: 2, borderRadius: '8px', fontSize: '0.8rem' }} onClose={() => setDialogError(null)}>
               {dialogError}

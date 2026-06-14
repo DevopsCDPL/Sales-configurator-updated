@@ -6,6 +6,10 @@ const { authenticate, authorize } = require('../middleware/auth');
 const { body } = require('express-validator');
 const { validate } = require('../middleware/validate');
 const { passwordStrength } = require('../middleware/passwordPolicy');
+const { DEPARTMENT_ROLES } = require('../middleware/departments');
+// Roles an admin may assign when creating/updating a user: base roles + the
+// 8 department roles (model enum already includes them).
+const ROLE_OPTIONS = ['main_admin', 'admin', 'user', 'sales_engineer', ...DEPARTMENT_ROLES];
 
 // Multer for avatar upload (memory storage — stored as base64 in DB)
 const avatarUpload = multer({
@@ -36,7 +40,7 @@ router.put(
     body('email').optional().isEmail().withMessage('Valid email is required'),
     body('phone').optional().isString().withMessage('Phone must be a string'),
     body('position').optional().isString().withMessage('Position must be a string'),
-    body('role').optional().isIn(['main_admin', 'admin', 'user', 'sales_engineer']).withMessage('Invalid role')
+    body('role').optional().isIn(ROLE_OPTIONS).withMessage('Invalid role')
   ]),
   userController.updateProfile
 );
@@ -66,7 +70,7 @@ router.post(
     body('name').trim().notEmpty().withMessage('Name is required'),
     body('email').isEmail().withMessage('Valid email is required'),
     passwordStrength('password'),
-    body('role').isIn(['main_admin', 'admin', 'user', 'sales_engineer']).withMessage('Invalid role'),
+    body('role').isIn(ROLE_OPTIONS).withMessage('Invalid role'),
   ]),
   userController.create
 );
@@ -78,7 +82,7 @@ router.put(
   validate([
     body('name').optional().notEmpty().withMessage('Name cannot be empty'),
     body('email').optional().isEmail().withMessage('Valid email is required'),
-    body('role').optional().isIn(['main_admin', 'admin', 'user', 'sales_engineer']).withMessage('Invalid role')
+    body('role').optional().isIn(ROLE_OPTIONS).withMessage('Invalid role')
   ]),
   userController.update
 );
