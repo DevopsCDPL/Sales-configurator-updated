@@ -32,11 +32,17 @@ const CO_ADMIN_SLOTS = [
  * - Admin: Can create User only
  * - User: No creation permissions
  */
+// The 8 department (shop-floor) roles — assignable by admin tiers.
+const DEPARTMENT_ROLES = [
+  'manufacturing', 'procurement', 'assembly', 'outsourcing',
+  'quality', 'packing', 'logistics', 'commissioning',
+];
+
 const ROLE_CREATION_MAP = {
-  platform_admin: ['main_admin', 'admin', 'sales_engineer'], // Platform Admin (full access)
-  co_admin: ['main_admin', 'admin', 'sales_engineer'],  // Owner/Co-owner
-  main_admin: ['main_admin', 'admin', 'sales_engineer'], // Super Admin (same as co_admin)
-  admin: ['admin', 'sales_engineer'],                     // Admin
+  platform_admin: ['main_admin', 'admin', 'sales_engineer', ...DEPARTMENT_ROLES], // Platform Admin (full access)
+  co_admin: ['main_admin', 'admin', 'sales_engineer', ...DEPARTMENT_ROLES],  // Owner/Co-owner
+  main_admin: ['main_admin', 'admin', 'sales_engineer', ...DEPARTMENT_ROLES], // Super Admin (same as co_admin)
+  admin: ['admin', 'sales_engineer', ...DEPARTMENT_ROLES],                     // Admin
   user: [],                                                       // No creation
   sales_engineer: [],                                              // No creation
 };
@@ -46,6 +52,9 @@ const ROLE_DISPLAY = {
   admin: 'Admin',
   sales_engineer: 'Sales Engineer',
   user: 'User',
+  manufacturing: 'Manufacturing', procurement: 'Procurement', assembly: 'Assembly',
+  outsourcing: 'Outsourcing', quality: 'Quality', packing: 'Packing',
+  logistics: 'Logistics', commissioning: 'Commissioning',
 };
 
 const ROLE_HIERARCHY = {
@@ -53,6 +62,8 @@ const ROLE_HIERARCHY = {
   admin: 70,
   sales_engineer: 30,
   user: 10,
+  manufacturing: 20, procurement: 20, assembly: 20, outsourcing: 20,
+  quality: 20, packing: 20, logistics: 20, commissioning: 20,
 };
 
 // Roles that are genuine User.role ENUM values (as opposed to
