@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -107,6 +108,7 @@ const ChatPage: React.FC = () => {
   // ── State ──────────────────────────────────────────────────────────────────
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConvo, setActiveConvo] = useState<Conversation | null>(null);
+  const location = useLocation();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [msgInput, setMsgInput] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -167,6 +169,16 @@ const ChatPage: React.FC = () => {
   useEffect(() => {
     loadConversations();
   }, [loadConversations]);
+
+  // Deep-link: open a conversation passed via navigation state (e.g. from Capacity → Operators message icon).
+  useEffect(() => {
+    const st = location.state as { openConvo?: Conversation } | null;
+    if (st && st.openConvo) {
+      setActiveConvo(st.openConvo);
+      window.history.replaceState({}, '');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Polling for new messages
   useEffect(() => {

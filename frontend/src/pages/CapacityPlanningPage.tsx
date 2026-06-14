@@ -3,7 +3,9 @@ import {
   Box, Typography, Grid, Tabs, Tab, TextField, MenuItem, Button, Table,
   TableHead, TableRow, TableCell, TableBody, IconButton, Chip, CircularProgress,
 } from '@mui/material';
-import { Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
+import { Delete as DeleteIcon, Add as AddIcon, MailOutline, ChatBubbleOutline } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
+import { chatService } from '../services/chatService';
 import { useAuth } from '../contexts/AuthContext';
 import { userManagementService, UserRecord } from '../services/userManagementService';
 import {
@@ -38,6 +40,18 @@ const DEPARTMENTS = [
 
 /* Seed machine / work-center types (editable free text too). */
 const MACHINE_TYPES = ['cnc_punch', 'press_brake', 'shear', 'plating', 'test_bay', 'assembly_bench', 'generic'];
+
+const GENERAL_SKILLS = ['Blueprint reading', 'Safety / LOTO', 'Quality awareness', 'Material handling'];
+const SKILLS_BY_DEPT: Record<string, string[]> = {
+  manufacturing: ['Sheet metal fab', 'Punching / CNC', 'Press brake', 'Welding', 'Bus bar fabrication', 'Painting / powder coat'],
+  assembly: ['Panel wiring', 'Busbar assembly', 'Torque to spec', 'Device mounting', 'Labeling', 'Control wiring'],
+  procurement: ['Vendor management', 'RFQ handling', 'Expediting', 'GRN / receiving'],
+  quality: ['Dimensional inspection', 'FAT', 'Hi-pot / dielectric test', 'Megger test', 'Continuity test', 'NCR handling'],
+  packing: ['Crating', 'Load securing', 'Export packing', 'Labeling'],
+  logistics: ['Dispatch planning', 'Carrier coordination', 'Bill of Lading', 'POD handling'],
+  outsourcing: ['Subcontractor coordination', 'Incoming inspection'],
+  commissioning: ['Site testing', 'Energization', 'Customer handover', 'Punch-list closure'],
+};
 
 /* sentence-case a snake/lower token for display. */
 const displayCase = (s: string) =>
@@ -77,6 +91,7 @@ const addBtnSx = {
 
 const CapacityPlanningPage: React.FC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const isAdmin = user?.role === 'main_admin' || user?.role === 'admin' || !!user?.is_co_admin;
 
   const [tab, setTab] = useState(0);
@@ -89,7 +104,7 @@ const CapacityPlanningPage: React.FC = () => {
 
   // Form state
   const [teamForm, setTeamForm] = useState({ name: '', department: DEPARTMENTS[0] });
-  const [workerForm, setWorkerForm] = useState({ user_id: '', team_id: '', skills: '', hours_per_day: 8 });
+  const [workerForm, setWorkerForm] = useState({ user_id: '', team_id: '', skills: [] as string[], hours_per_day: 8 });
   const [machineForm, setMachineForm] = useState({ name: '', type: MACHINE_TYPES[0], capacity_per_day: 8 });
   const [tasks, setTasks] = useState<WorkTask[]>([]);
   const [myTasks, setMyTasks] = useState<WorkTask[]>([]);
@@ -139,13 +154,13 @@ const CapacityPlanningPage: React.FC = () => {
         display_name: wu.name,
         department: team.department,
         team_id: team.id,
-        skills: workerForm.skills.split(',').map((s) => s.trim()).filter(Boolean),
+        skills: workerForm.skills,
         hours_per_day: Number(workerForm.hours_per_day) || 8,
       });
-      setWorkerForm({ user_id: '', team_id: '', skills: '', hours_per_day: 8 });
+      setWorkerForm({ user_id: '', team_id: '', skills: [], hours_per_day: 8 });
       await load();
     } catch (e: any) {
-      setError(e?.response?.data?.message || 'Failed to add worker.');
+      setError(e?.response?.data?.message || 'Failed to add operator.');
     } finally { setSaving(false); }
   };
 
@@ -230,6 +245,17 @@ const CapacityPlanningPage: React.FC = () => {
   const statusColor = (st: string) => (({ pending: '#64748B', ready: '#00c8ff', checked_in: '#D97706', done: '#22C55E', quality_hold: '#EF4444' }) as Record<string, string>)[st] || '#64748B';
   const miniBtnSx = { textTransform: 'none', fontSize: '0.72rem', color: C.blue, minWidth: 0, px: 1 } as const;
 
+  const selTeamDept = teams.find((t) => t.id === workerForm.team_id)?.department;
+  const skillOptions = (selTeamDept && SKILLS_BY_DEPT[selTeamDept]) || GENERAL_SKILLS;
+  const operatorEmail = (w: CapacityWorker) => users.find((u) => u.id === w.user_id)?.email || '';
+  const handleMessage = async (w: CapacityWorker) => {
+    if (!w.user_id) return;
+    try {
+      const convo = await chatService.getOrCreateDirect(w.user_id);
+      navigate('/messages', { state: { openConvo: convo } });
+    } catch (e: any) { setError(e?.response?.data?.message || 'Could not open chat.'); }
+  };
+
   const hasAll = teams.length > 0 && workers.length > 0 && machines.length > 0;
 
   if (!isAdmin) {
@@ -275,7 +301,7 @@ const CapacityPlanningPage: React.FC = () => {
             <Box sx={{ display: 'flex', gap: 1.25, alignItems: 'flex-start' }}>
               <Box sx={{ width: 9, height: 9, borderRadius: '50%', bgcolor: C.amber, mt: '5px', boxShadow: `0 0 6px ${C.amber}` }} />
               <Typography sx={{ color: C.sub, fontSize: '0.84rem', lineHeight: 1.4 }}>
-                Add at least one team, one worker and one machine / work center to get started.
+                Add at least one team, one operator and one machine / work center to get started.
                 The planner stays inert until your capacity setup is complete.
               </Typography>
             </Box>
@@ -295,7 +321,7 @@ const CapacityPlanningPage: React.FC = () => {
         }}
       >
         <Tab label={`Teams (${teams.length})`} />
-        <Tab label={`Workers (${workers.length})`} />
+        <Tab label={`Operators (${workers.length})`} />
         <Tab label={`Machines / work centers (${machines.length})`} />
         <Tab label={`Tasks (${tasks.length})`} />
         <Tab label={`My work (${myTasks.length})`} />
@@ -355,17 +381,17 @@ const CapacityPlanningPage: React.FC = () => {
             </Card>
           )}
 
-          {/* ── Workers ── */}
+          {/* ── Operators ── */}
           {tab === 1 && (
             <Card>
               {teams.length === 0 && (
                 <Typography sx={{ color: C.amber, fontSize: '0.78rem', mb: 1.5 }}>
-                  Add a team first — workers must be linked to a team.
+                  Add a team first — operators must be linked to a team.
                 </Typography>
               )}
               <Grid container spacing={1.5} sx={{ mb: 2 }} alignItems="flex-end">
                 <Grid item xs={12} sm={3}>
-                  <TextField fullWidth select size="small" label="Team member (user)" sx={fieldSx}
+                  <TextField fullWidth select size="small" label="Operator (user)" sx={fieldSx}
                     value={workerForm.user_id} onChange={(e) => setWorkerForm({ ...workerForm, user_id: e.target.value })}>
                     {users.length === 0 ? <MenuItem value="" disabled>Add a user first (Settings → Users)</MenuItem> : null}
                     {users.filter((u) => !workers.some((w) => w.user_id === u.id)).map((u) => (
@@ -380,8 +406,12 @@ const CapacityPlanningPage: React.FC = () => {
                   </TextField>
                 </Grid>
                 <Grid item xs={12} sm={3}>
-                  <TextField fullWidth size="small" label="Skills (comma sep, optional)" sx={fieldSx}
-                    value={workerForm.skills} onChange={(e) => setWorkerForm({ ...workerForm, skills: e.target.value })} />
+                  <TextField fullWidth select size="small" label="Skills" sx={fieldSx}
+                    value={workerForm.skills}
+                    onChange={(e) => setWorkerForm({ ...workerForm, skills: e.target.value as unknown as string[] })}
+                    SelectProps={{ multiple: true, renderValue: (sel) => (sel as string[]).join(', ') || 'None' }}>
+                    {skillOptions.map((sk) => <MenuItem key={sk} value={sk}>{sk}</MenuItem>)}
+                  </TextField>
                 </Grid>
                 <Grid item xs={6} sm={1.5}>
                   <TextField fullWidth size="small" type="number" label="Hrs/day" sx={fieldSx}
@@ -393,7 +423,7 @@ const CapacityPlanningPage: React.FC = () => {
                 </Grid>
               </Grid>
               {workers.length === 0 ? (
-                <Typography sx={{ color: C.sub, fontSize: '0.82rem' }}>No workers yet.</Typography>
+                <Typography sx={{ color: C.sub, fontSize: '0.82rem' }}>No operators yet.</Typography>
               ) : (
                 <Table size="small" sx={tableSx}>
                   <TableHead><TableRow>
@@ -402,6 +432,7 @@ const CapacityPlanningPage: React.FC = () => {
                     <TableCell sx={headCellSx}>Department</TableCell>
                     <TableCell sx={headCellSx}>Skills</TableCell>
                     <TableCell sx={headCellSx} align="right">Hrs/day</TableCell>
+                    <TableCell sx={headCellSx} align="right">Contact</TableCell>
                     <TableCell sx={headCellSx} align="right">Remove</TableCell>
                   </TableRow></TableHead>
                   <TableBody>
@@ -412,6 +443,18 @@ const CapacityPlanningPage: React.FC = () => {
                         <TableCell sx={{ color: `${C.sub} !important` }}>{displayCase(w.department)}</TableCell>
                         <TableCell sx={{ color: `${C.sub} !important` }}>{(w.skills && w.skills.length) ? w.skills.join(', ') : '—'}</TableCell>
                         <TableCell align="right">{w.hours_per_day}</TableCell>
+                        <TableCell align="right">
+                          {w.user_id ? (
+                            <IconButton size="small" onClick={() => handleMessage(w)} sx={{ color: C.sub, '&:hover': { color: C.blue } }} title="Message">
+                              <ChatBubbleOutline fontSize="small" />
+                            </IconButton>
+                          ) : null}
+                          {operatorEmail(w) ? (
+                            <IconButton size="small" component="a" href={`mailto:${operatorEmail(w)}`} sx={{ color: C.sub, '&:hover': { color: C.blue } }} title="Email">
+                              <MailOutline fontSize="small" />
+                            </IconButton>
+                          ) : null}
+                        </TableCell>
                         <TableCell align="right">
                           <IconButton size="small" onClick={() => handleDelete('worker', w.id)} sx={{ color: C.sub, '&:hover': { color: C.red } }}>
                             <DeleteIcon fontSize="small" />
